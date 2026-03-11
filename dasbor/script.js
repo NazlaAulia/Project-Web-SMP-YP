@@ -56,3 +56,43 @@ counter.innerText = target + "+";
 updateCount();
 
 });
+
+window.onload = function() {
+    let alumniIndex = 0;
+    const container = document.querySelector('.alumni-container');
+    const cards = document.querySelectorAll('.alumni-card');
+    const dots = document.querySelectorAll('.dot');
+
+    function updateSlider() {
+        // Rumus gesernya
+        container.style.transform = `translateX(-${alumniIndex * 100}%)`;
+        
+        // Update titik (dots)
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === alumniIndex);
+        });
+    }
+
+    // Fungsi buat ganti otomatis
+    function autoSlide() {
+        alumniIndex++;
+        if (alumniIndex >= cards.length) {
+            alumniIndex = 0;
+        }
+        updateSlider();
+    }
+
+    // Jalan otomatis tiap 5 detik
+    let timer = setInterval(autoSlide, 5000);
+
+    // Kalau dot diklik
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            alumniIndex = index;
+            updateSlider();
+            // Reset timer biar nggak langsung geser pas baru diklik
+            clearInterval(timer);
+            timer = setInterval(autoSlide, 5000);
+        });
+    });
+};

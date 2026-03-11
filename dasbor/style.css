@@ -242,3 +242,342 @@ header {
     color: #777;
     margin: 0;
 }
+
+/* Styling Dasar Menu */
+.menu li {
+    position: relative; /* Wajib ada biar dropdown nempel di bawahnya */
+    list-style: none;
+}
+
+/* Sembunyikan Dropdown Content secara default */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%; /* Pas di bawah menu utama */
+    left: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-radius: 0 0 10px 10px;
+    padding: 10px 0;
+    z-index: 1000;
+    border-top: 3px solid var(--secondary); /* Garis orange di atas dropdown */
+}
+
+/* Style isi pilihan dropdown */
+.dropdown-content li a {
+    color: #333 !important;
+    padding: 12px 20px;
+    display: block;
+    font-size: 14px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+/* Efek pas pilihan dropdown didekati kursor */
+.dropdown-content li a:hover {
+    background-color: #f5f5f5;
+    color: var(--secondary) !important;
+    padding-left: 25px; /* Efek geser sedikit ke kanan */
+}
+
+/* MUNCULKAN DROPDOWN SAAT HOVER */
+.dropdown:hover .dropdown-content {
+    display: block;
+    animation: slideDown 0.3s ease; /* Animasi muncul pelan */
+}
+
+/* Animasi Slide Down */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sambutan {
+    padding: 100px 0;
+    margin-top: 50px;
+}
+
+.sambutan-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+}
+
+.sambutan-img {
+    flex: 1;
+    position: relative;
+}
+
+.sambutan-img img {
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: 20px 20px 0px var(--primary); /* Variasi shadow kotak teal */
+}
+
+.name-tag {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    background: var(--secondary);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.name-tag h4 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.name-tag p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.sambutan-text {
+    flex: 1.2;
+}
+
+.sambutan-text span {
+    color: var(--secondary);
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.sambutan-text h2 {
+    font-size: 40px;
+    color: var(--primary);
+    margin: 10px 0;
+}
+
+.sambutan-text h2 span {
+    color: var(--secondary);
+}
+
+.sambutan-text .line {
+    width: 60px;
+    height: 4px;
+    background: var(--primary);
+    margin-bottom: 25px;
+}
+
+.sambutan-text p {
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.quote-icon {
+    font-size: 50px;
+    color: #eee;
+    text-align: right;
+}
+
+/* Responsif buat HP */
+@media (max-width: 768px) {
+    .sambutan-wrapper {
+        flex-direction: column;
+        text-align: center;
+    }
+    .sambutan-text .line {
+        margin: 0 auto 25px;
+    }
+    .name-tag {
+        position: static;
+        margin-top: 20px;
+    }
+}
+
+.sambutan p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 15px;
+    text-align: justify; /* Ini bikin lurus di kiri DAN kanan */
+}
+
+.pengumuman {
+    padding: 80px 0;
+}
+
+.announcement-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.announcement-card {
+    background: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.announcement-card:hover {
+    transform: translateY(-10px);
+}
+
+.a-img {
+    position: relative;
+    height: 220px;
+}
+
+.a-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.category-label {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--secondary);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.a-content {
+    padding: 25px;
+}
+
+.a-meta {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.a-content h4 {
+    color: var(--primary);
+    font-size: 18px;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.a-content p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.read-more {
+    color: var(--secondary);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.read-more:hover {
+    letter-spacing: 1px;
+}
+
+.alumni-section {
+    padding: 100px 0;
+    background: #fcfcfc;
+}
+
+.alumni-slider {
+    max-width: 800px;
+    margin: 40px auto 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.alumni-container {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.alumni-card {
+    min-width: 100%;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.quote-top {
+    font-size: 40px;
+    color: var(--secondary);
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.alumni-text {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 30px;
+}
+
+.alumni-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.alumni-profile img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary);
+}
+
+.alumni-info {
+    text-align: left;
+}
+
+.alumni-info h4 {
+    margin: 0;
+    color: var(--primary);
+}
+
+.alumni-info span {
+    font-size: 13px;
+    color: #888;
+}
+
+/* Navigasi Titik */
+.slider-dots {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.dot {
+    height: 12px;
+    width: 12px;
+    margin: 0 5px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.dot.active {
+    background-color: var(--secondary);
+    width: 30px;
+    border-radius: 10px;
+}
