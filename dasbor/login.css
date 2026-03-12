@@ -1,0 +1,176 @@
+/* LOGIN CSS - SATUAN REM (RESPONSIF)
+   TEMA: GRADASI HIJAU-KEBIRUAN (TEAL LUXURY)
+*/
+
+:root {
+    /* Gradasi Hijau-Biru */
+    --primary: #07484a;     /* Teal Tua */
+    --primary-light: #0b6a6d; /* Teal Muda */
+    --secondary: #f39c12;   /* Orange Aksen */
+    --white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    /* Gradasi Background Body */
+    background: linear-gradient(135deg, #07484a 0%, #042a2b 100%);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 26.25rem; /* 420px */
+    padding: 1.25rem;    /* 20px */
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2.5rem;      /* 40px */
+    border-radius: 1.25rem; /* 20px */
+    box-shadow: 0 1.25rem 2.5rem rgba(0,0,0,0.3);
+    text-align: center;
+    backdrop-filter: blur(0.625rem);
+    border: 0.0625rem solid rgba(255,255,255,0.2);
+}
+
+.login-header img {
+    width: 5.625rem;     /* 90px */
+    margin-bottom: 0.9375rem;
+}
+
+.login-header h2 {
+    color: var(--primary);
+    font-size: 1.5rem;    /* 24px */
+    margin-bottom: 0.3125rem;
+}
+
+.login-header p {
+    color: #666;
+    font-size: 0.875rem;  /* 14px */
+    margin-bottom: 1.875rem;
+}
+
+/* Input Styles */
+.input-group {
+    position: relative;
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.8125rem; /* 13px */
+    color: var(--primary);
+    font-weight: bold;
+    margin-bottom: 0.75rem; /* 12px */
+    margin-top: 0.625rem;   /* 10px */
+    margin-left: 0.3125rem;
+}
+
+.input-field {
+    position: relative;
+}
+
+.input-field i {
+    position: absolute;
+    left: 0.9375rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.input-field input, .select-role {
+    width: 100%;
+    padding: 0.75rem 0.9375rem 0.75rem 2.8125rem; /* 12px 15px 12px 45px */
+    border: 0.125rem solid #eee;
+    border-radius: 0.625rem; /* 10px */
+    outline: none;
+    transition: 0.3s;
+    font-size: 0.875rem;
+    background: white;
+}
+
+.input-field input:focus, .select-role:focus {
+    /* Border berubah jadi gradasi hijau saat fokus */
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0.5rem rgba(11, 106, 109, 0.2);
+}
+
+.input-field input:focus + i {
+    color: var(--primary-light);
+}
+
+/* Button MASUK - Gradasi Hijau-Biru */
+.btn-login {
+    width: 100%;
+    padding: 0.875rem;    /* 14px */
+    background: linear-gradient(to right, #07484a, #0b6a6d);
+    color: white;
+    border: none;
+    border-radius: 0.625rem;
+    font-weight: bold;
+    font-size: 1rem;      /* 16px */
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0.3125rem 0.9375rem rgba(7, 72, 74, 0.3);
+    margin-top: 0.625rem;
+}
+
+.btn-login:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.5rem 1.25rem rgba(7, 72, 74, 0.4);
+    filter: brightness(1.2);
+}
+
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    margin-bottom: 1.5625rem;
+}
+
+.login-options a {
+    color: var(--secondary);
+    text-decoration: none;
+}
+
+.back-home {
+    margin-top: 1.5625rem;
+    display: block;
+    font-size: 0.875rem;
+    color: #888;
+    text-decoration: none;
+}
+
+.back-home:hover {
+    color: var(--primary);
+}
+
+/* Dropdown Custom Arrow */
+.select-role {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+.input-field.has-dropdown::after {
+    content: '\f107'; 
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 0.9375rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    pointer-events: none;
+}

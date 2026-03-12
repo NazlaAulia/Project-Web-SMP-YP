@@ -1,6 +1,11 @@
+/* CSS FULL - SATUAN REM (RESPONSIF)
+   WARNA TETAP ASLI (TEAL & ORANGE)
+   LAYOUT TIDAK BERUBAH
+*/
+
 :root {
-    --primary: #07484a; /* Teal gelap sesuai gambar */
-    --secondary: #f5a425; /* Gold/Orange */
+    --primary: #07484a; /* Teal gelap sesuai gambar asli */
+    --secondary: #f5a425; /* Gold/Orange asli */
     --white: #ffffff;
     --text-light: #f4f4f4;
 }
@@ -9,21 +14,22 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     overflow-x: hidden;
+    line-height: 1.6;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 75rem; /* 1200px */
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 1.25rem; /* 20px */
 }
 
 /* TOP BAR */
 .top-bar {
     background: var(--primary);
     color: var(--white);
-    padding: 10px 0;
-    font-size: 13px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 0.625rem 0; /* 10px */
+    font-size: 0.8125rem; /* 13px */
+    border-bottom: 0.0625rem solid rgba(255,255,255,0.1);
 }
 
 .top-content {
@@ -32,23 +38,23 @@ body {
 }
 
 .contact-info span {
-    margin-right: 20px;
+    margin-right: 1.25rem; /* 20px */
 }
 
 .contact-info i, .social-links i {
     color: var(--secondary);
-    margin-right: 5px;
+    margin-right: 0.3125rem; /* 5px */
 }
 
 .social-links a {
     color: white;
-    margin-left: 15px;
+    margin-left: 0.9375rem; /* 15px */
 }
 
 /* NAVBAR */
 header {
     background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0.125rem 0.625rem rgba(0,0,0,0.1); /* 2px 10px */
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -58,27 +64,27 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 0;
+    padding: 0.9375rem 0; /* 15px */
 }
 
 .brand-name {
-    font-size: 24px;
+    font-size: 1.5rem; /* 24px */
     font-weight: bold;
     color: var(--primary);
-    letter-spacing: 1px;
+    letter-spacing: 0.0625rem; /* 1px */
 }
 
 .menu {
     display: flex;
     list-style: none;
-    gap: 30px;
+    gap: 1.875rem; /* 30px */
 }
 
 .menu a {
     text-decoration: none;
     color: #333;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 0.9375rem; /* 15px */
     transition: 0.3s;
 }
 
@@ -89,18 +95,19 @@ header {
 .apply-btn {
     background: var(--secondary);
     color: white;
-    padding: 10px 25px;
-    border-radius: 30px;
+    padding: 0.625rem 1.5625rem; /* 10px 25px */
+    border-radius: 1.875rem; /* 30px */
     text-decoration: none;
     font-weight: bold;
-    margin-left: 20px;
+    margin-left: 1.25rem; /* 20px */
 }
 
 /* HERO SECTION */
 .hero {
     position: relative;
     height: 80vh;
-    min-height: 600px;
+    min-height: 37.5rem;
+    margin-bottom: 8rem; /* Tambahkan margin bawah yang cukup besar (sekitar 128px) */
 }
 
 .hero-slider {
@@ -130,7 +137,7 @@ header {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(7, 72, 74, 0.7); /* Overlay teal transparan */
+    background: rgba(7, 72, 74, 0.7); /* Kembali ke Teal Transparan */
 }
 
 .hero-content {
@@ -141,19 +148,19 @@ header {
     transform: translate(-50%, -50%);
     text-align: center;
     color: white;
-    max-width: 800px;
+    max-width: 50rem; /* 800px */
 }
 
 .hero-content h3 {
     color: var(--secondary);
-    letter-spacing: 3px;
-    margin-bottom: 20px;
+    letter-spacing: 0.1875rem; /* 3px */
+    margin-bottom: 1.25rem; /* 20px */
 }
 
 .hero-content h1 {
-    font-size: 60px;
+    font-size: 3.75rem; /* 60px */
     line-height: 1.1;
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem; /* 20px */
 }
 
 .hero-content h1 span {
@@ -161,80 +168,94 @@ header {
 }
 
 .hero-btns {
-    margin-top: 30px;
+    margin-top: 1.875rem; /* 30px */
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 0.9375rem; /* 15px */
 }
 
 .btn-main {
     background: var(--secondary);
     color: white;
-    padding: 15px 35px;
+    padding: 0.9375rem 2.1875rem; /* 15px 35px */
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 0.3125rem; /* 5px */
     font-weight: bold;
 }
 
 .btn-sub {
     background: white;
     color: var(--primary);
-    padding: 15px 35px;
+    padding: 0.9375rem 2.1875rem; /* 15px 35px */
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 0.3125rem; /* 5px */
     font-weight: bold;
 }
 
 /* STATS CARDS */
+/* STATS CARDS */
 .stats-container {
     position: absolute;
-    bottom: -100px;
+    /* Ubah dari -6.25rem (-100px) menjadi -3rem atau lebih kecil */
+    bottom: -10rem; 
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 20px;
+    gap: 1.25rem;
     z-index: 20;
     width: 100%;
 }
 
+/* STATS CARDS */
 .stat-card {
     background: white;
     flex: 1;
-    padding: 30px;
-    border-radius: 20px 20px 20px 0px; /* Bentuk unik sesuai gambar */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 1.875rem;
+    border-radius: 1.25rem 1.25rem 1.25rem 0;
+    box-shadow: 0 0.625rem 1.875rem rgba(0,0,0,0.1);
     text-align: left;
     position: relative;
-    transition: 0.3s;
-    border-bottom: 5px solid var(--primary);
-}
-
-.stat-card.orange {
-    border-bottom: 5px solid var(--secondary);
+    
+    /* TRANSISI MAJU: Pakai scale dan cubic-bezier agar halus */
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+    border-bottom: 0.3125rem solid var(--primary);
+    will-change: transform;
 }
 
 .stat-card:hover {
-    transform: translateY(-10px);
+    /* MAJU: Skala diperbesar 5% (1.05) */
+    /* Kita hilangkan translateY agar tidak naik ke atas */
+    transform: scale(1.05); 
+    
+    /* Bayangan dibikin lebih tebal saat maju biar efek 3D-nya berasa */
+    box-shadow: 0 1.25rem 3.125rem rgba(0,0,0,0.2);
+    z-index: 30; /* Biar kartu yang di-hover menutupi bayangan kartu sebelahnya */
 }
+
+.stat-card.orange {
+    border-bottom: 0.3125rem solid var(--secondary); /* 5px */
+}
+
+
 
 .stat-num {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 40px;
+    top: 1.25rem;
+    right: 1.25rem;
+    font-size: 2.5rem; /* 40px */
     font-weight: bold;
     color: #eee;
 }
 
 .stat-icon {
-    font-size: 40px;
+    font-size: 2.5rem; /* 40px */
     color: var(--primary);
-    margin-bottom: 15px;
+    margin-bottom: 0.9375rem; /* 15px */
 }
 
 .stat-card h2 {
-    font-size: 35px;
-    margin: 10px 0;
+    font-size: 2.1875rem; /* 35px */
+    margin: 0.625rem 0; /* 10px */
     color: #333;
 }
 
@@ -243,71 +264,58 @@ header {
     margin: 0;
 }
 
-/* Styling Dasar Menu */
+/* DROPDOWN MENU */
 .menu li {
-    position: relative; /* Wajib ada biar dropdown nempel di bawahnya */
-    list-style: none;
+    position: relative;
 }
 
-/* Sembunyikan Dropdown Content secara default */
 .dropdown-content {
     display: none;
     position: absolute;
-    top: 100%; /* Pas di bawah menu utama */
+    top: 100%;
     left: 0;
     background-color: white;
-    min-width: 200px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    border-radius: 0 0 10px 10px;
-    padding: 10px 0;
+    min-width: 12.5rem; /* 200px */
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1); /* 8px 16px */
+    border-radius: 0 0 0.625rem 0.625rem; /* 10px */
+    padding: 0.625rem 0; /* 10px */
     z-index: 1000;
-    border-top: 3px solid var(--secondary); /* Garis orange di atas dropdown */
+    border-top: 0.1875rem solid var(--secondary); /* 3px */
 }
 
-/* Style isi pilihan dropdown */
 .dropdown-content li a {
     color: #333 !important;
-    padding: 12px 20px;
+    padding: 0.75rem 1.25rem; /* 12px 20px */
     display: block;
-    font-size: 14px;
-    text-decoration: none;
-    transition: 0.3s;
+    font-size: 0.875rem; /* 14px */
 }
 
-/* Efek pas pilihan dropdown didekati kursor */
 .dropdown-content li a:hover {
     background-color: #f5f5f5;
     color: var(--secondary) !important;
-    padding-left: 25px; /* Efek geser sedikit ke kanan */
+    padding-left: 1.5625rem; /* 25px */
 }
 
-/* MUNCULKAN DROPDOWN SAAT HOVER */
 .dropdown:hover .dropdown-content {
     display: block;
-    animation: slideDown 0.3s ease; /* Animasi muncul pelan */
+    animation: slideDown 0.3s ease;
 }
 
-/* Animasi Slide Down */
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(0.625rem); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
+/* SAMBUTAN */
 .sambutan {
-    padding: 100px 0;
-    margin-top: 50px;
+    padding: 6.25rem 0; /* 100px */
+    margin-top: 3.125rem; /* 50px */
 }
 
 .sambutan-wrapper {
     display: flex;
     align-items: center;
-    gap: 60px;
+    gap: 3.75rem; /* 60px */
 }
 
 .sambutan-img {
@@ -317,30 +325,34 @@ header {
 
 .sambutan-img img {
     width: 100%;
-    border-radius: 20px;
-    box-shadow: 20px 20px 0px var(--primary); /* Variasi shadow kotak teal */
+    border-radius: 1.25rem; /* 20px */
+    box-shadow: 1.25rem 1.25rem 0 var(--primary); /* 20px */
+}
+
+.sambutan {
+    padding: 6.25rem 0; /* Pastikan padding atasnya cukup (100px) */
+    margin-top: 5rem;    /* Kasih margin tambahan agar benar-benar terpisah */
 }
 
 .name-tag {
     position: absolute;
-    bottom: -20px;
-    right: -20px;
+    bottom: -1.25rem; /* -20px */
+    right: -1.25rem; /* -20px */
     background: var(--secondary);
     color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    padding: 1.25rem; /* 20px */
+    border-radius: 0.625rem; /* 10px */
+    box-shadow: 0 0.625rem 1.25rem rgba(0,0,0,0.1);
 }
 
 .name-tag h4 {
     margin: 0;
-    font-size: 18px;
+    font-size: 1.125rem; /* 18px */
 }
 
 .name-tag p {
-    margin: 5px 0 0;
-    font-size: 14px;
-    opacity: 0.9;
+    margin: 0.3125rem 0 0; /* 5px */
+    font-size: 0.875rem; /* 14px */
 }
 
 .sambutan-text {
@@ -350,88 +362,68 @@ header {
 .sambutan-text span {
     color: var(--secondary);
     font-weight: bold;
-    letter-spacing: 2px;
+    letter-spacing: 0.125rem; /* 2px */
 }
 
 .sambutan-text h2 {
-    font-size: 40px;
+    font-size: 2.5rem; /* 40px */
     color: var(--primary);
-    margin: 10px 0;
-}
-
-.sambutan-text h2 span {
-    color: var(--secondary);
+    margin: 0.625rem 0;
 }
 
 .sambutan-text .line {
-    width: 60px;
-    height: 4px;
+    width: 3.75rem; /* 60px */
+    height: 0.25rem; /* 4px */
     background: var(--primary);
-    margin-bottom: 25px;
+    margin-bottom: 1.5625rem; /* 25px */
 }
 
 .sambutan-text p {
     line-height: 1.8;
-    color: #555;
-    margin-bottom: 20px;
-    font-style: italic;
-}
-
-.quote-icon {
-    font-size: 50px;
-    color: #eee;
-    text-align: right;
-}
-
-/* Responsif buat HP */
-@media (max-width: 768px) {
-    .sambutan-wrapper {
-        flex-direction: column;
-        text-align: center;
-    }
-    .sambutan-text .line {
-        margin: 0 auto 25px;
-    }
-    .name-tag {
-        position: static;
-        margin-top: 20px;
-    }
-}
-
-.sambutan p {
-    font-size: 16px;
-    line-height: 1.8;
     color: #444;
-    margin-bottom: 15px;
-    text-align: justify; /* Ini bikin lurus di kiri DAN kanan */
+    margin-bottom: 0.9375rem; /* 15px */
+    text-align: justify;
 }
 
+/* PENGUMUMAN */
+/* PENGUMUMAN */
 .pengumuman {
-    padding: 80px 0;
-}
-
-.announcement-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    margin-top: 40px;
+    padding: 5rem 0;
+    background-color: var(--light-bg);
 }
 
 .announcement-card {
     background: #fff;
-    border-radius: 15px;
+    border-radius: 0.9375rem;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    transition: 0.3s;
+    box-shadow: 0 0.625rem 1.875rem rgba(0,0,0,0.05);
+    
+    /* BIAR HALUS: Tambahkan timing function 'ease-out' atau 'cubic-bezier' */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+    will-change: transform; /* Ngasih tau browser biar siap-siap animasi */
 }
 
 .announcement-card:hover {
-    transform: translateY(-10px);
+    /* Pakai nilai rem yang pas, jangan terlalu ekstrem */
+    transform: translateY(-0.5rem); 
+    box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.1);
+}
+
+.announcement-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18.75rem, 1fr)); /* 300px */
+    gap: 1.875rem; /* 30px */
+    margin-top: 2.5rem; /* 40px */
+}
+
+
+.announcement-card:hover {
+    transform: translateY(-0.625rem); /* -10px */
 }
 
 .a-img {
     position: relative;
-    height: 220px;
+    height: 13.75rem; /* 220px */
 }
 
 .a-img img {
@@ -442,60 +434,34 @@ header {
 
 .category-label {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 0.9375rem;
+    right: 0.9375rem;
     background: var(--secondary);
     color: white;
-    padding: 5px 15px;
-    border-radius: 50px;
-    font-size: 12px;
-    font-weight: bold;
+    padding: 0.3125rem 0.9375rem;
+    border-radius: 3.125rem; /* 50px */
+    font-size: 0.75rem;
 }
 
 .a-content {
-    padding: 25px;
-}
-
-.a-meta {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 10px;
+    padding: 1.5625rem; /* 25px */
 }
 
 .a-content h4 {
     color: var(--primary);
-    font-size: 18px;
-    margin-bottom: 12px;
-    line-height: 1.4;
+    font-size: 1.125rem; /* 18px */
+    margin-bottom: 0.75rem; /* 12px */
 }
 
-.a-content p {
-    color: #666;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-
-.read-more {
-    color: var(--secondary);
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-.read-more:hover {
-    letter-spacing: 1px;
-}
-
+/* ALUMNI SECTION */
 .alumni-section {
-    padding: 100px 0;
+    padding: 6.25rem 0; /* 100px */
     background: #fcfcfc;
 }
 
 .alumni-slider {
-    max-width: 800px;
-    margin: 40px auto 0;
+    max-width: 50rem; /* 800px */
+    margin: 2.5rem auto 0;
     position: relative;
     overflow: hidden;
 }
@@ -508,76 +474,169 @@ header {
 .alumni-card {
     min-width: 100%;
     background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+    padding: 2.5rem; /* 40px */
+    border-radius: 1.25rem; /* 20px */
+    box-shadow: 0 0.9375rem 2.5rem rgba(0,0,0,0.05);
     text-align: center;
     box-sizing: border-box;
 }
 
 .quote-top {
-    font-size: 40px;
+    font-size: 2.5rem; /* 40px */
     color: var(--secondary);
-    margin-bottom: 20px;
-    opacity: 0.3;
+    margin-bottom: 1.25rem;
 }
 
 .alumni-text {
-    font-size: 18px;
+    font-size: 1.125rem; /* 18px */
     line-height: 1.8;
     color: #555;
     font-style: italic;
-    margin-bottom: 30px;
-}
-
-.alumni-profile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
+    margin-bottom: 1.875rem; /* 30px */
 }
 
 .alumni-profile img {
-    width: 60px;
-    height: 60px;
+    width: 3.75rem; /* 60px */
+    height: 3.75rem;
     border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--primary);
-}
-
-.alumni-info {
-    text-align: left;
-}
-
-.alumni-info h4 {
-    margin: 0;
-    color: var(--primary);
-}
-
-.alumni-info span {
-    font-size: 13px;
-    color: #888;
-}
-
-/* Navigasi Titik */
-.slider-dots {
-    text-align: center;
-    margin-top: 30px;
-}
-
-.dot {
-    height: 12px;
-    width: 12px;
-    margin: 0 5px;
-    background-color: #bbb;
-    border-radius: 50%;
-    display: inline-block;
-    cursor: pointer;
-    transition: 0.3s;
+    border: 0.1875rem solid var(--primary); /* 3px */
 }
 
 .dot.active {
     background-color: var(--secondary);
-    width: 30px;
-    border-radius: 10px;
+    width: 1.875rem; /* 30px */
+    border-radius: 0.625rem; /* 10px */
+}
+
+/* Responsif buat HP */
+@media (max-width: 48rem) { /* 768px */
+    .sambutan-wrapper {
+        flex-direction: column;
+        text-align: center;
+    }
+    .stats-container {
+        position: static;
+        transform: none;
+        flex-direction: column;
+        margin-top: 1.25rem;
+    }
+}
+
+/* KODE ANTI BUNDER-BUNDER (TARUH PALING BAWAH) */
+header li, 
+.menu li, 
+.dropdown-content li {
+    list-style: none !important;
+    list-style-type: none !important;
+}
+
+.dropdown-content {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* --- MODERN PROFILE DESIGN --- */
+.profile-hero {
+    background: linear-gradient(rgba(7, 72, 74, 0.9), rgba(7, 72, 74, 0.9)), url('gambar-sekolah.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 5rem 0;
+    text-align: center;
+    color: white;
+    margin-bottom: 3rem;
+}
+
+.profile-hero h1 { font-size: 3rem; margin-bottom: 0.5rem; }
+.profile-hero p { font-size: 1.2rem; opacity: 0.8; }
+
+.content-card {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.05);
+    padding: 3rem;
+    margin-bottom: 3rem;
+    border: 1px solid #eee;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    color: var(--primary);
+}
+
+.card-header i { font-size: 2rem; color: var(--secondary); }
+
+.highlight-text {
+    font-size: 1.25rem;
+    color: var(--primary);
+    font-weight: 500;
+    border-left: 4px solid var(--secondary);
+    padding-left: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.history-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.history-info {
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 1rem;
+}
+
+.history-info h3 { color: var(--primary); margin-bottom: 0.5rem; font-size: 1.1rem; }
+
+/* VISI MISI STYLING */
+.visi-card {
+    background: var(--primary);
+    padding: 4rem 2rem;
+    border-radius: 2rem;
+    color: white;
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.visi-card span { color: var(--secondary); text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+.visi-card h2 { font-size: 2rem; margin-top: 1rem; line-height: 1.4; }
+
+.misi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 2rem;
+}
+
+.misi-box {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    text-align: center;
+    transition: 0.4s;
+    border: 1px solid #eee;
+}
+
+.misi-box:hover {
+    transform: translateY(-10px);
+    border-color: var(--secondary);
+    box-shadow: 0 1.5rem 3rem rgba(0,0,0,0.1);
+}
+
+.misi-icon {
+    width: 4rem;
+    height: 4rem;
+    background: #fdf4e6;
+    color: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    font-size: 1.5rem;
 }
