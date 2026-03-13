@@ -640,3 +640,98 @@ header li,
     margin: 0 auto 1.5rem;
     font-size: 1.5rem;
 }
+
+.kontak-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr; /* Info kiri agak kecil, Form kanan lebih lebar */
+    gap: 40px;
+    margin-top: 30px;
+}
+
+.kontak-info-box {
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 20px;
+}
+
+.info-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.info-item i {
+    font-size: 1.5rem;
+    color: #f5a425; /* Warna orange/kuning dasbor */
+    margin-top: 5px;
+}
+
+.info-item h4 {
+    margin: 0;
+    color: #07484a; /* Warna teal */
+    font-size: 1.1rem;
+}
+
+.info-item p {
+    margin: 5px 0 0;
+    font-size: 0.95rem;
+    color: #666;
+}
+
+/* FORM STYLING */
+.kontak-form {
+    padding: 20px 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input, 
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: inherit;
+    transition: 0.3s;
+}
+
+.form-group input:focus, 
+.form-group textarea:focus {
+    border-color: #07484a;
+    outline: none;
+    box-shadow: 0 0 8px rgba(7, 72, 74, 0.1);
+}
+
+.btn-kirim {
+    background: #07484a;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-kirim:hover {
+    background: #f5a425;
+    color: #07484a;
+    transform: translateY(-3px);
+}
+
+/* Responsif HP */
+@media (max-width: 768px) {
+    .kontak-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
+

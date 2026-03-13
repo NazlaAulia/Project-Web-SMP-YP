@@ -1,176 +1,165 @@
-/* LOGIN CSS - SATUAN REM (RESPONSIF)
-   TEMA: GRADASI HIJAU-KEBIRUAN (TEAL LUXURY)
-*/
-
+/* --- MODERN LOGIN STYLES --- */
 :root {
-    /* Gradasi Hijau-Biru */
-    --primary: #07484a;     /* Teal Tua */
-    --primary-light: #0b6a6d; /* Teal Muda */
-    --secondary: #f39c12;   /* Orange Aksen */
-    --white: #ffffff;
+    --primary-mulus: #07484a; /* Teal Dasbor */
+    --secondary-mulus: #f5a425; /* Gold/Orange Dasbor */
+    --white-mulus: #ffffff;
+    --text-dark: #333333;
 }
 
-* {
+/* GANTI BACKGROUND BIAR GAK PUTIH POLOS */
+body.login-mulus-page {
+    font-family: 'Segoe UI', sans-serif;
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f3f2; /* Warna abu soft dasbor biar card-nya 'keluar' */
 }
 
-body {
-    /* Gradasi Background Body */
-    background: linear-gradient(135deg, #07484a 0%, #042a2b 100%);
-    height: 100vh;
+/* CONTAINER split screen */
+.split-container {
+    max-width: 65rem; /* 1040px - Lebih ramping koyok card gambarmu */
+    width: 90%;
+    display: flex;
+    background: var(--white-mulus);
+    border-radius: 1.5rem; /* Pojokane bunder koyok gambarmu */
+    overflow: hidden; /* Ben gambar tengen melu bunder */
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.1);
+}
+
+/* PANEL KIRI: FORM LOGIN (Card Putih Keluwaran) */
+.login-form-panel {
+    flex: 1; /* Sedikit lebih lebar */
+    padding: 3rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--white-mulus); /* Putih card */
 }
 
-.login-container {
+.form-wrapper { width: 100%; max-width: 28rem; }
+.form-header { text-align: center; margin-bottom: 2rem; }
+.form-logo { width: 5rem; margin-bottom: 0.5rem; }
+.form-header h2 { color: var(--primary-mulus); margin: 0; font-size: 1.8rem; }
+
+/* INPUT STYLES (Bunder koyok gambarmu) */
+.input-group { margin-bottom: 1rem; }
+.input-group label { display: block; margin-bottom: 0.3rem; color: #666; font-size: 0.9rem; }
+.input-field {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 3rem; /* Pojokane bunder koyok gambarmu */
+    padding: 0.8rem 1.2rem;
+    background: #fdfdfd;
+}
+.input-field i { color: #aaa; margin-right: 1rem; font-size: 1.1rem; }
+.input-field input { border: none; width: 100%; font-size: 1rem; color: var(--text-dark); }
+.input-field input:focus { outline: none; }
+
+/* OPTIONS & BUTTON */
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    color: #555;
+}
+.forgot-link { text-decoration: none; color: var(--primary-mulus); font-weight: 500; }
+
+/* TOMBOL KUNING DENGAN EFEK CLICK */
+.btn-login-main {
     width: 100%;
-    max-width: 26.25rem; /* 420px */
-    padding: 1.25rem;    /* 20px */
+    border: none;
+    padding: 1rem;
+    border-radius: 3rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-.login-box {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 2.5rem;      /* 40px */
-    border-radius: 1.25rem; /* 20px */
-    box-shadow: 0 1.25rem 2.5rem rgba(0,0,0,0.3);
+.btn-yellow {
+    background: var(--secondary-mulus); /* Kuning/Orange Dasbor */
+    color: var(--primary-mulus); /* Teal Dasbor (Biar tulisan tetep jelas) */
+}
+
+.btn-yellow:hover {
+    background: #d48b1c; /* Kuning rada gelap pas di-hover */
+}
+
+/* EFEK CLICK: Berubah warna saat dipencet */
+.btn-yellow:active {
+    background: var(--primary-mulus); /* Berubah dadi Teal pas dipencet */
+    color: var(--white-mulus); /* Tulisan dadi Putih */
+    transform: scale(0.98); /* Sedikit mengecil koyok dipencet beneran */
+}
+
+.back-link {
+    display: block;
     text-align: center;
-    backdrop-filter: blur(0.625rem);
-    border: 0.0625rem solid rgba(255,255,255,0.2);
+    margin-top: 1.5rem;
+    text-decoration: none;
+    color: var(--primary-mulus);
+    font-weight: 500;
 }
 
-.login-header img {
-    width: 5.625rem;     /* 90px */
-    margin-bottom: 0.9375rem;
+/* PANEL KANAN: GAMBAR TETEP + TEXT SLIDER + TANSISI MULUS */
+.login-image-panel-fixed {
+    flex: 1.2; /* Sedikit lebih sempit */
+    background-image: url('img/gerbang-cover-website.webp'); /* FOTO GERBANG TETEP CETHHO */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    position: relative; /* Nggo penempatan overlay & slider */
+    overflow: hidden; /* Ben teks slider gak keluar */
+    color: var(--white-mulus);
+    padding: 3rem;
 }
 
-.login-header h2 {
-    color: var(--primary);
-    font-size: 1.5rem;    /* 24px */
-    margin-bottom: 0.3125rem;
+/* OVERLAY GRADASI (Transparan biar gambar gerbang ketok cetho) */
+.background-overlay-mulus {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(7, 72, 74, 0.7) 0%, rgba(4, 42, 43, 0.8) 100%); /* Gradasi Teal-Black rada tipis */
+    z-index: 1; /* Di bawah slider */
 }
 
-.login-header p {
-    color: #666;
-    font-size: 0.875rem;  /* 14px */
-    margin-bottom: 1.875rem;
-}
-
-/* Input Styles */
-.input-group {
+/* CONTAINER SLIDER */
+.slider-wrapper {
     position: relative;
-    margin-bottom: 1.25rem;
+    z-index: 10; /* Di atas overlay */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ELEMEN SLIDE */
+.slide {
+    display: none; /* Mateni kabeh slide dhisik */
+    opacity: 0; /* Mulai dadi transparan */
+    transition: opacity 1s ease-in-out; /* Tansisi LEMBUT lan mulus koyok gambarmu */
     text-align: left;
 }
 
-.input-group label {
-    display: block;
-    font-size: 0.8125rem; /* 13px */
-    color: var(--primary);
-    font-weight: bold;
-    margin-bottom: 0.75rem; /* 12px */
-    margin-top: 0.625rem;   /* 10px */
-    margin-left: 0.3125rem;
+.slide.active {
+    display: block; /* Mung nampili slide sing aktif tok */
+    opacity: 1; /* Dadi cetho pas aktif */
 }
 
-.input-field {
-    position: relative;
-}
+.slide h1 { font-size: 3.5rem; margin-bottom: 0.5rem; }
+.slide p { font-size: 1.2rem; opacity: 0.9; line-height: 1.6; max-width: 32rem; }
+.slide .line { width: 5rem; height: 3px; background: var(--secondary-mulus); margin-top: 1rem; }
 
-.input-field i {
-    position: absolute;
-    left: 0.9375rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #aaa;
-}
-
-.input-field input, .select-role {
-    width: 100%;
-    padding: 0.75rem 0.9375rem 0.75rem 2.8125rem; /* 12px 15px 12px 45px */
-    border: 0.125rem solid #eee;
-    border-radius: 0.625rem; /* 10px */
-    outline: none;
-    transition: 0.3s;
-    font-size: 0.875rem;
-    background: white;
-}
-
-.input-field input:focus, .select-role:focus {
-    /* Border berubah jadi gradasi hijau saat fokus */
-    border-color: var(--primary-light);
-    box-shadow: 0 0 0.5rem rgba(11, 106, 109, 0.2);
-}
-
-.input-field input:focus + i {
-    color: var(--primary-light);
-}
-
-/* Button MASUK - Gradasi Hijau-Biru */
-.btn-login {
-    width: 100%;
-    padding: 0.875rem;    /* 14px */
-    background: linear-gradient(to right, #07484a, #0b6a6d);
-    color: white;
-    border: none;
-    border-radius: 0.625rem;
-    font-weight: bold;
-    font-size: 1rem;      /* 16px */
-    cursor: pointer;
-    transition: 0.3s;
-    box-shadow: 0 0.3125rem 0.9375rem rgba(7, 72, 74, 0.3);
-    margin-top: 0.625rem;
-}
-
-.btn-login:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.5rem 1.25rem rgba(7, 72, 74, 0.4);
-    filter: brightness(1.2);
-}
-
-.login-options {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8125rem;
-    margin-bottom: 1.5625rem;
-}
-
-.login-options a {
-    color: var(--secondary);
-    text-decoration: none;
-}
-
-.back-home {
-    margin-top: 1.5625rem;
-    display: block;
-    font-size: 0.875rem;
-    color: #888;
-    text-decoration: none;
-}
-
-.back-home:hover {
-    color: var(--primary);
-}
-
-/* Dropdown Custom Arrow */
-.select-role {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    cursor: pointer;
-}
-
-.input-field.has-dropdown::after {
-    content: '\f107'; 
-    font-family: 'Font Awesome 5 Free';
-    font-weight: 900;
-    position: absolute;
-    right: 0.9375rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #aaa;
-    pointer-events: none;
+/* Responsif buat HP */
+@media (max-width: 60rem) {
+    .split-container { flex-direction: column-reverse; }
+    .login-image-panel-fixed { padding: 4rem 2rem; flex: 1; }
+    .login-form-panel { padding: 3rem 1.5rem; }
+    .slide h1 { font-size: 2.5rem; }
 }
