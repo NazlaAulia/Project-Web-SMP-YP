@@ -735,3 +735,249 @@ header li,
     }
 }
 
+/* ================= MEGA FOOTER STYLE ================= */
+.main-footer {
+    background: #07484a; /* Teal Gelap Premium */
+    color: #ffffff;
+    padding: 70px 0 0 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+    gap: 40px;
+    padding-bottom: 50px;
+}
+
+.footer-logo {
+    width: 180px;
+    margin-bottom: 20px;
+    filter: brightness(1.2); /* Agar logo lebih menonjol */
+}
+
+.footer-col h4 {
+    color: #f5a425; /* Warna Gold/Orange */
+    font-size: 18px;
+    margin-bottom: 25px;
+    position: relative;
+    font-weight: 600;
+}
+
+/* Garis bawah di judul kolom */
+.footer-col h4::after {
+    content: '';
+    width: 40px;
+    height: 3px;
+    background: #f5a425;
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+}
+
+.footer-col p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 12px;
+}
+
+.footer-col ul li a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+/* Bullet point custom di samping link */
+.footer-col ul li a::before {
+    content: '\f111';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 8px;
+    margin-right: 10px;
+    color: #f5a425;
+}
+
+.footer-col ul li a:hover {
+    color: #f5a425;
+    padding-left: 8px;
+}
+
+/* Social Media Icons */
+.footer-social {
+    margin-top: 25px;
+    display: flex;
+    gap: 15px;
+}
+
+.footer-social a {
+    width: 35px;
+    height: 35px;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.footer-social a:hover {
+    background: #f5a425;
+    transform: translateY(-3px);
+}
+
+/* Copyright Bar */
+.footer-bottom {
+    background: #053a3c; /* Lebih gelap dari teal utama */
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer-bottom p {
+    font-size: 13px;
+    margin: 0;
+    color: rgba(255,255,255,0.6);
+}
+
+.footer-bottom p span {
+    color: #f5a425;
+    font-weight: 600;
+}
+
+/* Tombol Back to Top */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #f5a425;
+    color: #fff;
+    width: 45px;
+    height: 45px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* PPDB PAGE STYLES */
+.ppdb-hero {
+    background: linear-gradient(rgba(7, 72, 74, 0.9), rgba(7, 72, 74, 0.9)), url('img/sekolah-cover.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 80px 0;
+    text-align: center;
+    color: white;
+}
+
+.ppdb-hero h1 { font-size: 36px; margin: 10px 0; color: #f5a425; }
+
+.ppdb-container { padding: 60px 0; }
+
+.step-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.step-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border-top: 5px solid #07484a;
+}
+
+.step-card.highlight { border-top-color: #f5a425; }
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    background: #07484a;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-weight: bold;
+}
+
+.highlight .step-icon { background: #f5a425; }
+
+.ppdb-flex {
+    display: flex;
+    gap: 30px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+}
+
+.ppdb-left, .ppdb-right { flex: 1; min-width: 300px; }
+
+.info-card, .action-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+    height: 100%;
+}
+
+.info-card h3, .action-card h3 { color: #07484a; margin-bottom: 25px; }
+
+.info-card ul { list-style: none; padding: 0; }
+.info-card ul li { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+.info-card ul li i { color: #f5a425; }
+
+.btn-primary-ppdb {
+    background: #f5a425;
+    color: white;
+    padding: 18px;
+    display: block;
+    text-align: center;
+    border-radius: 10px;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 20px 0;
+    transition: 0.3s;
+}
+
+.btn-primary-ppdb:hover { background: #07484a; transform: translateY(-3px); }
+
+.wa-ppdb {
+    color: #25d366;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+}
