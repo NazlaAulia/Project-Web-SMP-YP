@@ -1,0 +1,102 @@
+/* --- DASHBOARD STUDENT STYLES --- */
+.dashboard-siswa {
+    padding: 4rem 0;
+    background: #f8f9fa;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 1.5rem;
+}
+
+.welcome-text h1 {
+    font-size: 2.5rem;
+    color: var(--primary);
+}
+
+.welcome-text h1 span {
+    color: var(--secondary);
+}
+
+.student-mini-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.student-mini-profile img {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 2px solid var(--secondary);
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    text-align: center;
+    transition: 0.4s;
+    border: 1px solid #eee;
+    position: relative;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 1rem 3rem rgba(7, 72, 74, 0.1);
+}
+
+.feature-card.highlight-orange {
+    border-top: 5px solid var(--secondary);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.btn-feature {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.6rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.btn-feature:hover {
+    background: var(--secondary);
+}
+
+.rank-badge {
+    margin-top: 1rem;
+    display: inline-block;
+    padding: 0.5rem 1.2rem;
+    background: #fdf4e6;
+    color: var(--secondary);
+    font-weight: bold;
+    border-radius: 10px;
+}
