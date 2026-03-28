@@ -130,7 +130,7 @@ if (isset($_POST['login'])) {
             // Mateni slide sing saiki aktif
             slides[currentSlide].classList.remove('active');
             
-            // Ganti branch dadi main
+            // Ganti branch dadi main coba
             currentSlide = (currentSlide + 1) % slides.length;
             
             // Mung nampili slide sing aktif tok
