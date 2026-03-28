@@ -163,3 +163,34 @@ body.login-mulus-page {
     .login-form-panel { padding: 3rem 1.5rem; }
     .slide h1 { font-size: 2.5rem; }
 }
+
+/* --- LOADING SPINNER STYLES --- */
+.spinner {
+    display: none; /* Sembunyi secara default */
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(7, 72, 74, 0.3); /* Warna teal tipis */
+    border-radius: 50%;
+    border-top-color: var(--primary-mulus); /* Warna teal pekat */
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+}
+
+/* Animasi putar */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Kondisi saat tombol sedang loading */
+.btn-login-main.is-loading .btn-text {
+    display: none; /* Sembunyikan tulisan */
+}
+
+.btn-login-main.is-loading .spinner {
+    display: block; /* Munculkan spinner */
+}
+
+.btn-login-main.is-loading {
+    pointer-events: none; /* Tombol tidak bisa diklik lagi saat loading */
+    opacity: 0.8;
+}
