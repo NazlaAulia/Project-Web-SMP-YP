@@ -1,58 +1,160 @@
-/* --- DASHBOARD STUDENT STYLES --- */
-.dashboard-siswa {
-    padding: 4rem 0;
-    background: #f8f9fa;
+/* ================= DASHBOARD SISWA FINAL ================= */
+
+/* WRAPPER */
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+    background: #f4f6f9;
 }
 
-.dashboard-header {
+/* SIDEBAR */
+.sidebar {
+    width: 16rem;
+    background: linear-gradient(180deg, var(--primary), #053a3c);
+    color: white;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* LOGO */
+.logo {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+/* MENU */
+.menu-dashboard {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-dashboard li {
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.6rem;
+    border-radius: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.menu-dashboard li:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.menu-dashboard li.active {
+    background: var(--secondary);
+    color: var(--primary);
+    font-weight: bold;
+}
+
+/* LOGOUT */
+.logout {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+}
+
+/* HEADER */
+.top-dashboard {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 3rem;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-.welcome-text h1 {
-    font-size: 2.5rem;
+.top-dashboard h1 {
     color: var(--primary);
 }
 
-.welcome-text h1 span {
+/* SEARCH */
+.search-box {
+    background: white;
+    padding: 0.6rem 1rem;
+    border-radius: 2rem;
+    box-shadow: 0 0.3rem 1rem rgba(0,0,0,0.1);
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+}
+
+/* ================= CARD DASHBOARD ================= */
+
+.card-container {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1;
+    min-width: 16rem;
+    background: white;
+    padding: 1.8rem;
+    border-radius: 1.2rem;
+    box-shadow: 0 0.6rem 1.8rem rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--secondary);
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.15);
+}
+
+.card h3 {
+    color: var(--primary);
+}
+
+.card p {
+    color: #777;
+}
+
+.card h2 {
     color: var(--secondary);
 }
 
-.student-mini-profile {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: white;
-    padding: 0.8rem 1.5rem;
-    border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-
-.student-mini-profile img {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    border: 2px solid var(--secondary);
-}
+/* ================= FEATURE GRID (TAMBAHAN BIAR KEREN) ================= */
 
 .feature-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
+    margin-top: 2rem;
 }
 
 .feature-card {
     background: white;
-    padding: 2.5rem;
+    padding: 2rem;
     border-radius: 1.5rem;
     text-align: center;
-    transition: 0.4s;
     border: 1px solid #eee;
-    position: relative;
+    transition: 0.3s;
 }
 
 .feature-card:hover {
@@ -60,39 +162,15 @@
     box-shadow: 0 1rem 3rem rgba(7, 72, 74, 0.1);
 }
 
-.feature-card.highlight-orange {
-    border-top: 5px solid var(--secondary);
-}
-
-.feature-icon {
-    font-size: 2.5rem;
-    color: var(--primary);
-    margin-bottom: 1rem;
-}
-
 .feature-card h3 {
     color: var(--primary);
-    margin-bottom: 1rem;
 }
 
-.btn-feature {
-    display: inline-block;
-    margin-top: 1.5rem;
-    padding: 0.6rem 1.5rem;
-    background: var(--primary);
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    transition: 0.3s;
+.feature-card p {
+    color: #666;
 }
 
-.btn-feature:hover {
-    background: var(--secondary);
-}
-
-/* ini css*/
-
+/* BADGE */
 .rank-badge {
     margin-top: 1rem;
     display: inline-block;
@@ -101,4 +179,27 @@
     color: var(--secondary);
     font-weight: bold;
     border-radius: 10px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .menu-dashboard {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
 }
