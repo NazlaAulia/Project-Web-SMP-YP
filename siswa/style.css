@@ -1,205 +1,254 @@
-/* ================= DASHBOARD SISWA FINAL ================= */
-
-/* WRAPPER */
-.dashboard {
-    display: flex;
-    min-height: 100vh;
-    background: #f4f6f9;
+/* --- VARIABEL WARNA ASLI --- */
+:root {
+    --primary: #07484a;    /* Teal gelap */
+    --secondary: #f5a425;  /* Gold/Orange */
+    --white: #ffffff;
+    --bg-body: #f4f7f7;    /* Background abu-abu muda bersih */
+    --bg-light-teal: #e6eeee; 
 }
 
-/* SIDEBAR */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.dashboard-body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-body);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* --- LAYOUT WRAPPER --- */
+.dashboard-wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+/* --- SIDEBAR STYLE --- */
 .sidebar {
-    width: 16rem;
-    background: linear-gradient(180deg, var(--primary), #053a3c);
-    color: white;
-    padding: 2rem 1rem;
+    width: 260px;
+    background-color: var(--primary);
+    color: var(--white);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    padding: 2rem 1.5rem;
+    transition: 0.3s;
 }
 
-/* LOGO */
-.logo {
-    text-align: center;
+.sidebar-brand {
     font-size: 1.5rem;
     font-weight: bold;
-    margin-bottom: 2rem;
+    color: var(--secondary);
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-/* MENU */
-.menu-dashboard {
+.sidebar-menu {
     list-style: none;
-    padding: 0;
-    margin: 0;
+    flex-grow: 1;
 }
 
-.menu-dashboard li {
-    padding: 0.9rem 1rem;
-    margin-bottom: 0.6rem;
-    border-radius: 0.7rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
+.sidebar-menu li {
+    margin-bottom: 0.8rem;
 }
 
-.menu-dashboard li:hover {
+.sidebar-menu a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.sidebar-menu li.active a, 
+.sidebar-menu a:hover {
     background: rgba(255,255,255,0.1);
+    color: var(--secondary);
 }
 
-.menu-dashboard li.active {
-    background: var(--secondary);
-    color: var(--primary);
-    font-weight: bold;
+.sidebar-footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 1.5rem;
 }
 
-/* LOGOUT */
-.logout {
-    text-align: center;
-    margin-top: 2rem;
-    font-size: 0.9rem;
-    opacity: 0.8;
-    cursor: pointer;
+.sidebar-footer a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
 }
 
-/* MAIN CONTENT */
-.main-content {
-    flex: 1;
+/* --- MAIN CONTENT STYLE --- */
+.main-dashboard {
+    flex-grow: 1;
     padding: 2rem;
+    overflow-y: auto;
 }
 
-/* HEADER */
-.top-dashboard {
+/* Header */
+.dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
 }
 
-.top-dashboard h1 {
-    color: var(--primary);
-}
-
-/* SEARCH */
-.search-box {
+.search-bar {
     background: white;
-    padding: 0.6rem 1rem;
-    border-radius: 2rem;
-    box-shadow: 0 0.3rem 1rem rgba(0,0,0,0.1);
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 350px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 
-.search-box input {
+.search-bar input {
     border: none;
     outline: none;
-}
-
-/* ================= CARD DASHBOARD ================= */
-
-.card-container {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.card {
-    flex: 1;
-    min-width: 16rem;
-    background: white;
-    padding: 1.8rem;
-    border-radius: 1.2rem;
-    box-shadow: 0 0.6rem 1.8rem rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.card::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
-    height: 4px;
+}
+
+.user-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
     background: var(--secondary);
+    border-radius: 50%;
 }
 
-.card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.15);
+/* Welcome Banner */
+.welcome-banner {
+    background-color: var(--bg-light-teal);
+    border-radius: 24px;
+    padding: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
 }
 
-.card h3 {
+.welcome-text h1 {
     color: var(--primary);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
 }
 
-.card p {
-    color: #777;
-}
-
-.card h2 {
-    color: var(--secondary);
-}
-
-/* ================= FEATURE GRID (TAMBAHAN BIAR KEREN) ================= */
-
-.feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.feature-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 1.5rem;
-    text-align: center;
-    border: 1px solid #eee;
-    transition: 0.3s;
-}
-
-.feature-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 1rem 3rem rgba(7, 72, 74, 0.1);
-}
-
-.feature-card h3 {
-    color: var(--primary);
-}
-
-.feature-card p {
-    color: #666;
-}
-
-/* BADGE */
-.rank-badge {
-    margin-top: 1rem;
+.btn-cek {
     display: inline-block;
-    padding: 0.5rem 1.2rem;
-    background: #fdf4e6;
-    color: var(--secondary);
+    margin-top: 1rem;
+    color: var(--primary);
+    text-decoration: none;
     font-weight: bold;
-    border-radius: 10px;
+    border-bottom: 2px solid var(--primary);
 }
 
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 768px) {
-    .dashboard {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-around;
-    }
-
-    .menu-dashboard {
-        display: flex;
-        gap: 1rem;
-    }
-
-    .main-content {
-        padding: 1rem;
-    }
+.welcome-illustration i {
+    font-size: 5rem;
+    color: var(--primary);
+    opacity: 0.2;
 }
+
+/* Grid & Cards */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    gap: 1.5rem;
+}
+
+.grid-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.grid-card h3 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+}
+
+/* Bar Chart Mockup */
+.bar-chart-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 180px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.bar {
+    width: 40px;
+    background: var(--primary);
+    border-radius: 8px 8px 0 0;
+    position: relative;
+    transition: 0.4s;
+}
+
+.bar:hover { background: var(--secondary); }
+
+.label {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.chart-footer {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+    color: #888;
+    font-size: 0.8rem;
+}
+
+/* Schedule List */
+.schedule-item {
+    display: flex;
+    gap: 15px;
+    padding: 1rem;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    background: #fdfdfd;
+    border: 1px solid #f0f0f0;
+}
+
+.schedule-item.active {
+    background: #fff9f0;
+    border-color: var(--secondary);
+}
+
+.time {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.task-info h4 { font-size: 0.95rem; color: #333; }
+.task-info p { font-size: 0.8rem; color: #777; }
