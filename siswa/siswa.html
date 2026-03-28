@@ -1,24 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Siswa</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
 <div class="dashboard">
 
-<!-- update siswa terbaru -->
+    <!-- SIDEBAR -->
     <div class="sidebar">
-        <h2 class="logo">Smart</h2>
+        <div>
+            <h2 class="logo">Smart</h2>
 
-        <ul class="menu-dashboard">
-            <li class="active">Dashboard</li>
-            <li>Nilai</li>
-            <li>Jadwal</li>
-            <li>Peringkat</li>
-            <li>Profil</li>
-        </ul>
+            <ul class="menu-dashboard">
+                <li class="active">Dashboard</li>
+                <li>Nilai</li>
+                <li>Jadwal</li>
+                <li>Peringkat</li>
+                <li>Profil</li>
+            </ul>
+        </div>
+
+        <div class="logout">
+            Log Out
+        </div>
     </div>
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
 
-        <!-- TOP -->
+        <!-- TOP BAR -->
         <div class="top-dashboard">
             <h1>Dashboard Siswa</h1>
+
+            <!-- Search (optional) -->
+            <div class="search-box">
+                <input type="text" placeholder="Search...">
+            </div>
+        </div>
+
+        <!-- WELCOME BOX -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3>Halo, Siswa 👋</h3>
+            <p>Selamat datang di dashboard. Semangat belajar hari ini!</p>
         </div>
 
         <!-- CARD UTAMA -->
@@ -26,19 +55,19 @@
 
             <div class="card">
                 <h3>Performa Akademik</h3>
-                <p>Nilai rata-rata</p>
+                <p>Rata-rata nilai semester</p>
                 <h2>90</h2>
             </div>
 
             <div class="card">
                 <h3>Jadwal Hari Ini</h3>
-                <p>3 Mata Pelajaran</p>
-                <h2>Aktif</h2>
+                <p>Jumlah pelajaran</p>
+                <h2>3 Mapel</h2>
             </div>
-<!-- peringkat -->
+
             <div class="card">
                 <h3>Peringkat</h3>
-                <p>Di kelas</p>
+                <p>Posisi di kelas</p>
                 <h2>5</h2>
             </div>
 
@@ -46,3 +75,6 @@
 
     </div>
 </div>
+
+</body>
+</html>

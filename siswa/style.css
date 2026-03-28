@@ -1,0 +1,175 @@
+/* ================= DASHBOARD SISWA ================= */
+
+/* WRAPPER */
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+    background: #f4f6f9;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 16rem;
+    background: linear-gradient(180deg, var(--primary), #053a3c);
+    color: white;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* LOGO */
+.logo {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+/* MENU */
+.menu-dashboard {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-dashboard li {
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.6rem;
+    border-radius: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.menu-dashboard li:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.menu-dashboard li.active {
+    background: var(--secondary);
+    color: var(--primary);
+    font-weight: bold;
+}
+
+/* LOGOUT */
+.logout {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+}
+
+/* HEADER DASHBOARD */
+.top-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.top-dashboard h1 {
+    color: var(--primary);
+    font-size: 1.8rem;
+}
+
+/* SEARCH (opsional nanti) */
+.search-box {
+    background: white;
+    padding: 0.6rem 1rem;
+    border-radius: 2rem;
+    box-shadow: 0 0.3rem 1rem rgba(0,0,0,0.1);
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+}
+
+/* CARD CONTAINER */
+.card-container {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* CARD */
+.card {
+    flex: 1;
+    min-width: 16rem;
+    background: white;
+    padding: 1.8rem;
+    border-radius: 1.2rem;
+    box-shadow: 0 0.6rem 1.8rem rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* efek garis bawah */
+.card::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--secondary);
+}
+
+/* hover modern */
+.card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.15);
+}
+
+/* isi card */
+.card h3 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.card p {
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.card h2 {
+    color: var(--secondary);
+    margin-top: 0.8rem;
+    font-size: 2rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    .menu-dashboard {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .menu-dashboard li {
+        margin: 0;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+}
