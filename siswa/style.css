@@ -1,222 +1,38 @@
-/* --- VARIABEL WARNA ASLI --- */
-:root {
-    --primary: #07484a;    /* Teal gelap */
-    --secondary: #f5a425;  /* Gold/Orange */
-    --white: #ffffff;
-    --bg-body: #f4f7f7;    /* Background abu-abu muda bersih */
-    --bg-light-teal: #e6eeee; 
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body.dashboard-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--bg-body);
-    height: 100vh;
-    overflow: hidden;
-}
-
-/* --- LAYOUT WRAPPER --- */
-.dashboard-wrapper {
-    display: flex;
-    height: 100vh;
-}
-
-/* --- SIDEBAR STYLE --- */
-.sidebar {
-    width: 260px;
-    background-color: var(--primary);
-    color: var(--white);
-    display: flex;
-    flex-direction: column;
-    padding: 2rem 1.5rem;
-    transition: 0.3s;
-}
-
-.sidebar-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--secondary);
-    margin-bottom: 3rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.sidebar-menu {
-    list-style: none;
-    flex-grow: 1;
-}
-
-.sidebar-menu li {
-    margin-bottom: 0.8rem;
-}
-
-.sidebar-menu a {
-    color: rgba(255,255,255,0.7);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 0.8rem 1rem;
-    border-radius: 12px;
-    transition: 0.3s;
-}
-
-.sidebar-menu li.active a, 
-.sidebar-menu a:hover {
-    background: rgba(255,255,255,0.1);
-    color: var(--secondary);
-}
-
-.sidebar-footer {
-    border-top: 1px solid rgba(255,255,255,0.1);
-    padding-top: 1.5rem;
-}
-
-.sidebar-footer a {
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-}
-
-/* --- MAIN CONTENT STYLE --- */
-.main-dashboard {
-    flex-grow: 1;
-    padding: 2rem;
-    overflow-y: auto;
-}
-
-/* Header */
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.search-bar {
-    background: white;
-    padding: 0.6rem 1.2rem;
-    border-radius: 50px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 350px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-}
-
-.search-bar input {
-    border: none;
-    outline: none;
-    width: 100%;
-}
-
-.user-nav {
-    display: flex;
-    align-items: center;
+/* Susunan Grid Dashboard */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr; /* Kiri agak lebar untuk Grafik */
     gap: 20px;
 }
 
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    color: var(--primary);
-}
-
-.avatar-placeholder {
-    width: 40px;
-    height: 40px;
-    background: var(--secondary);
-    border-radius: 50%;
-}
-
-/* Welcome Banner */
-.welcome-banner {
-    background-color: var(--bg-light-teal);
-    border-radius: 24px;
-    padding: 2.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.welcome-text h1 {
-    color: var(--primary);
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.btn-cek {
-    display: inline-block;
-    margin-top: 1rem;
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: bold;
-    border-bottom: 2px solid var(--primary);
-}
-
-.welcome-illustration i {
-    font-size: 5rem;
-    color: var(--primary);
-    opacity: 0.2;
-}
-
-/* Grid & Cards */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1.8fr 1fr;
-    gap: 1.5rem;
-}
-
-.grid-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-}
-
-.grid-card h3 {
-    color: var(--primary);
-    margin-bottom: 1.5rem;
-}
-
-/* Bar Chart Mockup */
+/* Card Performa (Grafik Batang) */
 .bar-chart-container {
     display: flex;
     align-items: flex-end;
     justify-content: space-around;
     height: 180px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
+    padding: 10px 0;
+    border-bottom: 2px solid #f0f0f0;
 }
 
 .bar {
-    width: 40px;
-    background: var(--primary);
+    width: 35px;
+    background: var(--primary); /* Teal */
     border-radius: 8px 8px 0 0;
     position: relative;
-    transition: 0.4s;
+    transition: 0.3s;
 }
 
-.bar:hover { background: var(--secondary); }
+.bar:hover {
+    background: var(--secondary); /* Orange saat disentuh */
+}
 
 .label {
     position: absolute;
     top: -25px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.8rem;
+    font-size: 12px;
     font-weight: bold;
     color: var(--primary);
 }
@@ -225,30 +41,25 @@ body.dashboard-body {
     display: flex;
     justify-content: space-around;
     margin-top: 10px;
+    font-size: 12px;
     color: #888;
-    font-size: 0.8rem;
 }
 
-/* Schedule List */
-.schedule-item {
+/* Progress Circle CSS yang sudah diperbaiki tadi */
+.progress-circle-container {
+    position: relative;
     display: flex;
-    gap: 15px;
-    padding: 1rem;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    background: #fdfdfd;
-    border: 1px solid #f0f0f0;
+    justify-content: center;
+    align-items: center;
 }
 
-.schedule-item.active {
-    background: #fff9f0;
-    border-color: var(--secondary);
+.progress-circle svg {
+    transform: rotate(-90deg);
 }
 
-.time {
+.donut-percent {
+    position: absolute;
+    font-size: 24px;
     font-weight: bold;
     color: var(--primary);
 }
-
-.task-info h4 { font-size: 0.95rem; color: #333; }
-.task-info p { font-size: 0.8rem; color: #777; }
