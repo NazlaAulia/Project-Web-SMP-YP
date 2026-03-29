@@ -1,18 +1,16 @@
-<?php 
+<?php
 session_start();
 include 'koneksi.php';
 
-// 🔒 PROTEKSI: kalau belum login / bukan siswa → balik ke login
-if (!isset($_SESSION['username']) || $_SESSION['role_id'] != 3) {
-    header("Location: login.php");
-    exit;
+// 🔒 Cek login siswa
+if (!isset($_SESSION['id_siswa'])) {
+    die("Session siswa tidak ditemukan");
 }
 
-// 🎯 AMBIL DATA SESUAI USER YANG LOGIN
-// yang aku ganti
-$id_siswa = $_SESSION['id_siswa'];
+// 🎯 Ambil data sesuai siswa yang login
+$id_siswa = (int) $_SESSION['id_siswa'];
 
-$querySiswa = mysqli_query($conn, "SELECT * FROM siswa WHERE id_siswa = '$id_siswa'");
+$querySiswa = mysqli_query($conn, "SELECT * FROM siswa WHERE id_siswa = $id_siswa");
 $s = mysqli_fetch_assoc($querySiswa);
 ?>
 
