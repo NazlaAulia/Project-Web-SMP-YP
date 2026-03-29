@@ -1,65 +1,67 @@
-/* Susunan Grid Dashboard */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr; /* Kiri agak lebar untuk Grafik */
-    gap: 20px;
+:root {
+    --bg-color: #f0f4f4;
+    --sidebar-color: #064547;
+    --text-white: #ffffff;
+    --accent-yellow: #f4a261;
+    --card-bg: #ffffff;
+    --text-dark: #333;
 }
 
-/* Card Performa (Grafik Batang) */
-.bar-chart-container {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-around;
-    height: 180px;
-    padding: 10px 0;
-    border-bottom: 2px solid #f0f0f0;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-.bar {
-    width: 35px;
-    background: var(--primary); /* Teal */
-    border-radius: 8px 8px 0 0;
-    position: relative;
-    transition: 0.3s;
-}
+body { background-color: var(--bg-color); }
 
-.bar:hover {
-    background: var(--secondary); /* Orange saat disentuh */
-}
+.dashboard-wrapper { display: flex; min-height: 100vh; }
 
-.label {
-    position: absolute;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 12px;
-    font-weight: bold;
-    color: var(--primary);
-}
+/* SIDEBAR */
+.sidebar { width: 240px; background: var(--sidebar-color); color: white; padding: 30px 20px; display: flex; flex-direction: column; }
+.brand-text { color: var(--accent-yellow); font-size: 24px; margin-bottom: 40px; font-weight: bold; }
+.sidebar-menu { list-style: none; flex-grow: 1; }
+.sidebar-menu li { margin-bottom: 15px; }
+.sidebar-menu li a { color: rgba(255,255,255,0.7); text-decoration: none; display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: 12px; transition: 0.3s; }
+.sidebar-menu li.active a { background: white; color: var(--sidebar-color); font-weight: bold; }
+.sidebar-menu li a:hover:not(.active) { background: rgba(255,255,255,0.1); color: white; }
+.logout-btn { color: white; text-decoration: none; font-weight: bold; }
 
-.chart-footer {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 10px;
-    font-size: 12px;
-    color: #888;
-}
+/* MAIN CONTENT */
+.main-content { flex: 1; padding: 30px; }
+.top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.search-container input { width: 400px; padding: 12px 20px; border-radius: 25px; border: none; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.user-profile-top { display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--sidebar-color); }
+.avatar-img { width: 35px; height: 35px; border-radius: 50%; background: #ccc; }
 
-/* Progress Circle CSS yang sudah diperbaiki tadi */
-.progress-circle-container {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/* BANNER */
+.banner-welcome { background: #e8f1f1; border-radius: 25px; padding: 40px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; position: relative; }
+.banner-content h1 { font-size: 32px; color: var(--sidebar-color); margin-bottom: 10px; }
+.banner-content p { color: #666; margin-bottom: 20px; }
+.btn-cek { background: var(--sidebar-color); color: white; padding: 10px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+.banner-img { width: 200px; }
 
-.progress-circle svg {
-    transform: rotate(-90deg);
-}
+/* GRID */
+.dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+.card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
 
-.donut-percent {
-    position: absolute;
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--primary);
-}
+/* CHART */
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+.bar-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 200px; padding-bottom: 10px; border-bottom: 1px solid #eee; margin-bottom: 30px; }
+.bar-group { display: flex; flex-direction: column; align-items: center; width: 15%; }
+.bar-fill { width: 40px; background: var(--sidebar-color); border-radius: 10px 10px 0 0; position: relative; transition: 0.5s; }
+.bar-fill span { position: absolute; top: -25px; font-weight: bold; font-size: 14px; color: var(--sidebar-color); }
+.bar-label { margin-top: 10px; color: #aaa; font-size: 12px; }
+
+/* MENTOR */
+.mentor-section h4 { margin-bottom: 15px; }
+.mentor-card { display: flex; align-items: center; gap: 15px; background: #fafafa; padding: 15px; border-radius: 15px; }
+.mentor-card img { width: 45px; height: 45px; border-radius: 50%; }
+
+/* SCHEDULE */
+.schedule-item { background: #fffcf4; border: 1px solid #ffeeba; padding: 20px; border-radius: 15px; display: flex; gap: 15px; }
+.schedule-time { font-weight: bold; color: var(--sidebar-color); }
+
+/* PROGRESS CIRCLE */
+.circle-chart { display: flex; justify-content: center; margin: 20px 0; }
+.circular-chart { display: block; margin: 10px auto; max-width: 80%; max-height: 250px; }
+.circle-bg { fill: none; stroke: #eee; stroke-width: 3.8; }
+.circle { fill: none; stroke: var(--sidebar-color); stroke-width: 2.8; stroke-linecap: round; transition: stroke-dasharray 0.3s ease; }
+.percentage { fill: var(--sidebar-color); font-size: 0.5em; text-anchor: middle; font-weight: bold; }
+.progress-footer { text-align: center; color: #888; font-weight: bold; }
