@@ -1,8 +1,17 @@
 <?php 
+session_start();
 include 'koneksi.php';
 
-// Ambil data siswa (ID 1)
-$querySiswa = mysqli_query($conn, "SELECT * FROM siswa WHERE id = 1");
+// 🔒 PROTEKSI: kalau belum login / bukan siswa → balik ke login
+if (!isset($_SESSION['username']) || $_SESSION['role_id'] != 3) {
+    header("Location: login.php");
+    exit;
+}
+
+// 🎯 AMBIL DATA SESUAI USER YANG LOGIN
+$id = $_SESSION['id_user'];
+
+$querySiswa = mysqli_query($conn, "SELECT * FROM siswa WHERE user_id = '$id'");
 $s = mysqli_fetch_assoc($querySiswa);
 ?>
 
