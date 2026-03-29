@@ -9,9 +9,9 @@ if (!isset($_SESSION['username']) || $_SESSION['role_id'] != 3) {
 }
 
 // 🎯 AMBIL DATA SESUAI USER YANG LOGIN
-$id_siswa = $_SESSION['id_siswa'];
+$id = $_SESSION['id_user'];
 
-$querySiswa = mysqli_query($conn, "SELECT * FROM siswa WHERE id_siswa = '$id_siswa'");
+$querySiswa = mysqli_query($conn, "SELECT * FROM siswa WHERE user_id = '$id'");
 $s = mysqli_fetch_assoc($querySiswa);
 ?>
 
