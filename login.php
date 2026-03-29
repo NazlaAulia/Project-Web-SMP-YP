@@ -15,14 +15,24 @@ if (isset($_POST['login'])) {
     $query = mysqli_query($conn, "SELECT * FROM user WHERE username='$username' AND password='$password'");
     $data = mysqli_fetch_assoc($query);
 
-    if ($data) {
-        $_SESSION['username'] = $data['username'];
-        $_SESSION['role_id'] = $data['role_id'];
+   if ($data) {
+    $_SESSION['username'] = $data['username'];
+    $_SESSION['role_id'] = $data['role_id'];
+    $_SESSION['id_siswa'] = $data['id_siswa'] ?? null;
+    $_SESSION['id_guru'] = $data['id_guru'] ?? null;
+    $_SESSION['id_user'] = $data['id_user'];
 
-        if ($data['role_id'] == 1) { header("Location: admin.php"); exit; }
-        else if ($data['role_id'] == 2) { header("Location: guru.php"); exit; }
-        else if ($data['role_id'] == 3) { header("Location: siswa.php"); exit; }
-    } else {
+    if ($data['role_id'] == 1) {
+        header("Location: admin.php");
+        exit;
+    } else if ($data['role_id'] == 2) {
+        header("Location: guru.php");
+        exit;
+    } else if ($data['role_id'] == 3) {
+        header("Location: siswa.php");
+        exit;
+    }
+}else {
         $error_login = true; 
     }
 }
