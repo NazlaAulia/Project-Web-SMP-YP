@@ -22,16 +22,16 @@ if (isset($_POST['login'])) {
     $_SESSION['id_guru'] = $data['id_guru'] ?? null;
     $_SESSION['id_user'] = $data['id_user'];
 
-    if ($data['role_id'] == 1) {
-        header("Location: admin.php");
-        exit;
-    } else if ($data['role_id'] == 2) {
-        header("Location: guru.php");
-        exit;
-    } else if ($data['role_id'] == 3) {
-        header("Location: siswa.php");
-        exit;
-    }
+   if ($data['role_id'] == 1) {
+    header("Location: admin.php");
+    exit;
+} else if ($data['role_id'] == 2) {
+    header("Location: guru.php");
+    exit;
+} else if ($data['role_id'] == 3) {
+    header("Location: siswa/siswa.php");
+    exit;
+}
 }else {
         $error_login = true; 
     }
