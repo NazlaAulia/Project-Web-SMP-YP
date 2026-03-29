@@ -65,3 +65,16 @@ body { background-color: var(--bg-color); }
 .circle { fill: none; stroke: var(--sidebar-color); stroke-width: 2.8; stroke-linecap: round; transition: stroke-dasharray 0.3s ease; }
 .percentage { fill: var(--sidebar-color); font-size: 0.5em; text-anchor: middle; font-weight: bold; }
 .progress-footer { text-align: center; color: #888; font-weight: bold; }
+
+.avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #d9d9d9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #07484a;
+    font-size: 18px;
+}

@@ -56,7 +56,9 @@ $progress = isset($s['progress']) ? (int)$s['progress'] : 85;
                 <div class="user-info">
                     <span class="notif-badge">3</span>
                     <div class="user-profile-top">
-                        <img src="img/avatar.png" alt="Avatar" class="avatar-img">
+                       <div class="avatar-placeholder">
+    <?php echo strtoupper(substr($s['nama'], 0, 1)); ?>
+</div>
                         <span class="user-name"><?php echo $s['nama']; ?></span>
                     </div>
                 </div>
