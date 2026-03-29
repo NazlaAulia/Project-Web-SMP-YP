@@ -26,7 +26,7 @@ if (isset($_POST['login'])) {
     header("Location: admin.php");
     exit;
 } else if ($data['role_id'] == 2) {
-    header("Location: guru.php");
+    header("Location: guru/guru.php");
     exit;
 } else if ($data['role_id'] == 3) {
     header("Location: siswa/siswa.php");
