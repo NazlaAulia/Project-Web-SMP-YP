@@ -2,16 +2,18 @@
 session_start();
 include 'koneksi.php';
 
-// 🔒 Cek login siswa
+// 🔒 Cek login
 if (!isset($_SESSION['id_siswa'])) {
-    die("Session siswa tidak ditemukan");
+    header("Location: login.php");
+    exit;
 }
 
-// 🎯 Ambil data sesuai siswa yang login
 $id_siswa = (int) $_SESSION['id_siswa'];
-
 $querySiswa = mysqli_query($conn, "SELECT * FROM siswa WHERE id_siswa = $id_siswa");
 $s = mysqli_fetch_assoc($querySiswa);
+
+// Default progress nek neng database kosong
+$progress = isset($s['progress']) ? (int)$s['progress'] : 85;
 ?>
 
 <!DOCTYPE html>
@@ -19,106 +21,122 @@ $s = mysqli_fetch_assoc($querySiswa);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Siswa | Smart School SMP YP</title>
+    <title>Dashboard Siswa | Smart School</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="dashboard-body">
 
     <div class="dashboard-wrapper">
         <nav class="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Smart School</span>
+            <div class="sidebar-header">
+                <h2 class="brand-text">Smart School</h2>
             </div>
+            
             <ul class="sidebar-menu">
-                <li class="active"><a href="siswa.php"><i class="fas fa-th-large"></i> Dashboard Siswa</a></li>
-                <li><a href="performa.php"><i class="fas fa-chart-line"></i> Performa Akademik</a></li>
-                <li><a href="nilai.php"><i class="fas fa-file-invoice"></i> Nilai</a></li>
-                <li><a href="jadwal.php"><i class="fas fa-calendar-alt"></i> Jadwal</a></li>
-                <li><a href="peringkat.php"><i class="fas fa-medal"></i> Peringkat</a></li>
-                <li><a href="profil.php"><i class="fas fa-user-circle"></i> Profil Siswa</a></li>
+                <li class="active"><a href="#"><i class="fas fa-th-large"></i> Dashboard Siswa</a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> Performa Akademik</a></li>
+                <li><a href="#"><i class="fas fa-file-alt"></i> Nilai</a></li>
+                <li><a href="#"><i class="fas fa-calendar-alt"></i> Jadwal</a></li>
+                <li><a href="#"><i class="fas fa-medal"></i> Peringkat</a></li>
+                <li><a href="#"><i class="fas fa-user"></i> Profil Siswa</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
+
             <div class="sidebar-footer">
-                <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                <a href="logout.php" class="logout-btn">Log Out</a>
             </div>
         </nav>
 
-        <main class="main-dashboard">
-            <header class="dashboard-header">
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Cari info akademik...">
+        <main class="main-content">
+            <header class="top-header">
+                <div class="search-container">
+                    <input type="text" placeholder="Cari info akademik, tugas, atau jadwal...">
                 </div>
-                <div class="user-nav">
-                    <div class="user-profile">
-                        <span><?php echo $s['nama']; ?></span>
-                        <div class="avatar-placeholder"></div>
+                <div class="user-info">
+                    <span class="notif-badge">3</span>
+                    <div class="user-profile-top">
+                        <img src="img/avatar.png" alt="Avatar" class="avatar-img">
+                        <span class="user-name"><?php echo $s['nama']; ?></span>
                     </div>
                 </div>
             </header>
 
-            <section class="welcome-banner">
-                <div class="welcome-text">
+            <section class="banner-welcome">
+                <div class="banner-content">
                     <h1>Halo, <?php echo $s['nama']; ?>!</h1>
-                    <p>Selamat datang kembali di dashboard siswa SMP YP. Cek performa akademikmu hari ini.</p>
+                    <p>Ada 3 tugas baru hari ini. Semangat belajarnya ya!</p>
+                    <a href="#" class="btn-cek">Cek Sekarang</a>
                 </div>
-                <div class="welcome-illustration">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
+                <img src="img/student-illustration.png" alt="Study" class="banner-img">
             </section>
 
             <div class="dashboard-grid">
-                <div class="grid-card">
+                <div class="card chart-card">
                     <div class="card-header">
                         <h3>Performa Akademik</h3>
+                        <span class="year-label">Tahun Ini</span>
                     </div>
-                    <div class="bar-chart-container">
-                        <div class="bar" style="height: 85%"><span class="label">85</span></div>
-                        <div class="bar" style="height: 70%"><span class="label">70</span></div>
-                        <div class="bar" style="height: 95%"><span class="label">95</span></div>
-                        <div class="bar" style="height: 60%"><span class="label">60</span></div>
-                        <div class="bar" style="height: 80%"><span class="label">80</span></div>
+                    <div class="bar-chart">
+                        <div class="bar-group">
+                            <div class="bar-fill" style="height: 85%;"><span>85</span></div>
+                            <span class="bar-label">Mat</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar-fill" style="height: 64%;"><span>64</span></div>
+                            <span class="bar-label">Ind</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar-fill" style="height: 92%;"><span>92</span></div>
+                            <span class="bar-label">Ing</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar-fill" style="height: 45%;"><span>45</span></div>
+                            <span class="bar-label">Ipa</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar-fill" style="height: 75%;"><span>75</span></div>
+                            <span class="bar-label">Ips</span>
+                        </div>
                     </div>
-                    <div class="chart-footer">
-                        <span>Mat</span><span>Ind</span><span>Ing</span><span>Ipa</span><span>Ips</span>
+
+                    <div class="mentor-section">
+                        <h4>Guru Pengampu</h4>
+                        <div class="mentor-card">
+                            <img src="img/teacher.png" alt="Mentor">
+                            <div class="mentor-info">
+                                <strong>Mary Johnson (Mentor)</strong>
+                                <p>Sains & Biologi</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid-card">
-                    <h3>Jadwal Hari Ini</h3>
-                    <div class="schedule-list">
-                        <?php 
-                        $queryJadwal = mysqli_query($conn, "SELECT * FROM jadwal ORDER BY jam ASC");
-                        if(mysqli_num_rows($queryJadwal) > 0) {
-                            while($j = mysqli_fetch_assoc($queryJadwal)) { ?>
-                                <div class="schedule-item">
-                                    <span class="time"><?php echo $j['jam']; ?></span>
-                                    <div class="task-info">
-                                        <h4><?php echo $j['nama_pelajaran']; ?></h4>
-                                        <p><?php echo $j['ruangan']; ?></p>
-                                    </div>
-                                </div>
-                            <?php } 
-                        } else {
-                            echo "<p>Tidak ada jadwal hari ini.</p>";
-                        } ?>
+                <div class="right-column">
+                    <div class="card schedule-card">
+                        <div class="card-header">
+                            <h3>Jadwal Hari Ini</h3>
+                            <span class="day-label">Hari Ini</span>
+                        </div>
+                        <div class="schedule-item">
+                            <span class="schedule-time">09:00</span>
+                            <div class="schedule-details">
+                                <h4>Elektronika Dasar</h4>
+                                <p>R. Lab 01, Pertemuan 12</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="grid-card">
-                    <h3>Progress Belajar</h3>
-                    <div class="progress-circle-container">
-                        <div class="progress-circle">
-                            <div class="donut-percent"><?php echo $s['progress']; ?>%</div>
-                            <svg width="150" height="150">
-                                <circle cx="75" cy="75" r="60" stroke="#eee" stroke-width="12" fill="none" />
-                                <circle cx="75" cy="75" r="60" stroke="#07484a" stroke-width="12" fill="none" 
-                                        stroke-dasharray="377" 
-                                        stroke-dashoffset="<?php echo 377 - (377 * $s['progress'] / 100); ?>" 
-                                        stroke-linecap="round" />
+                    <div class="card progress-card">
+                        <h3>Progress Belajar</h3>
+                        <div class="circle-chart">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="circle" stroke-dasharray="<?php echo $progress; ?>, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <text x="18" y="20.35" class="percentage"><?php echo $progress; ?>%</text>
                             </svg>
                         </div>
+                        <p class="progress-footer">Tugas Selesai</p>
                     </div>
                 </div>
             </div>
