@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db   = "db_smp_yp"; // Sesuaikan dengan nama database yang dibuat temanmu
+$db   = "sekolahyp"; // ini yang bener
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 
