@@ -12,6 +12,8 @@ if ($conn->connect_error) {
 
 $pesan = "";
 $tipe_pesan = "";
+$showModal = false;
+$waLink = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $nama_lengkap    = trim($_POST['nama_lengkap'] ?? '');
@@ -65,8 +67,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             );
 
             if ($stmt->execute()) {
-                $pesan = "Pendaftaran berhasil dikirim. Silakan tunggu verifikasi admin.";
+                $pesan = "Pendaftaran berhasil dikirim.";
                 $tipe_pesan = "success";
+                $showModal = true;
+
+                $nomorAdmin = "6283846311788"; // ganti nomor admin
+                $pesanWa = "Halo Admin SMP YP 17 Surabaya,%0A%0ASaya atas nama *{$nama_lengkap}* telah melakukan pendaftaran PPDB.%0A"
+                         . "NISN: {$nisn}%0A"
+                         . "Asal Sekolah: {$asal_sekolah}%0A"
+                         . "No HP: {$no_hp}%0A%0A"
+                         . "Mohon konfirmasi pendaftaran saya. Terima kasih.";
+                $waLink = "https://wa.me/" . $nomorAdmin . "?text=" . $pesanWa;
             } else {
                 $pesan = "Gagal menyimpan data: " . $stmt->error;
                 $tipe_pesan = "error";
@@ -86,43 +97,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPDB Online - SMP YP 17 Surabaya</title>
     <link rel="stylesheet" href="pendaftaran.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
 <div class="page-wrap">
     <div class="register-card">
+        <div class="dot-pattern dot-1"></div>
+        <div class="dot-pattern dot-2"></div>
 
         <div class="register-left">
-            <div class="left-overlay"></div>
-            <div class="left-top-image">
-                <img src="img/sekolah-cover.jpg" alt="PPDB SMP YP 17">
-            </div>
-
-            <div class="shape shape-dark"></div>
-            <div class="shape shape-main"></div>
-            <div class="shape shape-accent"></div>
-            <div class="shape shape-small"></div>
-
-            <div class="left-content">
-                <span class="left-badge">PPDB ONLINE</span>
-                <h1>Let’s Make<br>It Happen<br>Together!</h1>
-                <p>
-                    Bergabunglah bersama SMP YP 17 Surabaya dan isi formulir pendaftaran
-                    secara online. Data akan masuk ke sistem dan menunggu ACC admin.
-                </p>
-            </div>
-        </div>
-
-        <div class="register-right">
-            <div class="brand-mark">SMP YP 17</div>
-            <div class="top-login-text">
-                Sudah pernah daftar? <a href="#">Cek status di admin</a>
+            <div class="brand-row">
+                <div class="brand-mark">co.</div>
+                <div class="top-login-text">Sudah pernah daftar? <a href="#">Sign in here!</a></div>
             </div>
 
             <div class="form-heading">
                 <h2>Form Pendaftaran</h2>
-                <p>Isi data dengan lengkap sesuai dokumen resmi.</p>
+                <p>Isi formulir sesuai data resmi dan kirim pendaftaranmu sekarang.</p>
             </div>
 
             <?php if (!empty($pesan)) : ?>
@@ -131,20 +122,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="" class="register-form">
+            <form method="POST" action="">
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap" required
-                               value="<?php echo htmlspecialchars($_POST['nama_lengkap'] ?? ''); ?>">
+                        <input type="text" name="nama_lengkap" required value="<?php echo htmlspecialchars($_POST['nama_lengkap'] ?? ''); ?>">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>NISN</label>
-                        <input type="text" name="nisn" maxlength="20" required
-                               value="<?php echo htmlspecialchars($_POST['nisn'] ?? ''); ?>">
+                        <input type="text" name="nisn" maxlength="20" required value="<?php echo htmlspecialchars($_POST['nisn'] ?? ''); ?>">
                     </div>
                     <div class="form-group">
                         <label>Jenis Kelamin</label>
@@ -159,41 +148,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir" required
-                               value="<?php echo htmlspecialchars($_POST['tanggal_lahir'] ?? ''); ?>">
+                        <input type="date" name="tanggal_lahir" required value="<?php echo htmlspecialchars($_POST['tanggal_lahir'] ?? ''); ?>">
                     </div>
                     <div class="form-group">
                         <label>No HP</label>
-                        <input type="text" name="no_hp" maxlength="20" required
-                               value="<?php echo htmlspecialchars($_POST['no_hp'] ?? ''); ?>">
+                        <input type="text" name="no_hp" maxlength="20" required value="<?php echo htmlspecialchars($_POST['no_hp'] ?? ''); ?>">
                     </div>
                 </div>
 
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Alamat</label>
-                        <textarea name="alamat" rows="4" required><?php echo htmlspecialchars($_POST['alamat'] ?? ''); ?></textarea>
+                        <textarea name="alamat" required><?php echo htmlspecialchars($_POST['alamat'] ?? ''); ?></textarea>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Asal Sekolah</label>
-                        <input type="text" name="asal_sekolah" required
-                               value="<?php echo htmlspecialchars($_POST['asal_sekolah'] ?? ''); ?>">
+                        <input type="text" name="asal_sekolah" required value="<?php echo htmlspecialchars($_POST['asal_sekolah'] ?? ''); ?>">
                     </div>
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="email" name="email"
-                               value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                        <input type="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
                     </div>
                 </div>
 
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Pendapatan Orang Tua</label>
-                        <input type="number" step="0.01" name="pendapatan_ortu" required
-                               value="<?php echo htmlspecialchars($_POST['pendapatan_ortu'] ?? ''); ?>">
+                        <input type="number" step="0.01" name="pendapatan_ortu" required value="<?php echo htmlspecialchars($_POST['pendapatan_ortu'] ?? ''); ?>">
                     </div>
                 </div>
 
@@ -205,14 +189,50 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
 
                 <div class="form-note">
-                    Setelah submit, data akan masuk ke tabel <strong>pendaftaran</strong>
-                    dengan status <strong>menunggu</strong>.
+                    Data akan masuk ke tabel pendaftaran dengan status menunggu.
                 </div>
             </form>
         </div>
 
+        <div class="register-right">
+            <div class="right-box">
+                <div class="right-title-box">
+                    <h3>Let’s Make<br>It Happen<br>Together!</h3>
+                </div>
+
+                <div class="right-image-box">
+                    <div class="right-placeholder">
+                        <strong>PPDB SMP YP 17 Surabaya</strong><br><br>
+                        Pendaftaran online lebih mudah, cepat, dan langsung masuk ke sistem sekolah.
+                    </div>
+                </div>
+
+                <div class="right-wa-note">Ping us for any inquiries!</div>
+            </div>
+        </div>
     </div>
 </div>
+
+<div class="modal-overlay <?php echo $showModal ? 'active' : ''; ?>" id="successModal">
+    <div class="modal-box">
+        <div class="modal-icon">✓</div>
+        <h3>Pendaftaran Berhasil</h3>
+        <p>
+            Terima kasih telah mendaftar.<br>
+            Silakan konfirmasi ke admin melalui WhatsApp agar pendaftaranmu segera dicek.
+        </p>
+        <div class="modal-actions">
+            <button class="btn-modal" onclick="closeModal()">Nanti Saja</button>
+            <a href="<?php echo htmlspecialchars($waLink); ?>" class="btn-wa" target="_blank">Konfirmasi ke Admin</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function closeModal() {
+    document.getElementById('successModal').classList.remove('active');
+}
+</script>
 
 </body>
 </html>
