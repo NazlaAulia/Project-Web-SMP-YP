@@ -98,6 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <title>PPDB Online - SMP YP 17 Surabaya</title>
     <link rel="stylesheet" href="pendaftaran.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
@@ -108,8 +109,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <div class="register-left" data-aos="fade-right">
             <div class="brand-row">
-                <div class="brand-mark">co.</div>
-                <div class="top-login-text">Sudah pernah daftar? <a href="#">Sign in here!</a></div>
+             <div class="brand-logo">
+    <img src="img/logo.webp" alt="Logo SMP YP 17 Surabaya">
+
+    
+</div>
+                <div class="top-login-text">Sudah pernah daftar? <a href="login.php">Masuk Sekarang!</a></div>
             </div>
 
             <div class="form-heading">
@@ -122,6 +127,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <?php echo htmlspecialchars($pesan); ?>
                 </div>
             <?php endif; ?>
+
+            <?php if ($showModal && !empty($waLink)) : ?>
+    <div class="wa-reminder-box">
+        <strong>Silakan lanjut konfirmasi ke admin.</strong>
+        <a href="<?php echo htmlspecialchars($waLink); ?>" target="_blank">
+            Chat Admin via WhatsApp
+        </a>
+    </div>
+<?php endif; ?>
 
             <form method="POST" action="">
                 <div class="form-row full">
@@ -186,13 +200,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <input type="checkbox" required>
                     <span>Saya mengisi data dengan benar dan siap menunggu verifikasi admin.</span>
                 </div>
-
+ <div class="form-note">
+                    Data akan masuk dengan status menunggu.
+                </div>
+                
                 <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
 
-                <div class="form-note">
-                    Data akan masuk ke tabel pendaftaran dengan status menunggu.
-                </div>
+               
+                <a href="index.html" class="btn-back-dashboard">Kembali ke Dashboard</a>
             </form>
+            
         </div>
 
         <div class="register-right" data-aos="fade-left" data-aos-delay="200">
@@ -202,13 +219,92 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
 
                 <div class="right-image-box">
-                    <div class="right-placeholder">
-                        <strong>PPDB SMP YP 17 Surabaya</strong><br><br>
-                        Pendaftaran online lebih mudah, cepat, dan langsung masuk ke sistem sekolah.
-                    </div>
                 </div>
+<div class="right-placeholder">
+    <p style="margin-bottom: 20px;">Pendaftaran online lebih mudah, cepat, dan langsung masuk ke sistem sekolah.</p>
+    
+    <div class="school-features">
+        <div class="feat-item" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px;">✓</span>
+            <span>Akreditasi A</span>
+        </div>
+        <div class="feat-item" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px;">✓</span>
+            <span>Ekstrakurikuler Lengkap</span>
+        </div>
+        <div class="feat-item" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px;">✓</span>
+            <span>Laboratorium Komputer Modern</span>
+        </div>
+    </div>
+</div>
+<div class="fasilitas-action" style="margin-top: 20px; text-align: left;">
+    <a href="fasilitas.php" class="btn-fasilitas">
+        <span>Lihat Detail Fasilitas</span>
+        <i class="icon-arrow">→</i>
+    </a>
+    <p style="font-size: 11px; opacity: 0.7; margin-top: 8px; font-style: italic;">
+        lihat fasilitas lebih lanjut
+    </p>
+</div>
 
-                <div class="right-wa-note">Ping us for any inquiries!</div>
+<div class="live-stats-container" style="margin-top: 35px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+    <div class="stat-card" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
+        <span style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px;">Pendaftar Hari Ini</span>
+        <strong style="font-size: 24px; color: var(--secondary);">12</strong>
+        <span style="font-size: 12px; display: block; opacity: 0.7;">Siswa</span>
+    </div>
+
+    <div class="stat-card" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
+        <span style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px;">Kuota Tersedia</span>
+        <strong style="font-size: 24px; color: #ffffff;">45</strong>
+        <span style="font-size: 12px; display: block; opacity: 0.7;">Kursi</span>
+    </div>
+</div>
+
+<div class="quota-progress" style="margin-top: 20px;">
+    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; opacity: 0.8;">
+        <span>Pengisian Kuota</span>
+        <span>75% Terisi</span>
+    </div>
+    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
+        <div style="width: 75%; height: 100%; background: var(--secondary); border-radius: 10px; animation: loadProgress 2s ease-out;"></div>
+    </div>
+
+</div>
+
+<div class="contact-info-box" style="margin-top: 25px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border-left: 4px solid var(--secondary); text-align: left;">
+    <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--secondary); font-weight: 700; margin-bottom: 5px;">Informasi Bantuan</span>
+    <p style="font-size: 13px; margin: 0; opacity: 0.9; line-height: 1.5;">
+        Senin - Sabtu (08:00 - 14:00 WIB)<br>
+        Gedung Pusat Informasi Lantai 1
+    </p>
+</div>
+
+<div class="testi-running" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+    <div class="marquee-wrap" style="overflow: hidden; white-space: nowrap;">
+        <p class="animate-text" style="display: inline-block; font-size: 13px; font-style: italic; opacity: 0.8; animation: mlakuKiri 15s linear infinite;">
+            "Belajar di SMP YP 17 Surabaya seru banget, fasilitasnya lengkap! - Alumni 2025" &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 
+            "Sekolahnya nyaman dan gurunya ramah-ramah! - Siswa Kelas 8" &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp;
+        </p>
+    </div>
+</div>
+                <div class="right-wa-note">PPDB ONLINE</div>
+
+                <div class="social-media-footer" style="margin-top: 30px; text-align: center;">
+    <p style="font-size: 11px; opacity: 0.6; margin-bottom: 12px; letter-spacing: 1px; text-transform: uppercase;">Follow Us On</p>
+    <div class="social-icons" style="display: flex; justify-content: center; gap: 20px;">
+        <a href="https://instagram.com/smpyp17sby" target="_blank" class="soc-link">
+            <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://wa.me/62xxxxxxxxxx" target="_blank" class="soc-link">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        <a href="https://youtube.com/c/smpyp17sby" target="_blank" class="soc-link">
+            <i class="fab fa-youtube"></i>
+        </a>
+    </div>
+</div>
             </div>
         </div>
     </div>
@@ -222,9 +318,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             Terima kasih telah mendaftar.<br>
             Silakan konfirmasi ke admin melalui WhatsApp agar pendaftaranmu segera dicek.
         </p>
+
         <div class="modal-actions">
-            <button class="btn-modal" onclick="closeModal()">Nanti Saja</button>
-            <a href="<?php echo htmlspecialchars($waLink); ?>" class="btn-wa" target="_blank">Konfirmasi ke Admin</a>
+            <button type="button" class="btn-modal" onclick="closeModal()">Nanti Saja</button>
+           <a href="<?php echo htmlspecialchars($waLink); ?>" class="btn-wa" target="_blank" onclick="closeModal();">
+    Konfirmasi ke Admin
+</a>
         </div>
     </div>
 </div>
