@@ -49,7 +49,7 @@ $nama_kelas = !empty($s['nama_kelas']) ? $s['nama_kelas'] : '-';
                 <li><a href="#"><i class="fas fa-calendar-alt"></i> Jadwal</a></li>
                 <li><a href="#"><i class="fas fa-medal"></i> Peringkat</a></li>
                 <li><a href="#"><i class="fas fa-user"></i> Profil Siswa</a></li>
-                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
 
             <div class="sidebar-footer">
