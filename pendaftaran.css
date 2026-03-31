@@ -1,26 +1,26 @@
 :root {
-    --primary: #07484a;
+    --primary: #07484a; 
     --primary-light: #0b6164;
-    --primary-soft: #1aa39c;
-    --secondary: #f5a425;
+    --secondary: #f4a261;
+    --secondary-soft: #ffb37b;
+    --bg-page: #eef2f5;
     --white: #ffffff;
-    --text-light: #f4f4f4;
-    --text-dark: #1f2937;
-    --shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
-    --radius-xl: 24px;
-    --radius-lg: 18px;
-    --radius-md: 12px;
+    --text-main: #2c3e50;
+    --text-muted: #6f7b8a;
+    --radius: 16px;
+    --shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
 }
 
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #2f376f;
-    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-main);
 }
 
 .page-wrap {
@@ -28,109 +28,54 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 30px 15px;
 }
 
 .register-card {
     width: 100%;
-    max-width: 1180px;
-    min-height: 700px;
-    border-radius: 0;
+    max-width: 1100px;
+    background: var(--white);
+    border-radius: var(--radius);
     overflow: hidden;
     box-shadow: var(--shadow);
     display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    background: linear-gradient(135deg, #1db9b2 0%, #56d3a2 100%);
+    grid-template-columns: 1.1fr 0.9fr;
+}
+
+/* PANEL KIRI (FORM) */
+.register-left {
+    padding: 50px 60px;
+    background: white;
     position: relative;
-}
-
-.register-card::before,
-.register-card::after {
-    content: "";
-    position: absolute;
-    border: 1px solid rgba(255,255,255,0.12);
-    pointer-events: none;
-}
-
-.register-card::before {
-    inset: 18px;
-}
-
-.register-card::after {
-    inset: 34px;
-    opacity: 0.4;
-}
-
-.register-left,
-.register-right {
-    position: relative;
-    z-index: 2;
-    padding: 48px 44px;
-}
-
-.brand-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 36px;
 }
 
 .brand-mark {
-    font-size: 30px;
+    font-size: 26px;
     font-weight: 800;
     color: var(--primary);
-    letter-spacing: 1px;
-}
-
-.top-login-text {
-    font-size: 12px;
-    color: rgba(255,255,255,0.85);
-}
-
-.top-login-text a {
-    color: var(--primary);
-    font-weight: 700;
-    text-decoration: none;
+    margin-bottom: 30px;
+    display: block;
 }
 
 .form-heading h2 {
-    margin: 0 0 10px;
-    font-size: 42px;
-    color: var(--white);
+    font-size: 34px;
+    color: var(--primary);
     font-weight: 800;
+    margin-bottom: 8px;
 }
 
 .form-heading p {
-    margin: 0 0 28px;
-    color: rgba(255,255,255,0.92);
-    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 35px;
+    font-size: 15px;
 }
 
-.alert {
-    padding: 14px 16px;
-    border-radius: 12px;
-    margin-bottom: 18px;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.alert.success {
-    background: rgba(255,255,255,0.18);
-    color: #ffffff;
-    border: 1px solid rgba(255,255,255,0.25);
-}
-
-.alert.error {
-    background: rgba(180, 30, 30, 0.16);
-    color: #fff;
-    border: 1px solid rgba(180, 30, 30, 0.28);
-}
-
+/* Form Styles */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 20px;
+    margin-bottom: 18px;
 }
 
 .form-row.full {
@@ -139,271 +84,189 @@ body {
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
-    color: var(--white);
     font-weight: 700;
     font-size: 13px;
+    color: var(--primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.form-group input,
-.form-group select,
+.form-group input, 
+.form-group select, 
 .form-group textarea {
     width: 100%;
-    padding: 13px 14px;
-    border: none;
-    border-radius: 0;
-    background: rgba(255,255,255,0.95);
-    color: var(--text-dark);
-    font-size: 14px;
+    padding: 12px 16px;
+    border: 2px solid #f0f3f5;
+    background: #f9fbfc;
+    border-radius: 10px;
     font-family: inherit;
+    font-size: 14px;
+    transition: 0.3s;
     outline: none;
 }
 
-.form-group textarea {
-    min-height: 110px;
-    resize: vertical;
-}
-
-.form-group input:focus,
-.form-group select:focus,
+.form-group input:focus, 
+.form-group select:focus, 
 .form-group textarea:focus {
-    box-shadow: 0 0 0 3px rgba(7,72,74,0.18);
+    border-color: var(--secondary);
+    background: white;
+    box-shadow: 0 5px 15px rgba(244, 162, 97, 0.1);
 }
 
 .agreement {
     display: flex;
     gap: 10px;
-    align-items: flex-start;
-    margin: 14px 0 20px;
-    color: rgba(255,255,255,0.92);
+    margin: 25px 0;
     font-size: 13px;
-    line-height: 1.5;
-}
-
-.agreement input {
-    margin-top: 4px;
-    accent-color: var(--primary);
+    color: var(--text-muted);
+    align-items: center;
 }
 
 .btn-submit {
-    border: none;
+    width: 100%;
+    padding: 16px;
     background: var(--primary);
     color: white;
-    padding: 14px 20px;
-    min-width: 220px;
-    font-size: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    transition: 0.25s ease;
+    transition: 0.3s;
 }
 
 .btn-submit:hover {
-    background: #05393a;
+    background: var(--secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(244, 162, 97, 0.3);
 }
 
-.form-note {
-    margin-top: 18px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.88);
-    line-height: 1.6;
-}
-
-/* RIGHT PANEL */
+/* PANEL KANAN (PROMOSI/HIASAN) */
 .register-right {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.right-box {
-    width: 100%;
-    max-width: 360px;
-    position: relative;
-}
-
-.right-title-box {
-    background: rgba(7,72,74,0.92);
+    background: var(--primary);
+    padding: 60px;
     color: white;
-    padding: 22px 24px;
-    width: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
-    z-index: 3;
-    margin-bottom: -20px;
-    margin-left: 10px;
+    overflow: hidden;
+}
+
+/* Variasi hiasan bulat biar gak sepi */
+.register-right::after {
+    content: "";
+    position: absolute;
+    bottom: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
 }
 
 .right-title-box h3 {
-    margin: 0;
-    font-size: 22px;
-    line-height: 1.15;
+    font-size: 42px;
     font-weight: 800;
-}
-
-.right-image-box {
-    background: rgba(255,255,255,0.18);
-    min-height: 280px;
-    border: 2px solid rgba(255,255,255,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 22px;
-    position: relative;
-}
-
-.right-image-box img {
-    width: 100%;
-    max-width: 250px;
-    object-fit: cover;
+    line-height: 1.1;
+    margin-bottom: 25px;
+    color: var(--secondary);
 }
 
 .right-placeholder {
-    color: white;
-    text-align: center;
-    line-height: 1.7;
-    font-size: 15px;
+    font-size: 16px;
+    line-height: 1.8;
+    opacity: 0.9;
 }
 
 .right-wa-note {
-    margin-top: 14px;
-    background: white;
-    color: var(--primary);
+    margin-top: 40px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px 20px;
+    border-radius: 50px;
     display: inline-block;
-    padding: 10px 16px;
-    font-size: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ALERTS */
+.alert {
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-size: 14px;
     font-weight: 600;
 }
-
-.dot-pattern {
-    position: absolute;
-    width: 70px;
-    height: 70px;
-    opacity: 0.18;
-    background-image: radial-gradient(var(--primary) 1.4px, transparent 1.4px);
-    background-size: 10px 10px;
-}
-
-.dot-1 {
-    top: 120px;
-    left: 250px;
-}
-
-.dot-2 {
-    bottom: 70px;
-    right: 20px;
-}
+.alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
 /* MODAL */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(7, 72, 74, 0.8);
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
-    padding: 20px;
+    z-index: 1000;
 }
-
-.modal-overlay.active {
-    display: flex;
-}
-
+.modal-overlay.active { display: flex; }
 .modal-box {
-    width: 100%;
-    max-width: 460px;
-    background: #fff;
-    border-radius: 18px;
-    padding: 28px 24px;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 450px;
     text-align: center;
-    box-shadow: 0 20px 45px rgba(0,0,0,0.2);
 }
-
 .modal-icon {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 18px;
-    border-radius: 50%;
-    background: rgba(37, 211, 102, 0.12);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
+    font-size: 50px;
     color: #25d366;
+    margin-bottom: 15px;
 }
-
-.modal-box h3 {
-    margin: 0 0 10px;
-    color: var(--primary);
-    font-size: 28px;
-}
-
-.modal-box p {
-    margin: 0 0 22px;
-    color: #4b5563;
-    line-height: 1.7;
-    font-size: 15px;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.btn-modal,
-.btn-wa {
-    border: none;
-    padding: 13px 18px;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-modal {
-    background: #e5e7eb;
-    color: #374151;
-}
-
 .btn-wa {
     background: #25d366;
     color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-block;
+    margin-top: 15px;
 }
 
-@media (max-width: 992px) {
-    .register-card {
-        grid-template-columns: 1fr;
-    }
-
-    .register-right {
-        padding-top: 0;
-    }
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .register-card { grid-template-columns: 1fr; }
+    .register-right { display: none; } /* Sembunyikan panel kanan di HP */
+    .register-left { padding: 40px 30px; }
 }
 
-@media (max-width: 640px) {
-    .register-left,
-    .register-right {
-        padding: 28px 20px;
-    }
+/* 1. Untuk Judul yang berubah warna */
+.right-title-box h3 {
+    font-size: 38px;
+    font-weight: 800;
+    /* TAMBAHKAN BARIS INI */
+    animation: gantiWarna 5s infinite; 
+}
 
-    .form-row {
-        grid-template-columns: 1fr;
-    }
+/* 2. Untuk Lingkaran di pojok yang bergerak */
+.dot-pattern.dot-2 {
+    /* ... kode posisi lingkaranmu ... */
+    /* TAMBAHKAN BARIS INI */
+    animation: gerakMuter 8s infinite ease-in-out;
+}
 
-    .form-heading h2 {
-        font-size: 32px;
-    }
+/* --- KODE RESEP ANIMASINYA (Taruh di paling bawah CSS) --- */
 
-    .brand-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
+@keyframes gantiWarna {
+    0%   { color: #f4a261; } /* Warna Orange asli */
+    50%  { color: #1db9b2; } /* Berubah ke Hijau Toska */
+    100% { color: #f4a261; } /* Balik ke Orange lagi */
+}
 
-    .right-title-box {
-        width: 100%;
-        margin-left: 0;
-    }
+@keyframes gerakMuter {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    50%  { transform: translate(-20px, 15px) rotate(10deg); } /* Gerak sedikit ke samping & muter */
+    100% { transform: translate(0, 0) rotate(0deg); }
 }

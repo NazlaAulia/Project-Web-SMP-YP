@@ -97,6 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPDB Online - SMP YP 17 Surabaya</title>
     <link rel="stylesheet" href="pendaftaran.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body>
 
@@ -105,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="dot-pattern dot-1"></div>
         <div class="dot-pattern dot-2"></div>
 
-        <div class="register-left">
+        <div class="register-left" data-aos="fade-right">
             <div class="brand-row">
                 <div class="brand-mark">co.</div>
                 <div class="top-login-text">Sudah pernah daftar? <a href="#">Sign in here!</a></div>
@@ -194,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </form>
         </div>
 
-        <div class="register-right">
+        <div class="register-right" data-aos="fade-left" data-aos-delay="200">
             <div class="right-box">
                 <div class="right-title-box">
                     <h3>Let’s Make<br>It Happen<br>Together!</h3>
@@ -234,5 +235,13 @@ function closeModal() {
 }
 </script>
 
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000,
+    once: true
+  });
+</script>
+<script src="pendaftaran.js"></script>
 </body>
 </html>
