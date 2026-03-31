@@ -4,7 +4,7 @@ include 'koneksi.php';
 
 // 🔒 Cek login
 if (!isset($_SESSION['id_siswa'])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit;
 }
 
