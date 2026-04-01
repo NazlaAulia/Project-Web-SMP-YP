@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Import Guru ke Firebase</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 24px;
+      background: #f5f7f8;
+    }
+    .box {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    button {
+      background: #07484a;
+      color: white;
+      border: none;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    button:hover { background: #06393b; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    pre {
+      background: #f0f3f5;
+      padding: 14px;
+      border-radius: 10px;
+      overflow: auto;
+      font-size: 13px;
+      max-height: 420px;
+      white-space: pre-wrap;
+    }
+    code {
+      display: block;
+      background: #f8fafb;
+      border: 1px solid #dde5e7;
+      padding: 10px;
+      border-radius: 10px;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+    #status { margin-top: 16px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Import Guru ke Firebase</h2>
+    <p>Isi dulu <b>firebaseConfig</b>-mu, lalu klik tombol import.</p>
+
+    <button id="btnImport">Import guru</button>
+    <div id="status">Belum dijalankan.</div>
+    <pre id="log"></pre>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+       apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
+  authDomain: "smpyp17.firebaseapp.com",
+  databaseURL: "https://smpyp17-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smpyp17",
+  storageBucket: "smpyp17.firebasestorage.app",
+  messagingSenderId: "74715637846",
+  appId: "1:74715637846:web:2e3ed5dc6bf4079aa1b3f7",
+  measurementId: "G-NEKTB23085"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const dataList = [
+  {
+    "id_guru": 1,
+    "nip": "1001",
+    "nama": "Dra. Mimik Pudjiati",
+    "id_mapel": 1
+  },
+  {
+    "id_guru": 2,
+    "nip": "1002",
+    "nama": "Dra. Yayuk Suminingsih",
+    "id_mapel": 2
+  },
+  {
+    "id_guru": 3,
+    "nip": "1003",
+    "nama": "Dra. Endang Aryati",
+    "id_mapel": 1
+  },
+  {
+    "id_guru": 4,
+    "nip": "1004",
+    "nama": "Murni, S.Pd",
+    "id_mapel": 3
+  },
+  {
+    "id_guru": 5,
+    "nip": "1005",
+    "nama": "Budi Utami, S.Pd",
+    "id_mapel": 1
+  },
+  {
+    "id_guru": 6,
+    "nip": "1006",
+    "nama": "Edy Susilo, S.Pd",
+    "id_mapel": 4
+  },
+  {
+    "id_guru": 7,
+    "nip": "1007",
+    "nama": "Mohamad Hanafi, S.Pd",
+    "id_mapel": 5
+  },
+  {
+    "id_guru": 8,
+    "nip": "1008",
+    "nama": "Dra. Mustajab",
+    "id_mapel": 1
+  },
+  {
+    "id_guru": 9,
+    "nip": "1009",
+    "nama": "Mayudin, S.Pd",
+    "id_mapel": 1
+  },
+  {
+    "id_guru": 10,
+    "nip": "1010",
+    "nama": "Enny Rusiwanto, S.Pd",
+    "id_mapel": 6
+  },
+  {
+    "id_guru": 11,
+    "nip": "1011",
+    "nama": "Nova Kurniawati, S.Pd",
+    "id_mapel": 7
+  },
+  {
+    "id_guru": 12,
+    "nip": "1012",
+    "nama": "Makhus Juwadi, S.Pd",
+    "id_mapel": 5
+  },
+  {
+    "id_guru": 13,
+    "nip": "1013",
+    "nama": "Saiful Bachri Gani, S.Pd",
+    "id_mapel": 3
+  },
+  {
+    "id_guru": 14,
+    "nip": "1014",
+    "nama": "Lilik Kusnarti, S.Pd",
+    "id_mapel": 8
+  },
+  {
+    "id_guru": 15,
+    "nip": "1015",
+    "nama": "Rizky Rahardi, S.Pd",
+    "id_mapel": 6
+  },
+  {
+    "id_guru": 16,
+    "nip": "1016",
+    "nama": "Dina Surya, S.Pd",
+    "id_mapel": 8
+  },
+  {
+    "id_guru": 17,
+    "nip": "1017",
+    "nama": "Dwi Cahyo Suryono, S.Pd",
+    "id_mapel": 5
+  },
+  {
+    "id_guru": 18,
+    "nip": "1018",
+    "nama": "Aan Kristian A.S, S.Pd",
+    "id_mapel": 8
+  },
+  {
+    "id_guru": 19,
+    "nip": "1019",
+    "nama": "Dyah Utami Sari, S.Pd",
+    "id_mapel": 9
+  },
+  {
+    "id_guru": 20,
+    "nip": "1020",
+    "nama": "Nindya Soraya, S.T",
+    "id_mapel": 10
+  },
+  {
+    "id_guru": 21,
+    "nip": "1021",
+    "nama": "Taufiq Rahman, S.Ud",
+    "id_mapel": 11
+  },
+  {
+    "id_guru": 22,
+    "nip": "1022",
+    "nama": "Siti Choiriyah, S.Pd",
+    "id_mapel": 1
+  },
+  {
+    "id_guru": 23,
+    "nip": "1023",
+    "nama": "Haris Suprapti Ningrum, S.Ud",
+    "id_mapel": 11
+  },
+  {
+    "id_guru": 24,
+    "nip": "1024",
+    "nama": "Ahmad Faris, S.Or",
+    "id_mapel": 12
+  },
+  {
+    "id_guru": 25,
+    "nip": "2001",
+    "nama": "Osa Noraise, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 26,
+    "nip": "2002",
+    "nama": "Nindy Putri Oktaviara, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 27,
+    "nip": "2003",
+    "nama": "Sangar Deni Daud Smi, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 28,
+    "nip": "2004",
+    "nama": "Sendy Aprinika Ningrum, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 29,
+    "nip": "2005",
+    "nama": "Agus Mahendra, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 30,
+    "nip": "2006",
+    "nama": "Dwi Atika, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 31,
+    "nip": "2007",
+    "nama": "Achmad Farkan, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 32,
+    "nip": "2008",
+    "nama": "Riyadna Krismanita, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 33,
+    "nip": "2009",
+    "nama": "Emy Kusmawati, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 34,
+    "nip": "2010",
+    "nama": "M. Khabib Khamida, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 35,
+    "nip": "2011",
+    "nama": "Vandyn Dyah Palupi, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 36,
+    "nip": "2012",
+    "nama": "Fajar Andrian, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 37,
+    "nip": "2013",
+    "nama": "Lilis Kurnia Valantin, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 38,
+    "nip": "2014",
+    "nama": "Aziza Prastiya Novitasari, S.Hum",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 39,
+    "nip": "2015",
+    "nama": "Okta Surya, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 40,
+    "nip": "2016",
+    "nama": "Achmad Purgantoro, S.Pd",
+    "id_mapel": null
+  },
+  {
+    "id_guru": 42,
+    "nip": "2017",
+    "nama": "Lilik Ratnawati, S.Pd",
+    "id_mapel": null
+  }
+];
+
+    const statusEl = document.getElementById("status");
+    const logEl = document.getElementById("log");
+    const btn = document.getElementById("btnImport");
+
+    function log(text) {
+      logEl.textContent += text + "\n";
+    }
+
+    async function importCollection() {
+      log("Mulai import guru...");
+      for (const item of dataList) {
+        const docId = String(item["id_guru"]);
+        await setDoc(doc(db, "guru", docId), item);
+        log("- guru/" + docId + " berhasil");
+      }
+      log("Selesai import guru.");
+    }
+
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      statusEl.textContent = "Sedang import guru...";
+      logEl.textContent = "";
+
+      try {
+        await importCollection();
+        statusEl.textContent = "Import guru selesai 🎉";
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = "Import guru gagal: " + error.message;
+        log("ERROR: " + error.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
