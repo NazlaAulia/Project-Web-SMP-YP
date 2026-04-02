@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Import Pengumuman</title>
+</head>
+<body>
+
+<button onclick="importPengumuman()">Import Pengumuman</button>
+<p id="status"></p>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+ apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
+  authDomain: "smpyp17.firebaseapp.com",
+  databaseURL: "https://smpyp17-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smpyp17",
+  storageBucket: "smpyp17.firebasestorage.app",
+  messagingSenderId: "74715637846",
+  appId: "1:74715637846:web:2e3ed5dc6bf4079aa1b3f7",
+  measurementId: "G-NEKTB23085"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const dataPengumuman = [
+  {
+    id_pengumuman: 1,
+    judul: "Libur Sekolah",
+    isi: "Libur dimulai tanggal 10 April",
+    tanggal: "2026-04-01",
+    status: "aktif"
+  },
+  {
+    id_pengumuman: 2,
+    judul: "Ujian Tengah Semester",
+    isi: "UTS dimulai minggu depan",
+    tanggal: "2026-04-02",
+    status: "aktif"
+  }
+];
+
+window.importPengumuman = async function() {
+  const status = document.getElementById("status");
+  status.innerText = "Import pengumuman...";
+
+  try {
+    for (let p of dataPengumuman) {
+      await setDoc(doc(db, "pengumuman", String(p.id_pengumuman)), p);
+    }
+    status.innerText = "Import selesai 🎉";
+  } catch (err) {
+    console.error(err);
+    status.innerText = "Error: " + err.message;
+  }
+};
+</script>
+
+</body>
+</html>
