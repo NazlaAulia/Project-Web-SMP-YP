@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profil Siswa | Smart School</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body class="dashboard-body">
+
+  <div class="dashboard-wrapper">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <img src="../img/logo.webp" alt="Logo" class="logo" />
+      </div>
+
+      <ul class="sidebar-menu">
+        <li><a href="siswa.html"><i class="fas fa-th-large"></i> Dashboard Siswa</a></li>
+        <li><a href="#"><i class="fas fa-chart-line"></i> Performa Akademik</a></li>
+        <li><a href="#"><i class="fas fa-file-alt"></i> Nilai</a></li>
+        <li><a href="#"><i class="fas fa-calendar-alt"></i> Jadwal</a></li>
+        <li><a href="#"><i class="fas fa-medal"></i> Peringkat</a></li>
+        <li class="active"><a href="profil-siswa.html"><i class="fas fa-user"></i> Profil Siswa</a></li>
+        <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="logout.html" class="logout-btn">Log Out</a>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <header class="top-header">
+        <div class="search-container">
+          <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." />
+        </div>
+        <div class="user-info">
+          <span class="notif-badge" id="namaKelas">-</span>
+          <div class="user-profile-top">
+            <div class="avatar-placeholder" id="avatarPlaceholder">-</div>
+            <span class="user-name" id="namaSiswa">Memuat...</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="profil-page">
+        <div class="profil-header-box">
+          <h1>Profil Siswa</h1>
+          <p>Halaman profil ini menampilkan detail informasi Anda.</p>
+        </div>
+
+        <div class="profil-content-box">
+          <div class="profil-left">
+            <div class="profil-photo-frame">
+              <img
+                id="fotoProfil"
+                src="https://via.placeholder.com/150x150.png?text=Foto"
+                alt="Foto Profil"
+                class="profil-photo-img"
+              />
+            </div>
+          </div>
+
+          <div class="profil-right">
+            <div class="profil-grid">
+              <div class="profil-col">
+                <div class="profil-item">
+                  <h4>Nama Lengkap</h4>
+                  <p id="nama">-</p>
+                </div>
+
+                <div class="profil-item">
+                  <h4>NIS / NISN</h4>
+                  <p id="nisn">-</p>
+                </div>
+
+                <div class="profil-item">
+                  <h4>Kelas</h4>
+                  <p id="kelas">-</p>
+                </div>
+              </div>
+
+              <div class="profil-col">
+                <div class="profil-item">
+                  <h4>Email</h4>
+                  <p id="email">-</p>
+                </div>
+
+                <div class="profil-item">
+                  <h4>No HP</h4>
+                  <p id="noHp">-</p>
+                </div>
+
+                <div class="profil-item">
+                  <h4>Alamat</h4>
+                  <p id="alamat">-</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="profil-readonly-bar">
+              Data profil hanya bisa dilihat oleh siswa.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="profil-siswa.js"></script>
+</body>
+</html>
