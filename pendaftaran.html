@@ -309,7 +309,7 @@ form.addEventListener("submit", async function(e) {
         console.log("Mulai kirim ke Firebase...", data);
 
         await Promise.race([
-            addDoc(collection(db, "pendaftaran"), data),
+            setDoc(doc(db, "pendaftaran", "1"), data)
             new Promise((_, reject) =>
                 setTimeout(() => reject(new Error("Request timeout: Firebase terlalu lama merespons.")), 15000)
             )
