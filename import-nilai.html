@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Import Nilai</title>
+</head>
+<body>
+
+<button onclick="importNilai()">Import Nilai</button>
+<p id="status"></p>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
+  authDomain: "smpyp17.firebaseapp.com",
+  databaseURL: "https://smpyp17-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smpyp17",
+  storageBucket: "smpyp17.firebasestorage.app",
+  messagingSenderId: "74715637846",
+  appId: "1:74715637846:web:2e3ed5dc6bf4079aa1b3f7",
+  measurementId: "G-NEKTB23085"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// contoh nilai
+const nilaiData = [
+  { id_nilai: 1, id_siswa: 1700, id_mapel: 1, nilai: 85 },
+  { id_nilai: 2, id_siswa: 1701, id_mapel: 2, nilai: 90 },
+  { id_nilai: 3, id_siswa: 1702, id_mapel: 3, nilai: 78 },
+  { id_nilai: 4, id_siswa: 1703, id_mapel: 1, nilai: 88 }
+];
+
+window.importNilai = async function() {
+  const status = document.getElementById("status");
+  status.innerText = "Import nilai...";
+
+  try {
+    for (let n of nilaiData) {
+      await setDoc(doc(db, "nilai", String(n.id_nilai)), n);
+    }
+    status.innerText = "Import nilai selesai 🎉";
+  } catch (err) {
+    console.error(err);
+    status.innerText = "Error: " + err.message;
+  }
+};
+</script>
+
+</body>
+</html>
