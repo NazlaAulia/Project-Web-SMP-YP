@@ -1,42 +1,4 @@
-<?php
-session_start();
-$conn = mysqli_connect("localhost", "root", "", "sekolahyp");
 
-if (!$conn) {
-    die("Koneksi ke database gagal: " . mysqli_connect_error());
-}
-
-$error_login = false; // Supaya warning orange ilang
-
-if (isset($_POST['login'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    $query = mysqli_query($conn, "SELECT * FROM user WHERE username='$username' AND password='$password'");
-    $data = mysqli_fetch_assoc($query);
-
-   if ($data) {
-    $_SESSION['username'] = $data['username'];
-    $_SESSION['role_id'] = $data['role_id'];
-    $_SESSION['id_siswa'] = $data['id_siswa'] ?? null;
-    $_SESSION['id_guru'] = $data['id_guru'] ?? null;
-    $_SESSION['id_user'] = $data['id_user'];
-
-   if ($data['role_id'] == 1) {
-    header("Location: admin.php");
-    exit;
-} else if ($data['role_id'] == 2) {
-    header("Location: guru/guru.php");
-    exit;
-} else if ($data['role_id'] == 3) {
-    header("Location: siswa/siswa.php");
-    exit;
-}
-}else {
-        $error_login = true; 
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -57,7 +19,7 @@ if (isset($_POST['login'])) {
                     <p>Mulai pengalaman belajar barumu</p>
                 </div>
 
-                <form action="login.php" method="POST" class="siakad-form" id="mainLoginForm">
+               <form class="siakad-form">
                     <div class="input-group">
                         <label>Username</label>
                         <div class="input-field">
@@ -140,16 +102,56 @@ if (isset($_POST['login'])) {
         };
     </script>
 
-    <?php if($error_login): ?>
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Login Gagal!',
-            text: 'Username Atau Passwoard salah',
-            confirmButtonColor: '#07484a'
-        });
-    </script>
-    <?php endif; ?>
+   <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 🔥 CONFIG KAMU
+const firebaseConfig = {
+  apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
+  authDomain: "smpyp17.firebaseapp.com",
+  projectId: "smpyp17",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// 🔥 LOGIN
+const form = document.querySelector(".siakad-form");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const username = document.querySelector("[name='username']").value;
+  const password = document.querySelector("[name='password']").value;
+
+  const q = query(
+    collection(db, "user"),
+    where("username", "==", username),
+    where("password", "==", password)
+  );
+
+  const querySnapshot = await getDocs(q);
+
+if (!querySnapshot.empty) {
+  const data = querySnapshot.docs[0].data();
+
+  localStorage.setItem("username", data.username);
+  localStorage.setItem("role_id", data.role_id);
+
+  if (data.role_id == 3) {
+    localStorage.setItem("id_siswa", data.id_siswa);
+    window.location.href = "siswa/siswa.html";
+  } else if (data.role_id == 2) {
+    window.location.href = "guru/guru.html";
+  } else if (data.role_id == 1) {
+    window.location.href = "admin.html";
+  }
+} else {
+    alert("Login gagal!");
+  }
+});
+</script>
 
 </body>
 </html>
