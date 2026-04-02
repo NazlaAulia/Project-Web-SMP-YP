@@ -243,7 +243,7 @@ AOS.init({
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
    apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
@@ -306,35 +306,64 @@ form.addEventListener("submit", async function(e) {
     };
 
     try {
-        console.log("Mulai kirim ke Firebase...", data);
+    console.log("Mulai kirim ke Firebase...", data);
 
-        await Promise.race([
-            setDoc(doc(db, "pendaftaran", "1"), data),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Request timeout: Firebase terlalu lama merespons.")), 15000)
-            )
-        ]);
+    const pendaftaranRef = collection(db, "pendaftaran");
+    const snapshot = await getDocs(pendaftaranRef);
 
-        const nomorAdmin = "6283846311788";
-        const pesanWa = `Halo Admin SMP YP 17 Surabaya,
+    let maxId = 0;
+    snapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        if (item.id_pendaftaran && item.id_pendaftaran > maxId) {
+            maxId = item.id_pendaftaran;
+        }
+    });
+
+    const idBaru = maxId + 1;
+
+    const dataDenganId = {
+        id_pendaftaran: idBaru,
+        nama_lengkap: namaLengkap,
+        nisn: nisn,
+        jenis_kelamin: jenisKelamin,
+        tanggal_lahir: tanggalLahir,
+        alamat: alamat,
+        asal_sekolah: asalSekolah,
+        no_hp: noHp,
+        email: email,
+        pendapatan_ortu: Number(pendapatanOrtu),
+        status: "menunggu",
+        tanggal_daftar: new Date().toISOString()
+    };
+
+    await Promise.race([
+        setDoc(doc(db, "pendaftaran", String(idBaru)), dataDenganId),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Request timeout: Firebase terlalu lama merespons.")), 15000)
+        )
+    ]);
+
+    const nomorAdmin = "6283846311788";
+    const pesanWa = `Halo Admin SMP YP 17 Surabaya,
 
 Saya atas nama *${namaLengkap}* telah melakukan pendaftaran PPDB.
+ID Pendaftaran: ${idBaru}
 NISN: ${nisn}
 Asal Sekolah: ${asalSekolah}
 No HP: ${noHp}
 
 Mohon konfirmasi pendaftaran saya. Terima kasih.`;
 
-        const waLink = `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesanWa)}`;
+    const waLink = `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesanWa)}`;
 
-        waBtn.href = waLink;
-        waReminderLink.href = waLink;
-        waReminder.style.display = "block";
+    waBtn.href = waLink;
+    waReminderLink.href = waLink;
+    waReminder.style.display = "block";
 
-        alertBox.innerHTML = `<div class="alert success">Pendaftaran berhasil dikirim silahkan di tunggu.</div>`;
-        modal.classList.add("active");
-        form.reset();
-    } catch (err) {
+    alertBox.innerHTML = `<div class="alert success">Pendaftaran berhasil dikirim silahkan di tunggu.</div>`;
+    modal.classList.add("active");
+    form.reset();
+}catch (err) {
         console.error("Firebase error:", err);
         alertBox.innerHTML = `<div class="alert error">Gagal menyimpan data: ${err.message}</div>`;
     } finally {
