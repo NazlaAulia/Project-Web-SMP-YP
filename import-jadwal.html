@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Import Jadwal</title>
+</head>
+<body>
+
+<button onclick="importJadwal()">Import Jadwal</button>
+<p id="status"></p>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
+  authDomain: "smpyp17.firebaseapp.com",
+  databaseURL: "https://smpyp17-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smpyp17",
+  storageBucket: "smpyp17.firebasestorage.app",
+  messagingSenderId: "74715637846",
+  appId: "1:74715637846:web:2e3ed5dc6bf4079aa1b3f7",
+  measurementId: "G-NEKTB23085"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// contoh jadwal (bisa kamu tambah sendiri nanti)
+const jadwalData = [
+  { id_jadwal: 1, id_kelas: 9, id_mapel: 1, id_guru: 1, hari: "Senin", jam: "07:00" },
+  { id_jadwal: 2, id_kelas: 9, id_mapel: 2, id_guru: 2, hari: "Senin", jam: "08:00" },
+  { id_jadwal: 3, id_kelas: 10, id_mapel: 3, id_guru: 3, hari: "Selasa", jam: "07:00" },
+  { id_jadwal: 4, id_kelas: 11, id_mapel: 4, id_guru: 4, hari: "Rabu", jam: "09:00" }
+];
+
+window.importJadwal = async function() {
+  const status = document.getElementById("status");
+  status.innerText = "Import jadwal...";
+
+  try {
+    for (let j of jadwalData) {
+      await setDoc(doc(db, "jadwal", String(j.id_jadwal)), j);
+    }
+    status.innerText = "Import jadwal selesai 🎉";
+  } catch (err) {
+    console.error(err);
+    status.innerText = "Error: " + err.message;
+  }
+};
+</script>
+
+</body>
+</html>
