@@ -133,22 +133,21 @@ form.addEventListener("submit", async (e) => {
 
   const querySnapshot = await getDocs(q);
 
-  if (!querySnapshot.empty) {
-    const data = querySnapshot.docs[0].data();
+if (!querySnapshot.empty) {
+  const data = querySnapshot.docs[0].data();
 
-    // 🔥 SIMPAN SESSION (LOCAL STORAGE)
-    localStorage.setItem("username", data.username);
-    localStorage.setItem("role_id", data.role_id);
+  localStorage.setItem("username", data.username);
+  localStorage.setItem("role_id", data.role_id);
 
-    if (data.role_id == 1) {
-      window.location.href = "admin.html";
-    } else if (data.role_id == 2) {
-      window.location.href = "guru.html";
-    } else if (data.role_id == 3) {
-      window.location.href = "siswa.html";
-    }
-
-  } else {
+  if (data.role_id == 3) {
+    localStorage.setItem("id_siswa", data.id_siswa);
+    window.location.href = "siswa/siswa.html";
+  } else if (data.role_id == 2) {
+    window.location.href = "guru/guru.html";
+  } else if (data.role_id == 1) {
+    window.location.href = "admin.html";
+  }
+} else {
     alert("Login gagal!");
   }
 });
