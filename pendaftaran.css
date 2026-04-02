@@ -408,22 +408,47 @@ body {
     background: #f6fbf9;
     border: 1px solid #cfe9dd;
     color: var(--primary);
+
     display: flex;
+    flex-direction: row;      /* penting */
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;        /* biar tetap samping */
 }
 
 .wa-reminder-box a {
     background: #25d366;
     color: #fff;
     text-decoration: none;
-    padding: 10px 16px;
+    padding: 8px 14px;
     border-radius: 10px;
     font-weight: 700;
+    font-size: 13px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    flex-shrink: 0;           /* biar tombol gak mengecil */
 }
 
+.wa-reminder-box strong {
+    font-size: 18px;     /* ⬅️ gedein tulisan */
+    font-weight: 800;    /* biar lebih tegas */
+    margin-bottom: 8px;  /* ⬅️ jarak ke tombol */
+    display: block;      /* penting biar bisa kasih jarak */
+}
+
+.wa-reminder-box a {
+    background: #25d366;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 18px;  /* dikit lebih lega */
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+}
 .btn-back-dashboard {
     display: block;
     width: 100%;
