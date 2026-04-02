@@ -3619,14 +3619,26 @@
     }
 
     async function importCollection() {
-      log("Mulai import siswa...");
-      for (const item of dataList) {
-        const docId = String(item["id_siswa"]);
-        await setDoc(doc(db, "siswa", docId), item);
-        log("- siswa/" + docId + " berhasil");
-      }
-      log("Selesai import siswa.");
-    }
+  log("Mulai import siswa...");
+
+  for (const item of dataList) {
+    const docId = String(item["id_siswa"]);
+
+    const siswaData = {
+      ...item,
+      nis: item.nis || item.nisn || "",
+      email: item.email || "",
+      no_hp: item.no_hp || "",
+      foto_profil: item.foto_profil || "",
+      kelas: item.kelas || ""
+    };
+
+    await setDoc(doc(db, "siswa", docId), siswaData);
+    log("- siswa/" + docId + " berhasil");
+  }
+
+  log("Selesai import siswa.");
+}
 
     btn.addEventListener("click", async () => {
       btn.disabled = true;
