@@ -1,5 +1,4 @@
-import { auth, db, storage } from "./firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { db, storage } from "./firebase-config.js";
 import {
   doc,
   getDoc,
@@ -10,6 +9,13 @@ import {
   uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+const idSiswa = localStorage.getItem("id_siswa");
+
+if (!idSiswa) {
+  alert("Silakan login terlebih dahulu.");
+  window.location.href = "../login.html";
+}
 
 const elNama = document.getElementById("nama");
 const elNisn = document.getElementById("nisn");
@@ -27,9 +33,6 @@ const elInputFoto = document.getElementById("inputFoto");
 const elBtnUploadFoto = document.getElementById("btnUploadFoto");
 
 const DEFAULT_PHOTO = "https://via.placeholder.com/150x150.png?text=Foto";
-
-let currentUser = null;
-let currentSiswaId = null;
 let selectedFile = null;
 
 const kelasMap = {
@@ -56,11 +59,11 @@ function setImage(el, src) {
   if (el) el.src = src || DEFAULT_PHOTO;
 }
 
-function setProfileUI(data, authUser) {
+function setProfileUI(data) {
   const nama = data?.nama || "-";
   const nisn = data?.nisn || data?.nis || "-";
   const kelas = data?.kelas || getKelasLabel(data?.id_kelas);
-  const email = data?.email || authUser?.email || "-";
+  const email = data?.email || "-";
   const noHp = data?.no_hp || data?.noHp || "-";
   const alamat = data?.alamat || "-";
   const foto = data?.foto_profil || data?.fotoProfil || DEFAULT_PHOTO;
@@ -75,39 +78,12 @@ function setProfileUI(data, authUser) {
 
   setText(elNamaSiswa, nama);
   setText(elNamaKelas, kelas);
-  setText(
-    elAvatarPlaceholder,
-    nama !== "-" ? nama.charAt(0).toUpperCase() : "-"
-  );
+  setText(elAvatarPlaceholder, nama !== "-" ? nama.charAt(0).toUpperCase() : "-");
 }
 
-async function loadProfilSiswa(user) {
+async function loadProfilSiswa() {
   try {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      alert("Data user tidak ditemukan di collection users.");
-      return;
-    }
-
-    const userData = userSnap.data();
-
-    if (userData.role !== "siswa") {
-      alert("Akun ini bukan akun siswa.");
-      return;
-    }
-
-    const siswaId = String(userData.siswaId || "");
-    if (!siswaId) {
-      alert("siswaId pada data user belum diisi.");
-      return;
-    }
-
-    currentUser = user;
-    currentSiswaId = siswaId;
-
-    const siswaRef = doc(db, "siswa", siswaId);
+    const siswaRef = doc(db, "siswa", String(idSiswa));
     const siswaSnap = await getDoc(siswaRef);
 
     if (!siswaSnap.exists()) {
@@ -116,7 +92,7 @@ async function loadProfilSiswa(user) {
     }
 
     const siswaData = siswaSnap.data();
-    setProfileUI(siswaData, user);
+    setProfileUI(siswaData);
   } catch (error) {
     console.error("Gagal load profil siswa:", error);
     alert("Gagal memuat profil siswa.");
@@ -145,8 +121,8 @@ function handlePreviewFoto(event) {
 
 async function uploadFotoProfil() {
   try {
-    if (!currentUser || !currentSiswaId) {
-      alert("Data user belum siap.");
+    if (!idSiswa) {
+      alert("Data siswa belum siap.");
       return;
     }
 
@@ -162,15 +138,12 @@ async function uploadFotoProfil() {
 
     const fileExt = selectedFile.name.split(".").pop();
     const fileName = `foto-${Date.now()}.${fileExt}`;
-    const storageRef = ref(
-      storage,
-      `foto-profil/${currentUser.uid}/${fileName}`
-    );
+    const storageRef = ref(storage, `foto-profil/${idSiswa}/${fileName}`);
 
     await uploadBytes(storageRef, selectedFile);
     const downloadURL = await getDownloadURL(storageRef);
 
-    const siswaRef = doc(db, "siswa", currentSiswaId);
+    const siswaRef = doc(db, "siswa", String(idSiswa));
     await updateDoc(siswaRef, {
       foto_profil: downloadURL
     });
@@ -178,9 +151,7 @@ async function uploadFotoProfil() {
     setImage(elFoto, downloadURL);
     alert("Foto profil berhasil diupload.");
 
-    if (elInputFoto) {
-      elInputFoto.value = "";
-    }
+    if (elInputFoto) elInputFoto.value = "";
     selectedFile = null;
   } catch (error) {
     console.error("Gagal upload foto profil:", error);
@@ -193,20 +164,7 @@ async function uploadFotoProfil() {
   }
 }
 
-if (elInputFoto) {
-  elInputFoto.addEventListener("change", handlePreviewFoto);
-}
+if (elInputFoto) elInputFoto.addEventListener("change", handlePreviewFoto);
+if (elBtnUploadFoto) elBtnUploadFoto.addEventListener("click", uploadFotoProfil);
 
-if (elBtnUploadFoto) {
-  elBtnUploadFoto.addEventListener("click", uploadFotoProfil);
-}
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    alert("Silakan login terlebih dahulu.");
-    window.location.href = "login.html";
-    return;
-  }
-
-  await loadProfilSiswa(user);
-});
+loadProfilSiswa();
