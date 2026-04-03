@@ -52,15 +52,24 @@
 
         <div class="profil-content-box">
           <div class="profil-left">
-            <div class="profil-photo-frame">
-              <img
-                id="fotoProfil"
-                src="https://via.placeholder.com/150x150.png?text=Foto"
-                alt="Foto Profil"
-                class="profil-photo-img"
-              />
-            </div>
-          </div>
+  <div class="profil-photo-card">
+    <div class="profil-photo-frame">
+      <img
+        id="fotoProfil"
+        src="https://via.placeholder.com/150x150.png?text=Foto"
+        alt="Foto Profil"
+        class="profil-photo-img"
+      />
+    </div>
+
+    <label for="inputFoto" class="btn-pilih-foto">Pilih Foto</label>
+    <input type="file" id="inputFoto" accept="image/*" hidden />
+
+    <button id="btnUploadFoto" type="button" class="btn-upload-foto">
+      Upload Foto
+    </button>
+  </div>
+</div>
 
           <div class="profil-right">
             <div class="profil-grid">
