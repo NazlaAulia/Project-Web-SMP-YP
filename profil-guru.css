@@ -1,0 +1,361 @@
+/* Update profil-guru.css */
+:root {
+    --primary: #07484a;
+    --primary-light: #0b6366;
+    --secondary: #f5a425;
+    --white: #ffffff;
+    --text-light: #f4f4f4;
+    --text-dark: #243436;
+    --text-muted: #6b7b7d;
+    --soft-bg: #f0f4f4; /* Warna bg sedikit lebih kontras agar card putih menonjol */
+    --card-border: rgba(7, 72, 74, 0.08);
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 20px 40px rgba(7, 72, 74, 0.15);
+}
+
+body {
+    background: var(--soft-bg);
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; /* Font lebih modern */
+    color: var(--text-dark);
+    margin: 0;
+}
+
+/* --- Hero Section --- */
+.guru-hero {
+    background: linear-gradient(rgba(7, 72, 74, 0.9), rgba(7, 72, 74, 0.8)),
+                url('img/sekolah-cover.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 6rem 0;
+    text-align: center;
+    color: var(--white);
+    clip-path: ellipse(150% 100% at 50% 0%); /* Efek lengkung bawah sedikit */
+}
+
+.guru-badge-top {
+    display: inline-block;
+    background: rgba(245, 164, 37, 0.2);
+    color: var(--secondary);
+    border: 1px solid var(--secondary);
+    padding: 0.4rem 1.2rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(5px);
+}
+
+.guru-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
+}
+
+.guru-hero p {
+    max-width: 38rem;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+/* --- Grid & Section --- */
+.guru-page-section {
+    padding: 5rem 0;
+    margin-top: -3rem; /* Menarik konten ke atas agar overlap dengan hero */
+}
+
+.guru-page-head {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.guru-page-head h2 {
+    color: var(--primary);
+    font-size: 2.5rem;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+.guru-page-head h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 25%;
+    width: 50%;
+    height: 4px;
+    background: var(--secondary);
+    border-radius: 2px;
+}
+
+.guru-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2.5rem;
+    padding: 10px;
+}
+
+/* --- Teacher Card Style --- */
+.guru-card {
+    background: var(--white);
+    border-radius: 2rem;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: var(--shadow-soft);
+}
+
+.guru-card:hover {
+    transform: translateY(-12px);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(245, 164, 37, 0.3);
+}
+
+/* Update di profil-guru.css */
+
+.guru-card-top {
+    height: 5.5rem; /* Pertahankan tinggi asli Anda */
+    
+    /* GANTI INI: Gunakan Linear Gradient */
+    background: linear-gradient(135deg, var(--primary), #0b6366); 
+    
+    /* TAMBAHAN (Opsional): Sedikit Border Radius */
+    border-top-left-radius: 1.4rem;
+    border-top-right-radius: 1.4rem;
+}
+
+.guru-photo-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: -55px; /* Setengah dari tinggi foto */
+    position: relative;
+    z-index: 5;
+}
+
+.guru-photo {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--white);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.guru-card:hover .guru-photo {
+    transform: scale(1.05);
+}
+
+.guru-card-body {
+    padding: 1.5rem 1.8rem 2rem;
+    text-align: center;
+}
+
+.guru-card-body h3 {
+    margin: 1rem 0 0.5rem;
+    color: var(--primary);
+    font-size: 1.3rem;
+    font-weight: 700;
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.guru-mapel {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    padding: 0.4rem 1rem;
+    background: #fff9f0;
+    color: #b77300;
+    border: 1px solid rgba(245, 164, 37, 0.2);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.guru-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    text-align: left;
+}
+
+.guru-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: #fcfdfe;
+    border: 1px solid #f0f3f3;
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    transition: background 0.3s ease;
+}
+
+.guru-meta-item:hover {
+    background: #f5f8f8;
+}
+
+.guru-meta-item i {
+    color: var(--secondary);
+    font-size: 0.9rem;
+    width: 20px; /* Lebar tetap agar icon sejajar vertikal */
+    text-align: center;
+}
+
+.guru-meta-item span {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.guru-meta-item strong {
+    color: var(--primary);
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+/* --- Feedback States --- */
+.guru-loading, .guru-empty, .guru-error {
+    grid-column: 1 / -1;
+    padding: 3rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.guru-loading {
+    background: var(--white);
+    color: var(--primary);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .guru-hero h1 { font-size: 2.2rem; }
+    .guru-hero { padding: 4rem 1rem; }
+    .guru-grid { gap: 1.5rem; }
+    .guru-page-section { margin-top: -2rem; }
+}
+
+/* Styling Baru untuk Footer Kartu */
+.guru-info-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #edf2f2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.nip-badge {
+    background: #f8fbfb;
+    padding: 0.6rem;
+    border-radius: 10px;
+    color: var(--primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid rgba(7, 72, 74, 0.05);
+}
+
+.school-tag {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    opacity: 0.8;
+}
+
+.nip-badge i, .school-tag i {
+    color: var(--secondary);
+}
+
+/* Hapus style lama guru-meta jika sudah tidak dipakai */
+.guru-meta { display: none; }
+
+
+/* Definisi Animasi Melayang Pelan */
+@keyframes floatPhoto {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px); /* Naik sedikit */
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Terapkan ke Lingkaran Putih (Foto) */
+.guru-photo-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: -3.5rem; /* Sesuaikan biar pas di tengah garis */
+    position: relative;
+    z-index: 2;
+    
+    /* ANIMASI UTAMA */
+    animation: floatPhoto 3s ease-in-out infinite; 
+}
+
+/* Biar makin gemoy, kita kasih bayangan yang ikut berubah */
+.guru-photo {
+    width: 7rem;
+    height: 7rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 0.35rem solid var(--white);
+    background: #e9efef;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efek pas kursor diarahin (Hover) */
+.guru-card:hover .guru-photo-wrap {
+    animation-play-state: paused; /* Berhenti melayang pas mau dilihat jelas */
+}
+
+.guru-card:hover .guru-photo {
+    transform: scale(1.1) rotate(3deg); /* Membesar dikit & miring lucu */
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+/* Styling buat Bulatan Inisial Nama */
+.guru-inisial {
+    width: 6.8rem;
+    height: 6.8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Gradasi warna ucu: Hijau ke Orange Muda */
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 800;
+    border: 0.35rem solid var(--white);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Biar inisialnya ikut melayang (animasi yang tadi dibuat) */
+.guru-photo-wrap .guru-inisial {
+    /* Otomatis ikut animasi floatPhoto karena ada di dalam guru-photo-wrap */
+}
+
+/* Sedikit variasi warna inisial biar gak sama semua (Opsional) */
+.guru-card:nth-child(even) .guru-inisial {
+    background: linear-gradient(135deg, var(--secondary), #ffcc80);
+    color: var(--primary);
+}
