@@ -904,15 +904,241 @@ body,
 }
 
 @media (max-width: 900px) {
+    .top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    .search-container input {
+        width: 100%;
+    }
+
+    .settings-banner-content {
+        max-width: 100%;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .banner-welcome {
+        padding: 30px 24px;
+        min-height: auto;
+        overflow: hidden;
+    }
+
+    .banner-content {
+        max-width: 100%;
+    }
+
+    .banner-image-wrap {
+        position: static;
+        margin-top: 20px;
+    }
+
+    .banner-img {
+        height: 220px;
+    }
+
     .profil-content-box {
         grid-template-columns: 1fr;
+        gap: 26px;
+        padding: 26px 22px;
     }
 
     .profil-left {
         justify-content: center;
     }
 
+    .profil-photo-card {
+        align-items: center;
+    }
+
     .profil-grid {
         grid-template-columns: 1fr;
+        gap: 22px;
     }
+
+    .profile-banner {
+        padding: 32px 26px;
+    }
+
+    .profile-banner-content h1 {
+        font-size: 34px;
+    }
+}
+
+/* PROFILE SISWA */
+.profil-page {
+    width: 100%;
+}
+
+.profil-header-box {
+    background: #f7f7f7;
+    border-radius: 22px;
+    padding: 22px 30px;
+    margin-bottom: 18px;
+}
+
+.profil-header-box h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0a3f45;
+    margin-bottom: 6px;
+}
+
+.profil-header-box p {
+    font-size: 15px;
+    color: #444;
+    margin: 0;
+}
+
+.profil-content-box {
+    background: #dfeeee;
+    border: 1px solid rgba(6, 69, 71, 0.22);
+    border-radius: 28px;
+    padding: 36px 32px 22px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 44px;
+    align-items: start;
+}
+
+.profil-left {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 0;
+}
+
+.profil-photo-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.profil-photo-frame {
+    width: 165px;
+    height: 165px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #ffffff;
+    border: 6px solid #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.profil-photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.btn-pilih-foto {
+    background: #ffffff;
+    color: #0b5c6b;
+    border: 1px solid #8f8f8f;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.profil-right {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.profil-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 110px;
+}
+
+.profil-col {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.profil-item h4 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0b5b5d;
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.profil-item p {
+    font-size: 16px;
+    color: #222;
+    line-height: 1.45;
+    margin: 0;
+    word-break: normal;
+}
+
+.profil-readonly-bar {
+    width: 100%;
+    background: linear-gradient(180deg, #0b6669 0%, #064547 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 18px 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow: 0 6px 14px rgba(6, 69, 71, 0.22);
+}
+
+.btn-pilih-foto {
+  background: #ffffff;
+  color: #0b5c6b;
+  border: 2px solid #0b5c6b;
+  padding: 12px 22px;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.btn-pilih-foto:hover {
+  background: #0b5c6b;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.profil-photo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.profil-photo-frame {
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f1f1f1;
+  border: 6px solid #ffffff;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.profil-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
