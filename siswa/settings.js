@@ -12,7 +12,7 @@ import {
 const idSiswa = localStorage.getItem("id_siswa");
 
 if (!idSiswa) {
-  window.location.replace("../login.php");
+window.location.replace("../login.html");
 }
 
 const namaKelasEl = document.getElementById("namaKelas");
