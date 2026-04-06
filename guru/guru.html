@@ -1,3 +1,127 @@
-nyoba lagi yhhhhh
-asjaak uiwhuhuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
-asjasjs
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <link rel="stylesheet" href="guru.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Guru - SMP YP 17</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+        <div class="logo-container-elegant">
+            <img src="../img/logo.webp" alt="Logo SMP YP 17" class="brand-icon">
+            <div class="brand-details">
+                <span class="brand-name">SMP YP 17</span>
+                <span class="brand-location">Surabaya</span>
+            </div>
+        </div>
+            
+            <nav>
+                <a href="#" class="nav-item active"><i class="bi bi-grid-fill"></i> Dashboard Guru</a>
+                <a href="#" class="nav-item"><i class="bi bi-calendar-event"></i> Jadwal Mengajar</a>
+                <a href="#" class="nav-item"><i class="bi bi-journal-text"></i> Nilai</a>
+                <a href="#" class="nav-item"><i class="bi bi-person-check"></i> Kehadiran</a>
+                <a href="#" class="nav-item"><i class="bi bi-trophy"></i> Peringkat</a>
+                <a href="#" class="nav-item"><i class="bi bi-arrow-left-right"></i> Ganti Jadwal</a>
+                <a href="#" class="nav-item"><i class="bi bi-person-circle"></i> Profil Guru</a>
+                <a href="#" class="nav-item"><i class="bi bi-gear"></i> Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+        <header>
+            <div class="search-container-elegant">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." class="search-input">
+            </div>
+            
+            <div class="user-profile">
+                <div class="profile-info">
+                    <span class="user-name">Bapak/Ibu Guru</span>
+                    <span class="user-role">Guru</span>
+                </div>
+                <div class="avatar-circle">G</div>
+            </div>
+        </header>
+
+            <section class="welcome-banner">
+                <div class="welcome-text">
+                    <h1>Halo, Bapak/Ibu Guru! 🌟</h1>
+                    <p>Selamat datang di pusat kontrol mengajar. Mari kelola pembelajaran hari ini dengan efisien.</p>
+                </div>
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/female-teacher-explaining-lesson-to-students-6644265-5517173.png" alt="Illustration">
+            </section>
+
+            <div class="grid-container">
+                <div class="card checklist-card">
+                    <h3><i class="bi bi-list-check"></i> Prioritas Hari Ini</h3>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <p class="task-title">Apa yang harus dikerjakan?</p>
+                            <small>Mengajar Kelas 9A - Elektronika Dasar</small>
+                        </div>
+                        <span class="badge status-now">Sekarang</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <p class="task-title">Apa yang belum selesai?</p>
+                            <small>Koreksi tugas praktikum Minggu ke-11</small>
+                        </div>
+                        <span class="badge status-pending">2 Tugas</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <p class="task-title">Apa yang perlu diinput?</p>
+                            <small>Absensi & Nilai Harian Kelas 8C</small>
+                        </div>
+                        <button class="btn-action">Input Sekarang</button>
+                    </div>
+                </div>
+
+                <div class="card schedule-card">
+                    <div class="card-header">
+                        <h3>Jadwal Mengajar</h3>
+                        <span class="date">Hari Ini</span>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="time">08:00</div>
+                        <div class="subject">
+                            <strong>Fisika Terapan</strong>
+                            <p>R. Lab 02, Pertemuan 10</p>
+                        </div>
+                    </div>
+                    <div class="schedule-item active">
+                        <div class="time">10:30</div>
+                        <div class="subject">
+                            <strong>Elektronika Dasar</strong>
+                            <p>R. Teori 01, Pertemuan 12</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card summary-card">
+                    <h3>Ringkasan Administrasi</h3>
+                    <div class="stat-box">
+                        <p>Input Nilai</p>
+                        <div class="progress-bar"><div class="progress" style="width: 85%;"></div></div>
+                        <small>85% Selesai</small>
+                    </div>
+                    <div class="stat-box">
+                        <p>Kehadiran Siswa</p>
+                        <div class="progress-bar"><div class="progress" style="width: 92%;"></div></div>
+                        <small>92% Terisi</small>
+                    </div>
+                    <div class="quick-buttons">
+                        <button class="btn-secondary"><i class="bi bi-download"></i> Export Data</button>
+                        <button class="btn-secondary"><i class="bi bi-upload"></i> Import Nilai</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

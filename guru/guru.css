@@ -1,0 +1,364 @@
+:root {
+    --primary-teal: #064e4b;
+    --sidebar-bg: #064e4b;
+    --bg-light: #f4f7f6;
+    --accent-mint: #e8f3f2;
+    --text-dark: #2c3e50;
+    --white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    color: white;
+    padding: 25px 0;
+    position: fixed;
+    height: 100%;
+}
+
+.logo {
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.logo img {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); /* Memberi efek dimensi halus */
+    object-fit: contain;
+}
+
+.logo span {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.2;
+    color: white; /* Sesuaikan dengan warna teks sidebar kamu */
+    line-height: 1.2;
+}
+.logo-wrapper {
+    display: flex;
+    align-items: center; /* Membuat ikon & teks sejajar tengah secara vertikal */
+    padding: 25px;
+    gap: 12px; /* Jarak antara ikon logo dan teks */
+    margin-bottom: 20px;
+}
+.logo-container-elegant {
+    display: flex;
+    align-items: center; /* Menjaga ikon dan teks tetap sejajar di tengah secara vertikal */
+    padding: 20px 25px;
+    gap: 12px; /* Jarak antara ikon dan teks */
+    margin-bottom: 30px;
+}
+.sidebar-logo {
+    width: 45px; /* Sesuaikan ukuran ikon */
+    height: auto;
+    object-fit: contain;
+}
+.logo-text {
+    display: flex;
+    flex-direction: column; /* Menyusun nama sekolah & kota ke bawah */
+    color: white;
+    font-family: 'Segoe UI', Tahoma, sans-serif; /* Menggunakan font Segoe UI */
+}
+.brand-name {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+    text-transform: uppercase; /* Membuat teks jadi kapital seperti di gambar */
+}
+.brand-sub {
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0.9;
+    letter-spacing: 1px;
+}
+.brand-icon {
+    width: 45px; /* Ukuran ikon disesuaikan agar proporsional */
+    height: auto;
+    object-fit: contain;
+}
+.brand-details {
+    display: flex;
+    flex-direction: column; /* Menyusun nama sekolah dan kota ke bawah */
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, sans-serif; /* Menggunakan font sesuai permintaan */
+}
+.brand-location {
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0.9;
+    letter-spacing: 1px;
+}
+nav .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    
+    /* Pastikan warna diatur ke putih bersih, bukan abu-abu */
+    color: #ffffff !important; 
+    
+    text-decoration: none;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    transition: all 0.4s ease;
+    font-size: 14px;
+    font-family: 'Segoe UI', sans-serif; /* Menggunakan font Segoe UI */
+    opacity: 0.9; /* Sedikit transparan agar elegan, tapi tetap terlihat putih */
+}
+
+nav .nav-item i {
+    margin-right: 15px;
+    font-size: 1.2rem;
+    color: #ffffff; /* Ikon juga harus putih */
+}
+
+nav .nav-item:hover, 
+nav .nav-item.active {
+    background: rgba(255, 255, 255, 1); /* Background putih penuh saat aktif */
+    color: #064e4b !important; /* Teks berubah jadi hijau gelap agar kontras */
+    opacity: 1;
+    transform: translateX(5px);
+}
+nav .nav-item.active i,
+nav .nav-item:hover i {
+    color: #064e4b !important;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 30px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.search-bar input {
+    width: 400px;
+    padding: 12px 25px;
+    border-radius: 30px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+/* Container Search Bar */
+.search-container-elegant {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    /* Menggunakan border hijau yang senada dengan brand */
+    border: 1.5px solid #064e4b; 
+    padding: 8px 20px;
+    border-radius: 50px; /* Membuat bentuk kapsul yang elegan */
+    width: 400px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Efek saat input diklik (Focus) */
+.search-container-elegant:focus-within {
+    box-shadow: 0 4px 15px rgba(6, 78, 43, 0.15);
+    transform: translateY(-1px);
+}
+
+/* Icon Search */
+.search-icon {
+    color: #064e4b; /* Warna ikon hijau */
+    font-size: 16px;
+    margin-right: 12px;
+}
+
+/* Input Text */
+.search-input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+.search-input::placeholder {
+    color: #999;
+    font-weight: 400;
+}
+
+/* Penempatan Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.initial {
+    background: #cbd5e0;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* Banner */
+.welcome-banner {
+    background-color: var(--accent-mint);
+    border-radius: 20px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-text h1 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--primary-teal);
+    margin-bottom: 10px;
+}
+
+.welcome-banner img {
+    height: 150px;
+}
+
+/* Grid Layout */
+.grid-container {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.card h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: var(--primary-teal);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Task Item Styling */
+.task-item {
+    background: var(--bg-light);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-now { background: #fee2e2; color: #ef4444; }
+.status-pending { background: #fef3c7; color: #d97706; }
+
+.btn-action {
+    background: var(--primary-teal);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* Schedule Styling */
+.schedule-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #eee;
+}
+
+.schedule-item.active {
+    color: var(--primary-teal);
+    border-left: 4px solid var(--primary-teal);
+    padding-left: 10px;
+}
+
+.time { font-weight: bold; font-size: 14px; }
+.subject p { font-size: 12px; color: #7f8c8d; }
+
+/* Progress Bar */
+.progress-bar {
+    background: #eee;
+    height: 8px;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.progress {
+    background: var(--primary-teal);
+    height: 100%;
+    border-radius: 10px;
+}
+
+.btn-secondary {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid var(--primary-teal);
+    background: transparent;
+    color: var(--primary-teal);
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-secondary:hover {
+    background: var(--primary-teal);
+    color: white;
+}
