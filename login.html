@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -19,7 +18,7 @@
                     <p>Mulai pengalaman belajar barumu</p>
                 </div>
 
-               <form class="siakad-form">
+               <form class="siakad-form" id="mainLoginForm">
                     <div class="input-group">
                         <label>Username</label>
                         <div class="input-field">
@@ -78,7 +77,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // 1. Fitur Mata Password
         const togglePassword = document.querySelector('#togglePassword');
         const passwordInput = document.querySelector('#password');
         togglePassword.addEventListener('click', function () {
@@ -87,7 +85,6 @@
             this.classList.toggle('fa-eye-slash');
         });
 
-        // 2. Slider Otomatis
         let slides = document.querySelectorAll('.slide');
         let currentSlide = 0;
         setInterval(() => {
@@ -95,60 +92,113 @@
             currentSlide = (currentSlide + 1) % slides.length;
             slides[currentSlide].classList.add('active');
         }, 5000);
-
-        // 3. Loading Spinner
-        document.getElementById('mainLoginForm').onsubmit = function() {
-            document.getElementById('loginBtn').classList.add('is-loading');
-        };
     </script>
 
-   <script type="module">
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// 🔥 CONFIG KAMU
 const firebaseConfig = {
   apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
   authDomain: "smpyp17.firebaseapp.com",
   projectId: "smpyp17",
 };
 
+const supabaseUrl = 'https://mwqqflnzeoxcbqigoxhz.supabase.co';
+const supabaseKey = 'sb_publishable_qgOE5u-TOYQnYPGf6tgi2Q_GmjsMEF4';
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-// 🔥 LOGIN
 const form = document.querySelector(".siakad-form");
+const loginBtn = document.getElementById('loginBtn');
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const username = document.querySelector("[name='username']").value;
+  loginBtn.classList.add('is-loading');
+  loginBtn.disabled = true;
+
+  const username = document.querySelector("[name='username']").value.trim();
   const password = document.querySelector("[name='password']").value;
 
-  const q = query(
-    collection(db, "user"),
-    where("username", "==", username),
-    where("password", "==", password)
-  );
+  try {
+    const q = query(
+      collection(db, "user"),
+      where("username", "==", username),
+      where("password", "==", password)
+    );
 
-  const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocs(q);
 
-if (!querySnapshot.empty) {
-  const data = querySnapshot.docs[0].data();
+    if (querySnapshot.empty) {
+      alert("Login gagal! Periksa username dan password.");
+      return;
+    }
 
-  localStorage.setItem("username", data.username);
-  localStorage.setItem("role_id", data.role_id);
+    const data = querySnapshot.docs[0].data();
 
-  if (data.role_id == 3) {
-    localStorage.setItem("id_siswa", data.id_siswa);
-    window.location.href = "siswa/siswa.html";
-  } else if (data.role_id == 2) {
-    window.location.href = "guru/guru.html";
-  } else if (data.role_id == 1) {
-    window.location.href = "admin.html";
-  }
-} else {
-    alert("Login gagal!");
+    // Email dummy + password dummy khusus Supabase
+    const emailDummy = `${username}@smpyp17.id`;
+    const supabasePassword = `spb-${username}-yp17`;
+
+    await supabase.auth.signOut();
+
+    let signInResult = await supabase.auth.signInWithPassword({
+      email: emailDummy,
+      password: supabasePassword,
+    });
+
+    if (signInResult.error) {
+      console.log("Login Supabase gagal, mencoba auto-register...", signInResult.error.message);
+
+      const signUpResult = await supabase.auth.signUp({
+        email: emailDummy,
+        password: supabasePassword,
+      });
+
+      if (signUpResult.error) {
+        throw new Error("Gagal membuat akun Supabase: " + signUpResult.error.message);
+      }
+
+      signInResult = await supabase.auth.signInWithPassword({
+        email: emailDummy,
+        password: supabasePassword,
+      });
+
+      if (signInResult.error) {
+        throw new Error("Akun Supabase berhasil dibuat, tapi login gagal: " + signInResult.error.message);
+      }
+    }
+
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !userData.user) {
+      throw new Error("Supabase Auth tidak mendeteksi login. Silakan coba login ulang.");
+    }
+
+    localStorage.setItem("username", data.username);
+    localStorage.setItem("role_id", data.role_id);
+
+    if (data.role_id == 3) {
+      localStorage.setItem("id_siswa", data.id_siswa);
+      window.location.href = "siswa/siswa.html";
+    } else if (data.role_id == 2) {
+      window.location.href = "guru/guru.html";
+    } else if (data.role_id == 1) {
+      window.location.href = "admin.html";
+    } else {
+      alert("Role user tidak dikenali.");
+    }
+
+  } catch (error) {
+    console.error("Error saat login:", error);
+    alert(error.message || "Terjadi kesalahan sistem.");
+  } finally {
+    loginBtn.classList.remove('is-loading');
+    loginBtn.disabled = false;
   }
 });
 </script>

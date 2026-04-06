@@ -8,11 +8,12 @@ import {
   getDocs,
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { supabase } from "./supabase-config.js";
 
 const idSiswa = localStorage.getItem("id_siswa");
 
 if (!idSiswa) {
-window.location.replace("../login.html");
+  window.location.replace("../login.html");
 }
 
 const namaKelasEl = document.getElementById("namaKelas");
@@ -191,6 +192,23 @@ formPassword.addEventListener("submit", async (e) => {
   btnSimpanPassword.textContent = "Menyimpan...";
 
   try {
+    // 1. Pastikan session Supabase aktif
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !userData.user) {
+      throw new Error("Sesi Supabase tidak ditemukan. Silakan login ulang.");
+    }
+
+    // 2. Update password di Supabase Auth
+    const { error: updateAuthError } = await supabase.auth.updateUser({
+      password: passwordBaru
+    });
+
+    if (updateAuthError) {
+      throw new Error("Gagal update password di Supabase: " + updateAuthError.message);
+    }
+
+    // 3. Update password di Firestore
     const userRef = doc(db, "user", currentUserDocId);
     await updateDoc(userRef, {
       password: passwordBaru
@@ -203,7 +221,7 @@ formPassword.addEventListener("submit", async (e) => {
     showAlert("success", "Password berhasil diubah.");
   } catch (error) {
     console.error(error);
-    showAlert("error", "Gagal mengubah password.");
+    showAlert("error", error.message || "Gagal mengubah password.");
   } finally {
     btnSimpanPassword.disabled = false;
     btnSimpanPassword.textContent = "Simpan Password";
