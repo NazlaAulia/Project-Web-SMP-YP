@@ -31,7 +31,28 @@ body {
     color: white;
     padding: 25px 0;
     position: fixed;
-    height: 100%;
+    height: 100vh; /* Ubah dari 100% ke 100vh agar pas tinggi layar */
+    display: flex;
+    flex-direction: column;
+    
+    /* TAMBAHKAN DUA BARIS INI */
+    overflow-y: auto; /* Ini yang bikin menu bisa di-scroll ke bawah */
+    overflow-x: hidden; /* Mencegah geser kanan-kiri yang ga perlu */
+}
+.sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Garis pembatas tipis */
+    padding-top: 15px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
 }
 
 .logo {
@@ -112,7 +133,6 @@ body {
 nav .nav-item {
     display: flex;
     align-items: center;
-    padding: 14px 18px;
     
     /* Pastikan warna diatur ke putih bersih, bukan abu-abu */
     color: #ffffff !important; 
@@ -120,28 +140,64 @@ nav .nav-item {
     text-decoration: none;
     margin-bottom: 8px;
     border-radius: 12px;
-    transition: all 0.4s ease;
+    transition: all 0.3s ease;
     font-size: 14px;
     font-family: 'Segoe UI', sans-serif; /* Menggunakan font Segoe UI */
     opacity: 0.9; /* Sedikit transparan agar elegan, tapi tetap terlihat putih */
+    background: transparent; /* Awalnya transparan */
+
 }
 
+.nav-item i {
+    margin-right: 12px;
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
 nav .nav-item i {
-    margin-right: 15px;
-    font-size: 1.2rem;
-    color: #ffffff; /* Ikon juga harus putih */
+    margin-right: 12px;
+    font-size: 1.1rem;
+    color: #ffffff; /* Ikon awalnya putih */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important; /* MENCEGAH KOTAK PUTIH DI IKON */
+    padding: 0;
 }
-
 nav .nav-item:hover, 
 nav .nav-item.active {
-    background: rgba(255, 255, 255, 1); /* Background putih penuh saat aktif */
+    background-color: #ffffff !important;
     color: #064e4b !important; /* Teks berubah jadi hijau gelap agar kontras */
     opacity: 1;
     transform: translateX(5px);
+
 }
 nav .nav-item.active i,
 nav .nav-item:hover i {
+    background-color: #ffffff !important; /* Background putih menutupi SELURUH area menu */
+    color: #064e4b !important; /* Teks berubah jadi hijau gelap agar kontras */
+    opacity: 1;
+    font-weight: 600;
+    transform: translateX(5px); /* Memberikan sedikit efek dimensi */
     color: #064e4b !important;
+    background: transparent !important;
+}
+nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* JARAK ANTAR MENU DIPERSEMPIT DI SINI */
+    margin-top: 10px;
+    flex-grow: 1; /* Membuat nav mengambil sisa ruang agar footer terdorong ke bawah */
+}
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: rgba(255, 255, 255, 0.8); /* Warna putih agak transparan agar tidak terlalu kontras */
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: 14px;
 }
 
 /* Main Content */
@@ -361,4 +417,12 @@ header {
 .btn-secondary:hover {
     background: var(--primary-teal);
     color: white;
+}
+/* Styling Khusus Logout */
+.logout-item {
+    color: #ffbaba !important; /* Warna merah muda lembut agar terlihat sebagai aksi penting */
+}
+
+.logout-item:hover {
+    background-color: rgba(255, 0, 0, 0.1) !important;
 }
