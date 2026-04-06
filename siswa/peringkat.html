@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Peringkat Siswa</title>
+  <link rel="stylesheet" href="peringkat.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+     <div class="sidebar-header">
+        <img src="../img/logo.webp" alt="Logo" class="logo" />
+      </div>
+
+    <nav>
+      <ul class="sidebar-menu">
+        <li><a href="siswa.html">Dashboard Siswa</a></li>
+        <li><a href="performa.html">Performa Akademik</a></li>
+        <li><a href="nilai.html">Nilai</a></li>
+        <li><a href="jadwal.html">Jadwal</a></li>
+        <li><a href="peringkat.html" class="active">Peringkat</a></li>
+        <li><a href="profil-siswa.html">Profil Siswa</a></li>
+        <li><a href="settings.html">Settings</a></li>
+      </ul>
+
+      <!-- JARAK KHUSUS -->
+      <div class="spacer"></div>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="logout-btn" id="logoutBtn">Log Out</a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main-content">
+
+    <div class="header">
+      <input type="text" placeholder="Cari info akademik, tugas, atau jadwal...">
+      <div class="profile">Adinda Eka Athiyyah Zahra</div>
+    </div>
+
+    <section class="card fade-in">
+      <h2>Peringkat & Prestasi Siswa</h2>
+
+      <div class="stats">
+        <div class="box">Peringkat<br><strong>#12</strong></div>
+        <div class="box">Nilai<br><strong>72.2</strong></div>
+        <div class="box">Posisi<br><strong>↑</strong></div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Nama</th>
+            <th>Kelas</th>
+            <th>Nilai</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script src="peringkat.js"></script>
+</body>
+</html>

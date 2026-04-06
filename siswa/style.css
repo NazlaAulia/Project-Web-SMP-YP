@@ -14,6 +14,13 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
 body,
 .dashboard-body {
     background-color: var(--bg-color);
@@ -82,11 +89,12 @@ body,
     font-size: 18px;
 }
 
-.sidebar-menu li.active a {
+.sidebar-menu li.active a,
+.sidebar-menu li a.active {
     background: white;
     color: var(--sidebar-color);
     font-weight: 700;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
+    box-shadow: none; /* HAPUS INI */
 }
 
 .sidebar-menu li a:hover {
@@ -94,7 +102,8 @@ body,
     color: white;
 }
 
-.sidebar-menu li.active a:hover {
+.sidebar-menu li.active a:hover,
+.sidebar-menu li a.active:hover {
     background: white;
     color: var(--sidebar-color);
 }
@@ -859,18 +868,30 @@ body,
 }
 
 @media (max-width: 768px) {
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
     .dashboard-wrapper {
-        flex-direction: column;
+        display: block;
+        width: 100%;
+        min-height: 100vh;
     }
 
     .sidebar {
         width: 100%;
-        min-height: auto;
-        border-radius: 0 0 24px 24px;
+        min-height: 100vh;
+        border-radius: 0;
+        margin: 0;
+        padding: 14px 28px 24px;
+        box-sizing: border-box;
     }
 
     .main-content {
-        padding: 20px;
+        display: none;
     }
 
     .user-info {
@@ -1174,4 +1195,37 @@ body,
   background: #fff1f0;
   color: #cf1322;
   border: 1px solid #ffa39e;
+}
+
+@media (max-width: 768px) {
+    .sidebar,
+    .dashboard-wrapper,
+    .main-content {
+        max-width: 100%;
+    }
+}
+
+/* FIX DOUBLE BACKGROUND SIDEBAR */
+/* FIX DOUBLE SIDEBAR / BACKGROUND HIJAU */
+
+/* pastikan wrapper full dan ga nyisain ruang */
+.dashboard-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* paksa sidebar bener-bener nempel kiri tanpa “layer belakang” */
+.sidebar {
+    width: 340px;
+    min-width: 340px;
+    max-width: 340px;
+    flex: 0 0 340px;
+}
+
+/* pastikan ga ada gap dari body/html */
+html, body {
+    width: 100%;
+    height: 100%;
 }
