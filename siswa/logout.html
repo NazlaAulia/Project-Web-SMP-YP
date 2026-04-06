@@ -6,13 +6,22 @@
   <title>Logout</title>
 </head>
 <body>
-  <script>
-  localStorage.removeItem("id_siswa");
-  localStorage.removeItem("id_user");
-  localStorage.removeItem("username");
-  sessionStorage.clear();
+  <script type="module">
+    import { supabase } from "./supabase-config.js";
 
-  window.location.replace("siswa.html");
-</script>
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Gagal logout Supabase:", error);
+    }
+
+    localStorage.removeItem("id_siswa");
+    localStorage.removeItem("id_user");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role_id");
+    sessionStorage.clear();
+
+    window.location.replace("../login.html");
+  </script>
 </body>
 </html>
