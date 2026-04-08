@@ -472,3 +472,211 @@ header {
         align-items: stretch;
     }
 }
+
+/* HAMBURGER BUTTON */
+.mobile-topbar {
+    display: none;
+}
+
+.menu-toggle {
+    display: none;
+    border: none;
+    background: var(--primary-teal);
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-overlay {
+    display: none;
+}
+
+/* MOBILE VERSION */
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    .container {
+        flex-direction: column;
+    }
+
+    .mobile-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 1100;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .mobile-topbar h2 {
+        font-size: 16px;
+        color: var(--primary-teal);
+        margin: 0;
+    }
+
+    .menu-toggle {
+        display: inline-flex;
+    }
+
+   .sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    left: auto;
+    width: 250px;
+    max-width: 78%;
+    height: 100vh;
+    z-index: 1200;
+    transition: 0.3s ease;
+    border-radius: 18px 0 0 18px;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.18);
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 1100;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 18px;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: stretch;
+        margin-bottom: 20px;
+    }
+
+    .search-container-elegant {
+        width: 100%;
+    }
+
+    .user-profile {
+        justify-content: flex-end;
+    }
+
+    .admin-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .grid-layout {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .card {
+        padding: 18px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .shortcut-grid {
+        flex-direction: column;
+    }
+
+    .btn-shortcut {
+        width: 100%;
+    }
+
+    .schedule-item {
+        gap: 10px;
+    }
+
+    .time {
+        min-width: 45px;
+        font-size: 13px;
+    }
+
+    .subject {
+        font-size: 14px;
+    }
+
+    .subject p {
+        font-size: 12px;
+    }
+
+    .calendar-days,
+    .calendar-grid {
+        gap: 6px;
+    }
+
+    .calendar-grid div {
+        height: 34px;
+        font-size: 12px;
+    }
+
+    /* optional: yang kurang penting di HP bisa disembunyikan */
+    .nav-label {
+        font-size: 9px;
+    }
+
+    @media (max-width: 768px) {
+    .mobile-topbar {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 1100;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .mobile-topbar h2 {
+        font-size: 18px;
+        margin: 0;
+        color: var(--primary-teal);
+    }
+
+    .menu-toggle {
+        display: inline-flex !important;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 16px;
+    }
+
+    header {
+        margin-top: 8px;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+        backdrop-filter: blur(1px);
+    }
+}
+}
