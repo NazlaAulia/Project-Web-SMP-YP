@@ -13,8 +13,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
+    <!-- TOPBAR MOBILE -->
+   <div class="mobile-topbar">
+    <h2>Dashboard Admin</h2>
+    <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
+
+    <!-- OVERLAY MOBILE -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="container">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <strong>SMP YP 17 SURABAYA</strong>
                 <span>ADMIN PANEL</span>
@@ -55,7 +67,6 @@
                     </div>
                 </details>
 
-               
                 <a href="#" class="nav-item logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Keluar</span>

@@ -51,42 +51,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-let currDate = new Date();
+const menuToggle = document.getElementById("menuToggle");
+const sidebar = document.querySelector(".sidebar");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
 
-function renderCalendar() {
-    const monthYear = document.getElementById("month-year");
-    const calendarBody = document.getElementById("calendar-body");
-    calendarBody.innerHTML = "";
+if (menuToggle && sidebar && sidebarOverlay) {
+    menuToggle.addEventListener("click", function () {
+        sidebar.classList.toggle("active");
+        sidebarOverlay.classList.toggle("active");
+    });
 
-    const month = currDate.getMonth();
-    const year = currDate.getFullYear();
-
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    monthYear.innerText = `${months[month]}  ${year}`;
-
-    // Cari hari pertama bulan ini (0 = Minggu, 1 = Senin, dst)
-    let firstDay = new Date(year, month, 1).getDay();
-    // Sesuaikan jika kalender kamu mulai dari Senin (M T W T F S S)
-    let shiftDay = firstDay === 0 ? 6 : firstDay - 1;
-
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const prevLastDay = new Date(year, month, 0).getDate();
-
-    // 1. Tampilkan sisa hari bulan lalu
-    for (let i = shiftDay; i > 0; i--) {
-        const div = document.createElement("div");
-        div.innerText = prevLastDay - i + 1;
-        div.classList.add("other-month");
-        calendarBody.appendChild(div);
-    }
-
-    // 2. Tampilkan hari bulan sekarang
-    for (let i = 1; i <= daysInMonth; i++) {
-        const div = document.createElement("div");
-        div.innerText = i;
-        if (i === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear()) {
-            div.classList.add("today");
-        }
-        calendarBody.appendChild(div);
-    }
+    sidebarOverlay.addEventListener("click", function () {
+        sidebar.classList.remove("active");
+        sidebarOverlay.classList.remove("active");
+    });
 }
