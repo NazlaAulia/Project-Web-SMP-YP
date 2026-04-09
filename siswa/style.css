@@ -31,94 +31,192 @@ body,
     min-height: 100vh;
 }
 
-/* SIDEBAR */
+/* ===== OVERRIDE SIDEBAR AGAR MIRIP SCREENSHOT ===== */
+
+/* Sidebar utama */
+/* ===== FINAL OVERRIDE SIDEBAR ===== */
+
 .sidebar {
-    width: 340px;
-    min-height: 100vh;
-    background: var(--sidebar-color);
-    color: white;
-    padding: 14px 28px 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    flex-shrink: 0;
+  background: #064547;
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+  flex: 0 0 320px !important;
+  padding: 18px 26px 24px !important;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-header {
-    margin-bottom: 0;
+  margin-bottom: 18px;
 }
 
 .logo {
-    width: 230px;
-    max-width: 100%;
-    display: block;
-    margin: 6px auto 28px;
-    object-fit: contain;
+  width: 235px !important;
+  max-width: 100%;
+  display: block;
+  margin: 8px auto 30px !important;
+  object-fit: contain;
 }
 
 .sidebar-menu {
-    list-style: none;
-    flex-grow: 1;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
 }
 
 .sidebar-menu li {
-    margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .sidebar-menu li a {
-    width: 100%;
-    color: rgba(255, 255, 255, 0.78);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    padding: 18px 18px;
-    border-radius: 18px;
-    transition: 0.3s;
-    font-size: 20px;
-    font-weight: 500;
-    line-height: 1.2;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 16px !important;
+  border-radius: 18px !important;
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  text-decoration: none;
+  font-size: 20px !important;
+  font-weight: 500 !important;
+  line-height: 1.25;
+  box-shadow: none !important;
+  transition: all 0.25s ease;
 }
 
 .sidebar-menu li a i {
-    width: 24px;
-    text-align: center;
-    flex-shrink: 0;
-    font-size: 18px;
-}
-
-.sidebar-menu li.active a,
-.sidebar-menu li a.active {
-    background: white;
-    color: var(--sidebar-color);
-    font-weight: 700;
-    box-shadow: none; /* HAPUS INI */
+  width: 26px;
+  min-width: 26px;
+  text-align: center;
+  font-size: 20px !important;
+  color: inherit !important;
+  flex-shrink: 0;
 }
 
 .sidebar-menu li a:hover {
-    background: rgba(255, 255, 255, 0.10);
-    color: white;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+  border-radius: 18px !important;
+  box-shadow: none !important;
+}
+
+/* menu aktif = kotak putih besar */
+.sidebar-menu li.active a,
+.sidebar-menu li a.active {
+  background: #f2f2f2 !important;
+  color: #083f45 !important;
+  font-weight: 700 !important;
+  min-height: 104px;
+  padding: 0 26px !important;
+  border-radius: 24px !important;
+  display: flex;
+  align-items: center;
+  box-shadow: none !important;
+}
+
+.sidebar-menu li.active a i,
+.sidebar-menu li a.active i {
+  color: #083f45 !important;
 }
 
 .sidebar-menu li.active a:hover,
 .sidebar-menu li a.active:hover {
-    background: white;
-    color: var(--sidebar-color);
+  background: #f2f2f2 !important;
+  color: #083f45 !important;
 }
 
 .sidebar-footer {
-    margin-top: auto;
-    padding-top: 26px;
+  margin-top: auto;
+  padding-top: 26px;
 }
 
 .logout-btn {
-    color: white;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 18px;
-    display: inline-block;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 16px !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  text-decoration: none;
+  font-size: 20px !important;
+  font-weight: 500 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.logout-btn i {
+  width: 26px;
+  min-width: 26px;
+  text-align: center;
+  font-size: 24px !important;
+}
+
+.logout-btn:hover {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+/* ===== RESPONSIVE HP ===== */
+@media (max-width: 768px) {
+  .dashboard-wrapper {
+    display: block !important;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    padding: 16px 20px 24px !important;
+    min-height: auto;
+  }
+
+  .logo {
+    width: 210px !important;
+    margin: 6px auto 24px !important;
+  }
+
+  .sidebar-menu li {
+    margin-bottom: 12px;
+  }
+
+  .sidebar-menu li a {
+    font-size: 18px !important;
+    gap: 16px;
+    padding: 14px 12px !important;
+    border-radius: 18px !important;
+  }
+
+  .sidebar-menu li a i {
+    font-size: 20px !important;
+    width: 24px;
+    min-width: 24px;
+  }
+
+  .sidebar-menu li.active a,
+  .sidebar-menu li a.active {
+    min-height: 86px;
+    padding: 0 20px !important;
+    border-radius: 22px !important;
+    font-size: 19px !important;
+  }
+
+  .logout-btn {
+    font-size: 18px !important;
+    gap: 16px;
+    padding: 14px 12px !important;
+  }
+
+  .logout-btn i {
+    font-size: 20px !important;
+    width: 24px;
+    min-width: 24px;
+  }
 }
 
 /* MAIN CONTENT */
