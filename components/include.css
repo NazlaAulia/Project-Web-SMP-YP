@@ -1,0 +1,115 @@
+/* ===== DEFAULT DESKTOP ===== */
+.hamburger-toggle {
+    display: none;
+}
+
+.menu-overlay {
+    display: none;
+}
+
+/* ===== MOBILE ONLY ===== */
+@media (max-width: 768px) {
+    .top-bar {
+        display: none;
+    }
+
+    .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+    }
+
+    .logo img {
+        width: 50px;
+        height: auto;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .hamburger-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #07484a;
+        z-index: 1002;
+    }
+
+    .nav-right {
+        display: none !important;
+    }
+
+    .menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        left: auto;
+        width: 280px;
+        max-width: 85%;
+        height: 100vh;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 0;
+        padding: 80px 20px 20px;
+        margin: 0;
+        box-shadow: -8px 0 25px rgba(0,0,0,0.15);
+        transition: right 0.3s ease;
+        z-index: 1001;
+        overflow-y: auto;
+    }
+
+    .menu.active {
+        right: 0;
+    }
+
+    .menu li {
+        width: 100%;
+    }
+
+    .menu li a {
+        display: block;
+        width: 100%;
+        padding: 14px 0;
+        border-bottom: 1px solid #eee;
+        color: #222;
+        font-size: 15px;
+    }
+
+    .dropdown-content {
+        position: static;
+        display: none;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        padding-left: 12px !important;
+        min-width: 100%;
+    }
+
+    .dropdown.active .dropdown-content {
+        display: block;
+    }
+
+    .menu-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s ease;
+        z-index: 1000;
+    }
+
+    .menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+}
