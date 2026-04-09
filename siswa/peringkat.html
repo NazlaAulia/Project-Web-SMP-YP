@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Peringkat Siswa</title>
   <link rel="stylesheet" href="peringkat.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
@@ -12,62 +12,174 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-     <div class="sidebar-header">
-        <img src="../img/logo.webp" alt="Logo" class="logo" />
-      </div>
+    <div class="sidebar-header">
+      <img src="../img/logo.webp" alt="Logo" class="logo" />
+    </div>
 
     <nav>
       <ul class="sidebar-menu">
-        <li><a href="siswa.html">Dashboard Siswa</a></li>
-        <li><a href="performa.html">Performa Akademik</a></li>
-        <li><a href="nilai.html">Nilai</a></li>
-        <li><a href="jadwal.html">Jadwal</a></li>
-        <li><a href="peringkat.html" class="active">Peringkat</a></li>
-        <li><a href="profil-siswa.html">Profil Siswa</a></li>
-        <li><a href="settings.html">Settings</a></li>
+        <li><a href="siswa.html"><i class="fa-solid fa-house"></i> Dashboard Siswa</a></li>
+        <li><a href="performa.html"><i class="fa-solid fa-chart-line"></i> Performa Akademik</a></li>
+        <li><a href="nilai.html"><i class="fa-solid fa-file-lines"></i> Nilai</a></li>
+        <li><a href="jadwal.html"><i class="fa-solid fa-calendar-days"></i> Jadwal</a></li>
+        <li><a href="peringkat.html" class="active"><i class="fa-solid fa-trophy"></i> Peringkat</a></li>
+        <li><a href="profil-siswa.html"><i class="fa-solid fa-user"></i> Profil Siswa</a></li>
+        <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
       </ul>
 
-      <!-- JARAK KHUSUS -->
       <div class="spacer"></div>
 
       <div class="sidebar-footer">
-        <a href="../login.html" class="logout-btn" id="logoutBtn">Log Out</a>
+        <a href="../login.html" class="logout-btn" id="logoutBtn">
+          <i class="fa-solid fa-right-from-bracket"></i> Log Out
+        </a>
       </div>
     </nav>
   </aside>
 
   <!-- CONTENT -->
   <main class="main-content">
-
     <div class="header">
       <input type="text" placeholder="Cari info akademik, tugas, atau jadwal...">
-      <div class="profile">Adinda Eka Athiyyah Zahra</div>
+
+      <div class="profile-top">
+        <div class="kelas-badge" id="kelasText">9C</div>
+        <div class="profile-avatar" id="avatarText">A</div>
+        <div class="profile-name-wrap">
+          <div class="profile" id="namaText">Adinda Eka Athiyyah Zahra</div>
+        </div>
+      </div>
     </div>
 
     <section class="card fade-in">
-      <h2>Peringkat & Prestasi Siswa</h2>
+
+      <div class="peringkat-banner">
+        <div class="peringkat-banner-text">
+          <h2>Peringkat & Prestasi Siswa</h2>
+          <p>Pantau pencapaian akademikmu dan tetap semangat berkompetisi secara sehat!</p>
+        </div>
+
+        <div class="peringkat-banner-img">
+          <img src="../img/siswa.webp" alt="Banner Peringkat">
+        </div>
+      </div>
 
       <div class="stats">
-        <div class="box">Peringkat<br><strong>#12</strong></div>
-        <div class="box">Nilai<br><strong>72.2</strong></div>
-        <div class="box">Posisi<br><strong>↑</strong></div>
+        <div class="box">
+          Peringkat Saat Ini<br>
+          <strong>#12</strong><br>
+          <span>Kelas 9C</span>
+        </div>
+
+        <div class="box">
+          Nilai Rata-Rata<br>
+          <strong>72.2</strong>
+        </div>
+
+        <div class="box">
+          Posisi Sebelumnya<br>
+          <strong>#14 ↑</strong>
+        </div>
       </div>
+
+      <div class="peringkat-filter-wrap">
+        <div class="filter-group">
+          <label for="kelas">Kelas</label>
+          <select id="kelas">
+            <option selected>9C</option>
+            <option>9A</option>
+            <option>9B</option>
+            <option>9D</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="semester">Tahun Ajaran/Semester</label>
+          <select id="semester">
+            <option selected>2025/2026 - Genap</option>
+            <option>2025/2026 - Ganjil</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="podium-section">
+        <h3>Podium Juara</h3>
+        <div class="podium-list">
+          <div class="podium-item">
+            <div class="podium-rank silver">2</div>
+            <div>
+              <strong>Siti Aminah</strong><br>
+              <span>94.2 - Medali Perak</span>
+            </div>
+          </div>
+
+          <div class="podium-item">
+            <div class="podium-rank gold">1</div>
+            <div>
+              <strong>Budi Santoso</strong><br>
+              <span>95.5 - Medali Emas</span>
+            </div>
+          </div>
+
+          <div class="podium-item">
+            <div class="podium-rank bronze">3</div>
+            <div>
+              <strong>Andi Wijaya</strong><br>
+              <span>93.8 - Medali Perunggu</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="table-title">Tabel Peringkat Lengkap</h3>
 
       <table>
         <thead>
           <tr>
             <th>Rank</th>
-            <th>Nama</th>
+            <th>Nama Siswa</th>
             <th>Kelas</th>
-            <th>Nilai</th>
+            <th>Nilai Rata-Rata</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody id="tableBody">
+          <tr>
+            <td>10</td>
+            <td>Budi Santoso</td>
+            <td>9C</td>
+            <td>95.5</td>
+            <td>↑</td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td>Siti Aminah</td>
+            <td>9C</td>
+            <td>94.2</td>
+            <td>↓</td>
+          </tr>
+          <tr class="active-row">
+            <td>12</td>
+            <td>Adinda Eka Athiyyah Zahra</td>
+            <td>9C</td>
+            <td>72.2</td>
+            <td>↔</td>
+          </tr>
         </tbody>
       </table>
 
+      <div class="table-footer">
+        <div class="pagination">
+          Halaman:
+          <button type="button">&lt;</button>
+          <button type="button" class="active-page">1</button>
+          <button type="button">2</button>
+          <button type="button">3</button>
+          <button type="button">&gt;</button>
+        </div>
+        <div class="table-info">Menampilkan 1-10 dari 32 siswa</div>
+      </div>
     </section>
-
   </main>
 
 </div>
