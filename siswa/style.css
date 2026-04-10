@@ -740,6 +740,36 @@ body,
     background: linear-gradient(180deg, #117174 0%, #075355 100%);
 }
 
+/* Settings banner*/
+.settings-banner {
+  background: #dceeee;
+  border-radius: 20px;
+  padding: 8px 18px;
+
+  max-width: 900px;
+  margin: 20px auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* teks */
+.settings-banner .text {
+  max-width: 50%;
+}
+
+.settings-banner h1 {
+  color: #0f4c4c;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+/* gambar */
+.settings-banner .image img {
+  width: 180px;
+}
+
 /* PROFILE SISWA */
 .profil-page {
     width: 100%;
@@ -844,6 +874,76 @@ body,
     font-size: 15px;
     font-weight: 700;
     box-shadow: 0 6px 14px rgba(6, 69, 71, 0.22);
+}
+
+/* PROFILE SISWA banner */
+.profil-banner {
+  background: #dceeee;
+  border-radius: 20px;
+  
+  padding: 8px 18px; /* kecilin padding */
+  max-width: 900px;   /* batasi lebar */
+  margin: 20px auto;  /* biar tengah */
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* teks */
+.profil-banner .text {
+  max-width: 50%;
+}
+
+.profil-banner h1 {
+  color: #0f4c4c;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+/* gambar */
+.profil-banner .image img {
+  width: 150px;
+}
+
+/* ===== FINAL FIX KOTAK PUTIH SIDEBAR ===== */
+.sidebar .sidebar-menu li.active a,
+.sidebar .sidebar-menu li a.active {
+  background: #f2f2f2 !important;
+  color: #083f45 !important;
+  font-weight: 700 !important;
+
+  min-height: 64px !important;
+  height: 64px !important;
+  padding: 0 18px !important;
+
+  border-radius: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+
+  box-shadow: none !important;
+}
+
+.sidebar .sidebar-menu li.active a i,
+.sidebar .sidebar-menu li a.active i {
+  color: #083f45 !important;
+  font-size: 20px !important;
+  width: 22px !important;
+  min-width: 22px !important;
+}
+
+.sidebar .sidebar-menu li.active,
+.sidebar .sidebar-menu li:has(a.active) {
+  margin-bottom: 12px !important;
+}
+
+.sidebar .sidebar-menu li a {
+  min-height: 56px !important;
+}
+
+.sidebar .sidebar-menu li {
+  margin-bottom: 12px !important;
 }
 
 /* RESPONSIVE */
@@ -1326,4 +1426,215 @@ body,
 html, body {
     width: 100%;
     height: 100%;
+}
+
+/* ===== FINAL FIX MOBILE: SIDEBAR TETAP DI SAMPING ===== */
+@media (max-width: 768px) {
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+  }
+
+  .dashboard-wrapper {
+    display: flex !important;
+    flex-direction: row !important; /* tetap samping */
+    align-items: stretch !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    overflow-x: auto !important;
+  }
+
+  .sidebar {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+    flex: 0 0 140px !important;
+    min-height: 100vh !important;
+    padding: 12px 10px 18px !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  .sidebar-header {
+    margin-bottom: 14px !important;
+  }
+
+  .logo {
+    width: 110px !important;
+    margin: 0 auto 16px !important;
+    display: block !important;
+  }
+
+  .sidebar-menu li {
+    margin-bottom: 8px !important;
+  }
+
+  .sidebar-menu li a {
+    width: 100% !important;
+    min-height: 42px !important;
+    padding: 10px 10px !important;
+    gap: 8px !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    border-radius: 12px !important;
+  }
+
+  .sidebar-menu li a i {
+    width: 16px !important;
+    min-width: 16px !important;
+    font-size: 14px !important;
+  }
+
+  .sidebar-menu li.active a,
+  .sidebar-menu li a.active,
+  .sidebar .sidebar-menu li.active a,
+  .sidebar .sidebar-menu li a.active {
+    min-height: 44px !important;
+    height: auto !important;
+    padding: 10px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+    gap: 8px !important;
+  }
+
+  .sidebar-footer {
+    margin-top: 12px !important;
+    padding-top: 8px !important;
+  }
+
+  .logout-btn {
+    padding: 10px !important;
+    font-size: 12px !important;
+    gap: 8px !important;
+    border-radius: 12px !important;
+  }
+
+  .logout-btn i {
+    width: 16px !important;
+    min-width: 16px !important;
+    font-size: 14px !important;
+  }
+
+  .main-content {
+    display: block !important;
+    flex: 1 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 12px !important;
+  }
+
+  .top-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .search-container {
+    width: 100% !important;
+  }
+
+  .search-container input {
+    width: 100% !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    border-radius: 18px !important;
+  }
+
+  .user-info {
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .notif-badge {
+    font-size: 18px !important;
+  }
+
+  .avatar-placeholder {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 14px !important;
+  }
+
+  .user-name {
+    font-size: 13px !important;
+  }
+
+  .banner-welcome,
+  .profil-banner,
+  .settings-banner {
+    padding: 12px !important;
+    border-radius: 14px !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .banner-content,
+  .profil-banner .text,
+  .settings-banner .text {
+    max-width: 65% !important;
+  }
+
+  .banner-content h1,
+  .profil-banner h1,
+  .settings-banner h1 {
+    font-size: 16px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .banner-content p,
+  .profil-banner p,
+  .settings-banner p {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+  }
+
+  .banner-image-wrap {
+    position: static !important;
+    margin: 0 !important;
+  }
+
+  .banner-img,
+  .profil-banner .image img,
+  .settings-banner .image img {
+    width: 70px !important;
+    height: auto !important;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .card,
+  .settings-modern-card,
+  .profil-content-box {
+    padding: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .academic-summary,
+  .settings-modern-grid,
+  .profil-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .profil-content-box {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profil-photo-frame {
+    width: 90px !important;
+    height: 90px !important;
+  }
+
+  .btn-pilih-foto,
+  .settings-submit-btn,
+  .profil-readonly-bar {
+    font-size: 12px !important;
+    padding: 10px 12px !important;
+  }
 }
