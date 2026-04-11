@@ -465,7 +465,68 @@ main,
         color: #07484a !important;
         font-weight: 700;
     }
+
+    .menu li a {
+    border-radius: 10px;
+    transition: 0.2s ease;
 }
+
+.menu li a:hover,
+.menu li a:active {
+    background: rgba(245, 164, 37, 0.08);
+    color: #f5a425 !important;
+}
+
+.menu li a:hover i,
+.menu li a:active i {
+    color: #f5a425 !important;
+}
+
+/* menu aktif */
+.menu li a.active {
+    background: rgba(245, 164, 37, 0.12);
+    color: #f5a425 !important;
+    font-weight: 600;
+}
+
+/* login jadi button */
+.menu .login-item {
+    margin-top: 12px;
+}
+
+.menu .login-btn {
+    background: #f5a425 !important;
+    color: #fff !important;
+    border-radius: 12px;
+    justify-content: center !important;
+    padding: 13px 16px !important;
+    font-weight: 700;
+    border-bottom: none !important;
+}
+
+.menu .login-btn i {
+    color: #fff !important;
+}
+
+.menu .login-btn:hover,
+.menu .login-btn:active {
+    background: #e59a22 !important;
+    color: #fff !important;
+}
+
+/* icon lebih rapi */
+.menu li a i:first-child {
+    width: 20px;
+    text-align: center;
+}
+
+/* efek klik halus */
+.menu li a:active {
+    transform: scale(0.98);
+}
+}
+
+
 }
 
 /* =================================================
