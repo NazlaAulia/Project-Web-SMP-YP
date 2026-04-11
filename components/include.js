@@ -8,6 +8,14 @@ document.addEventListener("DOMContentLoaded", function () {
     .then(data => {
       navbarContainer.innerHTML = data;
 
+      const links = document.querySelectorAll(".menu a");
+
+links.forEach(link => {
+  if (link.href === window.location.href) {
+    link.classList.add("active");
+  }
+});
+
       const toggleBtn = document.getElementById("btn-toggle");
       const menu = document.querySelector(".menu");
       const overlay = document.querySelector(".menu-overlay");
