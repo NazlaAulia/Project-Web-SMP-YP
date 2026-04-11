@@ -734,7 +734,7 @@ main,
         line-height: 1.5 !important;
         box-sizing: border-box !important;
     }
-}
+
    
     html, body {
     overflow-x: hidden !important;
@@ -747,5 +747,44 @@ main,
 .dropdown-content {
     width: 100%;
 }
+}
+
+/* =================================================
+   FIX CLOSE BUTTON SIDEBAR
+   ================================================= */
+
+/* --- 1. Sembunyikan close button pas di Desktop --- */
+@media (min-width: 769px) {
+    .menu .close-item {
+        display: none !important;
+    }
+}
+
+/* --- 2. Atur close button pas di Mobile (max-width: 768px) --- */
+@media (max-width: 768px) {
+    /* Atur panggone close button nang njero menu */
+    .menu .close-item {
+        display: flex !important;
+        justify-content: flex-end; /* Ikon dadi nang tengen */
+        padding: 10px 20px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .close-menu {
+        font-size: 28px;
+        color: #07484a; /* Warna asli navigasimu */
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .close-menu:hover {
+        color: #f5a425; /* Warna kuning orange sekolahmu pas di-hover */
+    }
+
+    /* Atur menu ben gak nutupi close button pas dibuka */
+    .menu {
+        padding-top: 60px !important; /* Tambahi padding dhuwur ben ikon close gak ketutupan */
+    }
 }
 
