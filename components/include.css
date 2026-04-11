@@ -526,7 +526,6 @@ main,
 }
 }
 
-
 }
 
 /* =================================================
@@ -630,11 +629,20 @@ main,
         padding: 20px 0 10px !important;
     }
 
+    .footer-col.work-hours {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    padding-right: 20px !important;
+}
+
     /* Layout jadi 2 kolom */
     .footer-grid {
-     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    align-items: center !important;
+.footer-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
         gap: 10px !important;
         padding: 0 16px !important;
     }
@@ -717,4 +725,16 @@ main,
     }
 
    
+    html, body {
+    overflow-x: hidden !important;
 }
+
+.dropdown > a {
+    cursor: pointer;
+}
+
+.dropdown-content {
+    width: 100%;
+}
+}
+
