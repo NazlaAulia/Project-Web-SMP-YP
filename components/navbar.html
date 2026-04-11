@@ -1,3 +1,4 @@
+<!-- TOP BAR -->
 <div class="top-bar">
   <div class="container top-content">
     <div class="contact-info">
@@ -16,6 +17,7 @@
 
 <header>
   <nav class="navbar container">
+
     <div class="logo">
       <img src="img/logo.webp" alt="Logo SMP YP 17">
     </div>
@@ -27,11 +29,28 @@
     </div>
 
     <ul class="menu">
-      <li><a href="index.html">Beranda</a></li>
-      <li><a href="Profil.html">Profil Sekolah</a></li>
+      <li>
+        <a href="index.html">
+          <i class="fas fa-home"></i>
+          <span>Beranda</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="Profil.html">
+          <i class="fas fa-school"></i>
+          <span>Profil Sekolah</span>
+        </a>
+      </li>
 
       <li class="dropdown">
-        <a href="#">Akademik <i class="fas fa-chevron-down"></i></a>
+        <a href="#">
+          <span class="menu-left">
+            <i class="fas fa-book"></i>
+            <span>Akademik</span>
+          </span>
+          <i class="fas fa-chevron-down"></i>
+        </a>
         <ul class="dropdown-content">
           <li><a href="akademik.html#ekstra">Ekstrakurikuler</a></li>
           <li><a href="akademik.html#prestasi">Prestasi</a></li>
@@ -39,14 +58,33 @@
         </ul>
       </li>
 
-      <li><a href="pendaftaran.html">Pendaftaran</a></li>
-      <li><a href="#kontak">Kontak</a></li>
+      <li>
+        <a href="pendaftaran.html">
+          <i class="fas fa-user-plus"></i>
+          <span>Pendaftaran</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="#kontak">
+          <i class="fas fa-phone"></i>
+          <span>Kontak</span>
+        </a>
+      </li>
+
+      <li class="login-item">
+        <a href="login.html">
+          <i class="fas fa-right-to-bracket"></i>
+          <span>Login</span>
+        </a>
+      </li>
     </ul>
 
     <div class="nav-right">
       <i class="fas fa-search"></i>
       <a href="login.html" class="apply-btn">LOGIN</a>
     </div>
+
   </nav>
 
   <div class="menu-overlay"></div>
