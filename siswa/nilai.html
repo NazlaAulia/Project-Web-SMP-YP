@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Halaman Nilai Siswa</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="nilai.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <!-- ganti src logo sesuai punyamu -->
+        <img src="../img/logo.webp" alt="Logo" class="logo" />
+      </div>
+
+      <nav>
+        <ul class="sidebar-menu">
+          <li><a href="siswa.html"><i class="fa-solid fa-house"></i> Dashboard Siswa</a></li>
+          <li><a href="nilai.html" class="active"><i class="fa-solid fa-file-lines"></i> Nilai</a></li>
+          <li><a href="jadwal.html"><i class="fa-solid fa-calendar-days"></i> Jadwal</a></li>
+          <li><a href="peringkat.html"><i class="fa-solid fa-trophy"></i> Peringkat</a></li>
+          <li><a href="profil_siswa.html"><i class="fa-solid fa-user"></i> Profil Siswa</a></li>
+          <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+        </ul>
+
+        <div class="spacer"></div>
+
+        <div class="sidebar-footer">
+          <a href="../login.html" class="logout-btn">Log Out</a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <div class="header">
+        <div class="search-box">
+          <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." />
+        </div>
+
+        <div class="profile-top">
+          <div class="kelas-badge">9C</div>
+          <div class="profile-avatar">A</div>
+          <div class="profile-name-wrap">
+            <p class="profile">Adinda Eka Athiyyah Zahra</p>
+          </div>
+        </div>
+      </div>
+
+      <section class="nilai-card fade-up">
+        <div class="nilai-banner">
+  <div class="nilai-banner-text">
+    <h2>Rangkuman Nilai Siswa</h2>
+    <p>Pantau perkembangan nilai akademikmu secara detail.</p>
+  </div>
+
+  <div class="nilai-banner-img">
+    <img src="../img/siswa.webp" alt="Ilustrasi Nilai Siswa">
+  </div>
+</div>
+
+        <div class="stats">
+          <div class="box stat-box">
+            <div class="box-title">Rata-Rata Nilai Semester Ini</div>
+            <div class="box-value counter" data-target="72.2">0</div>
+            <div class="box-sub">Kelas 9C</div>
+          </div>
+
+          <div class="box stat-box">
+            <div class="box-title">Kenaikan/Penurunan Nilai</div>
+            <div class="box-value counter" data-target="2.1">0</div>
+            <div class="box-sub">compared to last semester</div>
+          </div>
+
+          <div class="box stat-box">
+            <div class="box-title">Nilai Tertinggi (Mata Pelajaran)</div>
+            <div class="box-value counter" data-target="95.5">0</div>
+            <div class="box-sub">MTK - Budi Santoso</div>
+          </div>
+        </div>
+
+        <div class="nilai-filter-wrap">
+          <div class="filter-group">
+            <label for="kelas">Kelas</label>
+            <select id="kelas">
+  <option>7A</option>
+  <option>7B</option>
+  <option>7C</option>
+
+  <option>8A</option>
+  <option>8B</option>
+  <option>8C</option>
+
+  <option>9A</option>
+  <option>9B</option>
+  <option selected>9C</option>
+</select>
+          </div>
+
+          <div class="filter-group">
+            <label for="semester">Tahun Ajaran/Semester</label>
+            <select id="semester">
+              <option selected>2025/2026 - Genap</option>
+              <option>2025/2026 - Ganjil</option>
+              <option>2024/2025 - Genap</option>
+              <option>2024/2025 - Ganjil</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="nilai-section fade-up delay-1">
+          <h3>Halaman Nilai Akhir Semester</h3>
+          <h4>Rekap Nilai Siswa per Semester</h4>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Nama Siswa</th>
+                  <th>Kelas</th>
+                  <th>Nilai Rata-Rata</th>
+                  <th>Status</th>
+                  <th>Predikat</th>
+                  <th>Absensi</th>
+                </tr>
+              </thead>
+
+              <tbody id="nilaiTableBody">
+                <tr>
+                  <td><span class="rank-badge">12</span></td>
+                  <td>Adinda Eka Athiyyah Zahra</td>
+                  <td>9C</td>
+                  <td>72.2</td>
+                  <td>
+                    <span class="status-icon status-up">
+                      <i class="fa-solid fa-arrow-up"></i>
+                    </span>
+                  </td>
+                  <td>B+</td>
+                  <td>2 Sakit</td>
+                </tr>
+
+                <tr>
+                  <td><span class="rank-badge">1</span></td>
+                  <td>Budi Santoso</td>
+                  <td>9C</td>
+                  <td>95.5</td>
+                  <td>
+                    <span class="status-icon status-down">
+                      <i class="fa-solid fa-arrow-up"></i>
+                    </span>
+                  </td>
+                  <td>A+</td>
+                  <td>0 Sakit</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="export-wrap">
+            <button class="export-btn" id="exportBtn">
+              Export Nilai Final Akhir Semester (PDF/Excel)
+            </button>
+          </div>
+        </div>
+
+        <div class="table-footer">
+          <div class="pagination">
+            <span>Halaman:</span>
+            <button>&lt;</button>
+            <button class="active-page">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>&gt;</button>
+          </div>
+
+          <div class="table-info">Menampilkan 1-10 dari 32 siswa</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="nilai.js"></script>
+</body>
+</html>
