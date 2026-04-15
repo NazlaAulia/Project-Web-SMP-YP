@@ -1,9 +1,3 @@
-import { db } from "./firebase-config.js";
-import {
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 const idSiswa = localStorage.getItem("id_siswa");
 
 if (!idSiswa) {
@@ -55,60 +49,37 @@ function renderChart() {
   document.getElementById("minValue").textContent = `${terendah[0]} (${terendah[1]})`;
 }
 
-async function getNamaKelas(idKelas) {
-  try {
-    const kelasRef = doc(db, "kelas", String(idKelas));
-    const kelasSnap = await getDoc(kelasRef);
-
-    if (kelasSnap.exists()) {
-      const kelasData = kelasSnap.data();
-      return kelasData.nama_kelas || "-";
-    }
-
-    return "-";
-  } catch (error) {
-    console.error("Gagal mengambil data kelas:", error);
-    return "-";
-  }
-}
-
 async function loadDashboard() {
   renderChart();
 
-  if (!idSiswa) {
-    namaSiswaEl.textContent = "Siswa";
-    welcomeTextEl.textContent = "Halo, Siswa!";
-    avatarPlaceholderEl.textContent = "S";
-    namaKelasEl.textContent = "-";
-    alert("id_siswa belum ada di localStorage. Untuk testing isi dulu localStorage.");
-    return;
-  }
-
   try {
-    const siswaRef = doc(db, "siswa", String(idSiswa));
-    const siswaSnap = await getDoc(siswaRef);
+    const response = await fetch(`siswa.php?id_siswa=${encodeURIComponent(idSiswa)}`);
+    const text = await response.text();
+    console.log("RESPON SISWA:", text);
 
-    if (!siswaSnap.exists()) {
-      alert("Data siswa tidak ditemukan di Firestore.");
-      namaSiswaEl.textContent = "Siswa";
-      welcomeTextEl.textContent = "Halo, Siswa!";
-      avatarPlaceholderEl.textContent = "S";
-      namaKelasEl.textContent = "-";
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      throw new Error("Response bukan JSON: " + text);
+    }
+
+    if (result.status !== "success") {
+      alert(result.message || "Gagal memuat data siswa.");
       return;
     }
 
-    const s = siswaSnap.data();
+    const s = result.data;
     const nama = s.nama || "Siswa";
     const hurufAwal = nama.charAt(0).toUpperCase();
-    const namaKelas = await getNamaKelas(s.id_kelas);
 
     namaSiswaEl.textContent = nama;
     welcomeTextEl.textContent = `Halo, ${nama}!`;
     avatarPlaceholderEl.textContent = hurufAwal;
-    namaKelasEl.textContent = namaKelas;
+    namaKelasEl.textContent = s.nama_kelas || "-";
   } catch (error) {
     console.error("Error load dashboard:", error);
-    alert("Terjadi error saat memuat dashboard siswa.");
+    alert(error.message || "Terjadi error saat memuat dashboard siswa.");
   }
 }
 
