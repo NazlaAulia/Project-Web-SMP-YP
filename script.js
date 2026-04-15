@@ -84,3 +84,4 @@ if (cards.length > 0) {
         updateSlider();
     }, 5000);
 }
+
