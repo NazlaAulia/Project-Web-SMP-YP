@@ -41,13 +41,13 @@
     <div class="header">
       <input type="text" placeholder="Cari info akademik, tugas, atau jadwal...">
 
-      <div class="profile-top">
-        <div class="kelas-badge" id="kelasText">9C</div>
-        <div class="profile-avatar" id="avatarText">A</div>
-        <div class="profile-name-wrap">
-          <div class="profile" id="namaText">Adinda Eka Athiyyah Zahra</div>
-        </div>
-      </div>
+     <div class="profile-top">
+  <div class="kelas-badge" id="kelasText">-</div>
+  <div class="profile-avatar" id="avatarText">-</div>
+  <div class="profile-name-wrap">
+    <div class="profile" id="namaText">Loading...</div>
+  </div>
+</div>
     </div>
 
     <section class="card fade-in">
@@ -64,38 +64,37 @@
       </div>
 
       <div class="stats">
-        <div class="box">
-          Peringkat Saat Ini<br>
-          <strong>#12</strong><br>
-          <span>Kelas 9C</span>
-        </div>
+  <div class="box">
+    Peringkat Saat Ini<br>
+    <strong id="peringkatSaatIni">#-</strong><br>
+    <span id="kelasCard">Kelas -</span>
+  </div>
 
         <div class="box">
-          Nilai Rata-Rata<br>
-          <strong>72.2</strong>
-        </div>
+    Nilai Rata-Rata<br>
+    <strong id="nilaiRataRata">-</strong>
+  </div>
 
         <div class="box">
-          Posisi Sebelumnya<br>
-          <strong>#14 ↑</strong>
-        </div>
-      </div>
+    Posisi Sebelumnya<br>
+    <strong id="posisiSebelumnya">#-</strong>
+  </div>
+</div>
 
       <div class="peringkat-filter-wrap">
         <div class="filter-group">
           <label for="kelas">Kelas</label>
           <select id="kelas">
-  <option>7A</option>
-  <option>7B</option>
-  <option>7C</option>
-
-  <option>8A</option>
-  <option>8B</option>
-  <option>8C</option>
-
-  <option>9A</option>
-  <option>9B</option>
-  <option selected>9C</option>
+  <option value="" selected disabled>Pilih kelas</option>
+  <option value="7A">7A</option>
+  <option value="7B">7B</option>
+  <option value="7C">7C</option>
+  <option value="8A">8A</option>
+  <option value="8B">8B</option>
+  <option value="8C">8C</option>
+  <option value="9A">9A</option>
+  <option value="9B">9B</option>
+  <option value="9C">9C</option>
 </select>
         </div>
 
@@ -107,72 +106,20 @@
           </select>
         </div>
       </div>
-
-      <div class="podium-section">
-        <h3>Podium Juara</h3>
-        <div class="podium-list">
-          <div class="podium-item">
-            <div class="podium-rank silver">2</div>
-            <div>
-              <strong>Siti Aminah</strong><br>
-              <span>94.2 - Medali Perak</span>
-            </div>
-          </div>
-
-          <div class="podium-item">
-            <div class="podium-rank gold">1</div>
-            <div>
-              <strong>Budi Santoso</strong><br>
-              <span>95.5 - Medali Emas</span>
-            </div>
-          </div>
-
-          <div class="podium-item">
-            <div class="podium-rank bronze">3</div>
-            <div>
-              <strong>Andi Wijaya</strong><br>
-              <span>93.8 - Medali Perunggu</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <h3 class="table-title">Tabel Peringkat Lengkap</h3>
 
       <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Nama Siswa</th>
-            <th>Kelas</th>
-            <th>Nilai Rata-Rata</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <tr>
-            <td>10</td>
-            <td>Budi Santoso</td>
-            <td>9C</td>
-            <td>95.5</td>
-            <td>↑</td>
-          </tr>
-          <tr>
-            <td>11</td>
-            <td>Siti Aminah</td>
-            <td>9C</td>
-            <td>94.2</td>
-            <td>↓</td>
-          </tr>
-          <tr class="active-row">
-            <td>12</td>
-            <td>Adinda Eka Athiyyah Zahra</td>
-            <td>9C</td>
-            <td>72.2</td>
-            <td>↔</td>
-          </tr>
-        </tbody>
-      </table>
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Nama Siswa</th>
+      <th>Kelas</th>
+      <th>Nilai Rata-Rata</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
 
       <div class="table-footer">
         <div class="pagination">
@@ -191,5 +138,19 @@
 </div>
 
 <script src="peringkat.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const idSiswa = params.get("id_siswa") || localStorage.getItem("id_siswa");
+
+  if (idSiswa) {
+    localStorage.setItem("id_siswa", idSiswa);
+
+    document.querySelectorAll(".sidebar-menu a").forEach(link => {
+      const url = new URL(link.getAttribute("href"), window.location.href);
+      url.searchParams.set("id_siswa", idSiswa);
+      link.setAttribute("href", url.pathname.split("/").pop() + "?id_siswa=" + idSiswa);
+    });
+  }
+</script>
 </body>
 </html>
