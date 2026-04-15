@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logout</title>
+</head>
+<body>
+  <script type="module">
+    import { supabase } from "./supabase-config.js";
+
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Gagal logout Supabase:", error);
+    }
+
+    localStorage.removeItem("id_siswa");
+    localStorage.removeItem("id_user");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role_id");
+    sessionStorage.clear();
+
+    window.location.replace("../login.html");
+  </script>
+</body>
+</html>

@@ -4,143 +4,376 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPDB Online - SMP YP 17 Surabaya</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="pendaftaran.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <header>
-        </header>
+<div class="page-wrap">
+    <div class="register-card">
+        <div class="dot-pattern dot-1"></div>
+        <div class="dot-pattern dot-2"></div>
 
-    <main class="ppdb-page">
-        <section class="ppdb-hero">
-            <div class="container">
-                <span class="badge">PENDAFTARAN PESERTA DIDIK BARU</span>
-                <h1>Tahun Pelajaran 2026/2027</h1>
-                <p>Mari bergabung menjadi bagian dari generasi berprestasi dan berkarakter di SMP YP 17 Surabaya.</p>
+        <div class="register-left" data-aos="fade-right">
+            <div class="brand-row">
+                <div class="brand-logo">
+                    <img src="img/logo.webp" alt="Logo SMP YP 17 Surabaya">
+                </div>
+                <div class="top-login-text">
+                    Sudah pernah daftar? <a href="login.php">Masuk Sekarang!</a>
+                </div>
             </div>
-        </section>
 
-        <div class="container ppdb-container">
-            
-            <section class="ppdb-section">
-                <div class="section-title center">
-                    <h2>Alur Pendaftaran</h2>
-                    <div class="line mx-auto"></div>
-                </div>
-                <div class="step-grid">
-                    <div class="step-card">
-                        <div class="step-icon">1</div>
-                        <h4>Registrasi Online</h4>
-                        <p>Mengisi formulir pendaftaran melalui tombol "Daftar Sekarang".</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-icon">2</div>
-                        <h4>Verifikasi Berkas</h4>
-                        <p>Menyerahkan fotokopi KK, Akta, dan Ijazah/SKL ke sekolah.</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-icon">3</div>
-                        <h4>Wawancara</h4>
-                        <p>Calon siswa dan orang tua melakukan sesi wawancara singkat.</p>
-                    </div>
-                    <div class="step-card highlight">
-                        <div class="step-icon"><i class="fas fa-check"></i></div>
-                        <h4>Daftar Ulang</h4>
-                        <p>Penyelesaian administrasi dan pengambilan seragam sekolah.</p>
-                    </div>
-                </div>
-            </section>
+            <div class="form-heading">
+                <h2>Form Pendaftaran</h2>
+                <p>Isi formulir sesuai data resmi dan kirim pendaftaranmu sekarang.</p>
+            </div>
 
-            <div class="ppdb-flex">
-                <div class="ppdb-left">
-                    <div class="info-card">
-                        <h3><i class="fas fa-file-alt"></i> Syarat Pendaftaran</h3>
-                        <ul>
-                            <li><i class="fas fa-check-circle"></i> Mengisi Formulir Pendaftaran.</li>
-                            <li><i class="fas fa-check-circle"></i> Fotokopi Ijazah/SKL (2 Lembar).</li>
-                            <li><i class="fas fa-check-circle"></i> Fotokopi Akta Kelahiran (2 Lembar).</li>
-                            <li><i class="fas fa-check-circle"></i> Fotokopi Kartu Keluarga (2 Lembar).</li>
-                            <li><i class="fas fa-check-circle"></i> Pas Foto 3x4 Background Merah (4 Lembar).</li>
-                        </ul>
+            <div id="formAlert"></div>
+
+            <div id="waReminder" class="wa-reminder-box" style="display:none;">
+                <strong>Silakan lanjut konfirmasi ke admin.</strong>
+                <a href="#" id="waReminderLink" target="_blank">Chat Admin via WhatsApp</a>
+            </div>
+
+            <form id="formPendaftaran">
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" name="nama_lengkap" required>
                     </div>
                 </div>
 
-                <div class="ppdb-right">
-                    <div class="action-card">
-                        <h3>Siap Mendaftar?</h3>
-                        <p>Klik tombol di bawah untuk mengisi formulir pendaftaran online secara langsung.</p>
-                        <a href="https://bit.ly/formulir-smpyp17" target="_blank" class="btn-primary-ppdb">
-                            ISI FORMULIR SEKARANG <i class="fas fa-external-link-alt"></i>
-                        </a>
-                        <div class="contact-ppdb">
-                            <p>Butuh bantuan? Hubungi Panitia:</p>
-                            <a href="https://wa.me/62812345678" class="wa-ppdb">
-                                <i class="fab fa-whatsapp"></i> 0812-3456-78XX (Pak Panitia)
-                            </a>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>NISN</label>
+                        <input type="text" name="nisn" maxlength="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Kelamin</label>
+                        <select name="jenis_kelamin" required>
+                            <option value="">-- Pilih --</option>
+                            <option value="L">Laki-laki</option>
+                            <option value="P">Perempuan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir" required>
+                    </div>
+                    <div class="form-group">
+                        <label>No HP</label>
+                        <input type="text" name="no_hp" maxlength="20" required>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Alamat</label>
+                        <textarea name="alamat" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Asal Sekolah</label>
+                        <input type="text" name="asal_sekolah" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email">
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Pendapatan Orang Tua</label>
+                        <input type="number" step="0.01" name="pendapatan_ortu" required>
+                    </div>
+                </div>
+
+                <div class="agreement">
+                    <input type="checkbox" id="agreement" required>
+                    <span>Saya mengisi data dengan benar dan siap menunggu verifikasi admin.</span>
+                </div>
+
+                <div class="form-note">
+                    Data akan masuk dengan status menunggu.
+                </div>
+
+                <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
+                <a href="index.html" class="btn-back-dashboard">Kembali ke Dashboard</a>
+            </form>
+        </div>
+
+        <div class="register-right" data-aos="fade-left" data-aos-delay="200">
+            <div class="right-box">
+                <div class="right-title-box">
+                    <h3>Let’s Make<br>It Happen<br>Together!</h3>
+                </div>
+
+                <div class="right-image-box"></div>
+
+                <div class="right-placeholder">
+                    <p style="margin-bottom: 20px;">Pendaftaran online lebih mudah, cepat, dan langsung masuk ke sistem sekolah.</p>
+
+                    <div class="school-features">
+                        <div class="feat-item" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px;">✓</span>
+                            <span>Akreditasi A</span>
+                        </div>
+                        <div class="feat-item" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px;">✓</span>
+                            <span>Ekstrakurikuler Lengkap</span>
+                        </div>
+                        <div class="feat-item" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px;">✓</span>
+                            <span>Laboratorium Komputer Modern</span>
                         </div>
                     </div>
                 </div>
+
+                <div class="fasilitas-action" style="margin-top: 20px; text-align: left;">
+                    <a href="fasilitas.php" class="btn-fasilitas">
+                        <span>Lihat Detail Fasilitas</span>
+                        <i class="icon-arrow">→</i>
+                    </a>
+                    <p style="font-size: 11px; opacity: 0.7; margin-top: 8px; font-style: italic;">
+                        lihat fasilitas lebih lanjut
+                    </p>
+                </div>
+
+                <div class="live-stats-container" style="margin-top: 35px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="stat-card" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
+                        <span style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px;">Pendaftar Hari Ini</span>
+                        <strong style="font-size: 24px; color: var(--secondary);">12</strong>
+                        <span style="font-size: 12px; display: block; opacity: 0.7;">Siswa</span>
+                    </div>
+
+                    <div class="stat-card" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
+                        <span style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px;">Kuota Tersedia</span>
+                        <strong style="font-size: 24px; color: #ffffff;">45</strong>
+                        <span style="font-size: 12px; display: block; opacity: 0.7;">Kursi</span>
+                    </div>
+                </div>
+
+                <div class="quota-progress" style="margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; opacity: 0.8;">
+                        <span>Pengisian Kuota</span>
+                        <span>75% Terisi</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
+                        <div style="width: 75%; height: 100%; background: var(--secondary); border-radius: 10px; animation: loadProgress 2s ease-out;"></div>
+                    </div>
+                </div>
+
+                <div class="contact-info-box" style="margin-top: 25px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border-left: 4px solid var(--secondary); text-align: left;">
+                    <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--secondary); font-weight: 700; margin-bottom: 5px;">Informasi Bantuan</span>
+                    <p style="font-size: 13px; margin: 0; opacity: 0.9; line-height: 1.5;">
+                        Senin - Sabtu (08:00 - 14:00 WIB)<br>
+                        Gedung Pusat Informasi Lantai 1
+                    </p>
+                </div>
+
+                <div class="testi-running" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                    <div class="marquee-wrap" style="overflow: hidden; white-space: nowrap;">
+                        <p class="animate-text" style="display: inline-block; font-size: 13px; font-style: italic; opacity: 0.8; animation: mlakuKiri 15s linear infinite;">
+                            "Belajar di SMP YP 17 Surabaya seru banget, fasilitasnya lengkap! - Alumni 2025" &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp;
+                            "Sekolahnya nyaman dan gurunya ramah-ramah! - Siswa Kelas 8" &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp;
+                        </p>
+                    </div>
+                </div>
+
+                <div class="right-wa-note">PPDB ONLINE</div>
+
+                <div class="social-media-footer" style="margin-top: 30px; text-align: center;">
+                    <p style="font-size: 11px; opacity: 0.6; margin-bottom: 12px; letter-spacing: 1px; text-transform: uppercase;">Follow Us On</p>
+                    <div class="social-icons" style="display: flex; justify-content: center; gap: 20px;">
+                        <a href="https://instagram.com/smpyp17sby" target="_blank" class="soc-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://wa.me/62xxxxxxxxxx" target="_blank" class="soc-link">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://youtube.com/c/smpyp17sby" target="_blank" class="soc-link">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
-
-        </div>
-    </main>
-
-    
-<footer class="main-footer">
-    <div class="container footer-grid">
-        
-        <div class="footer-col about">
-            <img src="img/logo.webp" alt="Logo SMP YP 17" class="footer-logo">
-            <p class="school-addr">
-                Jl. Randu No.17, Sidotopo Wetan, <br>
-                Kec. Kenjeran, Surabaya, <br>
-                Jawa Timur 60128
-            </p>
-            <p class="school-phone">Telepon : (031) 376 3721</p>
-        </div>
-
-        <div class="footer-col links">
-            <h4>Jelajahi</h4>
-            <ul>
-                <li><a href="Profil.html">Tentang Kami</a></li>
-                <li><a href="akademik.html">Fasilitas</a></li>
-                <li><a href="#">Ekstrakurikuler</a></li>
-                <li><a href="#">Kalender Akademik</a></li>
-                <li><a href="#">Pendaftaran</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-col links">
-            <h4>Tautan Cepat</h4>
-            <ul>
-                <li><a href="#">Informasi Sekolah</a></li>
-                <li><a href="#kontak">Hubungi Kami</a></li>
-                <li><a href="login.html">Login Siswa/Guru</a></li>
-                <li><a href="#">PPDB Online</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-col work-hours">
-            <h4>Jam Kerja</h4>
-            <p>Senin – Jumat <br> 07.00 – 15.30 WIB</p>
-            
-            <div class="footer-social">
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-facebook"></i></a>
-                <a href="#"><i class="fab fa-youtube"></i></a>
-                <a href="#"><i class="fab fa-linkedin"></i></a>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="footer-bottom">
-        <div class="container">
-            <p>Copyright © 2026 <span>SMP YP 17 Surabaya</span>. All Right Reserved.</p>
         </div>
     </div>
-</footer>
+</div>
+
+<div class="modal-overlay" id="successModal">
+    <div class="modal-box">
+        <div class="modal-icon">✓</div>
+        <h3>Pendaftaran Berhasil</h3>
+        <p>
+            Terima kasih telah mendaftar.<br>
+            Silakan konfirmasi ke admin melalui WhatsApp agar pendaftaranmu segera dicek.
+        </p>
+
+        <div class="modal-actions">
+            <button type="button" class="btn-modal" onclick="closeModal()">Nanti Saja</button>
+            <a href="#" id="waAdminBtn" class="btn-wa" target="_blank" onclick="closeModal()">
+                Konfirmasi ke Admin
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function closeModal() {
+    document.getElementById('successModal').classList.remove('active');
+}
+</script>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init({
+    duration: 1000,
+    once: true
+});
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+   apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
+  authDomain: "smpyp17.firebaseapp.com",
+  databaseURL: "https://smpyp17-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smpyp17",
+  storageBucket: "smpyp17.firebasestorage.app",
+  messagingSenderId: "74715637846",
+  appId: "1:74715637846:web:2e3ed5dc6bf4079aa1b3f7",
+  measurementId: "G-NEKTB23085"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const form = document.getElementById("formPendaftaran");
+const alertBox = document.getElementById("formAlert");
+const modal = document.getElementById("successModal");
+const waBtn = document.getElementById("waAdminBtn");
+const waReminder = document.getElementById("waReminder");
+const waReminderLink = document.getElementById("waReminderLink");
+const submitBtn = form.querySelector(".btn-submit");
+
+form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = "Sedang Memproses... ⏳";
+
+    const namaLengkap = form.nama_lengkap.value.trim();
+    const nisn = form.nisn.value.trim();
+    const jenisKelamin = form.jenis_kelamin.value;
+    const tanggalLahir = form.tanggal_lahir.value;
+    const alamat = form.alamat.value.trim();
+    const asalSekolah = form.asal_sekolah.value.trim();
+    const noHp = form.no_hp.value.trim();
+    const email = form.email.value.trim();
+    const pendapatanOrtu = form.pendapatan_ortu.value.trim();
+
+    if (!namaLengkap || !nisn || !jenisKelamin || !tanggalLahir || !alamat || !asalSekolah || !noHp || !pendapatanOrtu) {
+        alertBox.innerHTML = `<div class="alert error">Semua field wajib diisi kecuali email.</div>`;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        return;
+    }
+
+    const data = {
+        nama_lengkap: namaLengkap,
+        nisn: nisn,
+        jenis_kelamin: jenisKelamin,
+        tanggal_lahir: tanggalLahir,
+        alamat: alamat,
+        asal_sekolah: asalSekolah,
+        no_hp: noHp,
+        email: email,
+        pendapatan_ortu: Number(pendapatanOrtu),
+        status: "menunggu",
+        tanggal_daftar: new Date().toISOString()
+    };
+
+    try {
+    console.log("Mulai kirim ke Firebase...", data);
+
+    const pendaftaranRef = collection(db, "pendaftaran");
+    const snapshot = await getDocs(pendaftaranRef);
+
+    let maxId = 0;
+    snapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        if (item.id_pendaftaran && item.id_pendaftaran > maxId) {
+            maxId = item.id_pendaftaran;
+        }
+    });
+
+    const idBaru = maxId + 1;
+
+    const dataDenganId = {
+        id_pendaftaran: idBaru,
+        nama_lengkap: namaLengkap,
+        nisn: nisn,
+        jenis_kelamin: jenisKelamin,
+        tanggal_lahir: tanggalLahir,
+        alamat: alamat,
+        asal_sekolah: asalSekolah,
+        no_hp: noHp,
+        email: email,
+        pendapatan_ortu: Number(pendapatanOrtu),
+        status: "menunggu",
+        tanggal_daftar: new Date().toISOString()
+    };
+
+    await Promise.race([
+        setDoc(doc(db, "pendaftaran", String(idBaru)), dataDenganId),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Request timeout: Firebase terlalu lama merespons.")), 15000)
+        )
+    ]);
+
+    const nomorAdmin = "6283846311788";
+    const pesanWa = `Halo Admin SMP YP 17 Surabaya,
+
+Saya atas nama *${namaLengkap}* telah melakukan pendaftaran PPDB.
+ID Pendaftaran: ${idBaru}
+NISN: ${nisn}
+Asal Sekolah: ${asalSekolah}
+No HP: ${noHp}
+
+Mohon konfirmasi pendaftaran saya. Terima kasih.`;
+
+    const waLink = `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesanWa)}`;
+
+    waBtn.href = waLink;
+    waReminderLink.href = waLink;
+    waReminder.style.display = "block";
+
+    alertBox.innerHTML = `<div class="alert success">Pendaftaran berhasil dikirim silahkan di tunggu.</div>`;
+    modal.classList.add("active");
+    form.reset();
+}catch (err) {
+        console.error("Firebase error:", err);
+        alertBox.innerHTML = `<div class="alert error">Gagal menyimpan data: ${err.message}</div>`;
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+</script>
+
+<script src="pendaftaran.js"></script>
 
 </body>
 </html>

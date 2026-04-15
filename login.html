@@ -1,42 +1,3 @@
-<?php
-session_start();
-$conn = mysqli_connect("localhost", "root", "", "sekolahyp");
-
-if (!$conn) {
-    die("Koneksi ke database gagal: " . mysqli_connect_error());
-}
-
-$error_login = false; // Supaya warning orange ilang
-
-if (isset($_POST['login'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    $query = mysqli_query($conn, "SELECT * FROM user WHERE username='$username' AND password='$password'");
-    $data = mysqli_fetch_assoc($query);
-
-   if ($data) {
-    $_SESSION['username'] = $data['username'];
-    $_SESSION['role_id'] = $data['role_id'];
-    $_SESSION['id_siswa'] = $data['id_siswa'] ?? null;
-    $_SESSION['id_guru'] = $data['id_guru'] ?? null;
-    $_SESSION['id_user'] = $data['id_user'];
-
-   if ($data['role_id'] == 1) {
-    header("Location: admin.php");
-    exit;
-} else if ($data['role_id'] == 2) {
-    header("Location: guru.php");
-    exit;
-} else if ($data['role_id'] == 3) {
-    header("Location: siswa/siswa.php");
-    exit;
-}
-}else {
-        $error_login = true; 
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -57,7 +18,7 @@ if (isset($_POST['login'])) {
                     <p>Mulai pengalaman belajar barumu</p>
                 </div>
 
-                <form action="login.php" method="POST" class="siakad-form" id="mainLoginForm">
+               <form class="siakad-form" id="mainLoginForm">
                     <div class="input-group">
                         <label>Username</label>
                         <div class="input-field">
@@ -116,7 +77,6 @@ if (isset($_POST['login'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // 1. Fitur Mata Password
         const togglePassword = document.querySelector('#togglePassword');
         const passwordInput = document.querySelector('#password');
         togglePassword.addEventListener('click', function () {
@@ -125,7 +85,6 @@ if (isset($_POST['login'])) {
             this.classList.toggle('fa-eye-slash');
         });
 
-        // 2. Slider Otomatis
         let slides = document.querySelectorAll('.slide');
         let currentSlide = 0;
         setInterval(() => {
@@ -133,23 +92,116 @@ if (isset($_POST['login'])) {
             currentSlide = (currentSlide + 1) % slides.length;
             slides[currentSlide].classList.add('active');
         }, 5000);
-
-        // 3. Loading Spinner
-        document.getElementById('mainLoginForm').onsubmit = function() {
-            document.getElementById('loginBtn').classList.add('is-loading');
-        };
     </script>
 
-    <?php if($error_login): ?>
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Login Gagal!',
-            text: 'Username Atau Passwoard salah',
-            confirmButtonColor: '#07484a'
-        });
-    </script>
-    <?php endif; ?>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
+  authDomain: "smpyp17.firebaseapp.com",
+  projectId: "smpyp17",
+};
+
+const supabaseUrl = 'https://mwqqflnzeoxcbqigoxhz.supabase.co';
+const supabaseKey = 'sb_publishable_qgOE5u-TOYQnYPGf6tgi2Q_GmjsMEF4';
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const form = document.querySelector(".siakad-form");
+const loginBtn = document.getElementById('loginBtn');
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  loginBtn.classList.add('is-loading');
+  loginBtn.disabled = true;
+
+  const username = document.querySelector("[name='username']").value.trim();
+  const password = document.querySelector("[name='password']").value;
+
+  try {
+    const q = query(
+      collection(db, "user"),
+      where("username", "==", username),
+      where("password", "==", password)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      alert("Login gagal! Periksa username dan password.");
+      return;
+    }
+
+    const data = querySnapshot.docs[0].data();
+
+    // Email dummy + password dummy khusus Supabase
+    const emailDummy = `${username}@smpyp17.id`;
+    const supabasePassword = `spb-${username}-yp17`;
+
+    await supabase.auth.signOut();
+
+    let signInResult = await supabase.auth.signInWithPassword({
+      email: emailDummy,
+      password: supabasePassword,
+    });
+
+    if (signInResult.error) {
+      console.log("Login Supabase gagal, mencoba auto-register...", signInResult.error.message);
+
+      const signUpResult = await supabase.auth.signUp({
+        email: emailDummy,
+        password: supabasePassword,
+      });
+
+      if (signUpResult.error) {
+        throw new Error("Gagal membuat akun Supabase: " + signUpResult.error.message);
+      }
+
+      signInResult = await supabase.auth.signInWithPassword({
+        email: emailDummy,
+        password: supabasePassword,
+      });
+
+      if (signInResult.error) {
+        throw new Error("Akun Supabase berhasil dibuat, tapi login gagal: " + signInResult.error.message);
+      }
+    }
+
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !userData.user) {
+      throw new Error("Supabase Auth tidak mendeteksi login. Silakan coba login ulang.");
+    }
+
+    localStorage.setItem("username", data.username);
+    localStorage.setItem("role_id", data.role_id);
+
+    if (data.role_id == 3) {
+      localStorage.setItem("id_siswa", data.id_siswa);
+      window.location.href = "siswa/siswa.html";
+    } else if (data.role_id == 2) {
+      window.location.href = "guru/guru.html";
+    } else if (data.role_id == 1) {
+      window.location.href = "admin.html";
+    } else {
+      alert("Role user tidak dikenali.");
+    }
+
+  } catch (error) {
+    console.error("Error saat login:", error);
+    alert(error.message || "Terjadi kesalahan sistem.");
+  } finally {
+    loginBtn.classList.remove('is-loading');
+    loginBtn.disabled = false;
+  }
+});
+</script>
 
 </body>
 </html>

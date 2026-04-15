@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings Siswa | Smart School</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<body class="dashboard-body">
+
+<div class="dashboard-wrapper">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <img src="../img/logo.webp" alt="Logo" class="logo" />
+        </div>
+
+ <ul class="sidebar-menu">
+  <li>
+    <a href="siswa.html"><i class="fa-solid fa-house"></i> Dashboard Siswa</a>
+  </li>
+  <li>
+    <a href="nilai.html"><i class="fa-solid fa-file-lines"></i> Nilai</a>
+  </li>
+  <li>
+    <a href="jadwal.html"><i class="fa-solid fa-calendar-days"></i> Jadwal</a>
+  </li>
+  <li>
+    <a href="peringkat.html"><i class="fa-solid fa-trophy"></i> Peringkat</a>
+  </li>
+  <li>
+    <a href="profil-siswa.html"><i class="fa-solid fa-user"></i> Profil Siswa</a>
+  </li>
+  <li class="active">
+    <a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+  </li>
+</ul>
+
+
+        <div class="sidebar-footer">
+    <a href="../login.html" class="logout-btn" id="logoutBtn">Log Out</a>
+</div>
+    </nav>
+
+    <main class="main-content">
+        <header class="top-header">
+            <div class="search-container">
+                <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." />
+            </div>
+
+            <div class="user-info">
+                <span class="notif-badge" id="namaKelas">-</span>
+                <div class="user-profile-top">
+                    <div class="avatar-placeholder" id="avatarHuruf">-</div>
+                    <span class="user-name" id="namaSiswa">Memuat...</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="settings-page">
+  <div class="settings-banner">
+
+    <div class="text">
+      <h1>Settings</h1>
+      <p>Kelola keamanan akunmu di sini. Gunakan password minimal 8 karakter.</p>
+    </div>
+
+    <div class="image">
+      <img src="../img/siswa.webp" alt="settings">
+    </div>
+
+  </div>
+</section>
+
+        <div id="alertBox"></div>
+
+        <section class="settings-modern-wrap">
+            <div class="settings-modern-card">
+                <h3 class="settings-modern-title">Ubah Password</h3>
+
+                <form id="formPassword" class="settings-modern-form">
+                    <div class="settings-modern-grid">
+
+                        <div class="settings-box">
+                            <div class="settings-box-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+
+                            <h4>Password Lama</h4>
+
+                            <div class="settings-input-wrap">
+                                <input type="password" id="password_lama" placeholder="Masukkan password lama" required />
+                                <button type="button" class="eye-btn" data-target="password_lama">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+
+                            <p>Masukkan password akunmu saat ini.</p>
+                        </div>
+
+                        <div class="settings-box">
+                            <div class="settings-box-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+
+                            <h4>Password Baru</h4>
+
+                            <div class="settings-input-wrap">
+                                <input type="password" id="password_baru" placeholder="Masukkan password baru" required />
+                                <button type="button" class="eye-btn" data-target="password_baru">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+
+                            <div class="strength-row">
+                                <div class="strength-bar">
+                                    <div class="strength-fill" id="strengthFill"></div>
+                                </div>
+                                <span class="strength-text" id="strengthText">Minimal 8 karakter</span>
+                            </div>
+                        </div>
+
+                        <div class="settings-box">
+                            <div class="settings-box-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+
+                            <h4>Konfirmasi Password Baru</h4>
+
+                            <div class="settings-input-wrap">
+                                <input type="password" id="konfirmasi_password" placeholder="Ulangi password baru" required />
+                                <button type="button" class="eye-btn" data-target="konfirmasi_password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+
+                            <p>Harus sama dengan password baru.</p>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="settings-submit-btn" id="btnSimpanPassword">
+                        Simpan Password
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script type="module" src="settings.js"></script>
+</body>
+</html>

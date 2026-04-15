@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - School Prime</title>
+
+    <link rel="stylesheet" href="indexstyle.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- TOPBAR MOBILE -->
+   <div class="mobile-topbar">
+    <h2>Dashboard Admin</h2>
+    <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
+
+    <!-- OVERLAY MOBILE -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <strong>SMP YP 17 SURABAYA</strong>
+                <span>ADMIN PANEL</span>
+            </div>
+
+            <nav>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <div class="nav-label">DATA</div>
+                <details class="menu-group" open>
+                    <summary class="nav-item">
+                        <i class="fas fa-database"></i>
+                        <span>Data</span>
+                        <i class="fas fa-chevron-down arrow"></i>
+                    </summary>
+                    <div class="sub-menu">
+                        <a href="#">Guru</a>
+                        <a href="#">Siswa</a>
+                        <a href="#">Pendaftaran</a>
+                        <a href="#">Kelas & Ruangan</a>
+                    </div>
+                </details>
+
+                <div class="nav-label">OPERASIONAL</div>
+                <details class="menu-group">
+                    <summary class="nav-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Operasional</span>
+                        <i class="fas fa-chevron-down arrow"></i>
+                    </summary>
+                    <div class="sub-menu">
+                        <a href="#">Mata Pelajaran</a>
+                        <a href="#">Jadwal</a>
+                        <a href="#">Pengumuman</a>
+                    </div>
+                </details>
+
+                <a href="#" class="nav-item logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Keluar</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div class="search-container-elegant">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Cari data guru atau siswa..." class="search-input">
+                </div>
+
+                <div class="user-profile">
+                    <span>Selamat Datang, <strong>Admin Nazla</strong></span>
+                    <div class="initial">N</div>
+                </div>
+            </header>
+
+            <section class="admin-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e0f2f1; color: #064e4b;">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="counter" data-target="124">0</h3>
+                        <p>Total Guru</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e3f2fd; color: #1e88e5;">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="counter" data-target="1240">0</h3>
+                        <p>Total Siswa</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fff3e0; color: #fb8c00;">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="counter" data-target="42">0</h3>
+                        <p>Total Kelas</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fce4ec; color: #d81b60;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="counter" data-target="8">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid-layout">
+                <div class="left-column">
+                    <div class="card action-card">
+                        <h3><i class="fas fa-exclamation-circle"></i> Perlu Ditindak</h3>
+
+                        <div class="action-item">
+                            <span>Pendaftaran Siswa Baru (Verifikasi)</span>
+                            <span class="badge status-now">5 Siswa</span>
+                        </div>
+
+                        <div class="action-item">
+                            <span>Ganti Jadwal Menunggu Approval</span>
+                            <span class="badge status-pending">3 Request</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-bolt"></i> Aksi Cepat</h3>
+                        <div class="shortcut-grid">
+                            <button class="btn-shortcut">
+                                <i class="fas fa-plus"></i>
+                                <span>Guru</span>
+                            </button>
+                            <button class="btn-shortcut">
+                                <i class="fas fa-calendar-plus"></i>
+                                <span>Jadwal</span>
+                            </button>
+                            <button class="btn-shortcut">
+                                <i class="fas fa-bullhorn"></i>
+                                <span>Info</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-column">
+                    <div class="card">
+                        <h3><i class="fas fa-calendar-alt"></i> Operasional Hari Ini</h3>
+
+                        <div class="schedule-list">
+                            <div class="schedule-item active-row">
+                                <div class="time">07:30</div>
+                                <div class="subject">
+                                    Upacara Bendera
+                                    <p>Lapangan Utama</p>
+                                </div>
+                            </div>
+
+                            <div class="schedule-item">
+                                <div class="time">09:00</div>
+                                <div class="subject">
+                                    Rapat Koordinasi Guru
+                                    <p>Ruang Meeting</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="calendar-card">
+                            <div class="calendar-header">
+                                <button id="prevMonth" class="cal-btn" type="button">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+
+                                <span id="month-year">Bulan Tahun</span>
+
+                                <button id="nextMonth" class="cal-btn" type="button">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+
+                            <div class="calendar-days">
+                                <div>Sen</div>
+                                <div>Sel</div>
+                                <div>Rab</div>
+                                <div>Kam</div>
+                                <div>Jum</div>
+                                <div>Sab</div>
+                                <div>Min</div>
+                            </div>
+
+                            <div id="calendar-body" class="calendar-grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="java.js"></script>
+</body>
+</html>

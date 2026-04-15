@@ -23,84 +23,7 @@ body {
     padding: 0 1.25rem; /* 20px */
 }
 
-/* TOP BAR */
-.top-bar {
-    background: var(--primary);
-    color: var(--white);
-    padding: 0.625rem 0; /* 10px */
-    font-size: 0.8125rem; /* 13px */
-    border-bottom: 0.0625rem solid rgba(255,255,255,0.1);
-}
 
-.top-content {
-    display: flex;
-    justify-content: space-between;
-}
-
-.contact-info span {
-    margin-right: 1.25rem; /* 20px */
-}
-
-.contact-info i, .social-links i {
-    color: var(--secondary);
-    margin-right: 0.3125rem; /* 5px */
-}
-
-.social-links a {
-    color: white;
-    margin-left: 0.9375rem; /* 15px */
-}
-
-/* NAVBAR */
-header {
-    background: white;
-    box-shadow: 0 0.125rem 0.625rem rgba(0,0,0,0.1); /* 2px 10px */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.9375rem 0; /* 15px */
-}
-
-.brand-name {
-    font-size: 1.5rem; /* 24px */
-    font-weight: bold;
-    color: var(--primary);
-    letter-spacing: 0.0625rem; /* 1px */
-}
-
-.menu {
-    display: flex;
-    list-style: none;
-    gap: 1.875rem; /* 30px */
-}
-
-.menu a {
-    text-decoration: none;
-    color: #333;
-    font-weight: 600;
-    font-size: 0.9375rem; /* 15px */
-    transition: 0.3s;
-}
-
-.menu a.active, .menu a:hover {
-    color: var(--secondary);
-}
-
-.apply-btn {
-    background: var(--secondary);
-    color: white;
-    padding: 0.625rem 1.5625rem; /* 10px 25px */
-    border-radius: 1.875rem; /* 30px */
-    text-decoration: none;
-    font-weight: bold;
-    margin-left: 1.25rem; /* 20px */
-}
 
 /* HERO SECTION */
 .hero {
@@ -980,4 +903,600 @@ header li,
     font-weight: bold;
     display: inline-block;
     margin-top: 10px;
+}
+
+
+@media (max-width: 768px) {
+    .hero {
+        height: auto;
+        min-height: 520px;
+        margin-bottom: 2rem;
+    }
+
+    .hero-slider {
+        position: relative;
+        height: 520px;
+    }
+
+    .hero-content {
+        width: calc(100% - 32px);
+        max-width: 100%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 0 10px;
+    }
+
+    .hero-content h3 {
+        font-size: 0.95rem;
+        line-height: 1.4;
+        letter-spacing: 1px;
+    }
+
+    .hero-content h1 {
+        font-size: 2.2rem;
+        line-height: 1.15;
+        margin-bottom: 12px;
+    }
+
+    .hero-content p {
+        font-size: 0.95rem;
+    }
+
+    .hero-btns {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-main,
+    .btn-sub {
+        width: 220px;
+        text-align: center;
+        padding: 14px 20px;
+    }
+
+    .stats-container {
+        position: static !important;
+        bottom: auto !important;
+        left: auto !important;
+        transform: none !important;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: auto;
+        margin-top: 24px;
+        padding: 0 16px;
+    }
+
+    .stat-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .stat-card:hover {
+        transform: none;
+    }
+
+    .sambutan {
+        margin-top: 2rem;
+        padding-top: 2rem;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .stats-container {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* container umum biar ga mepet */
+    .container {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    /* hero */
+    .hero {
+        height: auto !important;
+        min-height: auto !important;
+        margin-bottom: 24px !important;
+    }
+
+    .hero-slider {
+        position: relative !important;
+        height: 430px !important;
+    }
+
+    .hero-content {
+        width: calc(100% - 32px) !important;
+        max-width: 100% !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        padding: 0 8px !important;
+        text-align: center !important;
+    }
+
+    .hero-content h3 {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        margin-bottom: 10px !important;
+        letter-spacing: 1px !important;
+    }
+
+    .hero-content h1 {
+        font-size: 20px !important;
+        line-height: 1.25 !important;
+        margin-bottom: 10px !important;
+    }
+
+    .hero-content p {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        margin-bottom: 14px !important;
+    }
+
+    .hero-btns {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        align-items: center !important;
+    }
+
+    .btn-main,
+    .btn-sub {
+        width: 210px !important;
+        padding: 12px 16px !important;
+        font-size: 14px !important;
+        text-align: center !important;
+    }
+
+    /* hilangkan stats di HP */
+    .stats-container {
+        display: none !important;
+    }
+
+    /* section spacing umum */
+    .sambutan,
+    .pengumuman,
+    .alumni-section,
+    .kontak-section {
+        padding-top: 32px !important;
+        padding-bottom: 32px !important;
+        margin-top: 0 !important;
+    }
+
+    .section-title {
+        text-align: left !important;
+        margin-bottom: 20px !important;
+    }
+
+    .section-title span {
+        display: block;
+        font-size: 12px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .section-title h2 {
+        font-size: 26px !important;
+        line-height: 1.25 !important;
+        margin: 0 0 10px !important;
+    }
+
+    /* sambutan */
+    .sambutan-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 24px !important;
+        text-align: left !important;
+    }
+
+    .sambutan-img {
+        width: 100% !important;
+    }
+
+    .sambutan-img img {
+        width: 100% !important;
+        display: block !important;
+        border-radius: 18px !important;
+        box-shadow: none !important;
+    }
+
+    .name-tag {
+        position: static !important;
+        margin-top: 12px !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .sambutan-text {
+        width: 100% !important;
+    }
+
+    .sambutan-text span {
+        display: block !important;
+        font-size: 12px !important;
+        margin-bottom: 8px !important;
+        letter-spacing: 1px !important;
+        text-align: center !important;
+    }
+
+    .sambutan-text h2 {
+        font-size: 24px !important;
+        line-height: 1.35 !important;
+        margin: 0 0 12px !important;
+        text-align: center !important;
+    }
+
+    .sambutan-text .line {
+        margin: 0 auto 18px !important;
+        width: 70px !important;
+    }
+
+    .sambutan-text p {
+        font-size: 14px !important;
+        line-height: 1.9 !important;
+        text-align: left !important;
+        margin-bottom: 14px !important;
+    }
+
+    .quote-icon {
+        text-align: center !important;
+        margin-top: 8px !important;
+    }
+
+    /* pengumuman jadi 1 kolom */
+    .announcement-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 18px !important;
+        margin-top: 20px !important;
+    }
+
+    .announcement-card {
+        border-radius: 18px !important;
+    }
+
+    .a-img {
+        height: 190px !important;
+    }
+
+    .a-content {
+        padding: 16px !important;
+    }
+
+    .a-content h4 {
+        font-size: 17px !important;
+        line-height: 1.4 !important;
+    }
+
+    .a-content p {
+        font-size: 14px !important;
+        line-height: 1.7 !important;
+    }
+
+    /* alumni */
+    .alumni-section {
+        padding-top: 32px !important;
+    }
+
+    .alumni-slider {
+        margin-top: 20px !important;
+    }
+
+    .alumni-card {
+        padding: 22px 16px !important;
+    }
+
+    .alumni-text {
+        font-size: 15px !important;
+        line-height: 1.8 !important;
+    }
+
+    /* kontak */
+    .kontak-wrapper {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    .kontak-info-box,
+    .kontak-form {
+        padding: 18px !important;
+        border-radius: 18px !important;
+    }
+
+    .input-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+
+    /* footer */
+    .main-footer {
+        padding-top: 36px !important;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+        padding-bottom: 28px !important;
+    }
+
+    .footer-logo {
+        width: 130px !important;
+    }
+
+    .footer-col h4 {
+        margin-bottom: 18px !important;
+    }
+
+    /* back to top */
+    .back-to-top {
+        width: 42px !important;
+        height: 42px !important;
+        right: 16px !important;
+        bottom: 16px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .sambutan-wrapper {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        gap: 16px !important;
+    }
+
+    .sambutan-img {
+        flex: 0 0 38% !important;
+        max-width: 38% !important;
+        position: relative !important;
+    }
+
+    .sambutan-img img {
+        width: 100% !important;
+        height: auto !important;
+        border-radius: 16px !important;
+        box-shadow: none !important;
+        object-fit: cover !important;
+    }
+
+    .name-tag {
+        position: static !important;
+        margin-top: 10px !important;
+        padding: 10px 12px !important;
+        border-radius: 12px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .name-tag h4 {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+    }
+
+    .name-tag p {
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+    }
+
+    .sambutan-text {
+        flex: 1 !important;
+        max-width: 62% !important;
+    }
+
+    .sambutan-text span {
+        text-align: left !important;
+        font-size: 11px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .sambutan-text h2 {
+        text-align: left !important;
+        font-size: 20px !important;
+        line-height: 1.3 !important;
+        margin-bottom: 10px !important;
+    }
+
+    .sambutan-text .line {
+        margin: 0 0 14px 0 !important;
+        width: 56px !important;
+    }
+
+    .sambutan-text p {
+        font-size: 13px !important;
+        line-height: 1.8 !important;
+        text-align: justify !important;
+        margin-bottom: 10px !important;
+    }
+
+    .quote-icon {
+        text-align: left !important;
+        margin-top: 6px !important;
+    }
+}
+
+/* =========================
+   PROFILE SEKOLAH - FIX HP
+   ========================= */
+@media (max-width: 768px) {
+    .profile-hero {
+        padding: 36px 0 !important;
+        margin-bottom: 20px !important;
+    }
+
+    .profile-hero h1 {
+        font-size: 28px !important;
+        line-height: 1.25 !important;
+    }
+
+    .profile-hero p {
+        font-size: 14px !important;
+    }
+
+    .content-card {
+        padding: 20px !important;
+        border-radius: 18px !important;
+        margin-bottom: 20px !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    .card-header {
+        gap: 10px !important;
+        margin-bottom: 16px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .card-header i {
+        font-size: 24px !important;
+    }
+
+    .highlight-text {
+        font-size: 16px !important;
+        line-height: 1.7 !important;
+        padding-left: 12px !important;
+        margin-bottom: 18px !important;
+        text-align: justify !important;
+    }
+
+    .content-card p {
+        font-size: 14px !important;
+        line-height: 1.8 !important;
+        text-align: justify !important;
+    }
+
+    .history-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+
+    .history-info {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 18px !important;
+        border-radius: 16px !important;
+    }
+
+    .history-info h3 {
+        font-size: 18px !important;
+        line-height: 1.4 !important;
+        margin-bottom: 10px !important;
+    }
+
+    .history-info ul,
+    .history-info li,
+    .history-info p {
+        font-size: 14px !important;
+        line-height: 1.8 !important;
+        text-align: justify !important;
+    }
+}
+
+/* =========================
+   PROFILE SEKOLAH - DESKTOP JUSTIFY
+   ========================= */
+.highlight-text,
+.content-card p,
+.history-info p,
+.history-info li {
+    text-align: justify;
+}
+
+/* =========================
+   KONTAK SECTION - FIX HP
+   ========================= */
+@media (max-width: 768px) {
+    .kontak-section,
+    .kontak-wrapper,
+    .kontak-info-box,
+    .kontak-form,
+    .content-card {
+        box-sizing: border-box !important;
+    }
+
+    .kontak-section .container,
+    .kontak-wrapper {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .kontak-wrapper {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+        margin-top: 20px !important;
+    }
+
+    .kontak-info-box,
+    .kontak-form {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 20px !important;
+        border-radius: 18px !important;
+        box-sizing: border-box !important;
+    }
+
+    .kontak-form h2,
+    .kontak-info-box h2,
+    .kontak-section h2 {
+        font-size: 24px !important;
+        line-height: 1.3 !important;
+    }
+
+    .form-group {
+        margin-bottom: 18px !important;
+    }
+
+    .form-group label {
+        font-size: 14px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 14px 16px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+    }
+
+    .form-group textarea {
+        min-height: 140px !important;
+    }
+
+    .btn-kirim {
+        width: 100% !important;
+        max-width: 220px !important;
+        padding: 14px 20px !important;
+        font-size: 14px !important;
+        text-align: center !important;
+    }
+
+    .info-item {
+        gap: 12px !important;
+        margin-bottom: 18px !important;
+    }
+
+    .info-item i {
+        font-size: 1.2rem !important;
+        margin-top: 2px !important;
+    }
+
+    .info-item h4 {
+        font-size: 15px !important;
+    }
+
+    .info-item p {
+        font-size: 13px !important;
+        line-height: 1.6 !important;
+    }
 }
