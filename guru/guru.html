@@ -1,52 +1,89 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <link rel="stylesheet" href="guru.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Guru - SMP YP 17</title>
+    <title>Dashboard Guru</title>
+
+    <link rel="stylesheet" href="guru.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
     <aside class="sidebar">
-        <div class="logo-container-elegant" style="padding-bottom: 20px;">
-            <img src="../img/logo.webp">
-        </div>
+    <div>
+            <div class="logo-container-elegant" style="padding-bottom: 20px;">
+                <img src="../img/logo.webp">
+            </div>
 
-        <nav>
-            <a href="#" class="nav-item active"><i class="bi bi-grid-fill"></i> Dashboard Guru</a>
-            <a href="#" class="nav-item"><i class="bi bi-calendar-event"></i> Jadwal Mengajar</a>
-            <a href="#" class="nav-item"><i class="bi bi-journal-text"></i> Nilai</a>
-            <a href="#" class="nav-item"><i class="bi bi-person-check"></i> Kehadiran</a>
-            <a href="#" class="nav-item"><i class="bi bi-trophy"></i> Peringkat</a>
-            <a href="#" class="nav-item"><i class="bi bi-arrow-left-right"></i> Ganti Jadwal</a>
-            <a href="#" class="nav-item"><i class="bi bi-person-circle"></i> Profil Guru</a>
+        <nav class="sidebar-menu">
+            <a href="dashboardguru.html" class="nav-link active">
+                <i class="bi bi-grid-fill"></i>
+                <span>Dashboard Guru</span>
+            </a>
+
+            <a href="jadwalmengajar.html" class="nav-link">
+                <i class="bi bi-calendar-event"></i>
+                <span>Jadwal Mengajar</span>
+            </a>
+
+            <a href="nilaiguru.html" class="nav-link">
+                <i class="bi bi-journal-text"></i>
+                <span>Nilai</span>
+            </a>
+
+            <a href="kehadiran.html" class="nav-link">
+                <i class="bi bi-person-check"></i>
+                <span>Kehadiran</span>
+            </a>
+
+            <a href="peringkat.html" class="nav-link">
+                <i class="bi bi-trophy"></i>
+                <span>Peringkat</span>
+            </a>
+
+            <a href="gantijadwal.html" class="nav-link">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Ganti Jadwal</span>
+            </a>
+
+            <a href="profilguru.html" class="nav-link">
+                <i class="bi bi-person-circle"></i>
+                <span>Profil Guru</span>
+            </a>
+
+            <a href="settingsguru.html" class="nav-link">
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+            </a>
         </nav>
+    </div>
 
-        <div class="sidebar-footer">
-            <a href="settings-guru.html" class="nav-item"><i class="bi bi-gear"></i> Settings Guru</a>
-            <a href="../logout.html" class="nav-item logout-item"><i class="bi bi-box-arrow-right"></i> Logout</a>
-        </div>
-    </aside>
+    <div class="sidebar-bottom">
+        <a href="logout.html" class="nav-link logout-link">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+</aside>
 
         <main class="main-content">
-        <header>
-            <div class="search-container-elegant">
-                <i class="bi bi-search search-icon"></i>
-                <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." class="search-input">
-            </div>
-            
-            <div class="user-profile">
-                <div class="profile-info">
-                    <span class="user-name">Bapak/Ibu Guru</span>
-                    <span class="user-role">Guru</span>
+            <header>
+                <div class="search-container-elegant">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." class="search-input">
                 </div>
-                <div class="avatar-circle">G</div>
-            </div>
-        </header>
+
+                <div class="user-profile">
+                    <div class="profile-info">
+                        <span class="user-name">Bapak/Ibu Guru</span>
+                        <span class="user-role">Guru</span>
+                    </div>
+                    <div class="avatar-circle">G</div>
+                </div>
+            </header>
 
             <section class="welcome-banner">
                 <div class="welcome-text">
@@ -123,5 +160,9 @@
             </div>
         </main>
     </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
