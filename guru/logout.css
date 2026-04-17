@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #07484a;
+    --secondary: #f5a425;
+    --white: #ffffff;
+    --bg-soft: #f4f7f6;
+    --danger: #dc2626;
+    --shadow: 0 10px 35px rgba(7, 72, 74, 0.08);
+    --text-gray: #6b7a7a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f4f7f6, #ecf4f3);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.logout-wrapper {
+    width: 100%;
+    max-width: 520px;
+}
+
+.logout-card {
+    background: var(--white);
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+    padding: 40px 32px;
+    text-align: center;
+}
+
+.logout-icon {
+    width: 86px;
+    height: 86px;
+    margin: 0 auto 22px;
+    border-radius: 24px;
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.logout-card h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.logout-card p {
+    color: var(--text-gray);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 28px;
+}
+
+.logout-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-secondary,
+.btn-danger {
+    text-decoration: none;
+    border-radius: 14px;
+    padding: 13px 20px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s ease;
+}
+
+.btn-secondary {
+    background: #eef4f3;
+    color: var(--primary);
+}
+
+.btn-secondary:hover {
+    background: #e2eceb;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+@media (max-width: 600px) {
+    .logout-card {
+        padding: 30px 22px;
+    }
+
+    .logout-card h1 {
+        font-size: 1.6rem;
+    }
+
+    .logout-actions {
+        flex-direction: column;
+    }
+
+    .btn-secondary,
+    .btn-danger {
+        justify-content: center;
+        width: 100%;
+    }
+}

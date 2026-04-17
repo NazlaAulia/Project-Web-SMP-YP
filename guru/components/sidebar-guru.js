@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!sidebarContainer) return;
 
   try {
-    const response = await fetch("components/sidebar-guru.html");
+    const response = await fetch("/guru/components/sidebarguru.html");
     const sidebarHTML = await response.text();
     sidebarContainer.innerHTML = sidebarHTML;
 
