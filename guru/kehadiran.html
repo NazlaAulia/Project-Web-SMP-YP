@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kehadiran Siswa</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="components/sidebar.css">
+  <link rel="stylesheet" href="kehadiran.css">
+</head>
+<body>
+  <div class="app-container">
+    <div id="sidebar-container"></div>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1>Kehadiran Siswa</h1>
+          <p>Monitoring kehadiran siswa untuk 3 kelas tanpa input manual absensi</p>
+        </div>
+        <div class="header-badge">
+          <i class="bi bi-calendar-check"></i>
+          <span id="tanggalHariIni">Kamis, 17 April 2026</span>
+        </div>
+      </header>
+
+      <section class="filter-card">
+        <div class="filter-group">
+          <label for="filterHari"><i class="bi bi-funnel"></i> Filter Hari</label>
+          <select id="filterHari">
+            <option value="Semua">Semua Hari</option>
+            <option value="Senin">Senin</option>
+            <option value="Selasa">Selasa</option>
+            <option value="Rabu">Rabu</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filterKelas"><i class="bi bi-building"></i> Filter Kelas</label>
+          <select id="filterKelas">
+            <option value="Semua">Semua Kelas</option>
+            <option value="7A">Kelas 7A</option>
+            <option value="7B">Kelas 7B</option>
+            <option value="7C">Kelas 7C</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <div class="summary-card present">
+          <div class="summary-icon"><i class="bi bi-check-circle-fill"></i></div>
+          <div>
+            <p>Total Hadir</p>
+            <h3 id="totalHadir">0</h3>
+          </div>
+        </div>
+
+        <div class="summary-card izin">
+          <div class="summary-icon"><i class="bi bi-envelope-paper-fill"></i></div>
+          <div>
+            <p>Total Izin</p>
+            <h3 id="totalIzin">0</h3>
+          </div>
+        </div>
+
+        <div class="summary-card sakit">
+          <div class="summary-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+          <div>
+            <p>Total Sakit</p>
+            <h3 id="totalSakit">0</h3>
+          </div>
+        </div>
+
+        <div class="summary-card alfa">
+          <div class="summary-icon"><i class="bi bi-x-circle-fill"></i></div>
+          <div>
+            <p>Total Alfa</p>
+            <h3 id="totalAlfa">0</h3>
+          </div>
+        </div>
+      </section>
+
+      <section class="kelas-grid" id="kelasContainer"></section>
+
+      <section class="table-card">
+        <div class="table-header">
+          <div>
+            <h2>Detail Kehadiran Siswa</h2>
+            <p>Data rekap siswa berdasarkan kelas dan hari</p>
+          </div>
+          <input type="text" id="searchInput" placeholder="Cari nama siswa..." />
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Kelas</th>
+                <th>Status</th>
+                <th>Keterangan</th>
+                <th>Hari</th>
+              </tr>
+            </thead>
+            <tbody id="detailTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="components/sidebar-guru.js"></script>
+  <script src="kehadiran.js"></script>
+</body>
+</html>
