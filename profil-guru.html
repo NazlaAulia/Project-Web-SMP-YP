@@ -51,7 +51,7 @@ const guruGrid = document.getElementById("guruGrid");
 
 async function loadGuru() {
     try {
-        const response = await fetch("get_guru.php");
+        const response = await fetch("get-guru.php");
         const guruList = await response.json();
 
         if (!guruList || guruList.length === 0) {
