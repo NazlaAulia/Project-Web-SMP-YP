@@ -6,157 +6,102 @@
 <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
 <link rel="icon" type="image/x-icon" href="img/images.webp">
 <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="components/include.css">
+<link rel="stylesheet" href="components/include.css">
 <link rel="stylesheet" href="profil-guru.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
- <div id="navbar-container"></div>
-</header>
+<div id="navbar-container"></div>
 
+<section class="guru-hero">
+    <div class="container">
+        <span class="guru-badge-top">TENAGA PENDIDIK</span>
+        <h1>Profil Guru SMP YP 17 Surabaya</h1>
+        <p>
+            Kenali para guru kami yang berdedikasi dalam mendampingi siswa
+            untuk tumbuh, belajar, dan berprestasi.
+        </p>
+    </div>
+</section>
 
-    <section class="guru-hero">
-        <div class="container">
-            <span class="guru-badge-top">TENAGA PENDIDIK</span>
-            <h1>Profil Guru SMP YP 17 Surabaya</h1>
-            <p>
-                Kenali para guru kami yang berdedikasi dalam mendampingi siswa
-                untuk tumbuh, belajar, dan berprestasi.
-            </p>
+<section class="guru-page-section">
+    <div class="container">
+        <div class="guru-page-head">
+            <h2>Daftar Guru</h2>
+            <p>Data guru</p>
         </div>
-    </section>
 
-    <section class="guru-page-section">
-        <div class="container">
-            <div class="guru-page-head">
-                <h2>Daftar Guru</h2>
-                <p>Data guru ditampilkan otomatis dari database Firebase.</p>
-            </div>
-
-            <div class="guru-grid" id="guruGrid">
-                <div class="guru-loading">Memuat data guru...</div>
-            </div>
+        <div class="guru-grid" id="guruGrid">
+            <div class="guru-loading">Memuat data guru...</div>
         </div>
-    </section>
+    </div>
+</section>
 
-     <div id="footer-container"></div>
+<div id="footer-container"></div>
 
 <a href="#" class="back-to-top"><i class="fas fa-chevron-up"></i></a>
 
-
- <script src="components/include.js"></script>
-  <script src="components/navbar.js"></script>
+<script src="components/include.js"></script>
+<script src="components/navbar.js"></script>
 <script src="./script.js" defer></script>
-    
 
+<script>
+const guruGrid = document.getElementById("guruGrid");
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+async function loadGuru() {
+    try {
+        const response = await fetch("get_guru.php");
+        const guruList = await response.json();
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyBT5dv7OzGuTuwXZDvwbyqITZ4M-KaF1kY",
-  authDomain: "smpyp17.firebaseapp.com",
-  databaseURL: "https://smpyp17-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "smpyp17",
-  storageBucket: "smpyp17.firebasestorage.app",
-  messagingSenderId: "74715637846",
-  appId: "1:74715637846:web:2e3ed5dc6bf4079aa1b3f7",
-  measurementId: "G-NEKTB23085"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        const guruGrid = document.getElementById("guruGrid");
-        const DEFAULT_PHOTO = "img/default-user.png";
-
-        async function loadGuru() {
-            try {
-                const [guruSnap, userSnap, mapelSnap] = await Promise.all([
-                    getDocs(collection(db, "guru")),
-                    getDocs(collection(db, "user")),
-                    getDocs(collection(db, "mapel"))
-                ]);
-
-                const userMap = {};
-                const mapelMap = {};
-                const guruList = [];
-
-                userSnap.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    if (data.id_guru) {
-                        userMap[data.id_guru] = data;
-                    }
-                });
-
-                mapelSnap.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    if (data.id_mapel) {
-                        mapelMap[data.id_mapel] = data.nama_mapel || "-";
-                    }
-                });
-
-                guruSnap.forEach((docSnap) => {
-                    guruList.push(docSnap.data());
-                });
-
-                if (guruList.length === 0) {
-                    guruGrid.innerHTML = `<div class="guru-empty">Belum ada data guru.</div>`;
-                    return;
-                }
-
-                guruList.sort((a, b) => (a.nama || "").localeCompare(b.nama || ""));
-
-              guruGrid.innerHTML = guruList.map((guru) => {
-    const userData = userMap[guru.id_guru] || {};
-    const namaGuru = guru.nama || "Guru";
-    
-    // Ambil huruf depan nama (Inisial)
-    const inisial = namaGuru.charAt(0).toUpperCase();
-    
-    // Cek apakah ada foto profil yang valid
-    const adaFoto = userData.foto_profil && userData.foto_profil.trim() !== "";
-    
-    // HTML untuk bagian foto atau inisial
-    const avatarHTML = adaFoto 
-        ? `<img src="${userData.foto_profil}" alt="${namaGuru}" class="guru-photo" onerror="this.parentElement.innerHTML='<div class=guru-inisial>${inisial}</div>'">`
-        : `<div class="guru-inisial">${inisial}</div>`;
-
-    const namaMapel = guru.id_mapel
-        ? (mapelMap[guru.id_mapel] || "Belum diatur")
-        : "Wali Kelas / Umum";
-
-    return `
-        <div class="guru-card">
-            <div class="guru-card-top"></div>
-            <div class="guru-photo-wrap">
-                ${avatarHTML}
-            </div>
-            <div class="guru-card-body">
-                <h3>${namaGuru}</h3>
-                <p class="guru-mapel">${namaMapel}</p>
-
-                <div class="guru-info-footer">
-                    <div class="nip-badge">
-                        <i class="fas fa-id-card"></i>
-                        <span>NIP: ${guru.nip || "-"}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}).join("");
-
-            } catch (error) {
-                console.error(error);
-                guruGrid.innerHTML = `<div class="guru-error">Gagal memuat data guru dari Firebase.</div>`;
-            }
+        if (!guruList || guruList.length === 0) {
+            guruGrid.innerHTML = `<div class="guru-empty">Belum ada data guru.</div>`;
+            return;
         }
 
-        loadGuru();
-    </script>
+        guruList.sort((a, b) => (a.nama || "").localeCompare(b.nama || ""));
 
+        guruGrid.innerHTML = guruList.map((guru) => {
+            const namaGuru = guru.nama || "Guru";
+            const inisial = namaGuru.charAt(0).toUpperCase();
+
+            const namaMapel = guru.nama_mapel
+                ? guru.nama_mapel
+                : "Wali Kelas / Umum";
+
+            return `
+                <div class="guru-card">
+                    <div class="guru-card-top"></div>
+                    <div class="guru-photo-wrap">
+                        <div class="guru-inisial">${inisial}</div>
+                    </div>
+                    <div class="guru-card-body">
+                        <h3>${namaGuru}</h3>
+                        <p class="guru-mapel">${namaMapel}</p>
+
+                        <div class="guru-info-footer">
+                            <div class="nip-badge">
+                                <i class="fas fa-id-card"></i>
+                                <span>NIP: ${guru.nip || "-"}</span>
+                            </div>
+
+                            <div class="nip-badge">
+                                <i class="fas fa-envelope"></i>
+                                <span>${guru.email || "-"}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+    } catch (error) {
+        console.error(error);
+        guruGrid.innerHTML = `<div class="guru-error">Gagal memuat data guru dari database.</div>`;
+    }
+}
+
+loadGuru();
+</script>
 </body>
 </html>

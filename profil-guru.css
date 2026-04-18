@@ -359,3 +359,16 @@ body {
     background: linear-gradient(135deg, var(--secondary), #ffcc80);
     color: var(--primary);
 }
+
+.email-badge {
+    background: #f0f8ff;
+    padding: 0.6rem;
+    border-radius: 10px;
+    color: #07484a;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
