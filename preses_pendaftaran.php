@@ -1,5 +1,8 @@
 <?php
 header('Content-Type: application/json');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once 'pendaftaran.php';
 
 function respon($status, $message, $data = null) {
@@ -43,11 +46,20 @@ if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 $cek = $conn->prepare("SELECT id_pendaftaran FROM pendaftaran WHERE nisn = ?");
-$cek->bind_param("s", $nisn);
-$cek->execute();
-$hasil = $cek->get_result();
+if (!$cek) {
+    respon('error', 'Prepare cek gagal: ' . $conn->error);
+}
 
-if ($hasil->num_rows > 0) {
+$cek->bind_param("s", $nisn);
+
+if (!$cek->execute()) {
+    respon('error', 'Execute cek gagal: ' . $cek->error);
+}
+
+$cek->store_result();
+
+if ($cek->num_rows > 0) {
+    $cek->close();
     respon('error', 'NISN sudah pernah didaftarkan.');
 }
 $cek->close();
@@ -60,6 +72,10 @@ $stmt = $conn->prepare("
     (nama_lengkap, nisn, jenis_kelamin, tanggal_lahir, alamat, asal_sekolah, no_hp, email, tanggal_daftar, status, pendapatan_ortu)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
+
+if (!$stmt) {
+    respon('error', 'Prepare insert gagal: ' . $conn->error);
+}
 
 $stmt->bind_param(
     "ssssssssssd",
@@ -87,7 +103,7 @@ if ($stmt->execute()) {
         'no_hp' => $no_hp
     ]);
 } else {
-    respon('error', 'Gagal menyimpan data ke database.');
+    respon('error', 'Gagal menyimpan data ke database: ' . $stmt->error);
 }
 
 $stmt->close();
