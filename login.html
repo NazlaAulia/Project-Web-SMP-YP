@@ -27,14 +27,14 @@
                         </div>
                     </div>
 
-                    <div class="input-group">
-                        <label>Password</label>
-                        <div class="input-field">
-                            <i class="fas fa-key"></i>
-                            <input type="password" name="password" id="password" placeholder="Masukkan password" required>
-                            <i class="fas fa-eye" id="togglePassword" style="cursor: pointer; margin-left: auto; color: #aaa;"></i>
-                        </div>
-                    </div>
+                   <div class="input-group">
+    <label>Password</label>
+    <div class="input-field">
+        <i class="fas fa-key"></i>
+        <input type="password" name="password" id="password" placeholder="Masukkan password" required>
+        <span id="togglePasswordText" class="toggle-password-text">Tampilkan</span>
+    </div>
+</div>
 
                     <div class="form-footer">
                         <label><input type="checkbox"> Ingat Saya</label>
@@ -75,43 +75,46 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        const togglePassword = document.querySelector('#togglePassword');
-        const passwordInput = document.querySelector('#password');
-        togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.classList.toggle('fa-eye-slash');
-        });
+   <script>
+    const togglePasswordText = document.querySelector('#togglePasswordText');
+    const passwordInput = document.querySelector('#password');
+    const form = document.querySelector('.siakad-form');
+    const loginBtn = document.getElementById('loginBtn');
 
-        let slides = document.querySelectorAll('.slide');
-        let currentSlide = 0;
+    if (togglePasswordText && passwordInput) {
+        togglePasswordText.addEventListener('click', function () {
+            const isHidden = passwordInput.type === 'password';
+            passwordInput.type = isHidden ? 'text' : 'password';
+            this.textContent = isHidden ? 'Sembunyikan' : 'Tampilkan';
+        });
+    }
+
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+
+    if (slides.length > 0) {
         setInterval(() => {
             slides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % slides.length;
             slides[currentSlide].classList.add('active');
         }, 5000);
-    </script>
+    }
 
-    <script>
-        const form = document.querySelector(".siakad-form");
-        const loginBtn = document.getElementById("loginBtn");
-
-        form.addEventListener("submit", async (e) => {
+    if (form && loginBtn) {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            loginBtn.classList.add("is-loading");
+            loginBtn.classList.add('is-loading');
             loginBtn.disabled = true;
 
             const username = document.querySelector("[name='username']").value.trim();
             const password = document.querySelector("[name='password']").value;
 
             try {
-                const response = await fetch("login.php", {
-                    method: "POST",
+                const response = await fetch('login.php', {
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         username: username,
@@ -121,51 +124,51 @@
 
                 const result = await response.json();
 
-                if (result.status !== "success") {
+                if (result.status !== 'success') {
                     Swal.fire({
-                        icon: "error",
-                        title: "Login Gagal",
-                        text: result.message || "Periksa username dan password."
+                        icon: 'error',
+                        title: 'Login Gagal',
+                        text: result.message || 'Periksa username dan password.'
                     });
                     return;
                 }
 
-                localStorage.setItem("username", result.user.username);
-                localStorage.setItem("role_id", result.user.role_id);
+                localStorage.setItem('username', result.user.username);
+                localStorage.setItem('role_id', result.user.role_id);
 
                 if (result.user.id_siswa) {
-                    localStorage.setItem("id_siswa", result.user.id_siswa);
+                    localStorage.setItem('id_siswa', result.user.id_siswa);
                 }
 
                 if (result.user.id_guru) {
-                    localStorage.setItem("id_guru", result.user.id_guru);
+                    localStorage.setItem('id_guru', result.user.id_guru);
                 }
 
-          if (result.user.role_id == 3) {
-    localStorage.setItem("id_siswa", result.user.id_siswa);
-    window.location.href = "siswa/siswa.html";
-} else if (result.user.role_id == 2) {
-    localStorage.setItem("id_guru", result.user.id_guru);
-    window.location.href = "guru/guru.html";
-} else if (result.user.role_id == 1) {
-    window.location.href = "admin.html";
-} else {
-    alert("Role user tidak dikenali.");
-}
+                if (result.user.role_id == 3) {
+                    localStorage.setItem('id_siswa', result.user.id_siswa);
+                    window.location.href = 'siswa/siswa.html';
+                } else if (result.user.role_id == 2) {
+                    localStorage.setItem('id_guru', result.user.id_guru);
+                    window.location.href = 'guru/guru.html';
+                } else if (result.user.role_id == 1) {
+                    window.location.href = 'admin/admin.html';
+                } else {
+                    alert('Role user tidak dikenali.');
+                }
 
             } catch (error) {
-                console.error("Error saat login:", error);
+                console.error('Error saat login:', error);
                 Swal.fire({
-                    icon: "error",
-                    title: "Terjadi Kesalahan",
-                    text: "Tidak bisa terhubung ke server."
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan',
+                    text: 'Tidak bisa terhubung ke server.'
                 });
             } finally {
-                loginBtn.classList.remove("is-loading");
+                loginBtn.classList.remove('is-loading');
                 loginBtn.disabled = false;
             }
         });
-    </script>
-
+    }
+</script>
 </body>
 </html>

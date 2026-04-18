@@ -194,3 +194,13 @@ body.login-mulus-page {
     pointer-events: none; /* Tombol tidak bisa diklik lagi saat loading */
     opacity: 0.8;
 }
+
+.toggle-password-text {
+    margin-left: auto;
+    cursor: pointer;
+    color: #07484a;
+    font-size: 0.95rem;
+    font-weight: 600;
+    user-select: none;
+    white-space: nowrap;
+}
