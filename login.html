@@ -75,6 +75,8 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
    <script>
     const togglePasswordText = document.querySelector('#togglePasswordText');
     const passwordInput = document.querySelector('#password');
@@ -122,13 +124,21 @@
                     })
                 });
 
-                const result = await response.json();
+                const text = await response.text();
+                let result;
+
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Response server tidak valid.');
+                }
 
                 if (result.status !== 'success') {
                     Swal.fire({
                         icon: 'error',
                         title: 'Login Gagal',
-                        text: result.message || 'Periksa username dan password.'
+                        text: result.message || 'Periksa kembali username dan password.',
+                        confirmButtonText: 'Coba Lagi'
                     });
                     return;
                 }
@@ -144,24 +154,34 @@
                     localStorage.setItem('id_guru', result.user.id_guru);
                 }
 
-                if (result.user.role_id == 3) {
-                    localStorage.setItem('id_siswa', result.user.id_siswa);
-                    window.location.href = 'siswa/siswa.html';
-                } else if (result.user.role_id == 2) {
-                    localStorage.setItem('id_guru', result.user.id_guru);
-                    window.location.href = 'guru/guru.html';
-                } else if (result.user.role_id == 1) {
-                    window.location.href = 'admin/index.html';
-                } else {
-                    alert('Role user tidak dikenali.');
-                }
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Berhasil',
+                    text: 'Selamat datang kembali!',
+                    timer: 1200,
+                    showConfirmButton: false
+                }).then(() => {
+                    if (result.user.role_id == 3) {
+                        window.location.href = 'siswa/siswa.html';
+                    } else if (result.user.role_id == 2) {
+                        window.location.href = 'guru/guru.html';
+                    } else if (result.user.role_id == 1) {
+                        window.location.href = 'admin/index.html';
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Role Tidak Dikenali',
+                            text: 'Akun ini tidak memiliki akses yang valid.'
+                        });
+                    }
+                });
 
             } catch (error) {
                 console.error('Error saat login:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Terjadi Kesalahan',
-                    text: 'Tidak bisa terhubung ke server.'
+                    text: error.message || 'Tidak bisa terhubung ke server.'
                 });
             } finally {
                 loginBtn.classList.remove('is-loading');
@@ -169,6 +189,7 @@
             }
         });
     }
+
 </script>
 </body>
 </html>

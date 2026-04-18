@@ -13,7 +13,7 @@ $conn = new mysqli($host, $dbuser, $dbpass, $dbname);
 if ($conn->connect_error) {
     echo json_encode([
         "status" => "error",
-        "message" => "Koneksi database gagal: " . $conn->connect_error
+        "message" => "Koneksi database gagal."
     ]);
     exit;
 }
@@ -24,7 +24,7 @@ $data = json_decode($raw, true);
 if (!is_array($data)) {
     echo json_encode([
         "status" => "error",
-        "message" => "Data request tidak valid"
+        "message" => "Permintaan login tidak valid."
     ]);
     exit;
 }
@@ -32,10 +32,26 @@ if (!is_array($data)) {
 $username = trim($data["username"] ?? "");
 $password = trim($data["password"] ?? "");
 
-if ($username === "" || $password === "") {
+if ($username === "" && $password === "") {
     echo json_encode([
         "status" => "error",
         "message" => "Username dan password wajib diisi."
+    ]);
+    exit;
+}
+
+if ($username === "") {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Username wajib diisi."
+    ]);
+    exit;
+}
+
+if ($password === "") {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Password wajib diisi."
     ]);
     exit;
 }
@@ -45,7 +61,7 @@ $stmt = $conn->prepare("SELECT id_user, username, password, role_id, id_guru, id
 if (!$stmt) {
     echo json_encode([
         "status" => "error",
-        "message" => "Prepare gagal: " . $conn->error
+        "message" => "Terjadi kesalahan saat memproses login."
     ]);
     exit;
 }
@@ -55,7 +71,7 @@ $stmt->bind_param("s", $username);
 if (!$stmt->execute()) {
     echo json_encode([
         "status" => "error",
-        "message" => "Execute gagal: " . $stmt->error
+        "message" => "Login gagal diproses."
     ]);
     exit;
 }
@@ -76,13 +92,22 @@ $stmt->fetch();
 if ($db_password !== $password) {
     echo json_encode([
         "status" => "error",
-        "message" => "Password salah."
+        "message" => "Password yang kamu masukkan salah."
+    ]);
+    exit;
+}
+
+if (!in_array((int)$role_id, [1, 2, 3])) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Role akun tidak valid."
     ]);
     exit;
 }
 
 echo json_encode([
     "status" => "success",
+    "message" => "Login berhasil.",
     "user" => [
         "id_user" => $id_user,
         "username" => $db_username,
