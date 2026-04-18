@@ -1,11 +1,16 @@
 <?php
-header('Content-Type: application/json');
+ob_start();
+header('Content-Type: application/json; charset=utf-8');
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 require_once 'pendaftaran.php';
 
 function respon($status, $message, $data = null) {
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+
     echo json_encode([
         'status' => $status,
         'message' => $message,
@@ -66,6 +71,7 @@ $cek->close();
 
 $status = 'menunggu';
 $tanggal_daftar = date('Y-m-d');
+$pendapatan_ortu = (float)$pendapatan_ortu;
 
 $stmt = $conn->prepare("
     INSERT INTO pendaftaran
@@ -95,6 +101,9 @@ $stmt->bind_param(
 if ($stmt->execute()) {
     $id_pendaftaran = $stmt->insert_id;
 
+    $stmt->close();
+    $conn->close();
+
     respon('success', 'Pendaftaran berhasil dikirim, silakan tunggu verifikasi admin.', [
         'id_pendaftaran' => $id_pendaftaran,
         'nama_lengkap' => $nama_lengkap,
@@ -103,9 +112,8 @@ if ($stmt->execute()) {
         'no_hp' => $no_hp
     ]);
 } else {
-    respon('error', 'Gagal menyimpan data ke database: ' . $stmt->error);
+    $err = $stmt->error;
+    $stmt->close();
+    $conn->close();
+    respon('error', 'Gagal menyimpan data ke database: ' . $err);
 }
-
-$stmt->close();
-$conn->close();
-?>

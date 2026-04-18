@@ -42,6 +42,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const text = await response.text();
             console.log("RESPON PENDAFTARAN:", text);
 
+            if (!text.trim()) {
+                throw new Error("Server mengembalikan response kosong.");
+            }
+
             let result;
             try {
                 result = JSON.parse(text);
