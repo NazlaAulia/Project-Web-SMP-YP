@@ -1,1 +1,178 @@
-holaaa
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
+    <link rel="icon" type="image/x-icon" href="img/images.webp">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="components/include.css">
+    <link rel="stylesheet" href="prestasi.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+
+    <section class="prestasi-hero">
+        <div class="container">
+            <h1>PRESTASI <span>KAMI</span></h1>
+            <p>Kebanggaan SMP YP 17 Surabaya</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="achievement-stats">
+            <div class="stat-item">
+                <h2>50+</h2>
+                <p>Medali Nasional</p>
+            </div>
+            <div class="stat-item">
+                <h2>100+</h2>
+                <p>Piala Provinsi</p>
+            </div>
+            <div class="stat-item">
+                <h2>200+</h2>
+                <p>Siswa Juara</p>
+            </div>
+        </div>
+
+        <div class="tab-filter">
+            <button class="btn-tab active" onclick="filterPrestasi('semua', event)">Semua</button>
+            <button class="btn-tab" onclick="filterPrestasi('akademik', event)">Akademik</button>
+            <button class="btn-tab" onclick="filterPrestasi('paskibra', event)">Paskibra & Pramuka</button>
+            <button class="btn-tab" onclick="filterPrestasi('olahraga', event)">Minat Bakat</button>
+        </div>
+
+        <div class="achievement-grid" id="prestasiContainer">
+            <div class="card-wow akademik">
+                <div class="badge-winner">NASIONAL</div>
+                <div class="content-box">
+                    <div class="winner-tag"><i class="fas fa-trophy"></i> FOSNAS 2024</div>
+                    <h3>Medali Emas Fisika</h3>
+                    <p class="winner-name">Dicky Rifki Alfathoni (7F)</p>
+                </div>
+            </div>
+
+            <div class="card-wow akademik">
+                <div class="badge-winner">NASIONAL</div>
+                <div class="content-box">
+                    <div class="winner-tag"><i class="fas fa-award"></i> OMNAS UNESA</div>
+                    <h3>Medali Perak & Perunggu</h3>
+                    <p class="winner-name">Ayu Amalia (9A), Lailatul Rizka (8I), Alfino Pratama</p>
+                </div>
+            </div>
+
+            <div class="card-wow akademik">
+                <div class="badge-winner">PROVINSI</div>
+                <div class="content-box">
+                    <div class="winner-tag"><i class="fas fa-medal"></i> GSSC 2022 (GSI)</div>
+                    <h3>Emas, Perak, Perunggu</h3>
+                    <p class="winner-name">Kaka Milano, Farel Dwi, Kayla Safira, Indah Lestari</p>
+                    <small>Dan 15+ siswa lainnya di bidang IPA & B. Inggris</small>
+                </div>
+            </div>
+
+            <div class="card-wow paskibra">
+                <div class="badge-winner">JAWA TIMUR</div>
+                <div class="content-box">
+                    <div class="winner-tag"><i class="fas fa-users"></i> LKBBI RADHAR 2024</div>
+                    <h3>Juara 2 Madya</h3>
+                    <p class="winner-name">Tim Paskibra SMP YP 17 Surabaya</p>
+                </div>
+            </div>
+
+            <div class="card-wow paskibra">
+                <div class="badge-winner">KOTA</div>
+                <div class="content-box">
+                    <div class="winner-tag"><i class="fas fa-flag"></i> Kwaran Kenjeran</div>
+                    <h3>Juara 2 Pramuka</h3>
+                    <p class="winner-name">Tim Putra & Putri Pramuka</p>
+                </div>
+            </div>
+
+            <div class="card-wow paskibra">
+                <div class="badge-winner">UMUM</div>
+                <div class="content-box">
+                    <div class="winner-tag"><i class="fas fa-star"></i> LKBB 2024</div>
+                    <h3>7 Gelar Juara</h3>
+                    <p class="winner-name">Juara 1 Bina (Suprais), Juara 1 Perintis (JFEST)</p>
+                </div>
+            </div>
+
+            <div class="card-wow olahraga">
+                <div class="badge-winner">KOTA</div>
+                <div class="content-box">
+                    <div class="winner-tag"><i class="fas fa-bolt"></i> ARTENA BREAKDANCE</div>
+                    <h3>Juara 1 FDR Day</h3>
+                    <p class="winner-name">Alvino Putra Maarif (8H)</p>
+                </div>
+            </div>
+
+            <div class="card-wow olahraga">
+                <div class="badge-winner">NASIONAL</div>
+                <div class="content-box">
+                    <div class="winner-tag"><i class="fas fa-fist-raised"></i> Perisai Diri</div>
+                    <h3>Juara 2 & 3 Tanding</h3>
+                    <p class="winner-name">Budi Santoso (8B), Erza (8C), Ria Agustina</p>
+                </div>
+            </div>
+        </div> </div> <div id="footer-container"></div>
+
+    <script src="components/include.js"></script>
+    <script src="components/navbar.js"></script>
+
+    <script>
+        function filterPrestasi(kategori, event) {
+            const cards = document.querySelectorAll('.card-wow');
+            const buttons = document.querySelectorAll('.btn-tab');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                
+                setTimeout(() => {
+                    if (kategori === 'semua' || card.classList.contains(kategori)) {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'scale(1)';
+                        }, 50);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }, 200);
+            });
+        }
+
+        // Fungsi untuk animasi angka menghitung
+function animateCounter() {
+    const stats = document.querySelectorAll('.stat-item h2');
+    
+    stats.forEach(stat => {
+        const target = parseInt(stat.innerText.replace('+', '')); // Ambil angka target
+        let count = 0;
+        const speed = 2000 / target; // Durasi total 2 detik dibagi target
+
+        const updateCount = () => {
+            if (count < target) {
+                count++;
+                stat.innerText = count + "+";
+                setTimeout(updateCount, speed);
+            } else {
+                stat.innerText = target + "+";
+            }
+        };
+        
+        updateCount();
+    });
+}
+
+// Jalankan animasi saat halaman selesai dimuat
+window.addEventListener('DOMContentLoaded', animateCounter);
+    </script>
+</body>
+</html>
