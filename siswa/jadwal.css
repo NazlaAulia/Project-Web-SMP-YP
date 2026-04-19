@@ -1,0 +1,727 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #f4f6f8;
+  color: #1f1f1f;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== SIDEBAR DARI CSS NILAI ===== */
+
+.sidebar {
+  width: 320px;
+  min-height: 100vh;
+  background: #064547;
+  color: white;
+  padding: 18px 30px 24px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  margin-bottom: 28px;
+}
+
+.logo {
+  width: 230px;
+  max-width: 100%;
+  display: block;
+  margin: 6px auto 0;
+  object-fit: contain;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu li {
+  margin-bottom: 18px;
+}
+
+.sidebar-menu a {
+  width: 100%;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.88);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 20px;
+  font-weight: 500;
+  padding: 18px 22px;
+  border-radius: 22px;
+  transition: 0.3s ease;
+  line-height: 1.3;
+}
+
+.sidebar-menu a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.sidebar-menu a i {
+  font-size: 20px;
+  min-width: 24px;
+  text-align: center;
+  color: inherit;
+}
+
+.sidebar-menu a.active {
+  background: #f2f2f2;
+  color: #083f45;
+  font-weight: 700;
+  padding: 22px;
+  border-radius: 18px;
+  min-height: 68px;
+}
+
+.sidebar-menu a.active i {
+  color: #083f45;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.logout-btn {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 22px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: 22px;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+/* ===== MAIN ===== */
+
+.main-content {
+  flex: 1;
+  padding: 22px 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 630px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 24px;
+  outline: none;
+  background: #f7f7f7;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  font-size: 15px;
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.kelas-badge {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1;
+}
+
+.profile-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #064547;
+  flex-shrink: 0;
+}
+
+.profile-name-wrap .profile {
+  font-size: 17px;
+  font-weight: 700;
+  color: #064547;
+  line-height: 1.25;
+  margin: 0;
+  white-space: normal;
+  max-width: 260px;
+}
+
+/* ===== CARD ===== */
+
+.jadwal-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.jadwal-banner {
+  background: #dfeceb;
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.jadwal-banner-left {
+  flex: 1;
+  min-width: 240px;
+}
+
+.jadwal-banner h2 {
+  font-size: 20px;
+  color: #111;
+  margin-bottom: 4px;
+  font-weight: 800;
+}
+
+.jadwal-banner p {
+  font-size: 14px;
+  color: #555;
+}
+
+.semester-badge {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+  text-align: right;
+}
+
+/* ===== STATS ===== */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.box {
+  background: #eaf3f2;
+  padding: 18px 16px;
+  border-radius: 14px;
+  text-align: center;
+  transition: 0.3s ease;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(6, 69, 71, 0.08);
+}
+
+.box-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 8px;
+}
+
+.box-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.2;
+}
+
+.box-value.small-text {
+  font-size: 21px;
+}
+
+/* ===== FILTER ===== */
+
+.jadwal-filter-wrap {
+  display: grid;
+  grid-template-columns: 200px 1fr 260px;
+  gap: 14px;
+  margin: 18px 0 16px;
+  align-items: start;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+.filter-group select {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #d4d4d4;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 15px;
+  outline: none;
+  color: #555;
+}
+
+.update-box {
+  background: #eaf3f2;
+  border-radius: 14px;
+  padding: 14px 16px;
+  min-height: 100%;
+}
+
+.update-box h4 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #111;
+}
+
+.update-box p {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 3px;
+  line-height: 1.45;
+}
+
+/* ===== TABEL ===== */
+
+.jadwal-section {
+  border: 3px solid #0b4c4d;
+  border-radius: 24px;
+  padding: 14px 14px 12px;
+  background: linear-gradient(180deg, #eaf4f1 0%, #f7fbfa 100%);
+}
+
+.jadwal-section h3 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #111;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  margin-top: 4px;
+}
+
+th {
+  background: #0b4c4d;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 13px 14px;
+  text-align: left;
+}
+
+th:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+th:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+td {
+  font-size: 15px;
+  color: #222;
+  padding: 13px 14px;
+  background: rgba(255, 255, 255, 0.92);
+  vertical-align: middle;
+}
+
+tbody tr {
+  transition: 0.3s;
+}
+
+tbody tr:hover td {
+  background: #e6f4f2;
+}
+
+tbody td:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+tbody td:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.status-badge {
+  min-width: 95px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-done {
+  background: #0d7b53;
+}
+
+.status-live {
+  background: #0b4c4d;
+}
+
+.status-waiting {
+  background: #7d8790;
+}
+
+.empty-state {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+/* ===== ANIMATION ===== */
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.8s ease forwards;
+}
+
+.delay-1 {
+  animation-delay: 0.2s;
+}
+
+.show-box {
+  animation: fadeUp 0.6s ease forwards;
+}
+
+.show-row {
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.pulse-click {
+  animation: pulseClick 0.35s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseClick {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 1024px) {
+  .jadwal-filter-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .semester-badge {
+    text-align: left;
+  }
+}
+
+@media (max-width: 768px) {
+ .container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 152px;
+    min-height: 100vh;
+    padding: 10px 10px 18px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    flex-shrink: 0;
+  }
+
+  .sidebar-header {
+    margin-bottom: 16px;
+  }
+
+  .logo {
+    width: 110px;
+    margin: 4px auto 0;
+  }
+
+  .sidebar-menu li {
+    margin-bottom: 10px;
+  }
+
+  .sidebar-menu a {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 14px 10px;
+    border-radius: 14px;
+    gap: 10px;
+    line-height: 1.2;
+    align-items: center;
+  }
+
+  .sidebar-menu a i {
+    font-size: 15px;
+    min-width: 18px;
+  }
+
+  .sidebar-menu a.active {
+    min-height: 46px;
+    padding: 14px 10px;
+    border-radius: 14px;
+  }
+
+  .logout-btn {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 14px 10px;
+    border-radius: 14px;
+    gap: 10px;
+  }
+
+  .logout-btn i {
+    font-size: 15px;
+    min-width: 18px;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 10px 12px;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+    font-size: 13px;
+    padding: 12px 14px;
+    border-radius: 18px;
+  }
+
+  .profile-top {
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .kelas-badge {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .profile-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .profile-name-wrap .profile {
+    font-size: 12px;
+    max-width: 100%;
+    line-height: 1.3;
+  }
+
+  .jadwal-card {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .jadwal-banner {
+    padding: 14px;
+    border-radius: 16px;
+    margin-bottom: 14px;
+  }
+
+  .jadwal-banner h2 {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .jadwal-banner p,
+  .semester-badge {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 14px 0;
+  }
+
+  .box {
+    padding: 14px 12px;
+    border-radius: 14px;
+    min-height: auto;
+  }
+
+  .box-title {
+    font-size: 13px;
+  }
+
+  .box-value {
+    font-size: 24px;
+  }
+
+  .box-value.small-text {
+    font-size: 18px;
+  }
+
+  .jadwal-filter-wrap {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 16px 0 14px;
+  }
+
+  .filter-group {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .filter-group label {
+    font-size: 13px;
+  }
+
+  .filter-group select {
+    width: 100%;
+    min-width: 100%;
+    height: 42px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+
+  .update-box {
+    min-width: 100%;
+  }
+
+  .jadwal-section {
+    padding: 12px;
+    border-radius: 20px;
+  }
+
+  .jadwal-section h3 {
+    font-size: 15px;
+  }
+
+  table {
+    min-width: 650px;
+  }
+
+  th {
+    font-size: 13px;
+    padding: 11px 10px;
+  }
+
+  td {
+    font-size: 12px;
+    padding: 11px 10px;
+  }
+
+  .status-badge {
+    font-size: 11px;
+    min-width: 80px;
+    padding: 7px 10px;
+  }
+}
+
+.sidebar-menu a,
+.logout-btn {
+  box-sizing: border-box;
+}
+
+.sidebar-menu a span,
+.logout-btn span {
+  display: inline-block;
+}
+

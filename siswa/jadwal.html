@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jadwal Siswa</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="jadwal.css" />
+</head>
+<body>
+  <div class="container">
+   <aside class="sidebar">
+  <div class="sidebar-header">
+    <img src="../img/logo.webp" alt="Logo" class="logo" />
+  </div>
+
+  <nav>
+    <ul class="sidebar-menu">
+      <li>
+        <a href="siswa.html" class="nav-link">
+          <i class="fa-solid fa-house"></i>
+          <span>Dashboard Siswa</span>
+        </a>
+      </li>
+      <li>
+        <a href="nilai.html" class="nav-link">
+          <i class="fa-solid fa-file-lines"></i>
+          <span>Nilai</span>
+        </a>
+      </li>
+      <li>
+        <a href="jadwal.html" class="nav-link active">
+          <i class="fa-solid fa-calendar-days"></i>
+          <span>Jadwal</span>
+        </a>
+      </li>
+      <li>
+        <a href="peringkat.html" class="nav-link">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Peringkat</span>
+        </a>
+      </li>
+      <li>
+        <a href="profil-siswa.html" class="nav-link">
+          <i class="fa-solid fa-user"></i>
+          <span>Profil Siswa</span>
+        </a>
+      </li>
+      <li>
+        <a href="settings.html" class="nav-link">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <a href="../login.html" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Log Out</span>
+      </a>
+    </div>
+  </nav>
+</aside>
+
+    <main class="main-content">
+      <header class="header fade-up">
+        <div class="search-box">
+          <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." />
+        </div>
+
+        <div class="profile-top">
+          <div class="kelas-badge" id="kelasBadge">-</div>
+          <div class="profile-avatar" id="profileAvatar">S</div>
+          <div class="profile-name-wrap">
+            <p class="profile" id="profileName">Memuat...</p>
+          </div>
+        </div>
+      </header>
+
+      <section class="jadwal-card fade-up delay-1">
+        <div class="jadwal-banner">
+          <div class="jadwal-banner-left">
+            <h2>Rangkuman Jadwal Siswa</h2>
+            <p>Pantau jadwal pelajaranmu secara detail.</p>
+          </div>
+          <div class="semester-badge" id="semesterText">
+            Sesuai dengan kelas siswa yang login
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="box show-box">
+            <div class="box-title">Hari Ini</div>
+            <div class="box-value small-text" id="hariIni">-</div>
+          </div>
+
+          <div class="box show-box">
+            <div class="box-title">Total Pelajaran (Minggu Ini)</div>
+            <div class="box-value" id="totalPelajaran">0 Jam</div>
+          </div>
+
+          <div class="box show-box">
+            <div class="box-title">Pelajaran Utama</div>
+            <div class="box-value small-text" id="pelajaranUtama">-</div>
+          </div>
+        </div>
+
+        <div class="jadwal-filter-wrap">
+          <div class="filter-group">
+            <label>Kelas</label>
+            <select id="kelasSelect" disabled>
+              <option>Memuat...</option>
+            </select>
+          </div>
+
+          <div class="update-box">
+            <h4>Update Terbaru Jadwal</h4>
+            <div id="updateJadwal">
+              <p>- Memuat data jadwal...</p>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label>Tahun Ajaran/Semester</label>
+            <select id="semesterSelect" disabled>
+              <option>Memuat...</option>
+            </select>
+          </div>
+        </div>
+
+        <section class="jadwal-section">
+          <h3 id="judulTabel">Jadwal Pelajaran</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Hari/Jam</th>
+                  <th>Mata Pelajaran</th>
+                  <th>Guru Pengajar</th>
+                  <th>Ruangan</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="jadwalTableBody">
+                <tr>
+                  <td colspan="5" class="empty-state">Memuat jadwal...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="jadwal.js"></script>
+</body>
+</html>
