@@ -48,7 +48,7 @@
                 <i class="bi bi-person-circle"></i>
                 <span>Profil Guru</span>
             </a>
-            <a href="settingsguru.html" class="nav-link" data-page="settingsguru.html">
+            <a href="settings.html" class="nav-link" data-page="settingsguru.html">
                 <i class="bi bi-gear"></i>
                 <span>Settings</span>
             </a>
@@ -62,96 +62,113 @@
             </a>
         </div>
         </aside>
-        <main class="main-content">
-            <header>
-                <div class="search-container-elegant">
-                    <i class="bi bi-search search-icon"></i>
-                    <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." class="search-input">
-                </div>
 
+<main class="main-content">
+    <header>
+        <div class="search-container-elegant">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." class="search-input">
+        </div>
+        
+        <a href="profilguru.html" class="user-profile-link">
             <div class="user-profile">
-    <div class="profile-info">
-        <span class="user-name" id="namaGuru">Bapak/Ibu Guru</span>
-        <span class="user-role">Guru</span>
+                <div class="profile-info">
+                    <span class="user-name">Bapak/Ibu Guru</span>
+                    <span class="user-role">Guru</span>
+                </div>
+                <div class="avatar-circle">G</div>
+            </div>
+        </a>
+    </header>
+
+    <div class="main-banner">
+        <div class="banner-content">
+            <h1>Halo, Bapak/Ibu Guru! 🌟</h1>
+            <p>Kelola jadwal mengajar, input nilai, dan pantau kehadiran siswa dengan lebih mudah di satu dashboard terintegrasi.</p>
+            <button class="btn-banner">Mulai Mengajar</button>
+        </div>
+        <div class="banner-img">
+            <img src="https://cdni.iconscout.com/illustration/premium/thumb/female-teacher-explaining-lesson-to-students-6644265-5517173.png" alt="Ilustrasi Guru">
+        </div>
     </div>
-    <div class="avatar-circle" id="avatarGuru">G</div>
-</div>
-            </header>
 
-           <div class="welcome-text">
-    <h1 id="welcomeGuru">Halo, Bapak/Ibu Guru! 🌟</h1>
-    <p>Selamat datang di pusat kontrol mengajar. Mari kelola pembelajaran hari ini dengan efisien.</p>
-</div>
-                <img src="https://cdni.iconscout.com/illustration/premium/thumb/female-teacher-explaining-lesson-to-students-6644265-5517173.png" alt="Illustration">
-            </section>
-
-            <div class="grid-container">
-                <div class="card checklist-card">
-                    <h3><i class="bi bi-list-check"></i> Prioritas Hari Ini</h3>
-                    <div class="task-item">
-                        <div class="task-info">
-                            <p class="task-title">Apa yang harus dikerjakan?</p>
-                            <small>Mengajar Kelas 9A - Elektronika Dasar</small>
-                        </div>
-                        <span class="badge status-now">Sekarang</span>
-                    </div>
-                    <div class="task-item">
-                        <div class="task-info">
-                            <p class="task-title">Apa yang belum selesai?</p>
-                            <small>Koreksi tugas praktikum Minggu ke-11</small>
-                        </div>
-                        <span class="badge status-pending">2 Tugas</span>
-                    </div>
-                    <div class="task-item">
-                        <div class="task-info">
-                            <p class="task-title">Apa yang perlu diinput?</p>
-                            <small>Absensi & Nilai Harian Kelas 8C</small>
-                        </div>
-                        <button class="btn-action">Input Sekarang</button>
-                    </div>
+    <div class="content-row">
+            <div class="left-column">
+                <div class="section-header">
+                    <h3>Mata Pelajaran Aktif</h3>
+                    <a href="#">Lihat Semua</a>
                 </div>
-
-                <div class="card schedule-card">
-                    <div class="card-header">
-                        <h3>Jadwal Mengajar</h3>
-                        <span class="date">Hari Ini</span>
-                    </div>
-                    <div class="schedule-item">
-                        <div class="time">08:00</div>
-                        <div class="subject">
-                            <strong>Fisika Terapan</strong>
-                            <p>R. Lab 02, Pertemuan 10</p>
+                <div class="course-grid">
+                    <div class="course-card">
+                        <div class="course-thumb" style="background: #e7f0f0;">
+                            <i class="bi bi-book" style="font-size: 2rem; color: var(--primary);"></i>
+                        </div>
+                        <div class="course-info">
+                            <h4>Fisika Terapan</h4>
+                            <p>Kelas 9A • Lab 02</p>
                         </div>
                     </div>
-                    <div class="schedule-item active">
-                        <div class="time">10:30</div>
-                        <div class="subject">
-                            <strong>Elektronika Dasar</strong>
-                            <p>R. Teori 01, Pertemuan 12</p>
+                    <div class="course-card">
+                        <div class="course-thumb" style="background: #fef4e6;">
+                            <i class="bi bi-cpu" style="font-size: 2rem; color: var(--secondary);"></i>
+                        </div>
+                        <div class="course-info">
+                            <h4>Elektronika Dasar</h4>
+                            <p>Kelas 8C • Teori 01</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="card summary-card">
-                    <h3>Ringkasan Administrasi</h3>
-                    <div class="stat-box">
-                        <p>Input Nilai</p>
-                        <div class="progress-bar"><div class="progress" style="width: 85%;"></div></div>
-                        <small>85% Selesai</small>
+                <div class="section-header" style="margin-top: 30px;">
+                    <h3>Asisten AI Raport</h3>
+                </div>
+                <div class="ai-utility-card">
+                    <div class="ai-icon">
+                        <i class="bi bi-robot"></i>
                     </div>
-                    <div class="stat-box">
-                        <p>Kehadiran Siswa</p>
-                        <div class="progress-bar"><div class="progress" style="width: 92%;"></div></div>
-                        <small>92% Terisi</small>
+                    <div class="ai-text">
+                        <h4>Generate Deskripsi Otomatis</h4>
+                        <p>Buat deskripsi raport berdasarkan performa akademik siswa secara instan.</p>
                     </div>
-                    <div class="quick-buttons">
-                        <button class="btn-secondary"><i class="bi bi-download"></i> Export Data</button>
-                        <button class="btn-secondary"><i class="bi bi-upload"></i> Import Nilai</button>
+                    <button class="btn-action">Mulai</button>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="side-card">
+                    <h3>Kehadiran Hari Ini</h3>
+                    <div class="stat-circle">
+                        <strong>92%</strong>
+                        <span>Siswa Hadir</span>
+                    </div>
+                    <div class="stat-list">
+                        <div class="stat-item">
+                            <span>Telah Terisi</span>
+                            <span class="val">12/15 Kelas</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="side-card ranking-card">
+                    <h3>Peringkat Teratas </h3>
+                    <div class="rank-item">
+                        <div class="rank-avatar">AW</div>
+                        <div class="rank-info">
+                            <span>Andi Wijaya</span>
+                            <small>Rata-rata: 95.8</small>
+                        </div>
+                    </div>
+                    <div class="rank-item">
+                        <div class="rank-avatar">SA</div>
+                        <div class="rank-info">
+                            <span>Siti Aminah</span>
+                            <small>Rata-rata: 94.2</small>
+                        </div>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 
     <script>
         lucide.createIcons();
