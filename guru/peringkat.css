@@ -1,0 +1,95 @@
+:root {
+    --primary-green: #07484a;
+    --status-hadir: #d4edda;
+    --text-hadir: #28a745;
+    --status-izin: #fff3cd;
+    --text-izin: #856404;
+    --status-sakit: #d1ecf1;
+    --text-sakit: #0c5460;
+    --status-alfa: #f8d7da;
+    --text-alfa: #721c24;
+}
+
+.section-header-rank {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.filter-select {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    color: var(--primary-green);
+    font-weight: 600;
+}
+
+/* Performance Summary Boxes */
+.performance-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.summary-box {
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.summary-box .val { font-size: 2rem; font-weight: 800; color: var(--primary-green); }
+.summary-box p { font-size: 0.9rem; color: #667a7a; margin-top: 5px; }
+
+/* Table Styling - Menyamakan dengan Kehadiran */
+.rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.rank-table th {
+    background: var(--primary-green);
+    color: white;
+    padding: 15px;
+    text-align: left;
+}
+
+.rank-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Progress Bar dalam Tabel */
+.progress-bar-container {
+    background: #e9ecef;
+    border-radius: 10px;
+    height: 25px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Badge Status sesuai Gambar Kehadiran */
+.badge-rank {
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.excellent { background-color: var(--status-hadir); color: var(--text-hadir); }
+.good { background-color: var(--status-sakit); color: var(--text-sakit); }
+.attention { background-color: var(--status-alfa); color: var(--text-alfa); }

@@ -134,7 +134,123 @@ body {
     margin-left: 260px;
     width: calc(100% - 260px);
 }
+/* Layout Konten ala SkillSet */
+.main-banner {
+    background: linear-gradient(135deg, var(--primary) 0%, #0a5f62 100%);
+    border-radius: 24px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    margin-bottom: 30px;
+    overflow: hidden;
+    position: relative;
+}
 
+.banner-content { flex: 1; z-index: 2; }
+.banner-content h1 { font-size: 2.2rem; margin-bottom: 15px; }
+.banner-content p { opacity: 0.8; margin-bottom: 25px; max-width: 500px; }
+
+.btn-banner {
+    background: white;
+    color: var(--primary);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.banner-img img { width: 250px; z-index: 1; }
+
+.content-row { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header a { color: var(--secondary); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+
+/* Grid Kartu Mata Pelajaran */
+.course-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+.course-card {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.course-thumb {
+    height: 120px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* AI Utility Card */
+.ai-utility-card {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: var(--shadow);
+}
+
+.ai-icon {
+    width: 50px; height: 50px;
+    background: #f0f7f7;
+    color: var(--primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Sidebar Kanan */
+.side-card {
+    background: white;
+    padding: 25px;
+    border-radius: 24px;
+    margin-bottom: 25px;
+    box-shadow: var(--shadow);
+}
+
+.stat-circle {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.stat-circle strong { font-size: 2.5rem; display: block; color: var(--primary); }
+
+.rank-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.rank-avatar {
+    width: 40px; height: 40px;
+    background: var(--bg-soft);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
 /* =========================
    HEADER
 ========================= */
@@ -500,6 +616,56 @@ header {
 
     .user-profile {
         justify-content: flex-end;
+    }
+}
+/* Styling tambahan untuk widget baru */
+.ranking-list {
+    padding-left: 20px;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    margin-top: 10px;
+}
+
+.ranking-list li {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.ai-card {
+    border: 2px solid rgba(7, 72, 74, 0.1);
+    background: linear-gradient(145deg, #ffffff, #f0f7f7);
+}
+
+.schedule-item i {
+    font-size: 0.8rem;
+    margin-right: 5px;
+}
+/* Menghilangkan dekorasi link standar */
+.user-profile-link {
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+/* Efek saat profil di-hover */
+.user-profile-link:hover .avatar-circle {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(7, 72, 74, 0.2);
+}
+
+.user-profile-link:hover .user-name {
+    color: var(--secondary); /* Warna berubah sedikit saat akan diklik */
+}
+
+.user-profile {
+    cursor: pointer; /* Memberi indikasi bahwa ini bisa diklik */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+/* Responsif untuk grid agar lebih rapi */
+@media (max-width: 1400px) {
+    .grid-container {
+        grid-template-columns: 1fr 1fr; /* Jadi 2 kolom di layar sedang */
     }
 }
 

@@ -35,17 +35,18 @@
             <input type="file" id="uploadFoto" accept="image/*">
           </div>
 
-          <div class="profile-info">
-            <span class="role-badge">Guru Aktif</span>
-            <h2>Bapak Andi Prasetyo, S.Pd</h2>
-            <p class="teacher-subtitle">Guru Matematika • Wali Kelas 7A</p>
-
-            <div class="info-tags">
-              <span><i class="bi bi-envelope-fill"></i> andi.prasetyo@smpyp17.sch.id</span>
-              <span><i class="bi bi-telephone-fill"></i> 0812-3456-7890</span>
-              <span><i class="bi bi-geo-alt-fill"></i> Surabaya, Jawa Timur</span>
+        <div class="profile-info">
+            <h2 id="display-nama-guru">Bapak Andi Prasetyo, S.Pd</h2>
+            <p id="display-peran-guru">Guru Matematika • Wali Kelas 7A</p>
+            
+            <div class="edit-form" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="editNamaGuru" placeholder="Ubah Nama" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                <input type="text" id="editPeranGuru" placeholder="Ubah Peran/Mapel" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                <button id="btnSimpan" class="btn-simpan" style="background-color: #004d40; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">
+                    Simpan Perubahan
+                </button>
             </div>
-          </div>
+        </div>
         </div>
 
         <div class="quick-stats">
