@@ -161,23 +161,26 @@ function renderSiswa() {
     renderPagination(totalPages);
 }
 
-function renderPagination(totalPages) {
-    const paginationBtns = document.getElementById("paginationBtns");
-    if (!paginationBtns) return;
-
+function renderPagination() {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     paginationBtns.innerHTML = "";
 
-    const prevBtn = document.createElement("button");
-    prevBtn.className = "btn-page";
-    prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i>`;
-    prevBtn.disabled = currentPage === 1;
-    prevBtn.addEventListener("click", () => {
-        if (currentPage > 1) {
-            currentPage--;
-            renderSiswa();
-        }
-    });
-    paginationBtns.appendChild(prevBtn);
+    let start = Math.max(1, currentPage - 2);
+    let end = Math.min(totalPages, currentPage + 2);
+
+    for (let i = start; i <= end; i++) {
+        const btn = document.createElement("button");
+        btn.className = "btn-page" + (i === currentPage ? " active" : "");
+        btn.textContent = i;
+
+        btn.onclick = () => {
+            currentPage = i;
+            renderTable();
+            renderPagination();
+        };
+
+        paginationBtns.appendChild(btn);
+    }
 
     for (let i = 1; i <= totalPages; i++) {
         const pageBtn = document.createElement("button");
