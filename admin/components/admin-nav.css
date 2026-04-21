@@ -1,0 +1,249 @@
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    background: var(--primary-teal);
+    color: white;
+    height: 100vh;
+    position: fixed;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+}
+
+.logo {
+    padding: 0 25px 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo strong {
+    font-size: 18px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.logo span {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 2px;
+    color: #fff;
+}
+
+.nav-label {
+    padding: 16px 25px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.nav-item {
+    padding: 12px 25px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: rgba(255, 255, 255, 0.82);
+    text-decoration: none;
+    transition: 0.3s;
+    cursor: pointer;
+    list-style: none;
+    border: none;
+    background: transparent;
+    width: 100%;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.nav-item i:first-child {
+    width: 25px;
+    font-size: 16px;
+}
+
+.arrow {
+    margin-left: auto;
+    font-size: 10px;
+    transition: 0.3s;
+}
+
+.sub-menu {
+    background: rgba(0, 0, 0, 0.15);
+    padding: 5px 0;
+}
+
+.sub-menu a {
+    display: block;
+    padding: 10px 25px 10px 60px;
+    color: rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.nav-item:hover,
+.sub-menu a:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+    background: white !important;
+    color: var(--primary-teal) !important;
+    border-radius: 30px 0 0 30px;
+    margin-left: 15px;
+    font-weight: 600;
+}
+
+.sub-menu a.active-submenu {
+    background: white;
+    color: var(--primary-teal);
+    border-radius: 30px 0 0 30px;
+    margin-left: 15px;
+    font-weight: 600;
+    padding-left: 45px;
+}
+
+details[open] .arrow {
+    transform: rotate(180deg);
+}
+
+.logout {
+    margin-top: 10px;
+}
+
+/* MAIN SHIFT */
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 30px;
+}
+
+/* HAMBURGER BUTTON */
+.mobile-topbar {
+    display: none;
+}
+
+.menu-toggle {
+    display: none;
+    border: none;
+    background: var(--primary-teal);
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-overlay {
+    display: none;
+}
+
+/* MOBILE VERSION */
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    .container {
+        flex-direction: column;
+    }
+
+    .mobile-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 1100;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .mobile-topbar h2 {
+        font-size: 16px;
+        color: var(--primary-teal);
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .menu-toggle {
+        display: inline-flex;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        left: auto;
+        width: 250px;
+        max-width: 78%;
+        height: 100vh;
+        z-index: 1200;
+        transition: 0.3s ease;
+        border-radius: 18px 0 0 18px;
+        box-shadow: -8px 0 24px rgba(0,0,0,0.18);
+    }
+
+    .sidebar.active {
+        right: 0;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 1100;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+        backdrop-filter: blur(1px);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 18px;
+    }
+
+    .nav-label {
+        font-size: 9px;
+    }
+
+    /* Tambahno nang baris paling dhuwur file admin-nav.css */
+#admin-nav-root * {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+.logo strong {
+    font-size: 18px !important; /* Ukuran kudu sak mene */
+    font-weight: 700 !important;
+    color: #fff !important;
+    display: block;
+}
+
+.logo span {
+    font-size: 11px !important;
+    opacity: 0.7 !important;
+    color: #fff !important;
+}
+
+}
