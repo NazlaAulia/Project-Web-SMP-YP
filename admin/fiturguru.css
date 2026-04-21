@@ -94,31 +94,101 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
+/* --- REVISI AGAR PAS (TIDAK SCROLL KANAN KIRI) --- */
+
 .table-wrap {
-    overflow-x: auto;
+    overflow-x: hidden; /* Hilangkan scroll bar utama */
+    width: 100%;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 880px;
+    min-width: auto; /* Ubah dari 880px ke auto ben pas layar */
+    table-layout: fixed; /* Maksa tabel bagi kolom sesuai lebar layar */
 }
 
+/* Atur lebar kolom secara spesifik ben gak empet-empetan */
+thead th:nth-child(1), tbody td:nth-child(1) { width: 18%; } /* Nama */
+thead th:nth-child(2), tbody td:nth-child(2) { width: 22%; } /* Email */
+thead th:nth-child(3), tbody td:nth-child(3) { width: 15%; } /* Username */
+thead th:nth-child(4), tbody td:nth-child(4) { width: 8%; }  /* NIP */
+thead th:nth-child(5), tbody td:nth-child(5) { width: 12%; } /* Pelajaran */
+thead th:nth-child(6), tbody td:nth-child(6) { width: 10%; } /* Wali */
+thead th:nth-child(7), tbody td:nth-child(7) { width: 15%; } /* Aksi */
+
 thead th {
-    text-align: left;
-    padding: 16px 14px;
-    font-size: 13px;
-    color: var(--primary-teal);
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
+    padding: 12px 10px; /* Cilikno padding sithik */
+    font-size: 12px; /* Font header cilikno ben muat */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 tbody td {
-    padding: 16px 14px;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
+    padding: 12px 10px;
+    font-size: 13px; /* Font isi tabel cilikno ben rapi */
+    word-break: break-word; /* Ben nek email dowo otomatis mudun, gak nggeser tabel */
+}
+
+/* Style kanggo tombol Edit & Hapus ben luwih cilik & rapi */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    justify-content: flex-start;
+}
+
+.btn-edit, .btn-danger {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 8px;
+}
+
+/* --- STYLE PAGINATION (NEXT PAGE) --- */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+}
+
+.pagination-info {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.pagination-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-page {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
     color: var(--text-dark);
-    vertical-align: middle;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+    background: var(--soft-teal);
+    border-color: var(--primary-teal);
+    color: var(--primary-teal);
+}
+
+.btn-page.active {
+    background: var(--primary-teal);
+    color: var(--white);
+    border-color: var(--primary-teal);
+}
+
+.btn-page:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 tbody tr:hover {
@@ -462,4 +532,56 @@ button {
     .modal-box {
         padding: 16px;
     }
+}
+
+
+.pagination-container {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.pagination-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-page {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: var(--text-dark);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.btn-page:hover:not(:disabled) {
+    background: var(--primary-teal);
+    color: white;
+    border-color: var(--primary-teal);
+}
+
+.btn-page.active {
+    background: var(--primary-teal);
+    color: white;
+    border-color: var(--primary-teal);
+}
+
+.btn-page:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
