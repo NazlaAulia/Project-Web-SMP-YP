@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
+<link rel="icon" type="image/x-icon" href="img/admin/datasiswa/images.webp">
+    <link rel="stylesheet" href="../components/admin-nav.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet" href="fitursiswa.css">
+</head>
+<body data-page="siswa" data-nav-path="../components/admin-nav.html">
+
+    <div class="container">
+        <div id="admin-nav-root"></div>
+
+        <main class="main-content">
+            <div class="page-wrap">
+                <header class="page-header">
+                    <div>
+                        <h1>Data Siswa</h1>
+                        <p>Kelola data siswa dan akun login siswa.</p>
+                    </div>
+
+                   <button class="btn-primary" id="openApprovalBtn">
+    <i class="fas fa-user-check"></i>
+    Approval Siswa Baru (<span id="pendingApprovalCount">0</span>)
+</button>
+                </header>
+
+                <section class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchSiswa" placeholder="Cari nama, NISN, username, kelas...">
+                    </div>
+                </section>
+
+                <section class="table-card">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>NISN</th>
+                                    <th>Username</th>
+                                    <th>Jenis Kelamin</th>
+                                    <th>Kelas</th>
+                                    <th>Tahun Ajaran</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="siswaTableBody">
+                                <tr>
+                                     <td colspan="7" class="empty-cell">Memuat data siswa...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination-container">
+                        <div class="pagination-info" id="paginationInfo">
+                            Menampilkan 0 sampai 0 dari 0 Siswa
+                        </div>
+                        <div class="pagination-btns" id="paginationBtns"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+<div class="modal-overlay" id="approvalModal">
+    <div class="modal-box modal-approval-box">
+        <div class="modal-header">
+            <h2>Approval Siswa Baru</h2>
+            <button class="btn-close" id="closeApprovalBtn" type="button">&times;</button>
+        </div>
+
+        <div id="approvalList" class="approval-list">
+            <div class="empty-cell">Memuat data pendaftaran...</div>
+        </div>
+    </div>
+</div>
+
+    <script src="../components/admin-nav.js"></script>
+    <script src="fitursiswa.js"></script>
+</body>
+</html>

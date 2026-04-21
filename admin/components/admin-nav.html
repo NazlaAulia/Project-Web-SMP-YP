@@ -1,12 +1,10 @@
-<!-- TOPBAR MOBILE -->
 <div class="mobile-topbar">
-    <h2>Dashboard Admin</h2>
-    <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">
+    <h2>Admin Panel</h2>
+    <button class="menu-toggle" id="menuToggle">
         <i class="fas fa-bars"></i>
     </button>
 </div>
 
-<!-- OVERLAY MOBILE -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <aside class="sidebar" id="sidebar">
@@ -16,41 +14,47 @@
     </div>
 
     <nav>
-        <a href="index.html" class="nav-item" data-page="dashboard">
+        <!-- DASHBOARD -->
+        <a href="/admin/index.html" class="nav-item" data-page="dashboard">
             <i class="fas fa-home"></i>
             <span>Dashboard</span>
         </a>
 
+        <!-- DATA -->
         <div class="nav-label">DATA</div>
-        <details class="menu-group" open>
+        <details open>
             <summary class="nav-item">
                 <i class="fas fa-database"></i>
                 <span>Data</span>
                 <i class="fas fa-chevron-down arrow"></i>
             </summary>
+
             <div class="sub-menu">
-                <a href="fiturguru.html" data-subpage="guru">Guru</a>
-                <a href="siswa.html" data-subpage="siswa">Siswa</a>
-                <a href="pendaftaran.html" data-subpage="pendaftaran">Pendaftaran</a>
-                <a href="kelas.html" data-subpage="kelas">Kelas &amp; Ruangan</a>
+                <a href="/admin/fiturguru.html" data-subpage="guru">Guru</a>
+                <a href="/admin/datasiswa/data.html" data-subpage="siswa">Siswa</a>
+                <a href="/admin/pendaftaran.html" data-subpage="pendaftaran">Pendaftaran</a>
+                <a href="/admin/kelas.html" data-subpage="kelas">Kelas &amp; Ruangan</a>
             </div>
         </details>
 
+        <!-- OPERASIONAL -->
         <div class="nav-label">OPERASIONAL</div>
-        <details class="menu-group">
+        <details>
             <summary class="nav-item">
                 <i class="fas fa-tasks"></i>
                 <span>Operasional</span>
                 <i class="fas fa-chevron-down arrow"></i>
             </summary>
+
             <div class="sub-menu">
-                <a href="mapel.html" data-subpage="mapel">Mata Pelajaran</a>
-                <a href="jadwal.html" data-subpage="jadwal">Jadwal</a>
-                <a href="pengumuman.html" data-subpage="pengumuman">Pengumuman</a>
+                <a href="/admin/mapel.html">Mata Pelajaran</a>
+                <a href="/admin/jadwal.html">Jadwal</a>
+                <a href="/admin/pengumuman.html">Pengumuman</a>
             </div>
         </details>
 
-        <a href="login.html" class="nav-item logout" data-page="logout">
+        <!-- LOGOUT -->
+        <a href="/login.html" class="nav-item logout">
             <i class="fas fa-sign-out-alt"></i>
             <span>Keluar</span>
         </a>
