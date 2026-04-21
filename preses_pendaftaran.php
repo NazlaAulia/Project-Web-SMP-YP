@@ -19,8 +19,8 @@ function respon($status, $message, $data = null) {
     exit;
 }
 
-if (!$conn || $conn->connect_error) {
-    respon('error', 'Koneksi database gagal: ' . $conn->connect_error);
+if (!isset($conn) || $conn->connect_error) {
+    respon('error', 'Koneksi database gagal: ' . ($conn->connect_error ?? 'conn tidak terbaca'));
 }
 
 $nama_lengkap    = trim($_POST['nama_lengkap'] ?? '');
@@ -121,3 +121,4 @@ if ($stmt->execute()) {
     $conn->close();
     respon('error', 'Gagal menyimpan data ke database: ' . $err);
 }
+?>

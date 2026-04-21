@@ -34,12 +34,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData(form);
 
         try {
-            const response = await fetch("proses_pendaftaran.php", {
+            const response = await fetch("./proses_pendaftaran.php", {
                 method: "POST",
                 body: formData
             });
 
-            const result = await response.json();
+            const raw = await response.text();
+            console.log("RAW RESPONSE:", raw);
+            console.log("STATUS HTTP:", response.status);
+
+            let result;
+            try {
+                result = JSON.parse(raw);
+            } catch (err) {
+                throw new Error("Response bukan JSON: " + raw);
+            }
 
             if (result.status !== "success") {
                 alertBox.innerHTML = `<div class="alert error">${result.message}</div>`;
@@ -68,8 +77,8 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
             form.reset();
 
         } catch (error) {
-            console.error("Error:", error);
-            alertBox.innerHTML = `<div class="alert error">Gagal terhubung ke server.</div>`;
+            console.error("ERROR DETAIL:", error);
+            alertBox.innerHTML = `<div class="alert error">${error.message}</div>`;
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
