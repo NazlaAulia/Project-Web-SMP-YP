@@ -45,15 +45,17 @@ $sql = "
         s.nisn,
         s.nama,
         s.jenis_kelamin,
-        s.tahun_ajaran,
         u.username,
-        k.nama_kelas
+        k.nama_kelas,
+        ta.nama_tahun_ajaran AS tahun_ajaran
     FROM siswa s
     LEFT JOIN user u 
         ON u.id_siswa = s.id_siswa 
         AND u.role_id = 3
     LEFT JOIN kelas k 
         ON k.id_kelas = s.id_kelas
+    LEFT JOIN tahun_ajaran ta
+        ON ta.id_tahun_ajaran = s.id_tahun_ajaran
     ORDER BY s.nama ASC
 ";
 
