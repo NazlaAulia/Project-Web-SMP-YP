@@ -21,6 +21,8 @@ $totalGuru = 0;
 $totalSiswa = 0;
 $totalKelas = 0;
 $totalPending = 0;
+$pendingPendaftaran = 0;
+$pendingJadwal = 0;
 
 $qGuru = mysqli_query($conn, "SELECT COUNT(*) AS total FROM guru");
 if ($qGuru) {
@@ -44,6 +46,13 @@ $qPending = mysqli_query($conn, "SELECT COUNT(*) AS total FROM pendaftaran WHERE
 if ($qPending) {
     $row = mysqli_fetch_assoc($qPending);
     $totalPending = (int)($row['total'] ?? 0);
+    $pendingPendaftaran = (int)($row['total'] ?? 0);
+}
+
+$qRequestJadwal = mysqli_query($conn, "SELECT COUNT(*) AS total FROM request_jadwal WHERE status = 'menunggu'");
+if ($qRequestJadwal) {
+    $row = mysqli_fetch_assoc($qRequestJadwal);
+    $pendingJadwal = (int)($row['total'] ?? 0);
 }
 
 kirim([
@@ -51,6 +60,8 @@ kirim([
     "total_guru" => $totalGuru,
     "total_siswa" => $totalSiswa,
     "total_kelas" => $totalKelas,
-    "total_pending" => $totalPending
+    "total_pending" => $totalPending,
+    "pending_pendaftaran" => $pendingPendaftaran,
+    "pending_jadwal" => $pendingJadwal
 ]);
 ?>

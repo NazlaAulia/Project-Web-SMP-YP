@@ -1,0 +1,58 @@
+<!-- TOPBAR MOBILE -->
+<div class="mobile-topbar">
+    <h2>Dashboard Admin</h2>
+    <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
+
+<!-- OVERLAY MOBILE -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<aside class="sidebar" id="sidebar">
+    <div class="logo">
+        <strong>SMP YP 17 SURABAYA</strong>
+        <span>ADMIN PANEL</span>
+    </div>
+
+    <nav>
+        <a href="index.html" class="nav-item" data-page="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <div class="nav-label">DATA</div>
+        <details class="menu-group" open>
+            <summary class="nav-item">
+                <i class="fas fa-database"></i>
+                <span>Data</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </summary>
+            <div class="sub-menu">
+                <a href="fiturguru.html" data-subpage="guru">Guru</a>
+                <a href="siswa.html" data-subpage="siswa">Siswa</a>
+                <a href="pendaftaran.html" data-subpage="pendaftaran">Pendaftaran</a>
+                <a href="kelas.html" data-subpage="kelas">Kelas &amp; Ruangan</a>
+            </div>
+        </details>
+
+        <div class="nav-label">OPERASIONAL</div>
+        <details class="menu-group">
+            <summary class="nav-item">
+                <i class="fas fa-tasks"></i>
+                <span>Operasional</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </summary>
+            <div class="sub-menu">
+                <a href="mapel.html" data-subpage="mapel">Mata Pelajaran</a>
+                <a href="jadwal.html" data-subpage="jadwal">Jadwal</a>
+                <a href="pengumuman.html" data-subpage="pengumuman">Pengumuman</a>
+            </div>
+        </details>
+
+        <a href="login.html" class="nav-item logout" data-page="logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Keluar</span>
+        </a>
+    </nav>
+</aside>

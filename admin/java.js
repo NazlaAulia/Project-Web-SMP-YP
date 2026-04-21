@@ -6,9 +6,11 @@ document.querySelectorAll('.nav-item').forEach(item => {
     });
 });
 
+let currentDate = new Date();
+
 document.addEventListener("DOMContentLoaded", () => {
     // 1. KALENDER
-    loadCalendar();
+    initCalendar();
 
     // 2. ADMIN LOGIN / LIVE SERVER MODE
     const namaAdminEl = document.getElementById("namaAdmin");
@@ -28,14 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
         location.port === "5500";
 
     if (isLiveServer) {
-        // MODE DESAIN
         tampilkanAdmin("Admin Demo");
         console.log("Mode Live Server aktif, redirect login admin dimatikan.");
         isiCounterDummy();
         return;
     }
 
-    // MODE HOSTING / LOGIN ASLI
     const roleId = localStorage.getItem("role_id");
     const username = localStorage.getItem("username");
 
@@ -45,8 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     tampilkanAdmin(username || "Admin");
-
-    // 3. LOAD DATA DASHBOARD DARI DATABASE
     loadDashboardStats();
 });
 
@@ -121,40 +119,87 @@ async function loadDashboardStats() {
             animateCounter(counters[3], result.total_pending || 0);
         }
 
+        const pendingPendaftaranEl = document.getElementById("pendingPendaftaran");
+        const pendingJadwalEl = document.getElementById("pendingJadwal");
+
+        if (pendingPendaftaranEl) {
+            pendingPendaftaranEl.innerText = `${result.pending_pendaftaran || 0} Siswa`;
+        }
+
+        if (pendingJadwalEl) {
+            pendingJadwalEl.innerText = `${result.pending_jadwal || 0} Request`;
+        }
+
     } catch (error) {
         console.error("Gagal mengambil data dashboard:", error);
     }
 }
 
 // =========================
-// KALENDER
+// KALENDER BARU
 // =========================
-function loadCalendar() {
-    const date = new Date();
+function initCalendar() {
+    renderCalendar();
+
+    const prevBtn = document.getElementById("prevMonth");
+    const nextBtn = document.getElementById("nextMonth");
+
+    if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
+}
+
+function renderCalendar() {
     const monthYear = document.getElementById("month-year");
     const calendarBody = document.getElementById("calendar-body");
 
-    if (monthYear && calendarBody) {
-        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        monthYear.innerText = `${months[date.getMonth()]} ${date.getFullYear()}`;
+    if (!monthYear || !calendarBody) return;
 
-        const firstDayRaw = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-        const firstDay = firstDayRaw === 0 ? 6 : firstDayRaw - 1; // mulai Senin
-        const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    const months = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
 
-        calendarBody.innerHTML = "";
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
 
-        for (let i = 0; i < firstDay; i++) {
-            const emptyDiv = document.createElement("div");
-            calendarBody.appendChild(emptyDiv);
+    monthYear.innerText = `${months[month]} ${year}`;
+
+    const firstDayRaw = new Date(year, month, 1).getDay();
+    const firstDay = firstDayRaw === 0 ? 6 : firstDayRaw - 1;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const today = new Date();
+    const isCurrentMonth =
+        today.getFullYear() === year && today.getMonth() === month;
+
+    calendarBody.innerHTML = "";
+
+    for (let i = 0; i < firstDay; i++) {
+        const emptyDiv = document.createElement("div");
+        emptyDiv.classList.add("empty");
+        calendarBody.appendChild(emptyDiv);
+    }
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dayDiv = document.createElement("div");
+        dayDiv.innerText = i;
+
+        if (isCurrentMonth && i === today.getDate()) {
+            dayDiv.classList.add("today");
         }
 
-        for (let i = 1; i <= daysInMonth; i++) {
-            const dayDiv = document.createElement("div");
-            dayDiv.innerText = i;
-            if (i === date.getDate()) dayDiv.classList.add("today");
-            calendarBody.appendChild(dayDiv);
-        }
+        calendarBody.appendChild(dayDiv);
     }
 }
 

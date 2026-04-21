@@ -5,74 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - School Prime</title>
 
-    <link rel="stylesheet" href="indexstyle.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="indexstyle.css">
+
+    <link rel="stylesheet" href="components/admin-nav.css">
 </head>
-<body>
-
-    <!-- TOPBAR MOBILE -->
-   <div class="mobile-topbar">
-    <h2>Dashboard Admin</h2>
-    <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">
-        <i class="fas fa-bars"></i>
-    </button>
-</div>
-
-    <!-- OVERLAY MOBILE -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+<body data-page="dashboard">
 
     <div class="container">
-        <aside class="sidebar" id="sidebar">
-            <div class="logo">
-                <strong>SMP YP 17 SURABAYA</strong>
-                <span>ADMIN PANEL</span>
-            </div>
-
-            <nav>
-                <a href="#" class="nav-item active">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-
-                <div class="nav-label">DATA</div>
-                <details class="menu-group" open>
-                    <summary class="nav-item">
-                        <i class="fas fa-database"></i>
-                        <span>Data</span>
-                        <i class="fas fa-chevron-down arrow"></i>
-                    </summary>
-                    <div class="sub-menu">
-                        <a href="#">Guru</a>
-                        <a href="#">Siswa</a>
-                        <a href="#">Pendaftaran</a>
-                        <a href="#">Kelas & Ruangan</a>
-                    </div>
-                </details>
-
-                <div class="nav-label">OPERASIONAL</div>
-                <details class="menu-group">
-                    <summary class="nav-item">
-                        <i class="fas fa-tasks"></i>
-                        <span>Operasional</span>
-                        <i class="fas fa-chevron-down arrow"></i>
-                    </summary>
-                    <div class="sub-menu">
-                        <a href="#">Mata Pelajaran</a>
-                        <a href="#">Jadwal</a>
-                        <a href="#">Pengumuman</a>
-                    </div>
-                </details>
-
-                <a href="#" class="nav-item logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Keluar</span>
-                </a>
-            </nav>
-        </aside>
+        <div id="admin-nav-root"></div>
 
         <main class="main-content">
             <header>
@@ -82,9 +28,9 @@
                 </div>
 
                 <div class="user-profile">
-    <span>Selamat Datang, <strong id="namaAdmin">Admin</strong></span>
-    <div class="initial" id="avatarAdmin">A</div>
-</div>
+                    <span>Selamat Datang, <strong id="namaAdmin">Admin</strong></span>
+                    <div class="initial" id="avatarAdmin">A</div>
+                </div>
             </header>
 
             <section class="admin-stats-grid">
@@ -136,12 +82,12 @@
 
                         <div class="action-item">
                             <span>Pendaftaran Siswa Baru (Verifikasi)</span>
-                            <span class="badge status-now">5 Siswa</span>
+                            <span class="badge status-now" id="pendingPendaftaran">0 Siswa</span>
                         </div>
 
                         <div class="action-item">
                             <span>Ganti Jadwal Menunggu Approval</span>
-                            <span class="badge status-pending">3 Request</span>
+                            <span class="badge status-pending" id="pendingJadwal">0 Request</span>
                         </div>
                     </div>
 
@@ -165,26 +111,8 @@
                 </div>
 
                 <div class="right-column">
-                    <div class="card">
-                        <h3><i class="fas fa-calendar-alt"></i> Operasional Hari Ini</h3>
-
-                        <div class="schedule-list">
-                            <div class="schedule-item active-row">
-                                <div class="time">07:30</div>
-                                <div class="subject">
-                                    Upacara Bendera
-                                    <p>Lapangan Utama</p>
-                                </div>
-                            </div>
-
-                            <div class="schedule-item">
-                                <div class="time">09:00</div>
-                                <div class="subject">
-                                    Rapat Koordinasi Guru
-                                    <p>Ruang Meeting</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="card calendar-only-card">
+                        <h3><i class="fas fa-calendar-alt"></i> Kalender</h3>
 
                         <div class="calendar-card">
                             <div class="calendar-header">
@@ -217,6 +145,7 @@
         </main>
     </div>
 
+<script src="components/admin-nav.js"></script>
     <script src="java.js"></script>
 </body>
 </html>
