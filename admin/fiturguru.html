@@ -38,35 +38,78 @@
                     </div>
                 </section>
 
-               <section class="table-card">
+                <section class="table-card">
+                  <div class="table-card">
     <div class="table-wrap">
         <table>
-            <thead>
-                <tr>
-                    <th>Nama</th>
-                    <th>Email</th>
-                    <th>Username</th>
-                    <th>NIP</th>
-                    <th>Pelajaran</th>
-                    <th>Wali Kelas</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="guruTableBody">
-                <tr>
-                    <td colspan="7" class="empty-cell">Memuat data guru...</td>
-                </tr>
-            </tbody>
-        </table>
+            </table>
     </div>
 
     <div class="pagination-container">
-        <div class="pagination-info" id="paginationInfo">
-            Menampilkan 1 sampai 10 dari 0 Guru
+        <div class="pagination-info">
+            Menampilkan 1 sampai 10 dari 25 Guru
         </div>
-        <div class="pagination-btns" id="paginationBtns"></div>
+        <div class="pagination-btns">
+            <button class="btn-page" disabled><i class="fas fa-chevron-left"></i></button>
+            <button class="btn-page active">1</button>
+            <button class="btn-page">2</button>
+            <button class="btn-page">3</button>
+            <button class="btn-page"><i class="fas fa-chevron-right"></i></button>
+        </div>
     </div>
-</section>
+</div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL TAMBAH GURU -->
+    <div class="modal-overlay" id="guruModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Tambah Guru</h2>
+                <button class="btn-close" id="closeModalBtn">&times;</button>
+            </div>
+
+            <form id="formTambahGuru">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nip">NIP</label>
+                        <input type="text" id="nip" name="nip" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nama">Nama Guru</label>
+                        <input type="text" id="nama" name="nama" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_mapel">Pelajaran</label>
+                        <select id="id_mapel" name="id_mapel">
+                            <option value="">-- Pilih Pelajaran --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    Username dan password awal akan dibuat otomatis oleh sistem saat guru ditambahkan.
+                </div>
+
+                <div id="formMessage" class="form-message"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelModalBtn">Batal</button>
+                    <button type="submit" class="btn-primary">Simpan Guru</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="components/admin-nav.js"></script>
     <script src="fiturguru.js"></script>
 </body>
