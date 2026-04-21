@@ -4,7 +4,7 @@ header('Content-Type: application/json; charset=utf-8');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
-require_once 'pendaftaran.php';
+require_once 'koneksi.php';
 
 function respon($status, $message, $data = null) {
     while (ob_get_level()) {
@@ -17,6 +17,10 @@ function respon($status, $message, $data = null) {
         'data' => $data
     ]);
     exit;
+}
+
+if (!$conn || $conn->connect_error) {
+    respon('error', 'Koneksi database gagal: ' . $conn->connect_error);
 }
 
 $nama_lengkap    = trim($_POST['nama_lengkap'] ?? '');
