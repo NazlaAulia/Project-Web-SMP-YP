@@ -568,6 +568,27 @@ button {
     filter: brightness(0.97);
 }
 
+.pagination-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.btn-page {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #eee;
+    cursor: pointer;
+}
+
+.btn-page.active {
+    background: #0f5c4d;
+    color: white;
+    font-weight: bold;
+}
+
 }
 
 
