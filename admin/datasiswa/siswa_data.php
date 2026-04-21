@@ -47,7 +47,7 @@ $sql = "
         s.jenis_kelamin,
         u.username,
         k.nama_kelas,
-        ta.nama_tahun_ajaran AS tahun_ajaran
+        ta.tahun_ajaran AS tahun_ajaran
     FROM siswa s
     LEFT JOIN user u 
         ON u.id_siswa = s.id_siswa 
