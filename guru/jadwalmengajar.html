@@ -13,7 +13,6 @@
         <div id="sidebar-container"></div>
 
         <main class="main-content">
-
             <header class="content-header">
                 <div class="header-title">
                     <h1>Jadwal Mengajar ✨</h1>
@@ -29,26 +28,61 @@
                     <label><i class="bi bi-filter"></i> Filter Hari</label>
                     <select id="filterHari" onchange="filterData()">
                         <option value="Semua">Semua Hari</option>
-                        <option value="Senin">Senin</option>
-                        <option value="Selasa">Selasa</option>
-                        <option value="Rabu">Rabu</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label><i class="bi bi-building"></i> Kelas</label>
                     <select id="filterKelas" onchange="filterData()">
                         <option value="Semua">Semua Kelas</option>
-                        <option value="9A">Kelas 9A</option>
-                        <option value="9B">Kelas 9B</option>
-                        <option value="9C">Kelas 9C</option>
                     </select>
                 </div>
             </section>
 
-            <div class="schedule-grid" id="scheduleContainer">
-                </div>
+            <section>
+                <h2 style="margin-bottom: 18px;">Jadwal Aktif</h2>
+                <div class="schedule-grid" id="scheduleContainer"></div>
+            </section>
+
+            <section style="margin-top: 40px;">
+                <h2 style="margin-bottom: 18px;">Riwayat Pengajuan Ganti Jadwal</h2>
+                <div id="requestContainer"></div>
+            </section>
         </main>
     </div>
+
+    <!-- Modal Request -->
+    <div id="requestModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Ajukan Ganti Jadwal</h3>
+            <form id="requestForm">
+                <div class="filter-group">
+                    <label>Pilih Jadwal</label>
+                    <select id="id_jadwal" name="id_jadwal" required></select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Hari Baru</label>
+                    <input type="text" id="hari_baru" name="hari_baru" placeholder="Contoh: Kamis" required>
+                </div>
+
+                <div class="filter-group">
+                    <label>Jam Baru</label>
+                    <input type="text" id="jam_baru" name="jam_baru" placeholder="Contoh: 08.00 - 09.30" required>
+                </div>
+
+                <div class="filter-group">
+                    <label>Alasan</label>
+                    <textarea id="alasan" name="alasan" rows="4" required></textarea>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:16px;">
+                    <button type="submit" class="btn-request">Kirim Request</button>
+                    <button type="button" class="btn-request" onclick="closeRequestModal()">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="components/sidebar-guru.js"></script>
     <script src="jadwal.js"></script>
 </body>
