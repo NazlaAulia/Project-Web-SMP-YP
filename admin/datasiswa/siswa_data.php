@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-require_once 'koneksi.php';
+require_once '../koneksi.php';
 
 function respon($status, $message, $data = null) {
     echo json_encode([
@@ -19,7 +19,12 @@ $mode = $_GET['mode'] ?? 'siswa';
 
 if ($mode === 'kelas') {
     $data = [];
-    $query = mysqli_query($conn, "SELECT id_kelas, nama_kelas FROM kelas ORDER BY tingkat ASC, nama_kelas ASC");
+
+    $query = mysqli_query($conn, "
+        SELECT id_kelas, nama_kelas
+        FROM kelas
+        ORDER BY tingkat ASC, nama_kelas ASC
+    ");
 
     if (!$query) {
         respon("error", "Gagal mengambil data kelas: " . $conn->error);
@@ -33,6 +38,7 @@ if ($mode === 'kelas') {
 }
 
 $data = [];
+
 $sql = "
     SELECT 
         s.id_siswa,
