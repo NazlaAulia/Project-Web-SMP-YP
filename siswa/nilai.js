@@ -1,8 +1,23 @@
 window.addEventListener("load", async () => {
+  isiHeaderDariLocalStorage();
   aktifkanFilterAnimasi();
   aktifkanExportAnimasi();
   await loadDataNilai();
 });
+
+function isiHeaderDariLocalStorage() {
+  const nama = localStorage.getItem("nama_siswa") || "Siswa";
+  const kelas = localStorage.getItem("kelas_siswa") || "-";
+  const avatar = nama.charAt(0).toUpperCase();
+
+  const namaText = document.getElementById("namaText");
+  const kelasText = document.getElementById("kelasText");
+  const avatarText = document.getElementById("avatarText");
+
+  if (namaText) namaText.textContent = nama;
+  if (kelasText) kelasText.textContent = kelas;
+  if (avatarText) avatarText.textContent = avatar;
+}
 
 async function loadDataNilai() {
   try {
