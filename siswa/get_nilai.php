@@ -2,11 +2,13 @@
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
-echo json_encode([
-    "session" => $_SESSION,
-    "get" => $_GET
-]);
-exit;
+if (!isset($_SESSION['id_siswa'])) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Session siswa tidak ditemukan. Silakan login ulang."
+    ]);
+    exit;
+}
 
 $id_siswa = (int) $_SESSION['id_siswa'];
 $kelasFilter = $_GET['kelas'] ?? '';
