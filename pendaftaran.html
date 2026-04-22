@@ -41,18 +41,24 @@
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap" required>
+                        <input type="text" name="nama_lengkap" required
+                               oninvalid="this.setCustomValidity('Nama lengkap wajib diisi.')"
+                               oninput="this.setCustomValidity('')">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>NISN</label>
-                        <input type="text" name="nisn" maxlength="20" required>
+                        <input type="text" name="nisn" maxlength="10" minlength="10" pattern="[0-9]{10}" inputmode="numeric" placeholder="10 digit NISN" required
+                               oninvalid="this.setCustomValidity('NISN wajib 10 digit angka.')"
+                               oninput="this.setCustomValidity('')">
                     </div>
                     <div class="form-group">
                         <label>Jenis Kelamin</label>
-                        <select name="jenis_kelamin" required>
+                        <select name="jenis_kelamin" required
+                                oninvalid="this.setCustomValidity('Silakan pilih jenis kelamin.')"
+                                onchange="this.setCustomValidity('')">
                             <option value="">-- Pilih --</option>
                             <option value="L">Laki-laki</option>
                             <option value="P">Perempuan</option>
@@ -63,41 +69,64 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir" required>
+                        <input type="date" name="tanggal_lahir" required
+                               oninvalid="this.setCustomValidity('Tanggal lahir wajib diisi.')"
+                               oninput="this.setCustomValidity('')">
                     </div>
                     <div class="form-group">
-                        <label>No HP</label>
-                        <input type="text" name="no_hp" maxlength="20" required>
+                        <label>No HP Orang Tua / Wali</label>
+                        <input type="text" name="no_hp" maxlength="15" minlength="10" pattern="(08|62)[0-9]{8,13}" inputmode="numeric" placeholder="08xxxxxxxxxx" required
+                               oninvalid="this.setCustomValidity('Nomor HP orang tua / wali harus valid, misalnya 081234567890.')"
+                               oninput="this.setCustomValidity('')">
                     </div>
                 </div>
 
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Alamat</label>
-                        <textarea name="alamat" required></textarea>
+                        <textarea name="alamat" required
+                                  oninvalid="this.setCustomValidity('Alamat wajib diisi.')"
+                                  oninput="this.setCustomValidity('')"></textarea>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Asal Sekolah</label>
-                        <input type="text" name="asal_sekolah" required>
+                        <input type="text" name="asal_sekolah" required
+                               oninvalid="this.setCustomValidity('Asal sekolah wajib diisi.')"
+                               oninput="this.setCustomValidity('')">
                     </div>
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="email" name="email">
+                        <input type="email" name="email"
+                               oninvalid="this.setCustomValidity('Format email tidak valid.')"
+                               oninput="this.setCustomValidity('')">
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Nama Wali</label>
+                        <input type="text" name="nama_wali" maxlength="100" required
+                               oninvalid="this.setCustomValidity('Nama wali wajib diisi.')"
+                               oninput="this.setCustomValidity('')">
                     </div>
                 </div>
 
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Pendapatan Orang Tua</label>
-                        <input type="number" step="0.01" name="pendapatan_ortu" required>
+                        <input type="number" step="0.01" name="pendapatan_ortu" required
+                               oninvalid="this.setCustomValidity('Pendapatan orang tua wajib diisi.')"
+                               oninput="this.setCustomValidity('')">
                     </div>
                 </div>
 
                 <div class="agreement">
-                    <input type="checkbox" id="agreement" required>
+                    <input type="checkbox" id="agreement" required
+                           oninvalid="this.setCustomValidity('Anda harus menyetujui pernyataan ini.')"
+                           onchange="this.setCustomValidity('')">
                     <span>Saya mengisi data dengan benar dan siap menunggu verifikasi admin.</span>
                 </div>
 
@@ -149,14 +178,14 @@
 
                 <div class="live-stats-container" style="margin-top: 35px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="stat-card" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
-                        <span style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px;">Pendaftar Hari Ini</span>
-                        <strong style="font-size: 24px; color: var(--secondary);">12</strong>
+                        <span style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px;">Jumlah Pendaftar</span>
+                        <strong id="statHariIni" style="font-size: 24px; color: var(--secondary);">0</strong>
                         <span style="font-size: 12px; display: block; opacity: 0.7;">Siswa</span>
                     </div>
 
                     <div class="stat-card" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
                         <span style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px;">Kuota Tersedia</span>
-                        <strong style="font-size: 24px; color: #ffffff;">45</strong>
+                        <strong id="statKuota" style="font-size: 24px; color: #ffffff;">60</strong>
                         <span style="font-size: 12px; display: block; opacity: 0.7;">Kursi</span>
                     </div>
                 </div>
@@ -164,10 +193,10 @@
                 <div class="quota-progress" style="margin-top: 20px;">
                     <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; opacity: 0.8;">
                         <span>Pengisian Kuota</span>
-                        <span>75% Terisi</span>
+                        <span id="statPersen">0% Terisi</span>
                     </div>
                     <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
-                        <div style="width: 75%; height: 100%; background: var(--secondary); border-radius: 10px; animation: loadProgress 2s ease-out;"></div>
+                        <div id="progressBar" style="width: 0%; height: 100%; background: var(--secondary); border-radius: 10px; animation: loadProgress 2s ease-out;"></div>
                     </div>
                 </div>
 
@@ -240,7 +269,6 @@ AOS.init({
     once: true
 });
 </script>
-
 
 <script src="pendaftaran.js"></script>
 
