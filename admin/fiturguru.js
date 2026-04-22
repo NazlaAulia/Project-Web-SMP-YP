@@ -15,12 +15,18 @@ const formTambahGuru = document.getElementById("formTambahGuru");
 const formMessage = document.getElementById("formMessage");
 const mapelSelect = document.getElementById("id_mapel");
 
+let confirmCallback = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     injectHiddenFieldsIfNeeded();
+    injectCustomModalIfNeeded();
     loadGuru();
     loadMapel();
 });
 
+// ==========================
+// INIT HELPER
+// ==========================
 function injectHiddenFieldsIfNeeded() {
     if (!document.getElementById("id_guru")) {
         const inputIdGuru = document.createElement("input");
@@ -43,10 +49,82 @@ function injectHiddenFieldsIfNeeded() {
         modalHeaderTitle.id = "modalTitle";
     }
 
-    const submitBtn = formTambahGuru.querySelector('button[type="submit"]');
+    const submitBtn = formTambahGuru?.querySelector('button[type="submit"]');
     if (submitBtn) {
         submitBtn.id = "submitGuruBtn";
     }
+}
+
+function injectCustomModalIfNeeded() {
+    if (!document.getElementById("confirmModal")) {
+        const confirmModal = document.createElement("div");
+        confirmModal.id = "confirmModal";
+        confirmModal.className = "custom-popup-overlay";
+        confirmModal.style.display = "none";
+        confirmModal.innerHTML = `
+            <div class="custom-popup-box">
+                <div class="custom-popup-header">
+                    <h3>Konfirmasi</h3>
+                    <button type="button" class="custom-popup-close" id="confirmCloseBtn">&times;</button>
+                </div>
+                <div class="custom-popup-body">
+                    <p id="confirmMessage">Apakah Anda yakin?</p>
+                </div>
+                <div class="custom-popup-footer">
+                    <button type="button" class="custom-btn-secondary" id="confirmCancelBtn">Batal</button>
+                    <button type="button" class="custom-btn-primary" id="confirmOkBtn">Ya, lanjut</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(confirmModal);
+    }
+
+    if (!document.getElementById("customAlertModal")) {
+        const alertModal = document.createElement("div");
+        alertModal.id = "customAlertModal";
+        alertModal.className = "custom-popup-overlay";
+        alertModal.style.display = "none";
+        alertModal.innerHTML = `
+            <div class="custom-popup-box">
+                <div class="custom-popup-header">
+                    <h3>Informasi</h3>
+                    <button type="button" class="custom-popup-close" id="alertCloseBtn">&times;</button>
+                </div>
+                <div class="custom-popup-body">
+                    <p id="customAlertMessage">Pesan notifikasi</p>
+                </div>
+                <div class="custom-popup-footer">
+                    <button type="button" class="custom-btn-primary" id="alertOkBtn">OK</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(alertModal);
+    }
+
+
+
+    const confirmModal = document.getElementById("confirmModal");
+    const alertModal = document.getElementById("customAlertModal");
+
+    document.getElementById("confirmOkBtn")?.addEventListener("click", () => {
+        const cb = confirmCallback;
+        closeConfirmModal();
+        if (typeof cb === "function") cb();
+    });
+
+    document.getElementById("confirmCancelBtn")?.addEventListener("click", closeConfirmModal);
+    document.getElementById("confirmCloseBtn")?.addEventListener("click", closeConfirmModal);
+
+    document.getElementById("alertOkBtn")?.addEventListener("click", closeAlertModal);
+    document.getElementById("alertCloseBtn")?.addEventListener("click", closeAlertModal);
+
+    confirmModal?.addEventListener("click", (e) => {
+        if (e.target === confirmModal) closeConfirmModal();
+    });
+
+    alertModal?.addEventListener("click", (e) => {
+        if (e.target === alertModal) closeAlertModal();
+    });
 }
 
 function getIdGuruInput() {
@@ -66,9 +144,12 @@ function getSubmitGuruBtn() {
 }
 
 function resetFormToTambahMode() {
-    formTambahGuru.reset();
-    formMessage.textContent = "";
-    formMessage.className = "form-message";
+    formTambahGuru?.reset();
+
+    if (formMessage) {
+        formMessage.textContent = "";
+        formMessage.className = "form-message";
+    }
 
     const idGuruInput = getIdGuruInput();
     const formMode = getFormModeInput();
@@ -81,23 +162,64 @@ function resetFormToTambahMode() {
     if (submitGuruBtn) submitGuruBtn.textContent = "Simpan Guru";
 }
 
+// ==========================
+// CUSTOM POPUP
+// ==========================
+function openConfirmModal(message, callback) {
+    const el = document.getElementById("confirmMessage");
+    const modal = document.getElementById("confirmModal");
+
+    if (!el || !modal) return;
+
+    el.textContent = message;
+    confirmCallback = callback;
+    modal.style.display = "flex";
+}
+
+function closeConfirmModal() {
+    const modal = document.getElementById("confirmModal");
+    if (modal) modal.style.display = "none";
+    confirmCallback = null;
+}
+
+function showAlertModal(message) {
+    const el = document.getElementById("customAlertMessage");
+    const modal = document.getElementById("customAlertModal");
+
+    if (!el || !modal) {
+        window.alert(message);
+        return;
+    }
+
+    el.textContent = message;
+    modal.style.display = "flex";
+}
+
+function closeAlertModal() {
+    const modal = document.getElementById("customAlertModal");
+    if (modal) modal.style.display = "none";
+}
+
+// ==========================
+// MODAL GURU
+// ==========================
 if (openModalBtn) {
     openModalBtn.addEventListener("click", () => {
         resetFormToTambahMode();
-        guruModal.classList.add("active");
+        guruModal?.classList.add("active");
     });
 }
 
 if (closeModalBtn) {
     closeModalBtn.addEventListener("click", () => {
-        guruModal.classList.remove("active");
+        guruModal?.classList.remove("active");
         resetFormToTambahMode();
     });
 }
 
 if (cancelModalBtn) {
     cancelModalBtn.addEventListener("click", () => {
-        guruModal.classList.remove("active");
+        guruModal?.classList.remove("active");
         resetFormToTambahMode();
     });
 }
@@ -111,6 +233,9 @@ if (guruModal) {
     });
 }
 
+// ==========================
+// SEARCH
+// ==========================
 if (searchGuru) {
     searchGuru.addEventListener("input", function () {
         const keyword = this.value.toLowerCase().trim();
@@ -129,6 +254,9 @@ if (searchGuru) {
     });
 }
 
+// ==========================
+// SUBMIT FORM
+// ==========================
 if (formTambahGuru) {
     formTambahGuru.addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -136,60 +264,69 @@ if (formTambahGuru) {
         const formMode = getFormModeInput();
         const mode = formMode ? formMode.value : "tambah";
 
-        const yakin = confirm(
-            mode === "edit"
-                ? "Apakah Anda yakin ingin mengedit data guru ini?"
-                : "Apakah Anda yakin ingin menambahkan data guru ini?"
-        );
+        const pesanKonfirmasi = mode === "edit"
+            ? "Apakah Anda yakin ingin mengedit data guru ini?"
+            : "Apakah Anda yakin ingin menambahkan data guru ini?";
 
-        if (!yakin) return;
+        openConfirmModal(pesanKonfirmasi, async function () {
+            if (formMessage) {
+                formMessage.textContent = mode === "edit"
+                    ? "Menyimpan perubahan data guru..."
+                    : "Menyimpan data guru...";
+                formMessage.className = "form-message";
+            }
 
-        formMessage.textContent = mode === "edit"
-            ? "Menyimpan perubahan data guru..."
-            : "Menyimpan data guru...";
-        formMessage.className = "form-message";
-
-        const formData = new FormData(formTambahGuru);
-        const url = mode === "edit" ? "edit_guru.php" : "tambah_guru.php";
-
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                body: formData
-            });
-
-            const raw = await response.text();
-            let result;
+            const formData = new FormData(formTambahGuru);
+            const url = mode === "edit" ? "edit_guru.php" : "tambah_guru.php";
 
             try {
-                result = JSON.parse(raw);
-            } catch {
-                throw new Error("Response bukan JSON: " + raw);
+                const response = await fetch(url, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const raw = await response.text();
+                let result;
+
+                try {
+                    result = JSON.parse(raw);
+                } catch {
+                    throw new Error("Response bukan JSON: " + raw);
+                }
+
+                if (result.status !== "success") {
+                    if (formMessage) {
+                        formMessage.textContent = result.message || "Proses gagal.";
+                        formMessage.className = "form-message error";
+                    }
+                    return;
+                }
+
+                if (formMessage) {
+                    formMessage.textContent = result.message;
+                    formMessage.className = "form-message success";
+                }
+
+                await loadGuru();
+
+                setTimeout(() => {
+                    guruModal?.classList.remove("active");
+                    resetFormToTambahMode();
+                }, 900);
+
+            } catch (error) {
+                if (formMessage) {
+                    formMessage.textContent = error.message;
+                    formMessage.className = "form-message error";
+                }
             }
-
-            if (result.status !== "success") {
-                formMessage.textContent = result.message || "Proses gagal.";
-                formMessage.className = "form-message error";
-                return;
-            }
-
-            formMessage.textContent = result.message;
-            formMessage.className = "form-message success";
-
-            await loadGuru();
-
-            setTimeout(() => {
-                guruModal.classList.remove("active");
-                resetFormToTambahMode();
-            }, 900);
-
-        } catch (error) {
-            formMessage.textContent = error.message;
-            formMessage.className = "form-message error";
-        }
+        });
     });
 }
 
+// ==========================
+// LOAD DATA GURU
+// ==========================
 async function loadGuru() {
     try {
         const response = await fetch("guru_data.php");
@@ -213,11 +350,13 @@ async function loadGuru() {
         renderGuru();
 
     } catch (error) {
-        guruTableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="empty-cell">${error.message}</td>
-            </tr>
-        `;
+        if (guruTableBody) {
+            guruTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="empty-cell">${escapeHtml(error.message)}</td>
+                </tr>
+            `;
+        }
 
         const paginationInfo = document.getElementById("paginationInfo");
         const paginationBtns = document.getElementById("paginationBtns");
@@ -232,9 +371,14 @@ async function loadGuru() {
     }
 }
 
+// ==========================
+// RENDER TABLE
+// ==========================
 function renderGuru() {
     const paginationInfo = document.getElementById("paginationInfo");
     const paginationBtns = document.getElementById("paginationBtns");
+
+    if (!guruTableBody) return;
 
     if (!filteredGuru.length) {
         guruTableBody.innerHTML = `
@@ -307,6 +451,9 @@ function renderGuru() {
     renderPagination(totalPages);
 }
 
+// ==========================
+// PAGINATION
+// ==========================
 function renderPagination(totalPages) {
     const paginationBtns = document.getElementById("paginationBtns");
     if (!paginationBtns) return;
@@ -352,6 +499,9 @@ function renderPagination(totalPages) {
     paginationBtns.appendChild(nextBtn);
 }
 
+// ==========================
+// LOAD MAPEL
+// ==========================
 async function loadMapel() {
     try {
         const response = await fetch("guru_data.php?mode=mapel");
@@ -365,6 +515,7 @@ async function loadMapel() {
         }
 
         if (result.status !== "success") return;
+        if (!mapelSelect) return;
 
         mapelSelect.innerHTML = `<option value="">-- Pilih Pelajaran --</option>`;
 
@@ -379,53 +530,63 @@ async function loadMapel() {
     }
 }
 
+// ==========================
+// HAPUS GURU
+// ==========================
 async function hapusGuru(idGuru, namaGuru) {
-    const oke = confirm(`Apakah Anda yakin ingin menghapus guru ${namaGuru}?`);
-    if (!oke) return;
-
-    try {
-        const formData = new FormData();
-        formData.append("id_guru", idGuru);
-
-        const response = await fetch("hapus_guru.php", {
-            method: "POST",
-            body: formData
-        });
-
-        const raw = await response.text();
-        let result;
-
+    openConfirmModal(`Apakah Anda yakin ingin menghapus guru ${namaGuru}?`, async function () {
         try {
-            result = JSON.parse(raw);
-        } catch {
-            throw new Error("Response bukan JSON: " + raw);
+            const formData = new FormData();
+            formData.append("id_guru", idGuru);
+
+            const response = await fetch("hapus_guru.php", {
+                method: "POST",
+                body: formData
+            });
+
+            const raw = await response.text();
+            let result;
+
+            try {
+                result = JSON.parse(raw);
+            } catch {
+                throw new Error("Response bukan JSON: " + raw);
+            }
+
+            if (result.status !== "success") {
+                showAlertModal(result.message || "Gagal menghapus guru.");
+                return;
+            }
+
+            showAlertModal(result.message || "Data guru berhasil dihapus.");
+            await loadGuru();
+
+        } catch (error) {
+            showAlertModal(error.message);
         }
-
-        if (result.status !== "success") {
-            alert(result.message || "Gagal menghapus guru.");
-            return;
-        }
-
-        alert(result.message);
-        await loadGuru();
-
-    } catch (error) {
-        alert(error.message);
-    }
+    });
 }
 
+// ==========================
+// EDIT GURU
+// ==========================
 function editGuru(idGuru) {
     const guru = semuaGuru.find(item => String(item.id_guru) === String(idGuru));
 
     if (!guru) {
-        alert("Data guru tidak ditemukan.");
+        showAlertModal("Data guru tidak ditemukan.");
         return;
     }
 
-    document.getElementById("nip").value = guru.nip || "";
-    document.getElementById("nama").value = guru.nama || "";
-    document.getElementById("email").value = guru.email || "";
-    document.getElementById("id_mapel").value = guru.id_mapel || "";
+    const nipInput = document.getElementById("nip");
+    const namaInput = document.getElementById("nama");
+    const emailInput = document.getElementById("email");
+    const mapelInput = document.getElementById("id_mapel");
+
+    if (nipInput) nipInput.value = guru.nip || "";
+    if (namaInput) namaInput.value = guru.nama || "";
+    if (emailInput) emailInput.value = guru.email || "";
+    if (mapelInput) mapelInput.value = guru.id_mapel || "";
 
     const idGuruInput = getIdGuruInput();
     const formMode = getFormModeInput();
@@ -437,11 +598,17 @@ function editGuru(idGuru) {
     if (modalTitle) modalTitle.textContent = "Edit Guru";
     if (submitGuruBtn) submitGuruBtn.textContent = "Simpan Perubahan";
 
-    formMessage.textContent = "";
-    formMessage.className = "form-message";
-    guruModal.classList.add("active");
+    if (formMessage) {
+        formMessage.textContent = "";
+        formMessage.className = "form-message";
+    }
+
+    guruModal?.classList.add("active");
 }
 
+// ==========================
+// ESCAPE
+// ==========================
 function escapeHtml(text) {
     return String(text)
         .replaceAll("&", "&amp;")
@@ -456,3 +623,13 @@ function escapeJs(text) {
         .replaceAll("\\", "\\\\")
         .replaceAll("'", "\\'");
 }
+
+// ==========================
+// GLOBAL EXPORT
+// ==========================
+window.editGuru = editGuru;
+window.hapusGuru = hapusGuru;
+window.openConfirmModal = openConfirmModal;
+window.closeConfirmModal = closeConfirmModal;
+window.showAlertModal = showAlertModal;
+window.closeAlertModal = closeAlertModal;

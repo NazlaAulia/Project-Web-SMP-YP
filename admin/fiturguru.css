@@ -617,3 +617,115 @@ button {
     align-items: center;
     flex-wrap: nowrap;
 }
+
+.confirm-modal {
+    max-width: 460px;
+}
+
+.modal-body p {
+    font-size: 1rem;
+    color: var(--primary);
+    line-height: 1.6;
+}
+
+.custom-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.28);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    padding: 20px;
+}
+
+.custom-popup-box {
+    width: 100%;
+    max-width: 460px;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    animation: popupFadeIn 0.2s ease;
+}
+
+.custom-popup-header {
+    background: #07484a;
+    color: #ffffff;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-popup-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.custom-popup-close {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.custom-popup-body {
+    padding: 24px 22px 10px;
+    color: #123;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.custom-popup-body p {
+    margin: 0;
+}
+
+.custom-popup-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 18px 22px 22px;
+}
+
+.custom-btn-primary,
+.custom-btn-secondary {
+    border: none;
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.custom-btn-primary {
+    background: #f5a425;
+    color: #ffffff;
+}
+
+.custom-btn-secondary {
+    background: #e9eeee;
+    color: #07484a;
+}
+
+.form-message.success {
+    color: #1f7a46;
+}
+
+.form-message.error {
+    color: #b42318;
+}
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
