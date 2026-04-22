@@ -15,7 +15,7 @@
         <main class="main-content">
             <header class="content-header">
                 <div class="header-title">
-                    <h1>Jadwal Mengajar ✨</h1>
+                    <h1>Jadwal Mengajar</h1>
                     <p>Tahun Ajaran 2025/2026 - Semester Genap</p>
                 </div>
                 <button class="btn-request" onclick="openRequestModal()">
@@ -50,40 +50,88 @@
         </main>
     </div>
 
-    <!-- Modal Request -->
-    <div id="requestModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <h3>Ajukan Ganti Jadwal</h3>
-            <form id="requestForm">
-                <div class="filter-group">
-                    <label>Pilih Jadwal</label>
-                    <select id="id_jadwal" name="id_jadwal" required></select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Hari Baru</label>
-                    <input type="text" id="hari_baru" name="hari_baru" placeholder="Contoh: Kamis" required>
-                </div>
-
-                <div class="filter-group">
-                    <label>Jam Baru</label>
-                    <input type="text" id="jam_baru" name="jam_baru" placeholder="Contoh: 08.00 - 09.30" required>
-                </div>
-
-                <div class="filter-group">
-                    <label>Alasan</label>
-                    <textarea id="alasan" name="alasan" rows="4" required></textarea>
-                </div>
-
-                <div style="display:flex; gap:10px; margin-top:16px;">
-                    <button type="submit" class="btn-request">Kirim Request</button>
-                    <button type="button" class="btn-request" onclick="closeRequestModal()">Batal</button>
-                </div>
-            </form>
+<div id="requestModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-arrow-left-right"></i> Ajukan Ganti Jadwal</h3>
+            <button class="btn-close" onclick="closeRequestModal()">&times;</button>
         </div>
+
+        <form id="requestForm">
+            <div class="form-group">
+                <label>Pilih Jadwal Yang Ingin Diganti</label>
+                <select id="id_jadwal" name="id_jadwal" required onchange="autoFillOldSchedule()"></select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Hari Lama</label>
+                    <input type="text" id="hari_lama_view" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Jam Lama</label>
+                    <input type="text" id="jam_lama_view" readonly>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Jenis Pengajuan</label>
+                <select id="tipe_pengajuan" name="tipe_pengajuan" onchange="handleJenisPengajuan()" required>
+                    <option value="">Pilih jenis</option>
+                    <option value="geser">Geser ke jadwal lain</option>
+                    <option value="tukar">Tukar dengan guru lain</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Hari Baru</label>
+                    <select id="hari_baru" name="hari_baru" required onchange="cekKetersediaanSlot()">
+                        <option value="Senin">Senin</option>
+                        <option value="Selasa">Selasa</option>
+                        <option value="Rabu">Rabu</option>
+                        <option value="Kamis">Kamis</option>
+                        <option value="Jumat">Jumat</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Jam Baru</label>
+                    <select id="jam_baru" name="jam_baru" required onchange="cekKetersediaanSlot()">
+                        <option value="">Pilih jam</option>
+                        <option value="1-2">Jam 1-2</option>
+                        <option value="3-4">Jam 3-4</option>
+                        <option value="5-6">Jam 5-6</option>
+                        <option value="7-8">Jam 7-8</option>
+                        <option value="9-10">Jam 9-10</option>
+                        <option value="11-12">Jam 11-12</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" id="guruTujuanWrap" style="display:none;">
+                <label>Guru Tujuan Tukar Jadwal</label>
+                <select id="guru_tujuan" name="guru_tujuan">
+                    <option value="">Pilih guru</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Alasan Perubahan</label>
+                <textarea id="alasan" name="alasan" rows="3" required></textarea>
+            </div>
+
+            <div id="validationInfo" class="info-box"></div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeRequestModal()">Batal</button>
+                <button type="submit" class="btn-submit">Kirim Pengajuan</button>
+            </div>
+        </form>
     </div>
+</div>
 
     <script src="components/sidebar-guru.js"></script>
-    <script src="jadwal.js"></script>
+    <script src="jadwalmengajar.js"></script>
 </body>
 </html>
