@@ -55,12 +55,12 @@
       </li>
     </ul>
 
-    <div class="sidebar-footer">
-      <a href="../login.html" class="logout-btn">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        <span>Keluar</span>
-      </a>
-    </div>
+   <div class="sidebar-footer">
+  <a href="#" class="logout-btn" id="logoutBtn">
+    <i class="fa-solid fa-right-from-bracket"></i>
+    <span>Keluar</span>
+  </a>
+</div>
   </nav>
 </aside>
 
@@ -156,6 +156,48 @@
     </main>
   </div>
 
+<!-- Popup Konfirmasi Keluar -->
+<div class="logout-modal" id="logoutModal">
+  <div class="logout-modal-content">
+    <div class="logout-icon-wrap">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </div>
+
+    <h2>Konfirmasi Keluar</h2>
+    <p>Apakah Anda yakin ingin keluar dari akun ini?</p>
+
+    <div class="logout-modal-actions">
+      <button type="button" class="btn-batal" id="cancelLogout">Batal</button>
+      <button type="button" class="btn-keluar" id="confirmLogout">Ya, Keluar</button>
+    </div>
+  </div>
+</div>
+
   <script src="jadwal.js"></script>
+  <script>
+  const logoutBtn = document.getElementById("logoutBtn");
+  const logoutModal = document.getElementById("logoutModal");
+  const cancelLogout = document.getElementById("cancelLogout");
+  const confirmLogout = document.getElementById("confirmLogout");
+
+  logoutBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    logoutModal.classList.add("show");
+  });
+
+  cancelLogout.addEventListener("click", function () {
+    logoutModal.classList.remove("show");
+  });
+
+  confirmLogout.addEventListener("click", function () {
+    window.location.href = "logout.html";
+  });
+
+  logoutModal.addEventListener("click", function (e) {
+    if (e.target === logoutModal) {
+      logoutModal.classList.remove("show");
+    }
+  });
+</script>
 </body>
 </html>
