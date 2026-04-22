@@ -1,40 +1,22 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=utf-8');
-require_once '../koneksi.php';
 
-echo json_encode([
-    "session_id_siswa" => $_SESSION['id_siswa'] ?? null,
-    "session_nama_siswa" => $_SESSION['nama_siswa'] ?? null,
-    "session_kelas_siswa" => $_SESSION['kelas_siswa'] ?? null
-]);
-exit;
+require_once '../koneksi.php';
 
 function konversiSemesterKeAngka($semesterText) {
     $semesterText = trim((string)$semesterText);
 
-    if ($semesterText === '') {
-        return 2;
-    }
-
-    if (stripos($semesterText, 'genap') !== false) {
-        return 2;
-    }
-
-    if (stripos($semesterText, 'ganjil') !== false) {
-        return 1;
-    }
-
-    if (is_numeric($semesterText)) {
-        return (int)$semesterText;
-    }
+    if ($semesterText === '') return 2;
+    if (stripos($semesterText, 'genap') !== false) return 2;
+    if (stripos($semesterText, 'ganjil') !== false) return 1;
+    if (is_numeric($semesterText)) return (int)$semesterText;
 
     return 2;
 }
 
 function hitungPredikat($nilai) {
     $nilai = (float)$nilai;
-
     if ($nilai >= 90) return 'A';
     if ($nilai >= 80) return 'B';
     if ($nilai >= 70) return 'C';
@@ -42,7 +24,22 @@ function hitungPredikat($nilai) {
     return 'E';
 }
 
-$id_siswa = (int) $_SESSION['id_siswa'];
+$id_siswa = 0;
+
+if (isset($_SESSION['id_siswa']) && (int)$_SESSION['id_siswa'] > 0) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
+} elseif (isset($_GET['id_siswa']) && (int)$_GET['id_siswa'] > 0) {
+    $id_siswa = (int) $_GET['id_siswa'];
+}
+
+if ($id_siswa <= 0) {
+    echo json_encode([
+        "success" => false,
+        "message" => "ID siswa tidak ditemukan. Silakan login ulang."
+    ]);
+    exit;
+}
+
 $kelasFilter = trim($_GET['kelas'] ?? '');
 $semesterText = trim($_GET['semester'] ?? '');
 
@@ -55,7 +52,7 @@ $semester = konversiSemesterKeAngka($semesterText);
 $stmtSiswa = $conn->prepare("
     SELECT 
         s.id_siswa,
-        s.nama,
+        s.nama AS nama_siswa,
         k.nama_kelas
     FROM siswa s
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
@@ -111,7 +108,7 @@ $ringkasan = $resRingkasan->fetch_assoc();
 $stmtTopMapel = $conn->prepare("
     SELECT 
         m.nama_mapel AS mapel,
-        g.nama AS guru,
+        COALESCE(g.nama, '-') AS guru,
         n.nilai_angka
     FROM nilai n
     LEFT JOIN mapel m ON n.id_mapel = m.id_mapel
@@ -217,9 +214,9 @@ echo json_encode([
     "success" => true,
     "siswa" => [
         "id_siswa" => $siswa['id_siswa'],
-        "nama" => $siswa['nama'],
+        "nama" => $siswa['nama_siswa'],
         "kelas" => $siswa['nama_kelas'],
-        "inisial" => strtoupper(substr($siswa['nama'], 0, 1))
+        "inisial" => strtoupper(substr($siswa['nama_siswa'], 0, 1))
     ],
     "ringkasan" => [
         "rata_rata" => $avgNow,

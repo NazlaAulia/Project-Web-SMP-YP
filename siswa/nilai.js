@@ -23,9 +23,10 @@ async function loadDataNilai() {
   try {
     const kelas = document.getElementById("kelas").value;
     const semester = document.getElementById("semester").value;
+    const idSiswa = localStorage.getItem("id_siswa") || "";
 
     const response = await fetch(
-      `get_nilai.php?kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`,
+      `get_nilai.php?id_siswa=${encodeURIComponent(idSiswa)}&kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`,
       {
         method: "GET",
         credentials: "same-origin"
