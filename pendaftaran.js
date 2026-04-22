@@ -20,7 +20,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const waReminderLink = document.getElementById("waReminderLink");
     const submitBtn = document.querySelector(".btn-submit");
 
+    const statHariIni = document.getElementById("statHariIni");
+    const statKuota = document.getElementById("statKuota");
+    const statPersen = document.getElementById("statPersen");
+    const progressBar = document.getElementById("progressBar");
+
     if (!form) return;
+
+    function updateKuotaDisplay(data) {
+        if (statKuota) {
+            statKuota.textContent = data.kuota_tersisa;
+        }
+
+        if (statPersen && progressBar && data.kuota_max) {
+            const terisi = data.kuota_max - data.kuota_tersisa;
+            const persen = Math.round((terisi / data.kuota_max) * 100);
+            statPersen.textContent = `${persen}% Terisi`;
+            progressBar.style.width = `${persen}%`;
+        }
+
+        if (statHariIni && typeof data.jumlah_pendaftar !== "undefined") {
+            statHariIni.textContent = data.jumlah_pendaftar;
+        }
+    }
 
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -62,7 +84,11 @@ Saya atas nama *${result.data.nama_lengkap}* telah melakukan pendaftaran PPDB.
 ID Pendaftaran: ${result.data.id_pendaftaran}
 NISN: ${result.data.nisn}
 Asal Sekolah: ${result.data.asal_sekolah}
-No HP: ${result.data.no_hp}
+No HP Orang Tua/Wali: ${result.data.no_hp}
+Nama Wali: ${result.data.nama_wali}
+
+Jumlah Pendaftar: ${result.data.jumlah_pendaftar}
+Kuota Tersisa: ${result.data.kuota_tersisa} dari ${result.data.kuota_max}
 
 Mohon konfirmasi pendaftaran saya. Terima kasih.`;
 
@@ -72,7 +98,14 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
             waReminderLink.href = waLink;
             waReminder.style.display = "block";
 
-            alertBox.innerHTML = `<div class="alert success">${result.message}</div>`;
+            alertBox.innerHTML = `<div class="alert success">
+                ${result.message}<br>
+                Jumlah pendaftar: ${result.data.jumlah_pendaftar}<br>
+                Kuota tersisa: ${result.data.kuota_tersisa} / ${result.data.kuota_max}
+            </div>`;
+
+            updateKuotaDisplay(result.data);
+
             modal.classList.add("active");
             form.reset();
 
