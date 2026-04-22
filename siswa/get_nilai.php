@@ -1,12 +1,17 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=utf-8');
-require_once 'config/koneksi.php';
+
+echo json_encode([
+    "session" => $_SESSION
+]);
+exit;
 
 if (!isset($_SESSION['id_siswa'])) {
     echo json_encode([
         "success" => false,
-        "message" => "Siswa belum login."
+        "message" => "Siswa belum login.",
+        "session_debug" => $_SESSION
     ]);
     exit;
 }
