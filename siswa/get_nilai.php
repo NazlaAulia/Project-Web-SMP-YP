@@ -1,15 +1,12 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=utf-8');
-require_once 'config/koneksi.php';
 
-if (!isset($_SESSION['id_siswa'])) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Siswa belum login."
-    ]);
-    exit;
-}
+echo json_encode([
+    "session" => $_SESSION,
+    "get" => $_GET
+]);
+exit;
 
 $id_siswa = (int) $_SESSION['id_siswa'];
 $kelasFilter = $_GET['kelas'] ?? '';
