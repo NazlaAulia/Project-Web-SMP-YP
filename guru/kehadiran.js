@@ -128,5 +128,17 @@ function renderSemua() {
 filterHari.addEventListener("change", renderSemua);
 filterKelas.addEventListener("change", renderSemua);
 searchInput.addEventListener("input", renderSemua);
+// Tambahkan logika persentase di dalam renderKelasCards
+const totalMhs = dataKelas.length;
+const persenHadir = totalMhs > 0 ? Math.round((hadir / totalMhs) * 100) : 0;
 
+return `
+    <div class="kelas-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Kelas ${kelas}</h3>
+            <span class="status-hadir" style="font-size:0.7rem">${persenHadir}% Hadir</span>
+        </div>
+        ...
+    </div>
+`;
 renderSemua();
