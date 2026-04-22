@@ -86,7 +86,8 @@ if (!$row) {
 
 $kelasAktif = !empty($kelasFilter) ? $kelasFilter : $row['nama_kelas'];
 
-/* data ranking siswa login */
+/* data ranking siswa login *///
+
 $sqlRankSiswa = "
     SELECT 
         p.rank,
