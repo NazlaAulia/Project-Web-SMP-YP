@@ -1,8 +1,8 @@
 <?php
 $host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "sekolah_db";
+$dbname = "osbebslk_sekolahyp";
+$dbuser = "osbebslk_aliyahzz";
+$dbpass = "semangatgaes";
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 

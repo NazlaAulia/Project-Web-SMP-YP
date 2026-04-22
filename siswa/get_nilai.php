@@ -1,16 +1,14 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=utf-8');
+require_once '../koneksi.php';
 
-require_once 'koneksi.php'; // sesuaikan path kalau beda
-
-if (!isset($_SESSION['id_siswa'])) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Session siswa tidak ditemukan. Silakan login ulang."
-    ]);
-    exit;
-}
+echo json_encode([
+    "session_id_siswa" => $_SESSION['id_siswa'] ?? null,
+    "session_nama_siswa" => $_SESSION['nama_siswa'] ?? null,
+    "session_kelas_siswa" => $_SESSION['kelas_siswa'] ?? null
+]);
+exit;
 
 function konversiSemesterKeAngka($semesterText) {
     $semesterText = trim((string)$semesterText);
