@@ -17,13 +17,28 @@ let kelasLogin = "";
 let currentPage = 1;
 const perPage = 10;
 
+function isiHeaderDariLocalStorage() {
+  const nama = localStorage.getItem("nama_siswa") || "Siswa";
+  const kelas = localStorage.getItem("kelas_siswa") || "-";
+  const avatar = nama && nama !== "-" ? nama.charAt(0).toUpperCase() : "-";
+
+  if (namaText) namaText.textContent = nama;
+  if (kelasText) kelasText.textContent = kelas;
+  if (avatarText) avatarText.textContent = avatar;
+}
+
 async function loadPeringkat() {
   try {
     const kelas = document.getElementById("kelas").value;
     const semester = document.getElementById("semester").value;
+    const idSiswa = localStorage.getItem("id_siswa") || "";
 
     const response = await fetch(
-      `get_peringkat.php?kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`
+      `get_peringkat.php?id_siswa=${encodeURIComponent(idSiswa)}&kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`,
+      {
+        method: "GET",
+        credentials: "same-origin"
+      }
     );
 
     const text = await response.text();
@@ -37,11 +52,19 @@ async function loadPeringkat() {
       return;
     }
 
-    const siswa = result.siswa;
+    const siswa = result.siswa || {};
     data = result.ranking || [];
 
     namaLogin = siswa.nama || "";
     kelasLogin = siswa.kelas || "";
+
+    if (siswa.nama) {
+      localStorage.setItem("nama_siswa", siswa.nama);
+    }
+
+    if (siswa.kelas) {
+      localStorage.setItem("kelas_siswa", siswa.kelas);
+    }
 
     if (namaText) namaText.textContent = siswa.nama || "-";
     if (kelasText) kelasText.textContent = siswa.kelas || "-";
@@ -189,6 +212,7 @@ function aktifkanFilter() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  isiHeaderDariLocalStorage();
   aktifkanFilter();
   await loadPeringkat();
 });
