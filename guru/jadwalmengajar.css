@@ -339,3 +339,35 @@ body {
         grid-template-columns: 1fr;
     }
 }
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: #fff;
+    width: 100%;
+    max-width: 520px;
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #dfe7e6;
+    margin-top: 6px;
+}
+
+.status-menunggu { background: #f5a425; color: #fff; }
+.status-diterima { background: #2e9d58; color: #fff; }
+.status-ditolak { background: #d9534f; color: #fff; }
