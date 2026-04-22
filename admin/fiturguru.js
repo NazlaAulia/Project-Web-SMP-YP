@@ -202,10 +202,14 @@ function renderGuru() {
                     : `<span class="badge badge-empty">Bukan wali</span>`}
             </td>
             <td>
-                <div class="action-buttons">
-                    <button class="btn-edit" onclick="editGuru(${guru.id_guru})">Edit</button>
-                    <button class="btn-danger" onclick="hapusGuru(${guru.id_guru}, '${escapeJs(guru.nama)}')">Hapus</button>
-                </div>
+               <div class="action-buttons">
+    <button class="btn-edit icon-btn" onclick="editGuru(${guru.id_guru})" title="Edit">
+        <i class="fas fa-pen"></i>
+    </button>
+    <button class="btn-danger icon-btn" onclick="hapusGuru(${guru.id_guru}, '${escapeJs(guru.nama)}')" title="Hapus">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
             </td>
         </tr>
     `).join("");

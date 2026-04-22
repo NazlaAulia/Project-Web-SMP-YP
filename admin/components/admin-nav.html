@@ -54,9 +54,23 @@
         </details>
 
         <!-- LOGOUT -->
-        <a href="/login.html" class="nav-item logout">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Keluar</span>
-        </a>
+       <a href="/login.html" class="nav-item logout" id="logoutBtn">
+    <i class="fas fa-sign-out-alt"></i>
+    <span>Keluar</span>
+</a>
     </nav>
 </aside>
+<div class="logout-modal-overlay" id="logoutModal">
+    <div class="logout-modal-box">
+        <div class="logout-icon">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
+        <h3>Konfirmasi Logout</h3>
+        <p>Apakah Anda yakin ingin keluar dari akun ini?</p>
+
+        <div class="logout-actions">
+            <button type="button" class="btn-cancel" id="cancelLogout">Batal</button>
+            <a href="/login.html" class="btn-confirm">Ya, Logout</a>
+        </div>
+    </div>
+</div>

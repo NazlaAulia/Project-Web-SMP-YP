@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         setActiveMenu();
         initSidebar();
+        initLogoutModal();
     } catch (err) {
         console.error("Navbar gagal dimuat:", err);
     }
@@ -50,4 +51,27 @@ function initSidebar() {
         sidebar.classList.remove("active");
         overlay.classList.remove("active");
     };
+}
+
+function initLogoutModal() {
+    const logoutBtn = document.getElementById("logoutBtn");
+    const logoutModal = document.getElementById("logoutModal");
+    const cancelLogout = document.getElementById("cancelLogout");
+
+    if (!logoutBtn || !logoutModal || !cancelLogout) return;
+
+    logoutBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        logoutModal.classList.add("active");
+    });
+
+    cancelLogout.addEventListener("click", function () {
+        logoutModal.classList.remove("active");
+    });
+
+    logoutModal.addEventListener("click", function (e) {
+        if (e.target === logoutModal) {
+            logoutModal.classList.remove("active");
+        }
+    });
 }
