@@ -2,22 +2,28 @@
 session_start();
 header('Content-Type: application/json');
 
-require_once 'config/koneksi.php';
+require_once '../koneksi.php';
 
-if (!isset($_SESSION['id_siswa'])) {
+$id_siswa = 0;
+
+if (isset($_SESSION['id_siswa']) && (int)$_SESSION['id_siswa'] > 0) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
+} elseif (isset($_GET['id_siswa']) && (int)$_GET['id_siswa'] > 0) {
+    $id_siswa = (int) $_GET['id_siswa'];
+}
+
+if ($id_siswa <= 0) {
     echo json_encode([
         "success" => false,
-        "message" => "Siswa belum login."
+        "message" => "ID siswa tidak ditemukan. Silakan login ulang."
     ]);
     exit;
 }
 
-$id_siswa = (int) $_SESSION['id_siswa'];
-
 $querySiswa = mysqli_query($conn, "
     SELECT 
         s.id_siswa,
-        s.nama_siswa,
+        s.nama,
         k.nama_kelas
     FROM siswa s
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
@@ -42,7 +48,7 @@ if (!$dataSiswa) {
     exit;
 }
 
-$namaSiswa = $dataSiswa['nama_siswa'];
+$namaSiswa = $dataSiswa['nama'];
 $namaKelas = $dataSiswa['nama_kelas'] ?? '-';
 $inisial   = strtoupper(substr($namaSiswa, 0, 1));
 
@@ -88,7 +94,7 @@ if ($rowTotal = mysqli_fetch_assoc($queryTotal)) {
 $queryUtama = mysqli_query($conn, "
     SELECT mp.nama_mapel, COUNT(*) AS total
     FROM jadwal j
-    INNER JOIN mata_pelajaran mp ON j.id_mapel = mp.id_mapel
+    INNER JOIN mapel mp ON j.id_mapel = mp.id_mapel
     INNER JOIN siswa s ON s.id_kelas = j.id_kelas
     WHERE s.id_siswa = $id_siswa
     GROUP BY mp.nama_mapel
@@ -111,19 +117,19 @@ while ($rowUtama = mysqli_fetch_assoc($queryUtama)) {
 
 $queryHariIni = mysqli_query($conn, "
     SELECT 
-        j.jam_mulai,
-        j.jam_selesai,
+        j.jam AS jam_mulai,
+        j.jam AS jam_selesai,
         mp.nama_mapel,
-        COALESCE(g.nama_guru, '-') AS nama_guru,
-        j.ruangan,
-        j.status_jadwal
+        COALESCE(g.nama, '-') AS nama_guru,
+        '-' AS ruangan,
+        'Mendatang' AS status_jadwal
     FROM jadwal j
-    INNER JOIN mata_pelajaran mp ON j.id_mapel = mp.id_mapel
+    INNER JOIN mapel mp ON j.id_mapel = mp.id_mapel
     LEFT JOIN guru g ON j.id_guru = g.id_guru
     INNER JOIN siswa s ON s.id_kelas = j.id_kelas
     WHERE s.id_siswa = $id_siswa
       AND j.hari = '$hariDb'
-    ORDER BY j.jam_mulai ASC
+    ORDER BY j.jam ASC
 ");
 
 if (!$queryHariIni) {
@@ -146,18 +152,18 @@ while ($rowHariIni = mysqli_fetch_assoc($queryHariIni)) {
 $queryJadwal = mysqli_query($conn, "
     SELECT 
         j.hari,
-        j.jam_mulai,
-        j.jam_selesai,
+        j.jam AS jam_mulai,
+        j.jam AS jam_selesai,
         mp.nama_mapel,
-        COALESCE(g.nama_guru, '-') AS nama_guru,
-        j.ruangan,
-        j.status_jadwal
+        COALESCE(g.nama, '-') AS nama_guru,
+        '-' AS ruangan,
+        'Mendatang' AS status_jadwal
     FROM jadwal j
-    INNER JOIN mata_pelajaran mp ON j.id_mapel = mp.id_mapel
+    INNER JOIN mapel mp ON j.id_mapel = mp.id_mapel
     LEFT JOIN guru g ON j.id_guru = g.id_guru
     INNER JOIN siswa s ON s.id_kelas = j.id_kelas
     WHERE s.id_siswa = $id_siswa
-    ORDER BY FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'), j.jam_mulai ASC
+    ORDER BY FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'), j.jam ASC
 ");
 
 if (!$queryJadwal) {
@@ -198,4 +204,6 @@ echo json_encode([
     "update_terbaru" => $updateTerbaru,
     "jadwal_minggu" => $jadwalMinggu
 ]);
+
+$conn->close();
 ?>
