@@ -725,3 +725,40 @@ tbody td:last-child {
   display: inline-block;
 }
 
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.hero-text {
+  flex: 1;
+}
+
+/* ===== buat logo di samping tulisan ===== */
+
+.nilai-banner-img {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nilai-banner-img img {
+  width: 180px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+ .nilai-banner-img {
+    margin-top: 16px;
+  }
+
+  .nilai-banner-img img {
+    width: 120px;
+  }
+}

@@ -1,29 +1,35 @@
 <?php
+session_start();
 header('Content-Type: application/json');
+require_once 'config/koneksi.php';
 
-$conn = new mysqli("localhost", "root", "", "smartschool");
-if ($conn->connect_error) {
+if (!isset($_SESSION['id_siswa'])) {
     echo json_encode([
         "success" => false,
-        "message" => "Koneksi database gagal"
+        "message" => "Siswa belum login."
     ]);
     exit;
 }
 
-$id_siswa = $_GET['id_siswa'] ?? '';
-$kelas = $_GET['kelas'] ?? '';
+$id_siswa = (int) $_SESSION['id_siswa'];
+$kelasFilter = $_GET['kelas'] ?? '';
 $semester = $_GET['semester'] ?? '';
 
-if (empty($id_siswa)) {
-    echo json_encode([
-        "success" => false,
-        "message" => "ID siswa tidak ditemukan"
-    ]);
-    exit;
+if (empty($semester)) {
+    $semester = "2025/2026 - Genap";
 }
 
-$stmtSiswa = $conn->prepare("SELECT id_siswa, nama_siswa, kelas FROM siswa WHERE id_siswa = ?");
-$stmtSiswa->bind_param("s", $id_siswa);
+/* ambil data siswa login */
+$stmtSiswa = $conn->prepare("
+    SELECT 
+        s.id_siswa,
+        s.nama_siswa,
+        k.nama_kelas
+    FROM siswa s
+    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
+    WHERE s.id_siswa = ?
+");
+$stmtSiswa->bind_param("i", $id_siswa);
 $stmtSiswa->execute();
 $resSiswa = $stmtSiswa->get_result();
 $siswa = $resSiswa->fetch_assoc();
@@ -31,49 +37,53 @@ $siswa = $resSiswa->fetch_assoc();
 if (!$siswa) {
     echo json_encode([
         "success" => false,
-        "message" => "Data siswa tidak ditemukan"
+        "message" => "Data siswa tidak ditemukan."
     ]);
     exit;
 }
 
-if (empty($kelas)) {
-    $kelas = $siswa['kelas'];
-}
+/* kelas aktif = dari filter kalau ada, kalau tidak pakai kelas siswa login */
+$kelasAktif = !empty($kelasFilter) ? $kelasFilter : $siswa['nama_kelas'];
 
-if (empty($semester)) {
-    $semester = "2025/2026 - Genap";
-}
-
+/* ringkasan nilai siswa login */
 $stmtRingkasan = $conn->prepare("
     SELECT 
-        AVG(nilai_angka) AS rata_rata,
-        MAX(nilai_angka) AS nilai_tertinggi
-    FROM nilai
-    WHERE id_siswa = ? AND kelas = ? AND semester = ?
+        AVG(n.nilai_angka) AS rata_rata,
+        MAX(n.nilai_angka) AS nilai_tertinggi
+    FROM nilai n
+    WHERE n.id_siswa = ? 
+      AND n.kelas = ? 
+      AND n.semester = ?
 ");
-$stmtRingkasan->bind_param("sss", $id_siswa, $kelas, $semester);
+$stmtRingkasan->bind_param("iss", $id_siswa, $kelasAktif, $semester);
 $stmtRingkasan->execute();
 $resRingkasan = $stmtRingkasan->get_result();
 $ringkasan = $resRingkasan->fetch_assoc();
 
+/* mapel tertinggi */
 $stmtTopMapel = $conn->prepare("
     SELECT mapel, guru, nilai_angka
     FROM nilai
-    WHERE id_siswa = ? AND kelas = ? AND semester = ?
+    WHERE id_siswa = ? 
+      AND kelas = ? 
+      AND semester = ?
     ORDER BY nilai_angka DESC
     LIMIT 1
 ");
-$stmtTopMapel->bind_param("sss", $id_siswa, $kelas, $semester);
+$stmtTopMapel->bind_param("iss", $id_siswa, $kelasAktif, $semester);
 $stmtTopMapel->execute();
 $resTopMapel = $stmtTopMapel->get_result();
 $topMapel = $resTopMapel->fetch_assoc();
 
+/* rata-rata semester sebelumnya */
 $stmtPrev = $conn->prepare("
     SELECT AVG(nilai_angka) AS rata_prev
     FROM nilai
-    WHERE id_siswa = ? AND kelas = ? AND semester <> ?
+    WHERE id_siswa = ? 
+      AND kelas = ? 
+      AND semester <> ?
 ");
-$stmtPrev->bind_param("sss", $id_siswa, $kelas, $semester);
+$stmtPrev->bind_param("iss", $id_siswa, $kelasAktif, $semester);
 $stmtPrev->execute();
 $resPrev = $stmtPrev->get_result();
 $prev = $resPrev->fetch_assoc();
@@ -82,6 +92,7 @@ $avgNow = floatval($ringkasan['rata_rata'] ?? 0);
 $avgPrev = floatval($prev['rata_prev'] ?? 0);
 $selisih = round($avgNow - $avgPrev, 1);
 
+/* tabel ranking berdasarkan kelas + semester */
 $stmtTable = $conn->prepare("
     SELECT 
         s.nama_siswa,
@@ -92,11 +103,12 @@ $stmtTable = $conn->prepare("
         MAX(n.status_arah) AS status_arah
     FROM nilai n
     JOIN siswa s ON s.id_siswa = n.id_siswa
-    WHERE n.kelas = ? AND n.semester = ?
+    WHERE n.kelas = ? 
+      AND n.semester = ?
     GROUP BY n.id_siswa, s.nama_siswa, n.kelas
     ORDER BY nilai_rata_rata DESC
 ");
-$stmtTable->bind_param("ss", $kelas, $semester);
+$stmtTable->bind_param("ss", $kelasAktif, $semester);
 $stmtTable->execute();
 $resTable = $stmtTable->get_result();
 
@@ -120,14 +132,14 @@ echo json_encode([
     "siswa" => [
         "id_siswa" => $siswa['id_siswa'],
         "nama" => $siswa['nama_siswa'],
-        "kelas" => $siswa['kelas']
+        "kelas" => $siswa['nama_kelas']
     ],
     "ringkasan" => [
         "rata_rata" => round($avgNow, 1),
         "selisih" => $selisih,
         "nilai_tertinggi" => round(floatval($ringkasan['nilai_tertinggi'] ?? 0), 1),
-        "mapel_tertinggi" => ($topMapel['mapel'] ?? '-') . (isset($topMapel['guru']) ? " - " . $topMapel['guru'] : ""),
-        "kelas" => $kelas
+        "mapel_tertinggi" => ($topMapel['mapel'] ?? '-') . (!empty($topMapel['guru']) ? " - " . $topMapel['guru'] : ""),
+        "kelas" => $kelasAktif
     ],
     "tabel" => $tabel
 ]);

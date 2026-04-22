@@ -24,6 +24,14 @@ $querySiswa = mysqli_query($conn, "
     WHERE s.id_siswa = $id_siswa
 ");
 
+if (!$querySiswa) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query siswa gagal: " . mysqli_error($conn)
+    ]);
+    exit;
+}
+
 $dataSiswa = mysqli_fetch_assoc($querySiswa);
 
 if (!$dataSiswa) {
@@ -35,7 +43,7 @@ if (!$dataSiswa) {
 }
 
 $namaSiswa = $dataSiswa['nama_siswa'];
-$namaKelas = $dataSiswa['nama_kelas'];
+$namaKelas = $dataSiswa['nama_kelas'] ?? '-';
 $inisial   = strtoupper(substr($namaSiswa, 0, 1));
 
 $hariIndonesia = [
@@ -64,6 +72,14 @@ $queryTotal = mysqli_query($conn, "
     WHERE s.id_siswa = $id_siswa
 ");
 
+if (!$queryTotal) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query total gagal: " . mysqli_error($conn)
+    ]);
+    exit;
+}
+
 $totalPelajaran = 0;
 if ($rowTotal = mysqli_fetch_assoc($queryTotal)) {
     $totalPelajaran = (int)$rowTotal['total_pelajaran'];
@@ -79,6 +95,14 @@ $queryUtama = mysqli_query($conn, "
     ORDER BY total DESC
     LIMIT 3
 ");
+
+if (!$queryUtama) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query mapel utama gagal: " . mysqli_error($conn)
+    ]);
+    exit;
+}
 
 $mapelUtama = [];
 while ($rowUtama = mysqli_fetch_assoc($queryUtama)) {
@@ -101,6 +125,14 @@ $queryHariIni = mysqli_query($conn, "
       AND j.hari = '$hariDb'
     ORDER BY j.jam_mulai ASC
 ");
+
+if (!$queryHariIni) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query hari ini gagal: " . mysqli_error($conn)
+    ]);
+    exit;
+}
 
 $updateTerbaru = [];
 while ($rowHariIni = mysqli_fetch_assoc($queryHariIni)) {
@@ -128,6 +160,14 @@ $queryJadwal = mysqli_query($conn, "
     ORDER BY FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'), j.jam_mulai ASC
 ");
 
+if (!$queryJadwal) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query jadwal gagal: " . mysqli_error($conn)
+    ]);
+    exit;
+}
+
 $jadwalMinggu = [];
 while ($rowJadwal = mysqli_fetch_assoc($queryJadwal)) {
     $jadwalMinggu[] = [
@@ -137,7 +177,7 @@ while ($rowJadwal = mysqli_fetch_assoc($queryJadwal)) {
         "mapel" => $rowJadwal['nama_mapel'],
         "guru" => $rowJadwal['nama_guru'],
         "ruangan" => $rowJadwal['ruangan'],
-        "status" => $rowJadwal['status_jadwal'] ?? 'Mendatang'
+        "status" => $rowJadwal['status_jadwal'] ?: 'Mendatang'
     ];
 }
 

@@ -1,32 +1,24 @@
 window.addEventListener("load", async () => {
   aktifkanFilterAnimasi();
   aktifkanExportAnimasi();
-
-  const params = new URLSearchParams(window.location.search);
-  const idSiswa = params.get("id_siswa") || localStorage.getItem("id_siswa");
-
-  if (!idSiswa) {
-    alert("Sesi login tidak ditemukan. Silakan login ulang.");
-    window.location.href = "../login.html";
-    return;
-  }
-
-  localStorage.setItem("id_siswa", idSiswa);
-
-  await loadDataNilai(idSiswa);
+  await loadDataNilai();
 });
 
 /* ===== LOAD DATA NILAI DARI MYSQL ===== */
-async function loadDataNilai(idSiswa) {
+async function loadDataNilai() {
   try {
     const kelas = document.getElementById("kelas").value;
     const semester = document.getElementById("semester").value;
 
-    const response = await fetch(
-      `get_nilai.php?id_siswa=${encodeURIComponent(idSiswa)}&kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`
-    );
+   const response = await fetch(
+  `get_nilai.php?kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`
+);
 
-    const result = await response.json();
+    const text = await response.text();
+    console.log("RAW get_nilai:", text);
+
+    const result = JSON.parse(text);
+    console.log("JSON get_nilai:", result);
 
     if (!result.success) {
       alert(result.message || "Gagal mengambil data nilai.");
@@ -38,6 +30,7 @@ async function loadDataNilai(idSiswa) {
     isiTabel(result.tabel);
 
     if (result.siswa.kelas) {
+      document.getElementById("kelas").innerHTML = `<option value="${result.siswa.kelas}">${result.siswa.kelas}</option>`;
       document.getElementById("kelas").value = result.siswa.kelas;
     }
 
@@ -86,8 +79,6 @@ function isiStatistik(ringkasan) {
 /* ===== ISI TABEL ===== */
 function isiTabel(rows) {
   const tbody = document.getElementById("nilaiTableBody");
-  const tableInfo = document.getElementById("tableInfo");
-
   tbody.innerHTML = "";
 
   if (!rows || rows.length === 0) {
@@ -96,7 +87,6 @@ function isiTabel(rows) {
         <td colspan="7" style="text-align:center;">Data nilai tidak ditemukan</td>
       </tr>
     `;
-    tableInfo.textContent = "Menampilkan 0 data";
     return;
   }
 
@@ -120,8 +110,6 @@ function isiTabel(rows) {
       </tr>
     `;
   });
-
-  tableInfo.textContent = `Menampilkan ${rows.length} data`;
 }
 
 /* ===== ANIMASI BOX ===== */
@@ -189,10 +177,7 @@ function aktifkanFilterAnimasi() {
       nilaiSection.style.transform = "scale(0.98)";
       nilaiSection.style.opacity = "0.7";
 
-      const idSiswa = localStorage.getItem("id_siswa");
-      if (idSiswa) {
-        await loadDataNilai(idSiswa);
-      }
+      await loadDataNilai();
 
       setTimeout(() => {
         nilaiSection.style.transform = "scale(1)";
