@@ -8,7 +8,7 @@ window.addEventListener("load", async () => {
 function isiHeaderDariLocalStorage() {
   const nama = localStorage.getItem("nama_siswa") || "Siswa";
   const kelas = localStorage.getItem("kelas_siswa") || "-";
-  const avatar = nama.charAt(0).toUpperCase();
+  const avatar = nama && nama !== "-" ? nama.charAt(0).toUpperCase() : "-";
 
   const namaText = document.getElementById("namaText");
   const kelasText = document.getElementById("kelasText");
@@ -47,7 +47,13 @@ async function loadDataNilai() {
     isiStatistik(result.ringkasan);
     isiTabel(result.tabel);
 
-    if (result.siswa.kelas) {
+    if (result.siswa && result.siswa.nama) {
+      localStorage.setItem("nama_siswa", result.siswa.nama);
+    }
+
+    if (result.siswa && result.siswa.kelas) {
+      localStorage.setItem("kelas_siswa", result.siswa.kelas);
+
       document.getElementById("kelas").innerHTML =
         `<option value="${result.siswa.kelas}">${result.siswa.kelas}</option>`;
       document.getElementById("kelas").value = result.siswa.kelas;
@@ -67,7 +73,7 @@ function isiHeader(siswa) {
 
   const nama = siswa.nama || "-";
   const kelas = siswa.kelas || "-";
-  const avatar = siswa.inisial || nama.charAt(0).toUpperCase() || "S";
+  const avatar = siswa.inisial || (nama ? nama.charAt(0).toUpperCase() : "S");
 
   const namaText = document.getElementById("namaText");
   const kelasText = document.getElementById("kelasText");
