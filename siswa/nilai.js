@@ -4,14 +4,17 @@ window.addEventListener("load", async () => {
   await loadDataNilai();
 });
 
-/* ===== LOAD DATA NILAI DARI MYSQL ===== */
 async function loadDataNilai() {
   try {
     const kelas = document.getElementById("kelas").value;
     const semester = document.getElementById("semester").value;
 
     const response = await fetch(
-      `get_nilai.php?kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`
+      `get_nilai.php?kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`,
+      {
+        method: "GET",
+        credentials: "same-origin"
+      }
     );
 
     const text = await response.text();
@@ -21,7 +24,6 @@ async function loadDataNilai() {
     console.log("JSON get_nilai:", result);
 
     if (!result.success) {
-      console.error(result.message || "Gagal mengambil data nilai.");
       alert(result.message || "Gagal mengambil data nilai.");
       return;
     }
@@ -45,7 +47,6 @@ async function loadDataNilai() {
   }
 }
 
-/* ===== ISI HEADER SISWA ===== */
 function isiHeader(siswa) {
   if (!siswa) return;
 
@@ -62,7 +63,6 @@ function isiHeader(siswa) {
   if (avatarText) avatarText.textContent = avatar;
 }
 
-/* ===== ISI BOX STATISTIK ===== */
 function isiStatistik(ringkasan) {
   const rataRata = parseFloat(ringkasan.rata_rata || 0);
   const selisih = parseFloat(ringkasan.selisih || 0);
@@ -84,7 +84,6 @@ function isiStatistik(ringkasan) {
   document.getElementById("mapelTertinggiText").textContent = ringkasan.mapel_tertinggi || "-";
 }
 
-/* ===== ISI TABEL ===== */
 function isiTabel(rows) {
   const tbody = document.getElementById("nilaiTableBody");
   tbody.innerHTML = "";
@@ -120,7 +119,6 @@ function isiTabel(rows) {
   });
 }
 
-/* ===== ANIMASI BOX ===== */
 function tampilkanBox() {
   const boxes = document.querySelectorAll(".stat-box");
 
@@ -134,7 +132,6 @@ function tampilkanBox() {
   });
 }
 
-/* ===== ANIMASI BARIS TABEL ===== */
 function tampilkanRow() {
   const rows = document.querySelectorAll("#nilaiTableBody tr");
 
@@ -148,7 +145,6 @@ function tampilkanRow() {
   });
 }
 
-/* ===== COUNTER ANGKA ===== */
 function jalankanCounter() {
   const counters = document.querySelectorAll(".counter");
 
@@ -173,7 +169,6 @@ function jalankanCounter() {
   });
 }
 
-/* ===== ANIMASI FILTER + RELOAD DATA ===== */
 function aktifkanFilterAnimasi() {
   const kelas = document.getElementById("kelas");
   const semester = document.getElementById("semester");
@@ -195,7 +190,6 @@ function aktifkanFilterAnimasi() {
   });
 }
 
-/* ===== ANIMASI TOMBOL EXPORT ===== */
 function aktifkanExportAnimasi() {
   const exportBtn = document.getElementById("exportBtn");
 
