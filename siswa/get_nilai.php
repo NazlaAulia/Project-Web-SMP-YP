@@ -1,17 +1,12 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=utf-8');
-
-echo json_encode([
-    "session" => $_SESSION
-]);
-exit;
+require_once 'config/koneksi.php';
 
 if (!isset($_SESSION['id_siswa'])) {
     echo json_encode([
         "success" => false,
-        "message" => "Siswa belum login.",
-        "session_debug" => $_SESSION
+        "message" => "Siswa belum login."
     ]);
     exit;
 }
@@ -24,7 +19,6 @@ if (empty($semester)) {
     $semester = "2025/2026 - Genap";
 }
 
-/* ambil data siswa login */
 $stmtSiswa = $conn->prepare("
     SELECT 
         s.id_siswa,
@@ -33,6 +27,7 @@ $stmtSiswa = $conn->prepare("
     FROM siswa s
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
     WHERE s.id_siswa = ?
+    LIMIT 1
 ");
 
 if (!$stmtSiswa) {
@@ -56,9 +51,8 @@ if (!$siswa) {
     exit;
 }
 
-$kelasAktif = !empty($kelasFilter) ? $kelasFilter : $siswa['nama_kelas'];
+$kelasAktif = !empty($kelasFilter) ? $kelasFilter : ($siswa['nama_kelas'] ?? '-');
 
-/* ringkasan nilai siswa login */
 $stmtRingkasan = $conn->prepare("
     SELECT 
         AVG(n.nilai_angka) AS rata_rata,
@@ -82,7 +76,6 @@ $stmtRingkasan->execute();
 $resRingkasan = $stmtRingkasan->get_result();
 $ringkasan = $resRingkasan->fetch_assoc();
 
-/* mapel tertinggi */
 $stmtTopMapel = $conn->prepare("
     SELECT mapel, guru, nilai_angka
     FROM nilai
@@ -106,7 +99,6 @@ $stmtTopMapel->execute();
 $resTopMapel = $stmtTopMapel->get_result();
 $topMapel = $resTopMapel->fetch_assoc();
 
-/* rata-rata semester sebelumnya */
 $stmtPrev = $conn->prepare("
     SELECT AVG(nilai_angka) AS rata_prev
     FROM nilai
@@ -132,7 +124,6 @@ $avgNow = floatval($ringkasan['rata_rata'] ?? 0);
 $avgPrev = floatval($prev['rata_prev'] ?? 0);
 $selisih = round($avgNow - $avgPrev, 1);
 
-/* tabel ranking berdasarkan kelas + semester */
 $stmtTable = $conn->prepare("
     SELECT 
         s.nama_siswa,
