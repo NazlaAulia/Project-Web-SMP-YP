@@ -16,7 +16,12 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadJadwal() {
   try {
     const response = await fetch("get_jadwal.php");
-    const result = await response.json();
+    const text = await response.text();
+
+    console.log("RAW RESPONSE:", text);
+
+    const result = JSON.parse(text);
+    console.log("JSON RESULT:", result);
 
     if (!result.success) {
       renderError(result.message || "Gagal memuat data.");
@@ -29,7 +34,7 @@ async function loadJadwal() {
     renderTabel(result.jadwal_minggu, result.siswa.kelas);
   } catch (error) {
     renderError("Terjadi kesalahan saat mengambil data jadwal.");
-    console.error(error);
+    console.error("ERROR FETCH / JSON:", error);
   }
 }
 
@@ -37,8 +42,11 @@ function renderProfil(siswa) {
   document.getElementById("kelasBadge").textContent = siswa.kelas || "-";
   document.getElementById("profileName").textContent = siswa.nama || "-";
   document.getElementById("profileAvatar").textContent = siswa.inisial || "S";
-  document.getElementById("semesterText").textContent =
-    `Sesuai dengan Kelas ${siswa.kelas}, Semester Ini`;
+
+  const semesterText = document.getElementById("semesterText");
+  if (semesterText) {
+    semesterText.textContent = `Sesuai dengan Kelas ${siswa.kelas}, Semester Ini`;
+  }
 
   document.getElementById("kelasSelect").innerHTML =
     `<option>${siswa.kelas || "-"}</option>`;

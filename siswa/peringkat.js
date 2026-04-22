@@ -17,50 +17,20 @@ let kelasLogin = "";
 let currentPage = 1;
 const perPage = 10;
 
-function getIdSiswa() {
-  const params = new URLSearchParams(window.location.search);
-  const idFromUrl = params.get("id_siswa");
-
-  if (idFromUrl) {
-    localStorage.setItem("id_siswa", idFromUrl);
-    return idFromUrl;
-  }
-
-  return localStorage.getItem("id_siswa");
-}
-
-function updateSidebarLinks(idSiswa) {
-  if (!idSiswa) return;
-
-  const sidebarLinks = document.querySelectorAll(".sidebar-menu a");
-
-  sidebarLinks.forEach((link) => {
-    const href = link.getAttribute("href");
-    if (!href || href.startsWith("http") || href.startsWith("#")) return;
-
-    const baseUrl = href.split("?")[0];
-    link.setAttribute("href", `${baseUrl}?id_siswa=${idSiswa}`);
-  });
-}
-
 async function loadPeringkat() {
   try {
-    const idSiswa = getIdSiswa();
-    console.log("id_siswa =", idSiswa);
+    const kelas = document.getElementById("kelas").value;
+    const semester = document.getElementById("semester").value;
 
-    if (!idSiswa) {
-      alert("id_siswa tidak ditemukan. Silakan login ulang.");
-      return;
-    }
+    const response = await fetch(
+      `get_peringkat.php?kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`
+    );
 
-    updateSidebarLinks(idSiswa);
+    const text = await response.text();
+    console.log("RAW get_peringkat:", text);
 
-    const response = await fetch(`get_peringkat.php?id_siswa=${idSiswa}`, {
-      method: "GET"
-    });
-
-    const result = await response.json();
-    console.log("HASIL get_peringkat.php =", result);
+    const result = JSON.parse(text);
+    console.log("JSON get_peringkat:", result);
 
     if (!result.success) {
       alert(result.message || "Gagal mengambil data peringkat");
@@ -70,27 +40,30 @@ async function loadPeringkat() {
     const siswa = result.siswa;
     data = result.ranking || [];
 
-    namaLogin = siswa.nama;
-    kelasLogin = siswa.kelas;
+    namaLogin = siswa.nama || "";
+    kelasLogin = siswa.kelas || "";
 
-    console.log("Nama dari PHP =", namaLogin);
-    console.log("Kelas dari PHP =", kelasLogin);
+    if (namaText) namaText.textContent = siswa.nama || "-";
+    if (kelasText) kelasText.textContent = siswa.kelas || "-";
+    if (avatarText) avatarText.textContent = (siswa.nama || "S").charAt(0).toUpperCase();
 
-    if (namaText) namaText.textContent = siswa.nama;
-    if (kelasText) kelasText.textContent = siswa.kelas;
-    if (avatarText) avatarText.textContent = siswa.nama.charAt(0).toUpperCase();
+    if (peringkatSaatIni) peringkatSaatIni.textContent = `#${siswa.rank || 0}`;
+    if (kelasCard) kelasCard.textContent = `Kelas ${siswa.kelas || "-"}`;
+    if (nilaiRataRata) nilaiRataRata.textContent = siswa.nilai || 0;
 
-    if (peringkatSaatIni) peringkatSaatIni.textContent = `#${siswa.rank}`;
-    if (kelasCard) kelasCard.textContent = `Kelas ${siswa.kelas}`;
-    if (nilaiRataRata) nilaiRataRata.textContent = siswa.nilai;
     if (posisiSebelumnya) {
       const arrow = getStatusArrow(siswa.status);
-      posisiSebelumnya.textContent = `#${siswa.posisi_sebelumnya} ${arrow}`;
+      posisiSebelumnya.textContent = `#${siswa.posisi_sebelumnya || 0} ${arrow}`;
     }
 
+    if (siswa.kelas) {
+      document.getElementById("kelas").innerHTML = `<option value="${siswa.kelas}">${siswa.kelas}</option>`;
+      document.getElementById("kelas").value = siswa.kelas;
+    }
+
+    currentPage = 1;
     renderPagination();
     renderTable();
-    renderPodium();
   } catch (error) {
     console.error("Error:", error);
     alert("Terjadi kesalahan saat mengambil data dari server");
@@ -113,6 +86,18 @@ function renderTable() {
   const start = (currentPage - 1) * perPage;
   const end = start + perPage;
   const pageData = data.slice(start, end);
+
+  if (pageData.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center;">Data peringkat tidak ditemukan</td>
+      </tr>
+    `;
+    if (tableInfo) {
+      tableInfo.textContent = "Menampilkan 0-0 dari 0 siswa";
+    }
+    return;
+  }
 
   pageData.forEach((item) => {
     const row = document.createElement("tr");
@@ -164,6 +149,7 @@ function renderPagination() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.textContent = i;
+
     if (i === currentPage) {
       btn.classList.add("active-page");
     }
@@ -191,40 +177,18 @@ function renderPagination() {
   paginationWrap.appendChild(nextBtn);
 }
 
-function renderPodium() {
-  const podiumList = document.querySelector(".podium-list");
-  if (!podiumList) return;
+function aktifkanFilter() {
+  const kelas = document.getElementById("kelas");
+  const semester = document.getElementById("semester");
 
-  const top3 = [...data].sort((a, b) => a.rank - b.rank).slice(0, 3);
-
-  const medalClass = {
-    1: "gold",
-    2: "silver",
-    3: "bronze"
-  };
-
-  const medalText = {
-    1: "Medali Emas",
-    2: "Medali Perak",
-    3: "Medali Perunggu"
-  };
-
-  podiumList.innerHTML = "";
-
-  top3.forEach((item) => {
-    const div = document.createElement("div");
-    div.className = "podium-item";
-
-    div.innerHTML = `
-      <div class="podium-rank ${medalClass[item.rank] || ""}">${item.rank}</div>
-      <div>
-        <strong>${item.nama}</strong><br>
-        <span>${item.nilai} - ${medalText[item.rank] || "Peserta Terbaik"}</span>
-      </div>
-    `;
-
-    podiumList.appendChild(div);
+  [kelas, semester].forEach((select) => {
+    select.addEventListener("change", async () => {
+      await loadPeringkat();
+    });
   });
 }
 
-document.addEventListener("DOMContentLoaded", loadPeringkat);
+document.addEventListener("DOMContentLoaded", async () => {
+  aktifkanFilter();
+  await loadPeringkat();
+});

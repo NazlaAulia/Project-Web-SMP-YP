@@ -138,19 +138,5 @@
 </div>
 
 <script src="peringkat.js"></script>
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const idSiswa = params.get("id_siswa") || localStorage.getItem("id_siswa");
-
-  if (idSiswa) {
-    localStorage.setItem("id_siswa", idSiswa);
-
-    document.querySelectorAll(".sidebar-menu a").forEach(link => {
-      const url = new URL(link.getAttribute("href"), window.location.href);
-      url.searchParams.set("id_siswa", idSiswa);
-      link.setAttribute("href", url.pathname.split("/").pop() + "?id_siswa=" + idSiswa);
-    });
-  }
-</script>
 </body>
 </html>
