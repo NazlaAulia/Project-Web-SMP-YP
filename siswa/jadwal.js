@@ -10,12 +10,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  isiHeaderDariLocalStorage();
   loadJadwal();
 });
 
+function isiHeaderDariLocalStorage() {
+  const nama = localStorage.getItem("nama_siswa") || "Siswa";
+  const kelas = localStorage.getItem("kelas_siswa") || "-";
+  const avatar = nama && nama !== "-" ? nama.charAt(0).toUpperCase() : "-";
+
+  const kelasBadge = document.getElementById("kelasBadge");
+  const profileName = document.getElementById("profileName");
+  const profileAvatar = document.getElementById("profileAvatar");
+
+  if (kelasBadge) kelasBadge.textContent = kelas;
+  if (profileName) profileName.textContent = nama;
+  if (profileAvatar) profileAvatar.textContent = avatar;
+}
+
 async function loadJadwal() {
   try {
-    const response = await fetch("get_jadwal.php");
+    const idSiswa = localStorage.getItem("id_siswa") || "";
+
+    const response = await fetch(`get_jadwal.php?id_siswa=${encodeURIComponent(idSiswa)}`, {
+      method: "GET",
+      credentials: "same-origin"
+    });
+
     const text = await response.text();
 
     console.log("RAW RESPONSE:", text);
@@ -26,6 +47,14 @@ async function loadJadwal() {
     if (!result.success) {
       renderError(result.message || "Gagal memuat data.");
       return;
+    }
+
+    if (result.siswa && result.siswa.nama) {
+      localStorage.setItem("nama_siswa", result.siswa.nama);
+    }
+
+    if (result.siswa && result.siswa.kelas) {
+      localStorage.setItem("kelas_siswa", result.siswa.kelas);
     }
 
     renderProfil(result.siswa);
