@@ -1,6 +1,6 @@
 <?php
 session_start();
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 require_once 'config/koneksi.php';
 
 if (!isset($_SESSION['id_siswa'])) {
@@ -29,6 +29,15 @@ $stmtSiswa = $conn->prepare("
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
     WHERE s.id_siswa = ?
 ");
+
+if (!$stmtSiswa) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query siswa gagal: " . $conn->error
+    ]);
+    exit;
+}
+
 $stmtSiswa->bind_param("i", $id_siswa);
 $stmtSiswa->execute();
 $resSiswa = $stmtSiswa->get_result();
@@ -42,7 +51,6 @@ if (!$siswa) {
     exit;
 }
 
-/* kelas aktif = dari filter kalau ada, kalau tidak pakai kelas siswa login */
 $kelasAktif = !empty($kelasFilter) ? $kelasFilter : $siswa['nama_kelas'];
 
 /* ringkasan nilai siswa login */
@@ -55,6 +63,15 @@ $stmtRingkasan = $conn->prepare("
       AND n.kelas = ? 
       AND n.semester = ?
 ");
+
+if (!$stmtRingkasan) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query ringkasan gagal: " . $conn->error
+    ]);
+    exit;
+}
+
 $stmtRingkasan->bind_param("iss", $id_siswa, $kelasAktif, $semester);
 $stmtRingkasan->execute();
 $resRingkasan = $stmtRingkasan->get_result();
@@ -70,6 +87,15 @@ $stmtTopMapel = $conn->prepare("
     ORDER BY nilai_angka DESC
     LIMIT 1
 ");
+
+if (!$stmtTopMapel) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query mapel tertinggi gagal: " . $conn->error
+    ]);
+    exit;
+}
+
 $stmtTopMapel->bind_param("iss", $id_siswa, $kelasAktif, $semester);
 $stmtTopMapel->execute();
 $resTopMapel = $stmtTopMapel->get_result();
@@ -83,6 +109,15 @@ $stmtPrev = $conn->prepare("
       AND kelas = ? 
       AND semester <> ?
 ");
+
+if (!$stmtPrev) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query semester sebelumnya gagal: " . $conn->error
+    ]);
+    exit;
+}
+
 $stmtPrev->bind_param("iss", $id_siswa, $kelasAktif, $semester);
 $stmtPrev->execute();
 $resPrev = $stmtPrev->get_result();
@@ -108,6 +143,15 @@ $stmtTable = $conn->prepare("
     GROUP BY n.id_siswa, s.nama_siswa, n.kelas
     ORDER BY nilai_rata_rata DESC
 ");
+
+if (!$stmtTable) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Query tabel nilai gagal: " . $conn->error
+    ]);
+    exit;
+}
+
 $stmtTable->bind_param("ss", $kelasAktif, $semester);
 $stmtTable->execute();
 $resTable = $stmtTable->get_result();
@@ -132,7 +176,8 @@ echo json_encode([
     "siswa" => [
         "id_siswa" => $siswa['id_siswa'],
         "nama" => $siswa['nama_siswa'],
-        "kelas" => $siswa['nama_kelas']
+        "kelas" => $siswa['nama_kelas'],
+        "inisial" => strtoupper(substr($siswa['nama_siswa'], 0, 1))
     ],
     "ringkasan" => [
         "rata_rata" => round($avgNow, 1),

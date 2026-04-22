@@ -10,9 +10,9 @@ async function loadDataNilai() {
     const kelas = document.getElementById("kelas").value;
     const semester = document.getElementById("semester").value;
 
-   const response = await fetch(
-  `get_nilai.php?kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`
-);
+    const response = await fetch(
+      `get_nilai.php?kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`
+    );
 
     const text = await response.text();
     console.log("RAW get_nilai:", text);
@@ -21,6 +21,7 @@ async function loadDataNilai() {
     console.log("JSON get_nilai:", result);
 
     if (!result.success) {
+      console.error(result.message || "Gagal mengambil data nilai.");
       alert(result.message || "Gagal mengambil data nilai.");
       return;
     }
@@ -30,7 +31,8 @@ async function loadDataNilai() {
     isiTabel(result.tabel);
 
     if (result.siswa.kelas) {
-      document.getElementById("kelas").innerHTML = `<option value="${result.siswa.kelas}">${result.siswa.kelas}</option>`;
+      document.getElementById("kelas").innerHTML =
+        `<option value="${result.siswa.kelas}">${result.siswa.kelas}</option>`;
       document.getElementById("kelas").value = result.siswa.kelas;
     }
 
@@ -45,13 +47,19 @@ async function loadDataNilai() {
 
 /* ===== ISI HEADER SISWA ===== */
 function isiHeader(siswa) {
+  if (!siswa) return;
+
   const nama = siswa.nama || "-";
   const kelas = siswa.kelas || "-";
-  const avatar = nama.charAt(0).toUpperCase();
+  const avatar = siswa.inisial || nama.charAt(0).toUpperCase() || "S";
 
-  document.getElementById("namaText").textContent = nama;
-  document.getElementById("kelasText").textContent = kelas;
-  document.getElementById("avatarText").textContent = avatar;
+  const namaText = document.getElementById("namaText");
+  const kelasText = document.getElementById("kelasText");
+  const avatarText = document.getElementById("avatarText");
+
+  if (namaText) namaText.textContent = nama;
+  if (kelasText) kelasText.textContent = kelas;
+  if (avatarText) avatarText.textContent = avatar;
 }
 
 /* ===== ISI BOX STATISTIK ===== */
