@@ -39,6 +39,7 @@ $sql = "
         g.nip,
         g.nama,
         g.email,
+        g.id_mapel,
         u.username,
         m.nama_mapel,
         k.nama_kelas AS wali_kelas
