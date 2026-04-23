@@ -86,15 +86,7 @@ function setProfileUI(data) {
 async function loadProfilSiswa() {
   try {
     const response = await fetch(`get-profil-siswa.php?id_siswa=${encodeURIComponent(idSiswa)}`);
-    const text = await response.text();
-    console.log("RESPON get-profil-siswa.php:", text);
-
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch (e) {
-      throw new Error(text);
-    }
+    const result = await response.json();
 
     if (!result.success) {
       alert(result.message || "Data siswa tidak ditemukan.");
@@ -149,20 +141,20 @@ async function pilihDanUploadFoto(event) {
     formData.append("foto", file);
     formData.append("id_siswa", idSiswa);
 
-    const response = await fetch("upload-foto-profil.php", {
-      method: "POST",
-      body: formData
-    });
+   const response = await fetch("upload-foto-profil.php", {
+  method: "POST",
+  body: formData
+});
 
-    const text = await response.text();
-    console.log("RESPON upload-foto-profil.php:", text);
+const text = await response.text();
+console.log("RESPON upload-foto-profil.php:", text);
 
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch (e) {
-      throw new Error(text);
-    }
+let result;
+try {
+  result = JSON.parse(text);
+} catch (e) {
+  throw new Error(text);
+}
 
     if (!result.success) {
       throw new Error(result.message || "Upload gagal.");
