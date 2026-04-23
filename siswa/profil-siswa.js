@@ -1,12 +1,3 @@
-import { db } from "./firebase-config.js";
-import {
-  doc,
-  getDoc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-import { supabase } from "./supabase-config.js";
-
 const idSiswa = localStorage.getItem("id_siswa");
 
 if (!idSiswa) {
@@ -94,19 +85,20 @@ function setProfileUI(data) {
 
 async function loadProfilSiswa() {
   try {
-    const siswaRef = doc(db, "siswa", String(idSiswa));
-    const siswaSnap = await getDoc(siswaRef);
+    const response = await fetch(`get-profil-siswa.php?id_siswa=${encodeURIComponent(idSiswa)}`);
+    const result = await response.json();
 
-    if (!siswaSnap.exists()) {
-      alert("Data siswa tidak ditemukan.");
+    if (!result.success) {
+      alert(result.message || "Data siswa tidak ditemukan.");
       return;
     }
 
-    const siswaData = siswaSnap.data();
+    const siswaData = result.data;
     setProfileUI(siswaData);
 
     if (siswaData?.foto_profil) {
-      setImage(elFoto, siswaData.foto_profil);
+      const fotoUrl = siswaData.foto_profil + "?t=" + Date.now();
+      setImage(elFoto, fotoUrl);
       localStorage.setItem(FOTO_KEY, siswaData.foto_profil);
     } else {
       const fotoLocal = localStorage.getItem(FOTO_KEY);
@@ -145,45 +137,25 @@ async function pilihDanUploadFoto(event) {
       elBtnPilihFoto.textContent = "Menyimpan...";
     }
 
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    const user = userData?.user;
+    const formData = new FormData();
+    formData.append("foto", file);
+    formData.append("id_siswa", idSiswa);
 
-    if (userError || !user) {
-      throw new Error("Supabase Auth tidak mendeteksi login. Silakan login ulang.");
-    }
-
-    const fileExt = (file.name.split(".").pop() || "jpg").toLowerCase();
-    const fileName = `foto-${Date.now()}.${fileExt}`;
-    const filePath = `${user.id}/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("foto-profil")
-      .upload(filePath, file, {
-        upsert: true,
-        cacheControl: "3600"
-      });
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data: publicData } = supabase.storage
-      .from("foto-profil")
-      .getPublicUrl(filePath);
-
-    const publicUrl = publicData?.publicUrl;
-    if (!publicUrl) {
-      throw new Error("Gagal mendapatkan URL foto profil.");
-    }
-
-    localStorage.setItem(FOTO_KEY, publicUrl);
-
-    const siswaRef = doc(db, "siswa", String(idSiswa));
-    await updateDoc(siswaRef, {
-      foto_profil: publicUrl
+    const response = await fetch("upload-foto-profil.php", {
+      method: "POST",
+      body: formData
     });
 
-    setImage(elFoto, publicUrl);
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.message || "Upload gagal.");
+    }
+
+    const fotoBaru = result.foto_url;
+    localStorage.setItem(FOTO_KEY, fotoBaru);
+
+    setImage(elFoto, fotoBaru + "?t=" + Date.now());
     showToast("Foto profil berhasil disimpan.", "success");
   } catch (error) {
     console.error("Gagal upload:", error);
