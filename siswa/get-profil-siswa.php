@@ -12,8 +12,8 @@ if ($id_siswa <= 0) {
     exit;
 }
 
-$query = "SELECT nama, nisn, kelas, email, no_hp, alamat, jenis_kelamin, tanggal_lahir, foto_profil 
-          FROM siswa 
+$query = "SELECT nama, nisn, kelas, email, no_hp, alamat, jenis_kelamin, tanggal_lahir, foto_profil
+          FROM siswa
           WHERE id = $id_siswa
           LIMIT 1";
 

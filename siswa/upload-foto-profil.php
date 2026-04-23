@@ -25,12 +25,13 @@ $file = $_FILES['foto'];
 if ($file['error'] !== 0) {
     echo json_encode([
         "success" => false,
-        "message" => "Upload file gagal."
+        "message" => "Upload file gagal. Kode error: " . $file['error']
     ]);
     exit;
 }
 
 $allowedExt = ['jpg', 'jpeg', 'png', 'webp'];
+$allowedMime = ['image/jpeg', 'image/png', 'image/webp'];
 $maxSize = 2 * 1024 * 1024;
 
 $namaFile = $file['name'];
@@ -55,6 +56,15 @@ if ($fileSize > $maxSize) {
     exit;
 }
 
+$mime = mime_content_type($tmpFile);
+if (!in_array($mime, $allowedMime)) {
+    echo json_encode([
+        "success" => false,
+        "message" => "File bukan gambar yang valid."
+    ]);
+    exit;
+}
+
 $folderUpload = "uploads/profile/";
 if (!is_dir($folderUpload)) {
     mkdir($folderUpload, 0777, true);
@@ -62,6 +72,15 @@ if (!is_dir($folderUpload)) {
 
 $queryOld = "SELECT foto_profil FROM siswa WHERE id = $id_siswa LIMIT 1";
 $resultOld = mysqli_query($conn, $queryOld);
+
+if (!$resultOld) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Gagal mengambil foto lama: " . mysqli_error($conn)
+    ]);
+    exit;
+}
+
 $dataOld = mysqli_fetch_assoc($resultOld);
 $fotoLama = $dataOld['foto_profil'] ?? null;
 
@@ -71,12 +90,13 @@ $pathSimpan = $folderUpload . $namaBaru;
 if (!move_uploaded_file($tmpFile, $pathSimpan)) {
     echo json_encode([
         "success" => false,
-        "message" => "Gagal menyimpan file."
+        "message" => "Gagal menyimpan file ke folder upload."
     ]);
     exit;
 }
 
-$queryUpdate = "UPDATE siswa SET foto_profil = '$pathSimpan' WHERE id = $id_siswa";
+$pathDb = mysqli_real_escape_string($conn, $pathSimpan);
+$queryUpdate = "UPDATE siswa SET foto_profil = '$pathDb' WHERE id = $id_siswa";
 
 if (mysqli_query($conn, $queryUpdate)) {
     if (!empty($fotoLama) && file_exists($fotoLama)) {
@@ -89,6 +109,10 @@ if (mysqli_query($conn, $queryUpdate)) {
         "foto_url" => $pathSimpan
     ]);
 } else {
+    if (file_exists($pathSimpan)) {
+        @unlink($pathSimpan);
+    }
+
     echo json_encode([
         "success" => false,
         "message" => "Gagal update database: " . mysqli_error($conn)
