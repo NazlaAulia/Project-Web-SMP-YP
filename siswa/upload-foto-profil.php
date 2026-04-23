@@ -70,7 +70,7 @@ if (!is_dir($folderUpload)) {
     mkdir($folderUpload, 0777, true);
 }
 
-$queryOld = "SELECT foto_profil FROM siswa WHERE id = $id_siswa LIMIT 1";
+$queryOld = "SELECT foto_profil FROM user WHERE id_siswa = $id_siswa LIMIT 1";
 $resultOld = mysqli_query($conn, $queryOld);
 
 if (!$resultOld) {
@@ -96,7 +96,35 @@ if (!move_uploaded_file($tmpFile, $pathSimpan)) {
 }
 
 $pathDb = mysqli_real_escape_string($conn, $pathSimpan);
-$queryUpdate = "UPDATE siswa SET foto_profil = '$pathDb' WHERE id = $id_siswa";
+
+$queryCekUser = "SELECT id_user FROM user WHERE id_siswa = $id_siswa LIMIT 1";
+$resultCekUser = mysqli_query($conn, $queryCekUser);
+
+if (!$resultCekUser) {
+    if (file_exists($pathSimpan)) {
+        @unlink($pathSimpan);
+    }
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Gagal mengecek user: " . mysqli_error($conn)
+    ]);
+    exit;
+}
+
+if (mysqli_num_rows($resultCekUser) > 0) {
+    $queryUpdate = "UPDATE user SET foto_profil = '$pathDb' WHERE id_siswa = $id_siswa";
+} else {
+    if (file_exists($pathSimpan)) {
+        @unlink($pathSimpan);
+    }
+
+    echo json_encode([
+        "success" => false,
+        "message" => "User untuk siswa ini tidak ditemukan."
+    ]);
+    exit;
+}
 
 if (mysqli_query($conn, $queryUpdate)) {
     if (!empty($fotoLama) && file_exists($fotoLama)) {

@@ -12,10 +12,26 @@ if ($id_siswa <= 0) {
     exit;
 }
 
-$query = "SELECT nama, nisn, kelas, email, no_hp, alamat, jenis_kelamin, tanggal_lahir, foto_profil
-          FROM siswa
-          WHERE id = $id_siswa
-          LIMIT 1";
+$query = "
+    SELECT 
+        s.nama,
+        s.nis,
+        s.nisn,
+        s.jenis_kelamin,
+        s.tanggal_lahir,
+        s.alamat,
+        s.id_kelas,
+        k.nama_kelas AS kelas,
+        p.email,
+        p.no_hp,
+        u.foto_profil
+    FROM siswa s
+    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
+    LEFT JOIN pendaftaran p ON s.id_pendaftaran = p.id_pendaftaran
+    LEFT JOIN user u ON s.id_siswa = u.id_siswa
+    WHERE s.id_siswa = $id_siswa
+    LIMIT 1
+";
 
 $result = mysqli_query($conn, $query);
 
