@@ -637,3 +637,31 @@ td:nth-child(11) {
         display: none;
     }
 }
+
+/* SEARCH RESULT EMPTY */
+.no-search-result {
+    margin-top: 18px;
+    padding: 18px;
+    text-align: center;
+    background: var(--bg-light);
+    color: var(--muted);
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* SEARCH MOBILE */
+@media (max-width: 768px) {
+    .header-actions {
+        width: 100%;
+    }
+
+    .search-container-elegant {
+        width: 100%;
+    }
+
+    .no-search-result {
+        font-size: 13px;
+        padding: 15px;
+    }
+}
