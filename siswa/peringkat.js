@@ -7,14 +7,9 @@ const peringkatSaatIni = document.getElementById("peringkatSaatIni");
 const kelasCard = document.getElementById("kelasCard");
 const nilaiRataRata = document.getElementById("nilaiRataRata");
 
-const tableInfo = document.querySelector(".table-info");
-const paginationWrap = document.querySelector(".pagination");
-
 let data = [];
 let namaLogin = "";
-let kelasLogin = "";
-let currentPage = 1;
-const perPage = 10;
+let idLogin = "";
 
 function isiHeaderDariLocalStorage() {
   const nama = localStorage.getItem("nama_siswa") || "Siswa";
@@ -28,8 +23,8 @@ function isiHeaderDariLocalStorage() {
 
 async function loadPeringkat() {
   try {
-const kelas = localStorage.getItem("kelas_siswa") || "";
-const semester = document.getElementById("semester").value;
+    const kelas = localStorage.getItem("kelas_siswa") || "";
+    const semester = document.getElementById("semester").value;
     const idSiswa = localStorage.getItem("id_siswa") || "";
 
     const response = await fetch(
@@ -55,7 +50,7 @@ const semester = document.getElementById("semester").value;
     data = result.ranking || [];
 
     namaLogin = siswa.nama || "";
-    kelasLogin = siswa.kelas || "";
+    idLogin = String(siswa.id_siswa || "");
 
     if (siswa.nama) {
       localStorage.setItem("nama_siswa", siswa.nama);
@@ -69,12 +64,10 @@ const semester = document.getElementById("semester").value;
     if (kelasText) kelasText.textContent = siswa.kelas || "-";
     if (avatarText) avatarText.textContent = (siswa.nama || "S").charAt(0).toUpperCase();
 
-    if (peringkatSaatIni) peringkatSaatIni.textContent = `#${siswa.rank || 0}`;
+    if (peringkatSaatIni) peringkatSaatIni.textContent = siswa.rank ? `#${siswa.rank}` : "#-";
     if (kelasCard) kelasCard.textContent = `Kelas ${siswa.kelas || "-"}`;
-    if (nilaiRataRata) nilaiRataRata.textContent = siswa.nilai || 0;
+    if (nilaiRataRata) nilaiRataRata.textContent = siswa.nilai || "-";
 
-    currentPage = 1;
-    renderPagination();
     renderTable();
   } catch (error) {
     console.error("Error:", error);
@@ -86,7 +79,7 @@ function getStatusArrow(status) {
   if (status === "naik") return "↑";
   if (status === "turun") return "↓";
   if (status === "tetap") return "↔";
-  if (status === "↑" || status === "↓" || status === "↔") return status;
+  if (status === "-") return "-";
   return "↔";
 }
 
@@ -95,25 +88,20 @@ function renderTable() {
 
   tableBody.innerHTML = "";
 
-  const start = (currentPage - 1) * perPage;
-  const end = start + perPage;
-  const pageData = data.slice(start, end);
-
-  if (pageData.length === 0) {
+  if (data.length === 0) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="5" style="text-align:center;">Data peringkat tidak ditemukan</td>
       </tr>
     `;
-    if (tableInfo) {
-      tableInfo.textContent = "Menampilkan 0-0 dari 0 siswa";
-    }
     return;
   }
 
-  pageData.forEach((item) => {
+  data.forEach((item) => {
     const row = document.createElement("tr");
-    const isLoginUser = item.nama === namaLogin;
+
+    const isLoginUser =
+      String(item.id_siswa) === idLogin || item.nama === namaLogin;
 
     row.innerHTML = `
       <td>${item.rank}</td>
@@ -129,64 +117,6 @@ function renderTable() {
 
     tableBody.appendChild(row);
   });
-
-  if (tableInfo) {
-    const total = data.length;
-    const from = total === 0 ? 0 : start + 1;
-    const to = Math.min(end, total);
-    tableInfo.textContent = `Menampilkan ${from}-${to} dari ${total} siswa`;
-  }
-}
-
-function renderPagination() {
-  if (!paginationWrap) return;
-
-  const totalPages = Math.ceil(data.length / perPage) || 1;
-  paginationWrap.innerHTML = `Halaman: `;
-
-  const prevBtn = document.createElement("button");
-  prevBtn.type = "button";
-  prevBtn.textContent = "<";
-  prevBtn.disabled = currentPage === 1;
-  prevBtn.addEventListener("click", () => {
-    if (currentPage > 1) {
-      currentPage--;
-      renderPagination();
-      renderTable();
-    }
-  });
-  paginationWrap.appendChild(prevBtn);
-
-  for (let i = 1; i <= totalPages; i++) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = i;
-
-    if (i === currentPage) {
-      btn.classList.add("active-page");
-    }
-
-    btn.addEventListener("click", () => {
-      currentPage = i;
-      renderPagination();
-      renderTable();
-    });
-
-    paginationWrap.appendChild(btn);
-  }
-
-  const nextBtn = document.createElement("button");
-  nextBtn.type = "button";
-  nextBtn.textContent = ">";
-  nextBtn.disabled = currentPage === totalPages;
-  nextBtn.addEventListener("click", () => {
-    if (currentPage < totalPages) {
-      currentPage++;
-      renderPagination();
-      renderTable();
-    }
-  });
-  paginationWrap.appendChild(nextBtn);
 }
 
 function aktifkanFilter() {
