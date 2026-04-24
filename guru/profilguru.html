@@ -49,10 +49,10 @@
                 Username: <b id="displayUsername">-</b>
               </span>
 
-              <span>
-                <i class="bi bi-key"></i>
-                Password: <b id="displayPassword">Sesuai NIP</b>
-              </span>
+              <button class="btn-primary" id="btnSimpanProfil">
+              <i class="bi bi-check2-circle"></i>
+              Simpan Perubahan
+            </button>
             </div>
           </div>
         </div>
@@ -255,16 +255,22 @@
               <p>Pengaturan akses akun guru</p>
             </div>
 
-            <div class="security-box">
-              <button class="btn-outline">
-                <i class="bi bi-key-fill"></i>
-                Ubah Password
-              </button>
-              <button class="btn-outline">
-                <i class="bi bi-shield-lock-fill"></i>
-                Verifikasi Akun
-              </button>
+<div class="security-box">
+  <div class="form-group">
+    <label>Username</label>
+    <input type="text" id="usernameGuru" placeholder="Username akun guru">
+  </div>
+
+            <div class="form-group">
+              <label>Password Baru</label>
+              <input type="password" id="passwordGuru" placeholder="Kosongkan jika tidak diubah">
             </div>
+
+            <button class="btn-outline" id="btnSimpanAkun">
+              <i class="bi bi-shield-lock-fill"></i>
+              Simpan Akun
+            </button>
+          </div>
           </div>
         </div>
       </section>
