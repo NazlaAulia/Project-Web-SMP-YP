@@ -12,7 +12,7 @@ $result = mysqli_query($conn, $query);
     <title>Data Pendaftaran Siswa</title>
 
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=32">
+    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=40">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
@@ -87,7 +87,9 @@ $result = mysqli_query($conn, $query);
 
                                 <td><?= htmlspecialchars($row['nama_wali']); ?></td>
 
-                                <td>Rp <?= number_format($row['pendapatan_ortu'], 0, ',', '.'); ?></td>
+                                <td>
+                                    Rp <?= number_format($row['pendapatan_ortu'], 0, ',', '.'); ?>
+                                </td>
 
                                 <td>
                                     <?php if ($row['status'] == 'menunggu') { ?>
@@ -98,15 +100,21 @@ $result = mysqli_query($conn, $query);
                                         <span class="badge rejected">Ditolak</span>
                                     <?php } ?>
                                 </td>
-                                    <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima" 
-                                       class="btn-accept"
-                                       onclick="return confirm('Terima pendaftaran ini?')">
+
+                                <td class="action-cell">
+                                    <a 
+                                        href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima"
+                                        class="btn-accept"
+                                        onclick="return confirm('Terima pendaftaran ini?')"
+                                    >
                                         Terima
                                     </a>
 
-                                    <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak" 
-                                       class="btn-reject"
-                                       onclick="return confirm('Tolak pendaftaran ini?')">
+                                    <a 
+                                        href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak"
+                                        class="btn-reject"
+                                        onclick="return confirm('Tolak pendaftaran ini?')"
+                                    >
                                         Tolak
                                     </a>
                                 </td>
@@ -116,7 +124,9 @@ $result = mysqli_query($conn, $query);
                         } else {
                         ?>
                             <tr>
-                                <td colspan="11" class="empty-data">Belum ada data pendaftaran.</td>
+                                <td colspan="11" class="empty-data">
+                                    Belum ada data pendaftaran.
+                                </td>
                             </tr>
                         <?php } ?>
                     </tbody>
