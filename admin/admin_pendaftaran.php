@@ -9,15 +9,11 @@ $result = mysqli_query($conn, $query);
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pendaftaran Siswa</title>
 
-    <link rel="stylesheet" href="components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-       <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/components/admin-nav.css">
+    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=30">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body data-page="pendaftaran" data-nav-path="/admin/components/admin-nav.html">
@@ -27,22 +23,38 @@ $result = mysqli_query($conn, $query);
 
     <main class="main-content">
         <div class="admin-container">
+
             <div class="admin-header">
                 <div>
                     <h1>Data Pendaftaran Siswa</h1>
                     <p>Daftar siswa yang telah mengisi formulir pendaftaran online.</p>
                 </div>
-                <a href="/admin/index.html" class="btn-back">Kembali</a>
+
+                <div class="header-actions">
+                    <div class="search-container-elegant">
+                        <span class="search-icon">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            id="searchPendaftaran" 
+                            class="search-input" 
+                            placeholder="Cari nama, NISN, sekolah..."
+                        >
+                    </div>
+
+                    <a href="/admin/index.html" class="btn-back">Kembali</a>
+                </div>
             </div>
 
             <div class="table-card">
-                <table>
+                <table id="tablePendaftaran">
                     <thead>
                         <tr>
                             <th>No</th>
                             <th>Nama Lengkap</th>
                             <th>NISN</th>
-                            <th>Jenis Kelamin</th>
+                            <th>JK</th>
                             <th>Tanggal Lahir</th>
                             <th>No HP Wali</th>
                             <th>Asal Sekolah</th>
@@ -62,16 +74,25 @@ $result = mysqli_query($conn, $query);
                         ?>
                             <tr>
                                 <td><?= $no++; ?></td>
+
                                 <td><?= htmlspecialchars($row['nama_lengkap']); ?></td>
+
                                 <td><?= htmlspecialchars($row['nisn']); ?></td>
+
                                 <td>
                                     <?= $row['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?>
                                 </td>
+
                                 <td><?= htmlspecialchars($row['tanggal_lahir']); ?></td>
+
                                 <td><?= htmlspecialchars($row['no_hp']); ?></td>
+
                                 <td><?= htmlspecialchars($row['asal_sekolah']); ?></td>
+
                                 <td><?= htmlspecialchars($row['nama_wali']); ?></td>
+
                                 <td>Rp <?= number_format($row['pendapatan_ortu'], 0, ',', '.'); ?></td>
+
                                 <td>
                                     <?php if ($row['status'] == 'menunggu') { ?>
                                         <span class="badge waiting">Menunggu</span>
@@ -81,6 +102,7 @@ $result = mysqli_query($conn, $query);
                                         <span class="badge rejected">Ditolak</span>
                                     <?php } ?>
                                 </td>
+
                                 <td class="action-cell">
                                     <a href="/admin/detail_pendaftaran.php?id=<?= $row['id_pendaftaran']; ?>" class="btn-detail">
                                         Detail
@@ -109,12 +131,55 @@ $result = mysqli_query($conn, $query);
                         <?php } ?>
                     </tbody>
                 </table>
+
+                <div id="noSearchResult" class="no-search-result" style="display: none;">
+                    Data tidak ditemukan.
+                </div>
             </div>
+
         </div>
     </main>
 </div>
 
-<script src="/admin/components/admin-nav.js?v=5"></script>
+<script src="/admin/components/admin-nav.js?v=999"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchPendaftaran");
+    const table = document.getElementById("tablePendaftaran");
+    const noSearchResult = document.getElementById("noSearchResult");
+
+    if (!searchInput || !table) return;
+
+    searchInput.addEventListener("keyup", function () {
+        const keyword = this.value.toLowerCase().trim();
+        const rows = table.querySelectorAll("tbody tr");
+
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const isEmptyRow = row.querySelector(".empty-data");
+
+            if (isEmptyRow) {
+                return;
+            }
+
+            const rowText = row.textContent.toLowerCase();
+
+            if (rowText.includes(keyword)) {
+                row.style.display = "";
+                visibleCount++;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        if (noSearchResult) {
+            noSearchResult.style.display = visibleCount === 0 && keyword !== "" ? "block" : "none";
+        }
+    });
+});
+</script>
 
 </body>
 </html>
