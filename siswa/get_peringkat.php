@@ -39,8 +39,9 @@ if (empty($semesterText)) {
 }
 
 $semester = konversiSemesterKeAngka($semesterText);
+$semesterSebelumnya = $semester == 2 ? 1 : 0;
 
-/* ambil data siswa login */
+/* Ambil data siswa login */
 $sqlSiswa = "
     SELECT 
         s.id_siswa,
@@ -74,9 +75,9 @@ if (!$stmt->execute()) {
 }
 
 $result = $stmt->get_result();
-$row = $result->fetch_assoc();
+$siswaLogin = $result->fetch_assoc();
 
-if (!$row) {
+if (!$siswaLogin) {
     echo json_encode([
         "success" => false,
         "message" => "Data siswa tidak ditemukan"
@@ -84,58 +85,27 @@ if (!$row) {
     exit;
 }
 
-$kelasAktif = !empty($kelasFilter) ? $kelasFilter : $row['nama_kelas'];
+$kelasAktif = !empty($kelasFilter) ? $kelasFilter : $siswaLogin['nama_kelas'];
 
-/* data ranking siswa login *///
-
-$sqlRankSiswa = "
-    SELECT 
-        p.rank,
-        p.nilai_rata_rata,
-        p.posisi_sebelumnya,
-        p.status
-    FROM peringkat p
-    WHERE p.id_siswa = ?
-    LIMIT 1
-";
-
-$stmtRankSiswa = $conn->prepare($sqlRankSiswa);
-
-if (!$stmtRankSiswa) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Prepare query rank siswa gagal: " . $conn->error
-    ]);
-    exit;
-}
-
-$stmtRankSiswa->bind_param("i", $id_siswa);
-
-if (!$stmtRankSiswa->execute()) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Execute query rank siswa gagal: " . $stmtRankSiswa->error
-    ]);
-    exit;
-}
-
-$resultRankSiswa = $stmtRankSiswa->get_result();
-$rankSiswa = $resultRankSiswa->fetch_assoc();
-
-/* ranking satu kelas */
+/*
+  Ambil rata-rata nilai siswa hanya dalam kelas yang sama.
+  Ranking dihitung dari AVG(nilai.nilai_angka), bukan dari tabel peringkat.
+*/
 $sqlRank = "
     SELECT 
         s.id_siswa,
         s.nama,
         k.nama_kelas,
-        p.rank,
-        p.nilai_rata_rata,
-        p.status
+        ROUND(AVG(n.nilai_angka), 2) AS nilai_rata_rata
     FROM siswa s
-    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-    INNER JOIN peringkat p ON p.id_siswa = s.id_siswa
+    INNER JOIN kelas k ON s.id_kelas = k.id_kelas
+    LEFT JOIN nilai n 
+        ON n.id_siswa = s.id_siswa 
+        AND n.semester = ?
     WHERE k.nama_kelas = ?
-    ORDER BY p.rank ASC
+    GROUP BY s.id_siswa, s.nama, k.nama_kelas
+    HAVING nilai_rata_rata IS NOT NULL
+    ORDER BY nilai_rata_rata DESC, s.nama ASC
 ";
 
 $stmtRank = $conn->prepare($sqlRank);
@@ -148,7 +118,7 @@ if (!$stmtRank) {
     exit;
 }
 
-$stmtRank->bind_param("s", $kelasAktif);
+$stmtRank->bind_param("is", $semester, $kelasAktif);
 
 if (!$stmtRank->execute()) {
     echo json_encode([
@@ -159,34 +129,106 @@ if (!$stmtRank->execute()) {
 }
 
 $resultRank = $stmtRank->get_result();
+
 $ranking = [];
+$rank = 1;
+$rankSiswaLogin = 0;
+$nilaiSiswaLogin = 0;
 
 while ($r = $resultRank->fetch_assoc()) {
-    $ranking[] = [
-        "rank" => (int) ($r["rank"] ?? 0),
+    $id = (int) $r["id_siswa"];
+    $nilai = (float) $r["nilai_rata_rata"];
+
+    $item = [
+        "id_siswa" => $id,
+        "rank" => $rank,
         "nama" => $r["nama"] ?? "",
         "kelas" => $r["nama_kelas"] ?? "",
-        "nilai" => (float) ($r["nilai_rata_rata"] ?? 0),
-        "status" => $r["status"] ?? "↔"
+        "nilai" => $nilai,
+        "status" => "-"
     ];
+
+    if ($id === $id_siswa) {
+        $rankSiswaLogin = $rank;
+        $nilaiSiswaLogin = $nilai;
+    }
+
+    $ranking[] = $item;
+    $rank++;
+}
+
+/*
+  Optional: hitung status naik/turun berdasarkan semester sebelumnya.
+  Kalau semester sebelumnya tidak ada, status tetap "-".
+*/
+if ($semesterSebelumnya > 0) {
+    $sqlPrev = "
+        SELECT 
+            s.id_siswa,
+            ROUND(AVG(n.nilai_angka), 2) AS nilai_rata_rata
+        FROM siswa s
+        INNER JOIN kelas k ON s.id_kelas = k.id_kelas
+        LEFT JOIN nilai n 
+            ON n.id_siswa = s.id_siswa 
+            AND n.semester = ?
+        WHERE k.nama_kelas = ?
+        GROUP BY s.id_siswa
+        HAVING nilai_rata_rata IS NOT NULL
+        ORDER BY nilai_rata_rata DESC, s.nama ASC
+    ";
+
+    $stmtPrev = $conn->prepare($sqlPrev);
+
+    if ($stmtPrev) {
+        $stmtPrev->bind_param("is", $semesterSebelumnya, $kelasAktif);
+        $stmtPrev->execute();
+        $resultPrev = $stmtPrev->get_result();
+
+        $rankSebelumnya = [];
+        $prevRank = 1;
+
+        while ($p = $resultPrev->fetch_assoc()) {
+            $rankSebelumnya[(int)$p["id_siswa"]] = $prevRank;
+            $prevRank++;
+        }
+
+        foreach ($ranking as &$item) {
+            $id = (int) $item["id_siswa"];
+
+            if (!isset($rankSebelumnya[$id])) {
+                $item["status"] = "-";
+            } else {
+                $rankLama = $rankSebelumnya[$id];
+                $rankBaru = $item["rank"];
+
+                if ($rankBaru < $rankLama) {
+                    $item["status"] = "naik";
+                } elseif ($rankBaru > $rankLama) {
+                    $item["status"] = "turun";
+                } else {
+                    $item["status"] = "tetap";
+                }
+            }
+        }
+
+        unset($item);
+        $stmtPrev->close();
+    }
 }
 
 echo json_encode([
     "success" => true,
     "siswa" => [
-        "id_siswa" => (int) $row["id_siswa"],
-        "nama" => $row["nama"] ?? "",
-        "kelas" => $row["nama_kelas"] ?? "",
-        "rank" => (int) ($rankSiswa["rank"] ?? 0),
-        "nilai" => (float) ($rankSiswa["nilai_rata_rata"] ?? 0),
-        "posisi_sebelumnya" => (int) ($rankSiswa["posisi_sebelumnya"] ?? 0),
-        "status" => $rankSiswa["status"] ?? "↔"
+        "id_siswa" => (int) $siswaLogin["id_siswa"],
+        "nama" => $siswaLogin["nama"] ?? "",
+        "kelas" => $siswaLogin["nama_kelas"] ?? "",
+        "rank" => $rankSiswaLogin,
+        "nilai" => $nilaiSiswaLogin
     ],
     "ranking" => $ranking
 ]);
 
 $stmt->close();
-$stmtRankSiswa->close();
 $stmtRank->close();
 $conn->close();
 ?>
