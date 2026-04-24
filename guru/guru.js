@@ -1,6 +1,6 @@
 const namaGuruEl = document.getElementById("namaGuru");
 const avatarGuruEl = document.getElementById("avatarGuru");
-const welcomeGuruEl = document.getElementById("namaGuruDashboard");
+const welcomeGuruEl = document.getElementById("welcomeGuru");
 
 function tampilkanGuru(nama) {
     const namaFix = nama || "Bapak/Ibu Guru";
@@ -8,24 +8,21 @@ function tampilkanGuru(nama) {
 
     if (namaGuruEl) namaGuruEl.textContent = namaFix;
     if (avatarGuruEl) avatarGuruEl.textContent = huruf;
-    if (welcomeGuruEl) welcomeGuruEl.textContent = namaFix;
+    if (welcomeGuruEl) welcomeGuruEl.textContent = `Halo, ${namaFix}! 🌟`;
 }
 
-fetch("get_profil_guru.php", {
-    credentials: "same-origin"
-})
-.then(res => res.json())
-.then(result => {
-    console.log("Data guru dashboard:", result);
+fetch("get_guru.php")
+    .then(res => res.json())
+    .then(result => {
+        console.log("Data guru dashboard:", result);
 
-    if (result.status === "success") {
-        tampilkanGuru(result.data.nama);
-    } else {
-        alert(result.message);
-        window.location.href = "../login.html";
-    }
-})
-.catch(err => {
-    console.error(err);
-    alert("Gagal load data guru");
-});
+        if (result.status === "success") {
+            tampilkanGuru(result.data.nama);
+        } else {
+            alert(result.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Gagal load data guru");
+    });

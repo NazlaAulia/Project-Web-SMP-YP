@@ -18,13 +18,20 @@ function kirim_json($status, $message, $extra = []) {
 
     exit;
 }
+session_start();
+include "koneksi.php";
 
-$host = "localhost";
-$dbname = "osbebslk_sekolahyp";
-$dbuser = "osbebslk_aliyahzz";
-$dbpass = "semangatgaes";
+$username = $_POST['username'];
+$password = $_POST['password'];
 
-$conn = new mysqli($host, $dbuser, $dbpass, $dbname);
+$query = mysqli_query($conn, "
+    SELECT user.*, guru.nama, guru.nip
+    FROM user
+    JOIN guru ON user.id_guru = guru.id_guru
+    WHERE user.username = '$username'
+    AND user.password = '$password'
+    AND user.role = 'guru'
+");
 
 if ($conn->connect_error) {
     kirim_json("error", "Koneksi database gagal: " . $conn->connect_error);
@@ -83,7 +90,8 @@ $stmt->bind_result($id_user, $db_username, $db_password, $role_id, $id_guru, $id
 $stmt->fetch();
 
 if ($db_password !== $password) {
-    kirim_json("error", "Password yang kamu masukkan salah.");
+    kirim_json("error", "P
+    
 }
 
 if (!in_array((int)$role_id, [1, 2, 3])) {
@@ -99,3 +107,20 @@ kirim_json("success", "Login berhasil.", [
         "id_siswa" => $id_siswa
     ]
 ]);
+$data = mysqli_fetch_assoc($query);
+
+if ($data) {
+    $_SESSION['id_user'] = $data['id_user'];
+    $_SESSION['id_guru'] = $data['id_guru'];
+    $_SESSION['username'] = $data['username'];
+    $_SESSION['role'] = $data['role'];
+
+    header("Location: guru.html");
+    exit;
+} else {
+    echo "<script>
+        alert('Username atau password salah');
+        window.location.href='../login.html';
+    </script>";
+}
+?>

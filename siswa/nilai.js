@@ -242,106 +242,82 @@ function aktifkanExportAnimasi() {
 async function exportNilaiPdfFinal() {
   try {
     if (!window.jspdf || !window.jspdf.jsPDF) {
-      alert("Library jsPDF belum terbaca. Taruh script jsPDF sebelum nilai.js di HTML.");
+      alert("jsPDF belum kebaca. Pastikan script jsPDF ada sebelum nilai.js di HTML.");
       return;
     }
 
     if (!window.jspdf.jsPDF.API.autoTable) {
-      alert("Library jsPDF AutoTable belum terbaca. Taruh script jspdf-autotable sebelum nilai.js di HTML.");
+      alert("jspdf-autotable belum kebaca. Pastikan script autotable ada sebelum nilai.js.");
       return;
     }
 
     const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("p", "mm", "a4");
 
-    const idSiswa = localStorage.getItem("id_siswa") || "";
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const nama = document.getElementById("namaText")?.textContent?.trim() || localStorage.getItem("nama_siswa") || "-";
+    const kelas = document.getElementById("kelasText")?.textContent?.trim() || localStorage.getItem("kelas_siswa") || "-";
     const semesterText = document.getElementById("semester")?.value || "2025/2026 - Genap";
 
-    if (!idSiswa) {
-      alert("ID siswa tidak ditemukan. Silakan login ulang.");
-      return;
+    const kepalaSekolah = getNamaKepalaSekolahFinal();
+    const waliKelas = getNamaWaliKelasFinal(kelas);
+
+    const dataMapel = ambilNilaiPerMapelDariHalamanFinal();
+
+    let logoData = null;
+
+    const logoPaths = [
+      "../img/images.webp",
+      "img/images.webp",
+      "../img/logo.webp",
+      "img/logo.webp",
+      "../img/logo.png",
+      "img/logo.png"
+    ];
+
+    for (const path of logoPaths) {
+      try {
+        logoData = await loadImageAsDataURLFinal(path);
+        if (logoData) break;
+      } catch (error) {}
     }
 
-    const exportUrl = new URL("get_detail_nilai_export.php", window.location.href);
-    exportUrl.searchParams.set("id_siswa", idSiswa);
-    exportUrl.searchParams.set("semester", semesterText);
-
-    const response = await fetch(exportUrl.toString(), {
-      method: "GET",
-      credentials: "same-origin",
-      headers: {
-        "Accept": "application/json"
-      }
-    });
-
-    const text = await response.text();
-
-    console.log("URL export:", exportUrl.toString());
-    console.log("RAW export nilai:", text);
-
-    let result;
-
-    try {
-      result = JSON.parse(text);
-    } catch (error) {
-      alert(
-        "File get_detail_nilai_export.php belum menghasilkan JSON.\n\n" +
-        "Buka Console, lihat URL export, lalu buka URL itu di browser.\n" +
-        "Kalau bukan tulisan {\"success\":true... berarti PHP/lokasi file-nya masih salah."
-      );
-      return;
-    }
-
-    if (!result.success) {
-      alert(result.message || "Gagal mengambil data nilai export.");
-      return;
-    }
-
-    const siswa = result.siswa || {};
-    const detailNilai = result.detail_nilai || [];
-
-    const doc = new jsPDF("p", "mm", "a4");
-    const pageWidth = doc.internal.pageSize.getWidth();
-
+    // =========================
+    // BORDER LUAR
+    // =========================
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.4);
     doc.rect(10, 10, 190, 277);
 
-    let logoData = null;
-
-    try {
-      logoData = await loadImageAsDataURL("../img/logo.webp");
-    } catch (error) {
-      try {
-        logoData = await loadImageAsDataURL("img/logo.webp");
-      } catch (error2) {
-        console.warn("Logo tidak berhasil dimuat. PDF tetap dibuat tanpa logo.");
-      }
-    }
-
+    // =========================
+    // HEADER + LOGO
+    // =========================
     if (logoData) {
-      doc.addImage(logoData, "PNG", 18, 15, 24, 24);
+      doc.addImage(logoData, "WEBP", 18, 14, 24, 24);
     }
 
-    doc.setFont("helvetica", "bold");
+    doc.setFont("times", "bold");
     doc.setFontSize(11);
-    doc.text("YAYASAN PENDIDIKAN TUNAS PERTIWI", pageWidth / 2 + 8, 17, {
+    doc.text("YAYASAN PENDIDIKAN TUNAS PERTIWI", pageWidth / 2 + 10, 17, {
       align: "center"
     });
 
     doc.setFontSize(18);
-    doc.text("SMP YP 17 SURABAYA", pageWidth / 2 + 8, 25, {
+    doc.text("SMP YP 17 SURABAYA", pageWidth / 2 + 10, 25, {
       align: "center"
     });
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont("times", "normal");
     doc.setFontSize(9);
-    doc.text("Jl. Randu No.17, Sidotopo Wetan,", pageWidth / 2 + 8, 31, {
+    doc.text("Jl. Randu No.17, Sidotopo Wetan,", pageWidth / 2 + 10, 31, {
       align: "center"
     });
-    doc.text("Kec. Kenjeran, Surabaya, Jawa Timur 60128", pageWidth / 2 + 8, 36, {
+    doc.text("Kec. Kenjeran, Surabaya, Jawa Timur 60128", pageWidth / 2 + 10, 36, {
       align: "center"
     });
-    doc.text("Telepon : (031) 376 3721", pageWidth / 2 + 8, 41, {
+    doc.text("Telepon : (031) 376 3721", pageWidth / 2 + 10, 41, {
       align: "center"
     });
 
@@ -351,24 +327,19 @@ async function exportNilaiPdfFinal() {
     doc.setLineWidth(0.3);
     doc.line(16, 48, 194, 48);
 
+    // =========================
+    // IDENTITAS SISWA
+    // =========================
     let y = 58;
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont("times", "normal");
     doc.setFontSize(10);
 
     doc.text("Nama Siswa", 16, y);
-    doc.text(`: ${siswa.nama || "-"}`, 52, y);
+    doc.text(`: ${nama}`, 52, y);
 
     doc.text("Kelas", 132, y);
-    doc.text(`: ${siswa.kelas || "-"}`, 160, y);
-
-    y += 7;
-
-    doc.text("NIS", 16, y);
-    doc.text(`: ${siswa.nis || "-"}`, 52, y);
-
-    doc.text("NISN", 132, y);
-    doc.text(`: ${siswa.nisn || "-"}`, 160, y);
+    doc.text(`: ${kelas}`, 160, y);
 
     y += 7;
 
@@ -378,46 +349,43 @@ async function exportNilaiPdfFinal() {
     y += 7;
 
     doc.text("Tahun Ajaran", 16, y);
-    doc.text(`: ${formatTahunAjaranFinal(semesterText, siswa.tahun_ajaran)}`, 52, y);
+    doc.text(`: ${formatTahunAjaranFinal(semesterText)}`, 52, y);
 
     y += 7;
 
     doc.text("Alamat Sekolah", 16, y);
     doc.text(": Jl. Randu No.17, Sidotopo Wetan, Kec. Kenjeran, Surabaya", 52, y);
 
+    // =========================
+    // JUDUL
+    // =========================
     y += 12;
 
-    doc.setFont("helvetica", "bold");
+    doc.setFont("times", "bold");
     doc.setFontSize(11);
     doc.text("A. Nilai Akhir Semester", 16, y);
 
-    const bodyNilai = detailNilai.length > 0
-      ? detailNilai.map((item, index) => [
-          index + 1,
-          ubahNamaMapel(item.mapel || "-"),
-          item.nilai || "-",
-          item.keterangan || "-"
-        ])
-      : [[1, "Data nilai belum tersedia", "-", "-"]];
-
+    // =========================
+    // TABEL NILAI
+    // =========================
     doc.autoTable({
-      startY: y + 5,
+      startY: y + 4,
       head: [[
         "No",
         "Mata Pelajaran",
         "Nilai",
         "Keterangan"
       ]],
-      body: bodyNilai,
+      body: dataMapel,
       theme: "grid",
       margin: {
         left: 16,
         right: 16
       },
       styles: {
-        font: "helvetica",
+        font: "times",
         fontSize: 9,
-        cellPadding: 2.4,
+        cellPadding: 2.1,
         lineWidth: 0.2,
         lineColor: [0, 0, 0],
         textColor: [0, 0, 0],
@@ -446,99 +414,140 @@ async function exportNilaiPdfFinal() {
       }
     });
 
-    let afterTableY = doc.lastAutoTable.finalY + 10;
+    let afterTableY = doc.lastAutoTable.finalY + 8;
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.text("B. Ketidakhadiran", 16, afterTableY);
-
-    const absensi = ambilAbsensiDariDetailNilai(detailNilai);
-
-    doc.autoTable({
-      startY: afterTableY + 5,
-      head: [[
-        "No",
-        "Keterangan",
-        "Jumlah"
-      ]],
-      body: [
-        [1, "Hadir", absensi.hadir],
-        [2, "Izin", absensi.izin],
-        [3, "Sakit", absensi.sakit],
-        [4, "Alfa", absensi.alfa]
-      ],
-      theme: "grid",
-      margin: {
-        left: 16,
-        right: 16
-      },
-      styles: {
-        font: "helvetica",
-        fontSize: 9,
-        cellPadding: 2.4,
-        lineWidth: 0.2,
-        lineColor: [0, 0, 0],
-        textColor: [0, 0, 0],
-        halign: "center"
-      },
-      headStyles: {
-        fillColor: [255, 255, 255],
-        textColor: [0, 0, 0],
-        fontStyle: "bold"
-      },
-      columnStyles: {
-        0: {
-          cellWidth: 14
-        },
-        1: {
-          cellWidth: 100,
-          halign: "left"
-        },
-        2: {
-          cellWidth: 64
-        }
-      }
-    });
-
-    afterTableY = doc.lastAutoTable.finalY + 10;
-
-    doc.setFont("helvetica", "bold");
+    // =========================
+    // CATATAN
+    // =========================
+    doc.setFont("times", "bold");
     doc.setFontSize(10);
     doc.text("Catatan :", 16, afterTableY);
 
-    doc.setFont("helvetica", "normal");
-    doc.rect(16, afterTableY + 3, 178, 18);
+    doc.setFont("times", "normal");
+    doc.rect(16, afterTableY + 3, 178, 16);
     doc.text("Pertahankan semangat belajar dan terus tingkatkan prestasi.", 18, afterTableY + 10);
 
-    const ttdY = afterTableY + 35;
+// =========================
+// TANDA TANGAN BAWAH
+// =========================
+let ttdY = afterTableY + 24;
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
+// Biar tanda tangan tidak nabrak border bawah
+if (ttdY + 50 > pageHeight - 16) {
+  ttdY = pageHeight - 72;
+}
 
-    doc.text("Mengetahui,", 16, ttdY);
-    doc.text("Kepala Sekolah", 16, ttdY + 6);
+doc.setFont("times", "normal");
+doc.setFontSize(11);
 
-    doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
-    doc.text("Wali Kelas", 124, ttdY + 6);
+doc.text("Mengetahui,", 16, ttdY);
+doc.text("Kepala Sekolah", 16, ttdY + 9);
 
-    doc.setFont("helvetica", "bold");
-    doc.text("(............................)", 16, ttdY + 32);
-    doc.text("(............................)", 124, ttdY + 32);
+doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
+doc.text("Wali Kelas", 124, ttdY + 9);
 
-    const namaSiswa = siswa.nama || "Siswa";
-    const namaFile = `Nilai_Akhir_Semester_${namaSiswa.replace(/\s+/g, "_")}.pdf`;
+doc.setFont("times", "bold");
+doc.setFontSize(11);
+
+// Nama dibuat lebih naik, jadi rapi dan tidak kepotong
+doc.text(`( ${kepalaSekolah} )`, 16, ttdY + 43);
+doc.text(`( ${waliKelas} )`, 124, ttdY + 43);
+
+    const namaFile = `Nilai_Akhir_Semester_${nama.replace(/\s+/g, "_")}.pdf`;
 
     doc.save(namaFile);
 
   } catch (error) {
-    console.error("Error export PDF final:", error);
+    console.error("Error export PDF:", error);
     alert("Gagal membuat PDF: " + error.message);
   }
 }
 
-function formatTahunAjaranFinal(semesterText, tahunAjaranBackend) {
+function ambilNilaiPerMapelDariHalamanFinal() {
+  const rataRata = parseFloat(
+    document.getElementById("rataRataCounter")?.dataset.target ||
+    document.getElementById("rataRataCounter")?.textContent ||
+    0
+  );
+
+  const nilaiTertinggi = parseFloat(
+    document.getElementById("nilaiTertinggiCounter")?.dataset.target ||
+    document.getElementById("nilaiTertinggiCounter")?.textContent ||
+    0
+  );
+
+  const mapelTertinggi = (
+    document.getElementById("mapelTertinggiText")?.textContent || ""
+  ).toUpperCase();
+
+  const daftarMapel = [
+    "Bahasa Indonesia",
+    "Bahasa Jawa",
+    "Pendidikan Kewarganegaraan",
+    "Informatika",
+    "Matematika",
+    "Bahasa Inggris",
+    "Ilmu Pengetahuan Alam",
+    "Ilmu Pengetahuan Sosial",
+    "Bimbingan Konseling",
+    "Informatika / Bimbingan Konseling",
+    "Pendidikan Agama Islam / Baca Hafal Quran",
+    "Pendidikan Jasmani, Olahraga dan Kesehatan"
+  ];
+
+  return daftarMapel.map((mapel, index) => {
+    let nilai = rataRata || 0;
+
+    const mapelUpper = mapel.toUpperCase();
+
+    if (
+      mapelTertinggi.includes(mapelUpper) ||
+      mapelUpper.includes(mapelTertinggi) ||
+      (mapelTertinggi.includes("INFO") && mapelUpper.includes("INFORMATIKA")) ||
+      (mapelTertinggi.includes("BK") && mapelUpper.includes("BIMBINGAN"))
+    ) {
+      nilai = nilaiTertinggi || nilai;
+    }
+
+    const angka = parseFloat(nilai) || 0;
+    const keterangan = angka >= 75 ? "Tuntas" : "Belum Tuntas";
+
+    return [
+      index + 1,
+      mapel,
+      angka,
+      keterangan
+    ];
+  });
+}
+
+function getNamaKepalaSekolahFinal() {
+  return "Dra. Slamet Suwarni";
+}
+
+function getNamaWaliKelasFinal(kelas) {
+  const kelasBersih = String(kelas || "").trim().toUpperCase();
+
+  // Data wali kelas dari database:
+  // kelas.id_wali_kelas -> guru.id_guru
+  const daftarWali = {
+    "7A": "Osa Noraise, S.Pd",
+    "7B": "Nindy Putri Oktaviara, S.Pd",
+    "7C": "Sangar Deni Daud Smi, S.Pd",
+    "8A": "Haris Suprapti Ningrum, S.Ud",
+    "8B": "Achmad Farkan, S.Pd",
+    "8C": "Riyadna Krismanita, S.Pd",
+    "9A": "Mohamad Hanafi, S.Pd",
+    "9B": "Murni, S.Pd",
+    "9C": "Dra. Endang Aryati"
+  };
+
+  return daftarWali[kelasBersih] || "Wali Kelas";
+}
+
+function formatTahunAjaranFinal(semesterText) {
   const match = semesterText.match(/\d{4}\/\d{4}/);
-  const tahunAjaran = match ? match[0] : (tahunAjaranBackend || "2025/2026");
+  const tahunAjaran = match ? match[0] : "2025/2026";
 
   if (/genap/i.test(semesterText)) {
     return `${tahunAjaran} - Genap`;
@@ -570,49 +579,7 @@ function formatTanggalIndonesiaFinal(date) {
   return `${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-function ubahNamaMapel(mapel) {
-  const daftarMapel = {
-    "BIN": "Bahasa Indonesia",
-    "B. JAWA": "Bahasa Jawa",
-    "PKN": "Pendidikan Kewarganegaraan",
-    "INFOR": "Informatika",
-    "MAT": "Matematika",
-    "BIG": "Bahasa Inggris",
-    "IPA": "Ilmu Pengetahuan Alam",
-    "IPS": "Ilmu Pengetahuan Sosial",
-    "BK": "Bimbingan Konseling",
-    "INFO/BK": "Informatika / Bimbingan Konseling",
-    "PAI/BHQ": "Pendidikan Agama Islam / Baca Hafal Quran",
-    "PJOK": "Pendidikan Jasmani, Olahraga dan Kesehatan"
-  };
-
-  return daftarMapel[mapel] || mapel;
-}
-
-function ambilAbsensiDariDetailNilai(detailNilai) {
-  let hadir = "-";
-  let izin = "-";
-  let sakit = "-";
-  let alfa = "-";
-
-  if (detailNilai && detailNilai.length > 0) {
-    const item = detailNilai[0];
-
-    hadir = item.hadir ?? "-";
-    izin = item.izin ?? "-";
-    sakit = item.sakit ?? "-";
-    alfa = item.alfa ?? "-";
-  }
-
-  return {
-    hadir,
-    izin,
-    sakit,
-    alfa
-  };
-}
-
-function loadImageAsDataURL(src) {
+function loadImageAsDataURLFinal(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
 
@@ -628,7 +595,7 @@ function loadImageAsDataURL(src) {
     };
 
     img.onerror = function () {
-      reject(new Error("Gagal memuat gambar logo."));
+      reject(new Error("Logo gagal dimuat."));
     };
 
     img.src = src;

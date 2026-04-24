@@ -2,51 +2,73 @@
 session_start();
 include "koneksi.php";
 
+header("Content-Type: application/json");
+
 $username = $_POST['username'] ?? '';
 $password = $_POST['password'] ?? '';
 
-$query = mysqli_query($conn, "SELECT * FROM user WHERE username = '$username' LIMIT 1");
+if ($username == '' || $password == '') {
+    echo json_encode([
+        "status" => "error",
+        "success" => false,
+        "message" => "Username dan password wajib diisi"
+    ]);
+    exit;
+}
+
+$query = mysqli_query($conn, "
+    SELECT 
+        user.*,
+        guru.id_guru,
+        guru.nama,
+        guru.nip
+    FROM user
+    JOIN guru ON user.id_guru = guru.id_guru
+    WHERE user.username = '$username'
+    AND user.password = '$password'
+    AND user.role = 'guru'
+    LIMIT 1
+");
 
 if (!$query) {
-    echo "Query error: " . mysqli_error($conn);
+    echo json_encode([
+        "status" => "error",
+        "success" => false,
+        "message" => "Query login error: " . mysqli_error($conn)
+    ]);
     exit;
 }
 
-$user = mysqli_fetch_assoc($query);
+$data = mysqli_fetch_assoc($query);
 
-if (!$user) {
-    echo "Username tidak ditemukan";
+if ($data) {
+    $_SESSION['id_user'] = $data['id_user'];
+    $_SESSION['id_guru'] = $data['id_guru'];
+    $_SESSION['username'] = $data['username'];
+    $_SESSION['role'] = $data['role'];
+
+    echo json_encode([
+        "status" => "success",
+        "success" => true,
+        "message" => "Login berhasil",
+        "role" => "guru",
+        "redirect" => "guru/guru.html",
+        "data" => [
+            "id_user" => $data['id_user'],
+            "id_guru" => $data['id_guru'],
+            "username" => $data['username'],
+            "nama" => $data['nama'],
+            "nip" => $data['nip'],
+            "role" => $data['role']
+        ]
+    ]);
+    exit;
+} else {
+    echo json_encode([
+        "status" => "error",
+        "success" => false,
+        "message" => "Username atau password salah"
+    ]);
     exit;
 }
-
-if ($password != $user['password']) {
-    echo "Password salah";
-    exit;
-}
-
-$_SESSION['id_user'] = $user['id_user'];
-$_SESSION['username'] = $user['username'];
-$_SESSION['role_id'] = $user['role_id'];
-$_SESSION['id_guru'] = $user['id_guru'];
-$_SESSION['id_siswa'] = $user['id_siswa'];
-
-session_write_close();
-
-if ($user['role_id'] == 1) {
-    header("Location: ../admin/admin.html");
-    exit;
-}
-
-if ($user['role_id'] == 2) {
-    header("Location: guru.html");
-    exit;
-}
-
-if ($user['role_id'] == 3) {
-    header("Location: ../siswa/siswa.html");
-    exit;
-}
-
-echo "Role tidak dikenali";
-exit;
 ?>
