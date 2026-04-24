@@ -1,12 +1,13 @@
 <?php
 header('Content-Type: application/json');
+
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 $host = "localhost";
-$dbname = "NAMA_DATABASE";
-$dbuser = "USERNAME_DATABASE";
-$dbpass = "PASSWORD_DATABASE";
+$dbname = "osbebslk_sekolahyp";
+$dbuser = "osbebslk_aliyahzz";
+$dbpass = "semangatgaes";
 
 $conn = new mysqli($host, $dbuser, $dbpass, $dbname);
 
@@ -46,6 +47,14 @@ $stmt = $conn->prepare("
     LIMIT 1
 ");
 
+if (!$stmt) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Query user gagal disiapkan."
+    ]);
+    exit;
+}
+
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $stmt->store_result();
@@ -62,13 +71,25 @@ $stmt->bind_result($id_user, $db_username, $role_id, $id_guru, $id_siswa);
 $stmt->fetch();
 $stmt->close();
 
+$id_guru = $id_guru ?: null;
+$id_siswa = $id_siswa ?: null;
+
 $cek = $conn->prepare("
-    SELECT id_request 
-    FROM password_reset_requests 
-    WHERE id_user = ? 
+    SELECT id_request
+    FROM password_reset_requests
+    WHERE id_user = ?
     AND status = 'pending'
     LIMIT 1
 ");
+
+if (!$cek) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Query cek request gagal disiapkan."
+    ]);
+    exit;
+}
+
 $cek->bind_param("i", $id_user);
 $cek->execute();
 $cek->store_result();
@@ -80,6 +101,7 @@ if ($cek->num_rows > 0) {
     ]);
     exit;
 }
+
 $cek->close();
 
 $insert = $conn->prepare("
@@ -87,6 +109,14 @@ $insert = $conn->prepare("
     (id_user, id_siswa, id_guru, username, role_id, status)
     VALUES (?, ?, ?, ?, ?, 'pending')
 ");
+
+if (!$insert) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Query insert request gagal disiapkan."
+    ]);
+    exit;
+}
 
 $insert->bind_param(
     "iiisi",
