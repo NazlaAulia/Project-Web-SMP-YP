@@ -4,19 +4,7 @@ include "koneksi.php";
 
 header("Content-Type: application/json");
 
-$id_guru = "";
-
-// ambil dari session kalau ada
-if (isset($_SESSION['id_guru']) && $_SESSION['id_guru'] != "") {
-    $id_guru = $_SESSION['id_guru'];
-}
-
-// kalau session kosong, ambil dari URL ?id_guru=
-if ($id_guru == "" && isset($_GET['id_guru']) && $_GET['id_guru'] != "") {
-    $id_guru = $_GET['id_guru'];
-}
-
-if ($id_guru == "") {
+if (!isset($_SESSION['id_guru'])) {
     echo json_encode([
         "status" => "error",
         "message" => "ID guru tidak ditemukan"
@@ -24,39 +12,61 @@ if ($id_guru == "") {
     exit;
 }
 
-$query = mysqli_query($conn, "
+$id_guru = $_SESSION['id_guru'];
+
+$queryGuru = mysqli_query($conn, "
     SELECT 
-        guru.id_guru,
-        guru.nip,
-        guru.nama,
-        guru.email,
-        guru.id_mapel,
-        mapel.nama_mapel
+        id_guru,
+        nip,
+        nama,
+        email,
+        id_mapel
     FROM guru
-    LEFT JOIN mapel ON guru.id_mapel = mapel.id_mapel
-    WHERE guru.id_guru = '$id_guru'
+    WHERE id_guru = '$id_guru'
     LIMIT 1
 ");
 
-if (!$query) {
+if (!$queryGuru) {
     echo json_encode([
         "status" => "error",
-        "message" => "Query error: " . mysqli_error($conn)
+        "message" => "Query guru error: " . mysqli_error($conn)
     ]);
     exit;
 }
 
-$data = mysqli_fetch_assoc($query);
+$data = mysqli_fetch_assoc($queryGuru);
 
-if ($data) {
-    echo json_encode([
-        "status" => "success",
-        "data" => $data
-    ]);
-} else {
+if (!$data) {
     echo json_encode([
         "status" => "error",
         "message" => "Data guru tidak ditemukan"
     ]);
+    exit;
 }
+
+$data['nama_mapel'] = "-";
+
+if (!empty($data['id_mapel'])) {
+    $id_mapel = $data['id_mapel'];
+
+    $queryMapel = mysqli_query($conn, "
+        SELECT nama_mapel
+        FROM mapel
+        WHERE id_mapel = '$id_mapel'
+        LIMIT 1
+    ");
+
+    if ($queryMapel) {
+        $mapel = mysqli_fetch_assoc($queryMapel);
+
+        if ($mapel) {
+            $data['nama_mapel'] = $mapel['nama_mapel'];
+        }
+    }
+}
+
+echo json_encode([
+    "status" => "success",
+    "data" => $data
+]);
 ?>
