@@ -25,6 +25,7 @@ $query = mysqli_query($conn, "
     FROM guru
     LEFT JOIN mapel ON guru.id_mapel = mapel.id_mapel
     WHERE guru.id_guru = '$id_guru'
+    LIMIT 1
 ");
 
 $data = mysqli_fetch_assoc($query);
