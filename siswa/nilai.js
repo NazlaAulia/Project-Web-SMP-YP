@@ -242,7 +242,12 @@ function aktifkanExportAnimasi() {
 async function exportNilaiPdfFinal() {
   try {
     if (!window.jspdf || !window.jspdf.jsPDF) {
-      alert("Library jsPDF belum terbaca. Pastikan script jsPDF sudah ada di HTML sebelum nilai.js.");
+      alert("Library jsPDF belum terbaca. Taruh script jsPDF sebelum nilai.js di HTML.");
+      return;
+    }
+
+    if (!window.jspdf.jsPDF.API.autoTable) {
+      alert("Library jsPDF AutoTable belum terbaca. Taruh script jspdf-autotable sebelum nilai.js di HTML.");
       return;
     }
 
@@ -256,22 +261,33 @@ async function exportNilaiPdfFinal() {
       return;
     }
 
-    const response = await fetch(
-      `get_detail_nilai_export.php?id_siswa=${encodeURIComponent(idSiswa)}&semester=${encodeURIComponent(semesterText)}`,
-      {
-        method: "GET",
-        credentials: "same-origin"
+    const exportUrl = new URL("get_detail_nilai_export.php", window.location.href);
+    exportUrl.searchParams.set("id_siswa", idSiswa);
+    exportUrl.searchParams.set("semester", semesterText);
+
+    const response = await fetch(exportUrl.toString(), {
+      method: "GET",
+      credentials: "same-origin",
+      headers: {
+        "Accept": "application/json"
       }
-    );
+    });
 
     const text = await response.text();
+
+    console.log("URL export:", exportUrl.toString());
     console.log("RAW export nilai:", text);
 
     let result;
+
     try {
       result = JSON.parse(text);
     } catch (error) {
-      alert("Data export dari PHP bukan JSON. Cek file get_detail_nilai_export.php atau lihat Console.");
+      alert(
+        "File get_detail_nilai_export.php belum menghasilkan JSON.\n\n" +
+        "Buka Console, lihat URL export, lalu buka URL itu di browser.\n" +
+        "Kalau bukan tulisan {\"success\":true... berarti PHP/lokasi file-nya masih salah."
+      );
       return;
     }
 
@@ -286,22 +302,20 @@ async function exportNilaiPdfFinal() {
     const doc = new jsPDF("p", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    // =========================
-    // BORDER LUAR
-    // =========================
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.4);
     doc.rect(10, 10, 190, 277);
 
-    // =========================
-    // HEADER SEKOLAH
-    // =========================
     let logoData = null;
 
     try {
       logoData = await loadImageAsDataURL("../img/logo.webp");
     } catch (error) {
-      console.warn("Logo tidak berhasil dimuat, PDF tetap dibuat tanpa logo.", error);
+      try {
+        logoData = await loadImageAsDataURL("img/logo.webp");
+      } catch (error2) {
+        console.warn("Logo tidak berhasil dimuat. PDF tetap dibuat tanpa logo.");
+      }
     }
 
     if (logoData) {
@@ -331,16 +345,12 @@ async function exportNilaiPdfFinal() {
       align: "center"
     });
 
-    // Batas header
     doc.setLineWidth(0.8);
     doc.line(16, 46, 194, 46);
 
     doc.setLineWidth(0.3);
     doc.line(16, 48, 194, 48);
 
-    // =========================
-    // IDENTITAS SISWA
-    // =========================
     let y = 58;
 
     doc.setFont("helvetica", "normal");
@@ -375,18 +385,12 @@ async function exportNilaiPdfFinal() {
     doc.text("Alamat Sekolah", 16, y);
     doc.text(": Jl. Randu No.17, Sidotopo Wetan, Kec. Kenjeran, Surabaya", 52, y);
 
-    // =========================
-    // JUDUL NILAI
-    // =========================
     y += 12;
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.text("A. Nilai Akhir Semester", 16, y);
 
-    // =========================
-    // TABEL NILAI PER MAPEL
-    // =========================
     const bodyNilai = detailNilai.length > 0
       ? detailNilai.map((item, index) => [
           index + 1,
@@ -444,9 +448,6 @@ async function exportNilaiPdfFinal() {
 
     let afterTableY = doc.lastAutoTable.finalY + 10;
 
-    // =========================
-    // PENILAIAN SIKAP / ABSENSI
-    // =========================
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.text("B. Ketidakhadiran", 16, afterTableY);
@@ -501,9 +502,6 @@ async function exportNilaiPdfFinal() {
 
     afterTableY = doc.lastAutoTable.finalY + 10;
 
-    // =========================
-    // CATATAN
-    // =========================
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.text("Catatan :", 16, afterTableY);
@@ -512,9 +510,6 @@ async function exportNilaiPdfFinal() {
     doc.rect(16, afterTableY + 3, 178, 18);
     doc.text("Pertahankan semangat belajar dan terus tingkatkan prestasi.", 18, afterTableY + 10);
 
-    // =========================
-    // TANDA TANGAN
-    // =========================
     const ttdY = afterTableY + 35;
 
     doc.setFont("helvetica", "normal");
@@ -530,9 +525,6 @@ async function exportNilaiPdfFinal() {
     doc.text("(............................)", 16, ttdY + 32);
     doc.text("(............................)", 124, ttdY + 32);
 
-    // =========================
-    // SAVE PDF
-    // =========================
     const namaSiswa = siswa.nama || "Siswa";
     const namaFile = `Nilai_Akhir_Semester_${namaSiswa.replace(/\s+/g, "_")}.pdf`;
 

@@ -1,4 +1,5 @@
 <?php
+ob_start();
 error_reporting(0);
 ini_set('display_errors', 0);
 
@@ -6,19 +7,21 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once 'koneksi.php';
 
-// Biar aman kalau koneksi kamu namanya $conn atau $koneksi
 $db = null;
 
 if (isset($conn)) {
     $db = $conn;
-} elseif (isset($koneksi)) {
+}
+
+if (isset($koneksi)) {
     $db = $koneksi;
 }
 
 if (!$db) {
+    ob_clean();
     echo json_encode([
         "success" => false,
-        "message" => "Koneksi database tidak ditemukan. Cek nama variabel di koneksi.php."
+        "message" => "Koneksi database tidak ditemukan."
     ]);
     exit;
 }
@@ -27,6 +30,7 @@ $idSiswa = isset($_GET['id_siswa']) ? intval($_GET['id_siswa']) : 0;
 $semesterText = isset($_GET['semester']) ? $_GET['semester'] : '';
 
 if ($idSiswa <= 0) {
+    ob_clean();
     echo json_encode([
         "success" => false,
         "message" => "ID siswa tidak valid."
@@ -34,15 +38,12 @@ if ($idSiswa <= 0) {
     exit;
 }
 
-// Ganjil = 1, Genap = 2
 $semesterAngka = 1;
+
 if (stripos($semesterText, 'genap') !== false) {
     $semesterAngka = 2;
 }
 
-// ==========================
-// AMBIL DATA SISWA
-// ==========================
 $sqlSiswa = "
     SELECT 
         s.id_siswa,
@@ -61,9 +62,10 @@ $sqlSiswa = "
 $stmtSiswa = mysqli_prepare($db, $sqlSiswa);
 
 if (!$stmtSiswa) {
+    ob_clean();
     echo json_encode([
         "success" => false,
-        "message" => "Query siswa gagal disiapkan."
+        "message" => "Query siswa gagal."
     ]);
     exit;
 }
@@ -74,6 +76,7 @@ $resultSiswa = mysqli_stmt_get_result($stmtSiswa);
 $siswa = mysqli_fetch_assoc($resultSiswa);
 
 if (!$siswa) {
+    ob_clean();
     echo json_encode([
         "success" => false,
         "message" => "Data siswa tidak ditemukan."
@@ -81,9 +84,6 @@ if (!$siswa) {
     exit;
 }
 
-// ==========================
-// AMBIL DETAIL NILAI PER MAPEL
-// ==========================
 $sqlNilai = "
     SELECT 
         m.nama_mapel,
@@ -101,9 +101,10 @@ $sqlNilai = "
 $stmtNilai = mysqli_prepare($db, $sqlNilai);
 
 if (!$stmtNilai) {
+    ob_clean();
     echo json_encode([
         "success" => false,
-        "message" => "Query nilai gagal disiapkan."
+        "message" => "Query nilai gagal."
     ]);
     exit;
 }
@@ -128,6 +129,8 @@ while ($row = mysqli_fetch_assoc($resultNilai)) {
     ];
 }
 
+ob_clean();
+
 echo json_encode([
     "success" => true,
     "siswa" => [
@@ -140,5 +143,5 @@ echo json_encode([
     ],
     "detail_nilai" => $detailNilai
 ]);
+
 exit;
-?>
