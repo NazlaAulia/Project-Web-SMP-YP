@@ -67,14 +67,17 @@ function renderChart(dataNilai = null) {
     return;
   }
 
+  barChartEl.style.setProperty("--jumlah-bar", nilaiFinal.length);
+
   barChartEl.innerHTML = nilaiFinal.map((item) => {
     const nilaiAngka = Number(item.nilai_angka) || 0;
     const label = singkatNamaMapel(item.nama_mapel);
 
     return `
       <div class="bar-group">
-        <div class="bar-fill" style="height: ${nilaiAngka}%;">
-          <span>${nilaiAngka}</span>
+        <div class="bar-value">${nilaiAngka}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="height: ${nilaiAngka}%;"></div>
         </div>
         <span class="bar-label" title="${item.nama_mapel}">${label}</span>
       </div>
