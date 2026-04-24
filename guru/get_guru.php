@@ -1,76 +1,43 @@
 <?php
-header('Content-Type: application/json');
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+include "koneksi.php";
 
-$host = "localhost";
-$dbname = "osbebslk_sekolahyp";
-$dbuser = "osbebslk_aliyahzz";
-$dbpass = "semangatgaes";
+header("Content-Type: application/json");
 
-$conn = new mysqli($host, $dbuser, $dbpass, $dbname);
-
-if ($conn->connect_error) {
+if (!isset($_GET['id_guru'])) {
     echo json_encode([
         "status" => "error",
-        "message" => "Koneksi database gagal: " . $conn->connect_error
+        "message" => "ID guru tidak ditemukan"
     ]);
     exit;
 }
 
-$id_guru = isset($_GET['id_guru']) ? (int)$_GET['id_guru'] : 0;
+$id_guru = $_GET['id_guru'];
 
-if ($id_guru <= 0) {
+$query = mysqli_query($conn, "
+    SELECT 
+        guru.id_guru,
+        guru.nip,
+        guru.nama,
+        guru.email,
+        guru.id_mapel,
+        mapel.nama_mapel
+    FROM guru
+    LEFT JOIN mapel ON guru.id_mapel = mapel.id_mapel
+    WHERE guru.id_guru = '$id_guru'
+    LIMIT 1
+");
+
+$data = mysqli_fetch_assoc($query);
+
+if ($data) {
     echo json_encode([
-        "status" => "error",
-        "message" => "id_guru tidak valid"
+        "status" => "success",
+        "data" => $data
     ]);
-    exit;
-}
-
-$sql = "SELECT id_guru, nama, nip FROM guru WHERE id_guru = ? LIMIT 1";
-$stmt = $conn->prepare($sql);
-
-if (!$stmt) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Prepare gagal: " . $conn->error
-    ]);
-    exit;
-}
-
-$stmt->bind_param("i", $id_guru);
-
-if (!$stmt->execute()) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Execute gagal: " . $stmt->error
-    ]);
-    exit;
-}
-
-$stmt->store_result();
-
-if ($stmt->num_rows === 0) {
+} else {
     echo json_encode([
         "status" => "error",
         "message" => "Data guru tidak ditemukan"
     ]);
-    exit;
 }
-
-$stmt->bind_result($db_id_guru, $nama, $nip);
-$stmt->fetch();
-
-echo json_encode([
-    "status" => "success",
-    "data" => [
-        "id_guru" => $db_id_guru,
-        "nama" => $nama,
-        "nip" => $nip
-    ]
-]);
-
-$stmt->close();
-$conn->close();
 ?>
