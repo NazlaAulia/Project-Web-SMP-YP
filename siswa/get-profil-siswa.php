@@ -3,18 +3,29 @@ session_start();
 header("Content-Type: application/json");
 require_once "koneksi.php";
 
-if (!isset($_SESSION['id_siswa'])) {
+$id_siswa = 0;
+
+// Ambil dari session dulu
+if (isset($_SESSION['id_siswa'])) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
+}
+
+// Kalau session kosong, ambil dari URL
+if ($id_siswa <= 0 && isset($_GET['id_siswa'])) {
+    $id_siswa = (int) $_GET['id_siswa'];
+}
+
+if ($id_siswa <= 0) {
     echo json_encode([
         "success" => false,
-        "message" => "Session siswa tidak ditemukan. Silakan login ulang."
+        "message" => "ID siswa tidak ditemukan."
     ]);
     exit;
 }
 
-$id_siswa = (int) $_SESSION['id_siswa'];
-
 $stmt = $conn->prepare("
     SELECT 
+        s.id_siswa,
         s.nama,
         s.nis,
         s.nisn,
