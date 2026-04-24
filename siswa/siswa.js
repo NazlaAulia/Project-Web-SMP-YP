@@ -49,6 +49,45 @@ function renderChart() {
   document.getElementById("minValue").textContent = `${terendah[0]} (${terendah[1]})`;
 }
 
+function renderJadwalHariIni(jadwal) {
+  const scheduleCard = document.querySelector(".schedule-card");
+  const oldScheduleItem = document.querySelector(".schedule-item");
+
+  if (!scheduleCard) return;
+
+  let container = document.getElementById("jadwalHariIniContainer");
+
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "jadwalHariIniContainer";
+
+    if (oldScheduleItem) {
+      oldScheduleItem.replaceWith(container);
+    } else {
+      scheduleCard.appendChild(container);
+    }
+  }
+
+  if (!jadwal || jadwal.length === 0) {
+    container.innerHTML = `
+      <p class="schedule-empty">Tidak ada jadwal hari ini.</p>
+    `;
+    return;
+  }
+
+  container.innerHTML = jadwal.map((item) => {
+    return `
+      <div class="schedule-item">
+        <span class="schedule-time">${item.jam || "-"}</span>
+        <div class="schedule-details">
+          <h4>${item.nama_mapel || "Mata Pelajaran"}</h4>
+          <p>${item.nama_guru || "Guru belum ditentukan"}</p>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
 async function loadDashboard() {
   renderChart();
 
@@ -77,6 +116,9 @@ async function loadDashboard() {
     welcomeTextEl.textContent = `Halo, ${nama}!`;
     avatarPlaceholderEl.textContent = hurufAwal;
     namaKelasEl.textContent = s.nama_kelas || "-";
+
+    renderJadwalHariIni(s.jadwal_hari_ini);
+
   } catch (error) {
     console.error("Error load dashboard:", error);
     alert(error.message || "Terjadi error saat memuat dashboard siswa.");
