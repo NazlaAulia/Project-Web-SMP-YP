@@ -85,8 +85,10 @@ function setProfileUI(data) {
 
 async function loadProfilSiswa() {
   try {
-    const response = await fetch("./get_profil_siswa.php");
+    const response = await fetch(`get_profil_siswa.php?id_siswa=${encodeURIComponent(idSiswa)}`);
     const result = await response.json();
+
+    console.log("RESPON PROFIL:", result);
 
     if (!result.success) {
       alert(result.message || "Data siswa tidak ditemukan.");
@@ -94,6 +96,7 @@ async function loadProfilSiswa() {
     }
 
     const siswaData = result.data;
+
     setProfileUI(siswaData);
 
     if (siswaData?.foto_profil) {
@@ -104,97 +107,12 @@ async function loadProfilSiswa() {
       const fotoLocal = localStorage.getItem(FOTO_KEY);
       setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
     }
+
   } catch (error) {
     console.error("Gagal load profil siswa:", error);
+    alert("Gagal mengambil data profil siswa.");
+
     const fotoLocal = localStorage.getItem(FOTO_KEY);
     setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
   }
 }
-
-async function pilihDanUploadFoto(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  try {
-    if (!file.type || !file.type.startsWith("image/")) {
-      showToast("File harus berupa gambar.", "error");
-      elInputFoto.value = "";
-      return;
-    }
-
-    const maxSize = 2 * 1024 * 1024;
-    if (file.size > maxSize) {
-      showToast("Ukuran gambar maksimal 2 MB.", "error");
-      elInputFoto.value = "";
-      return;
-    }
-
-    const previewURL = URL.createObjectURL(file);
-    setImage(elFoto, previewURL);
-
-    if (elBtnPilihFoto) {
-      elBtnPilihFoto.disabled = true;
-      elBtnPilihFoto.textContent = "Menyimpan...";
-    }
-
-    const formData = new FormData();
-    formData.append("foto", file);
-    formData.append("id_siswa", idSiswa);
-
-   const response = await fetch("upload-foto-profil.php", {
-  method: "POST",
-  body: formData
-});
-
-const text = await response.text();
-console.log("RESPON upload-foto-profil.php:", text);
-
-let result;
-try {
-  result = JSON.parse(text);
-} catch (e) {
-  throw new Error(text);
-}
-
-    if (!result.success) {
-      throw new Error(result.message || "Upload gagal.");
-    }
-
-    const fotoBaru = result.foto_url;
-    localStorage.setItem(FOTO_KEY, fotoBaru);
-
-    setImage(elFoto, fotoBaru + "?t=" + Date.now());
-    showToast("Foto profil berhasil disimpan.", "success");
-  } catch (error) {
-    console.error("Gagal upload:", error);
-
-    const fotoLocal = localStorage.getItem(FOTO_KEY);
-    if (fotoLocal) {
-      setImage(elFoto, fotoLocal);
-    } else {
-      setImage(elFoto, DEFAULT_PHOTO);
-    }
-
-    showToast(
-      "Gagal upload: " + (error?.message || "Terjadi kesalahan."),
-      "error"
-    );
-  } finally {
-    if (elBtnPilihFoto) {
-      elBtnPilihFoto.disabled = false;
-      elBtnPilihFoto.textContent = "Pilih Foto";
-    }
-
-    elInputFoto.value = "";
-  }
-}
-
-if (elBtnPilihFoto && elInputFoto) {
-  elBtnPilihFoto.addEventListener("click", () => {
-    elInputFoto.click();
-  });
-
-  elInputFoto.addEventListener("change", pilihDanUploadFoto);
-}
-
-loadProfilSiswa();
