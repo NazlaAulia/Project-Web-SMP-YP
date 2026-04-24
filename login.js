@@ -117,10 +117,10 @@ if (forgotPasswordLink) {
 
         const { value: username } = await Swal.fire({
             title: 'Lupa Sandi',
-            text: 'Masukkan username akunmu.',
+            text: 'Masukkan username akun siswa/guru.',
             input: 'text',
             inputPlaceholder: 'Masukkan username',
-            confirmButtonText: 'Kirim',
+            confirmButtonText: 'Lanjut',
             cancelButtonText: 'Batal',
             showCancelButton: true,
             inputValidator: (value) => {
@@ -156,22 +156,23 @@ if (forgotPasswordLink) {
             if (result.status === 'success' && result.wa_link) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Berhasil',
+                    title: 'Konfirmasi ke Admin',
                     html: `
                         <p>${result.message}</p>
                         <a href="${result.wa_link}" target="_blank" class="swal2-confirm swal2-styled">
-                            Konfirmasi ke Admin
+                            Buka WhatsApp Admin
                         </a>
                     `,
                     showConfirmButton: false
                 });
-            } else {
-                Swal.fire({
-                    icon: result.status === 'success' ? 'success' : 'error',
-                    title: result.status === 'success' ? 'Berhasil' : 'Gagal',
-                    text: result.message || 'Terjadi kesalahan.'
-                });
+                return;
             }
+
+            Swal.fire({
+                icon: result.status === 'success' ? 'success' : 'error',
+                title: result.status === 'success' ? 'Berhasil' : 'Gagal',
+                text: result.message || 'Terjadi kesalahan.'
+            });
 
         } catch (error) {
             Swal.fire({
