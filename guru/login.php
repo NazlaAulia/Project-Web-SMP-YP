@@ -19,13 +19,13 @@ if ($user) {
         $_SESSION['id_siswa'] = $user['id_siswa'];
 
         if ($user['role_id'] == 1) {
-            header("Location: dashboard_admin.php");
+            header("Location: ../dashboard_admin.php");
             exit;
         } elseif ($user['role_id'] == 2) {
-            header("Location: dashboard_guru.php");
+            header("Location: guru.html");
             exit;
         } elseif ($user['role_id'] == 3) {
-            header("Location: dashboard_siswa.php");
+            header("Location: ../dashboard_siswa.php");
             exit;
         } else {
             echo "Role tidak dikenali";

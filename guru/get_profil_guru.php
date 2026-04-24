@@ -4,7 +4,7 @@ include "koneksi.php";
 
 header("Content-Type: application/json");
 
-if (!isset($_SESSION['id_guru'])) {
+if (!isset($_SESSION['id_guru']) || $_SESSION['id_guru'] == '') {
     echo json_encode([
         "status" => "error",
         "message" => "Belum login"
@@ -27,6 +27,14 @@ $query = mysqli_query($conn, "
     WHERE guru.id_guru = '$id_guru'
     LIMIT 1
 ");
+
+if (!$query) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Query error: " . mysqli_error($conn)
+    ]);
+    exit;
+}
 
 $data = mysqli_fetch_assoc($query);
 
