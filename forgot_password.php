@@ -9,6 +9,8 @@ $dbname = "osbebslk_sekolahyp";
 $dbuser = "osbebslk_aliyahzz";
 $dbpass = "semangatgaes";
 
+$adminWa = "6283123500258"; // GANTI nomor WA admin
+
 $conn = new mysqli($host, $dbuser, $dbpass, $dbname);
 
 if ($conn->connect_error) {
@@ -41,9 +43,16 @@ if ($username === "") {
 }
 
 $stmt = $conn->prepare("
-    SELECT id_user, username, role_id, id_guru, id_siswa
-    FROM `user`
-    WHERE username = ?
+    SELECT 
+        u.id_user,
+        u.username,
+        u.role_id,
+        u.id_guru,
+        u.id_siswa,
+        s.nama AS nama_siswa
+    FROM `user` u
+    LEFT JOIN siswa s ON u.id_siswa = s.id_siswa
+    WHERE u.username = ?
     LIMIT 1
 ");
 
@@ -57,22 +66,18 @@ if (!$stmt) {
 
 $stmt->bind_param("s", $username);
 $stmt->execute();
-$stmt->store_result();
+$result = $stmt->get_result();
 
-if ($stmt->num_rows === 0) {
+if ($result->num_rows === 0) {
     echo json_encode([
-        "status" => "success",
-        "message" => "Jika username terdaftar, permintaan reset sandi akan dikirim ke admin."
+        "status" => "error",
+        "message" => "Username tidak ditemukan."
     ]);
     exit;
 }
 
-$stmt->bind_result($id_user, $db_username, $role_id, $id_guru, $id_siswa);
-$stmt->fetch();
+$user = $result->fetch_assoc();
 $stmt->close();
-
-$id_guru = $id_guru ?: null;
-$id_siswa = $id_siswa ?: null;
 
 $cek = $conn->prepare("
     SELECT id_request
@@ -85,19 +90,33 @@ $cek = $conn->prepare("
 if (!$cek) {
     echo json_encode([
         "status" => "error",
-        "message" => "Query cek request gagal disiapkan."
+        "message" => "Query cek reset gagal disiapkan."
     ]);
     exit;
 }
 
-$cek->bind_param("i", $id_user);
+$cek->bind_param("i", $user["id_user"]);
 $cek->execute();
 $cek->store_result();
 
+$nama = $user["nama_siswa"] ?: $user["username"];
+
+$pesan = "Halo Admin, saya ingin konfirmasi reset password SIAKAD.%0A%0A" .
+         "Username: " . $user["username"] . "%0A" .
+         "Nama: " . $nama . "%0A" .
+         "Role ID: " . $user["role_id"] . "%0A%0A" .
+         "Mohon dibantu untuk reset password akun saya.";
+
+$wa_link = "https://wa.me/" . $adminWa . "?text=" . $pesan;
+
 if ($cek->num_rows > 0) {
+    $cek->close();
+    $conn->close();
+
     echo json_encode([
         "status" => "success",
-        "message" => "Permintaan reset sandi kamu sudah masuk. Silakan tunggu admin memproses."
+        "message" => "Permintaan reset sandi kamu sudah masuk. Silakan konfirmasi ke admin melalui WhatsApp.",
+        "wa_link" => $wa_link
     ]);
     exit;
 }
@@ -113,18 +132,21 @@ $insert = $conn->prepare("
 if (!$insert) {
     echo json_encode([
         "status" => "error",
-        "message" => "Query insert request gagal disiapkan."
+        "message" => "Query insert reset gagal disiapkan."
     ]);
     exit;
 }
 
+$id_siswa = $user["id_siswa"];
+$id_guru = $user["id_guru"];
+
 $insert->bind_param(
     "iiisi",
-    $id_user,
+    $user["id_user"],
     $id_siswa,
     $id_guru,
-    $db_username,
-    $role_id
+    $user["username"],
+    $user["role_id"]
 );
 
 if (!$insert->execute()) {
@@ -140,6 +162,7 @@ $conn->close();
 
 echo json_encode([
     "status" => "success",
-    "message" => "Permintaan reset sandi berhasil dikirim ke admin."
+    "message" => "Permintaan reset sandi berhasil dikirim. Silakan konfirmasi ke admin melalui WhatsApp.",
+    "wa_link" => $wa_link
 ]);
 ?>
