@@ -1,332 +1,356 @@
-function $(id) {
-    return document.getElementById(id);
-}
-
-// ======================
-// DATA DUMMY
-// ======================
 const jadwalData = [
     {
         id_jadwal: 1,
-        id_guru: 101,
-        nama_mapel: "Matematika",
-        nama_kelas: "7A",
+        guru: "Guru 1",
+        kelas: "7A",
+        mapel: "BIN",
         hari: "Senin",
-        jam: "1-2",
-        ruang: "R-01"
+        jam: "07:00-08:00"
     },
     {
         id_jadwal: 2,
-        id_guru: 101,
-        nama_mapel: "Matematika",
-        nama_kelas: "7B",
-        hari: "Selasa",
-        jam: "3-4",
-        ruang: "R-02"
+        guru: "Guru 7",
+        kelas: "7A",
+        mapel: "MAT",
+        hari: "Senin",
+        jam: "08:00-09:00"
     },
     {
         id_jadwal: 3,
-        id_guru: 101,
-        nama_mapel: "Matematika",
-        nama_kelas: "8A",
-        hari: "Rabu",
-        jam: "5-6",
-        ruang: "R-03"
+        guru: "Guru 6",
+        kelas: "7A",
+        mapel: "INFOR",
+        hari: "Selasa",
+        jam: "07:00-08:00"
     },
     {
         id_jadwal: 4,
-        id_guru: 101,
-        nama_mapel: "Matematika",
-        nama_kelas: "8B",
-        hari: "Kamis",
-        jam: "7-8",
-        ruang: "R-04"
+        guru: "Guru 4",
+        kelas: "7A",
+        mapel: "PKN",
+        hari: "Rabu",
+        jam: "09:00-10:00"
     },
     {
         id_jadwal: 5,
-        id_guru: 101,
-        nama_mapel: "Matematika",
-        nama_kelas: "9A",
+        guru: "Guru 2",
+        kelas: "7B",
+        mapel: "B. JAWA",
+        hari: "Senin",
+        jam: "07:00-08:00"
+    },
+    {
+        id_jadwal: 6,
+        guru: "Guru 10",
+        kelas: "7B",
+        mapel: "BIG",
+        hari: "Senin",
+        jam: "08:00-09:00"
+    },
+    {
+        id_jadwal: 7,
+        guru: "Guru 11",
+        kelas: "7B",
+        mapel: "IPA",
+        hari: "Selasa",
+        jam: "09:00-10:00"
+    },
+    {
+        id_jadwal: 8,
+        guru: "Belum Ditentukan",
+        kelas: "7B",
+        mapel: "PJOK",
+        hari: "Kamis",
+        jam: "07:00-08:00"
+    },
+    {
+        id_jadwal: 9,
+        guru: "Guru 1",
+        kelas: "7C",
+        mapel: "BIN",
+        hari: "Senin",
+        jam: "09:00-10:00"
+    },
+    {
+        id_jadwal: 10,
+        guru: "Guru 14",
+        kelas: "7C",
+        mapel: "IPS",
+        hari: "Selasa",
+        jam: "08:00-09:00"
+    },
+    {
+        id_jadwal: 11,
+        guru: "Belum Ditentukan",
+        kelas: "7C",
+        mapel: "PAI/BHQ",
+        hari: "Rabu",
+        jam: "07:00-08:00"
+    },
+    {
+        id_jadwal: 12,
+        guru: "Belum Ditentukan",
+        kelas: "7C",
+        mapel: "BK",
         hari: "Jumat",
-        jam: "9-10",
-        ruang: "R-05"
+        jam: "08:00-09:00"
     }
 ];
 
 let requestData = [];
 
-// ======================
-// SAAT HALAMAN DIBUKA
-// ======================
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("jadwal.js aktif");
+const scheduleContainer = document.getElementById("scheduleContainer");
+const requestContainer = document.getElementById("requestContainer");
+const filterHari = document.getElementById("filterHari");
+const filterKelas = document.getElementById("filterKelas");
+const requestModal = document.getElementById("requestModal");
+const jadwalDipilih = document.getElementById("jadwalDipilih");
+const hariBaru = document.getElementById("hariBaru");
+const jamBaru = document.getElementById("jamBaru");
+const alasanRequest = document.getElementById("alasanRequest");
+const aiSuggestionText = document.getElementById("aiSuggestionText");
+const requestForm = document.getElementById("requestForm");
 
-    initFilterOptions();
-    renderSchedule(jadwalData);
-    renderRequest(requestData);
-    populateScheduleOptions();
-
-    const form = $("requestForm");
-    if (form) {
-        form.addEventListener("submit", submitRequestForm);
-    }
+document.addEventListener("DOMContentLoaded", () => {
+    initFilter();
+    renderJadwal(jadwalData);
+    renderSelectJadwal();
+    renderRequest();
 });
 
-// ======================
-// MODAL
-// ======================
-function openRequestModal() {
-    console.log("modal dibuka");
-    const modal = $("requestModal");
-    if (modal) {
-        modal.style.display = "flex";
-    }
-}
+function initFilter() {
+    const hariList = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
+    const kelasList = ["7A", "7B", "7C", "8A", "8B", "8C", "9A", "9B", "9C"];
 
-function closeRequestModal() {
-    const modal = $("requestModal");
-    if (modal) {
-        modal.style.display = "none";
-    }
-}
-
-window.openRequestModal = openRequestModal;
-window.closeRequestModal = closeRequestModal;
-
-// klik area luar modal = tutup
-window.addEventListener("click", function (e) {
-    const modal = $("requestModal");
-    if (e.target === modal) {
-        closeRequestModal();
-    }
-});
-
-// ======================
-// FILTER
-// ======================
-function initFilterOptions() {
-    const filterHari = $("filterHari");
-    const filterKelas = $("filterKelas");
-
-    if (!filterHari || !filterKelas) return;
-
-    const daftarHari = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
-    const kelasUnik = [...new Set(jadwalData.map(item => item.nama_kelas))];
-
-    filterHari.innerHTML = `<option value="Semua">Semua Hari</option>`;
-    filterKelas.innerHTML = `<option value="Semua">Semua Kelas</option>`;
-
-    daftarHari.forEach(hari => {
+    hariList.forEach(hari => {
         const option = document.createElement("option");
         option.value = hari;
         option.textContent = hari;
         filterHari.appendChild(option);
     });
 
-    kelasUnik.forEach(kelas => {
+    kelasList.forEach(kelas => {
         const option = document.createElement("option");
         option.value = kelas;
-        option.textContent = kelas;
+        option.textContent = `Kelas ${kelas}`;
         filterKelas.appendChild(option);
     });
 }
-function filterData() {
-    const selectedHari = $("filterHari").value;
-    const selectedKelas = $("filterKelas").value;
 
-    let filtered = [...jadwalData];
-
-    if (selectedHari !== "Semua") {
-        filtered = filtered.filter(item => item.hari === selectedHari);
-    }
-
-    if (selectedKelas !== "Semua") {
-        filtered = filtered.filter(item => item.nama_kelas === selectedKelas);
-    }
-
-    renderSchedule(filtered);
-}
-
-window.filterData = filterData;
-
-// ======================
-// RENDER JADWAL
-// ======================
-function renderSchedule(data) {
-    const container = $("scheduleContainer");
-    if (!container) return;
-
-    container.innerHTML = "";
+function renderJadwal(data) {
+    scheduleContainer.innerHTML = "";
 
     if (data.length === 0) {
-        container.innerHTML = `<div style="background:#fff;padding:20px;border-radius:16px;">Tidak ada jadwal</div>`;
+        scheduleContainer.innerHTML = `
+            <div class="empty-card">
+                <i class="bi bi-calendar-x"></i>
+                <p>Tidak ada jadwal yang sesuai filter.</p>
+            </div>
+        `;
         return;
     }
 
     data.forEach(item => {
-        container.innerHTML += `
-            <div class="card-schedule">
+        const card = document.createElement("div");
+        card.className = "card-schedule click-animate";
+
+        card.innerHTML = `
+            <div class="schedule-top">
                 <span class="day-badge">${item.hari}</span>
-                <h3>${item.nama_mapel}</h3>
-                <p>Kelas ${item.nama_kelas}</p>
-                <div class="info-row">
-                    <i class="bi bi-clock"></i>
-                    <span>Jam ${item.jam}</span>
-                </div>
-                <div class="info-row">
-                    <i class="bi bi-door-open"></i>
-                    <span>${item.ruang}</span>
-                </div>
+                <span class="time-badge">${item.jam}</span>
+            </div>
+
+            <h3>${item.mapel}</h3>
+
+            <div class="info-row">
+                <i class="bi bi-person-badge"></i>
+                <span>${item.guru}</span>
+            </div>
+
+            <div class="info-row">
+                <i class="bi bi-building"></i>
+                <span>Kelas ${item.kelas}</span>
+            </div>
+
+            <div class="schedule-actions">
+                <button type="button" onclick="pilihJadwal(${item.id_jadwal})">
+                    <i class="bi bi-arrow-repeat"></i>
+                    Ajukan Ganti
+                </button>
             </div>
         `;
+
+        scheduleContainer.appendChild(card);
     });
+
+    setupClickAnimation();
 }
 
-// ======================
-// ISI DROPDOWN JADWAL
-// ======================
-function populateScheduleOptions() {
-    const select = $("id_jadwal");
-    if (!select) return;
+function filterData() {
+    const hari = filterHari.value;
+    const kelas = filterKelas.value;
 
-    select.innerHTML = `<option value="">-- Pilih Jadwal --</option>`;
+    const filtered = jadwalData.filter(item => {
+        const cocokHari = hari === "Semua" || item.hari === hari;
+        const cocokKelas = kelas === "Semua" || item.kelas === kelas;
+
+        return cocokHari && cocokKelas;
+    });
+
+    renderJadwal(filtered);
+}
+
+function renderSelectJadwal() {
+    jadwalDipilih.innerHTML = `<option value="">Pilih jadwal</option>`;
 
     jadwalData.forEach(item => {
         const option = document.createElement("option");
         option.value = item.id_jadwal;
-        option.textContent = `${item.nama_mapel} - ${item.nama_kelas} | ${item.hari}, Jam ${item.jam}`;
-        select.appendChild(option);
+        option.textContent = `${item.hari}, ${item.jam} - ${item.mapel} - Kelas ${item.kelas} - ${item.guru}`;
+        jadwalDipilih.appendChild(option);
     });
 }
 
-// ======================
-// AUTOFILL JADWAL LAMA
-// ======================
-function autoFillOldSchedule() {
-    const selectedId = $("id_jadwal").value;
-    const selectedJadwal = jadwalData.find(j => j.id_jadwal == selectedId);
-
-    if (!selectedJadwal) return;
-
-    $("hari_lama_view").value = selectedJadwal.hari;
-    $("jam_lama_view").value = selectedJadwal.jam;
+function openRequestModal() {
+    requestModal.style.display = "flex";
 }
 
-window.autoFillOldSchedule = autoFillOldSchedule;
-
-// ======================
-// JENIS PENGAJUAN
-// ======================
-function handleJenisPengajuan() {
-    const tipe = $("tipe_pengajuan").value;
-    const wrap = $("guruTujuanWrap");
-
-    if (!wrap) return;
-    wrap.style.display = tipe === "tukar" ? "block" : "none";
+function closeRequestModal() {
+    requestModal.style.display = "none";
+    requestForm.reset();
+    aiSuggestionText.textContent = "Klik tombol generate untuk mendapatkan saran jadwal otomatis.";
 }
 
-window.handleJenisPengajuan = handleJenisPengajuan;
+function pilihJadwal(idJadwal) {
+    openRequestModal();
+    jadwalDipilih.value = idJadwal;
+}
 
-// ======================
-// VALIDASI SLOT
-// ======================
-function cekKetersediaanSlot() {
-    const idJadwal = $("id_jadwal").value;
-    const hariBaru = $("hari_baru").value;
-    const jamBaru = $("jam_baru").value;
-    const info = $("validationInfo");
+function generateAIJadwal() {
+    const jadwalId = Number(jadwalDipilih.value);
 
-    if (!idJadwal || !hariBaru || !jamBaru) {
-        info.innerHTML = "";
+    if (!jadwalId) {
+        alert("Pilih jadwal terlebih dahulu sebelum generate AI.");
         return;
     }
 
-    const jadwalDipilih = jadwalData.find(j => j.id_jadwal == idJadwal);
-    if (!jadwalDipilih) return;
+    const jadwal = jadwalData.find(item => item.id_jadwal === jadwalId);
 
-    const bentrok = jadwalData.some(j =>
-        j.id_jadwal != idJadwal &&
-        (
-            (j.hari === hariBaru && j.jam === jamBaru && j.nama_kelas === jadwalDipilih.nama_kelas)
-        )
-    );
+    const opsiHari = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
+    const opsiJam = ["07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00"];
 
-    if (bentrok) {
-        info.innerHTML = `<div class="alert-error">Slot bentrok, pilih jam lain.</div>`;
-    } else {
-        info.innerHTML = `<div class="alert-success">Slot tersedia.</div>`;
+    const rekomendasi = opsiHari
+        .flatMap(hari => opsiJam.map(jam => ({ hari, jam })))
+        .find(slot => {
+            const bentrok = jadwalData.some(item =>
+                item.kelas === jadwal.kelas &&
+                item.hari === slot.hari &&
+                item.jam === slot.jam
+            );
+
+            return !bentrok && !(slot.hari === jadwal.hari && slot.jam === jadwal.jam);
+        });
+
+    if (!rekomendasi) {
+        aiSuggestionText.textContent = "AI belum menemukan slot kosong yang cocok.";
+        return;
     }
+
+    hariBaru.value = rekomendasi.hari;
+    jamBaru.value = rekomendasi.jam;
+
+    aiSuggestionText.textContent =
+        `AI menyarankan jadwal baru pada hari ${rekomendasi.hari}, jam ${rekomendasi.jam}, karena slot tersebut tidak bentrok dengan jadwal kelas ${jadwal.kelas}.`;
 }
 
-window.cekKetersediaanSlot = cekKetersediaanSlot;
-
-// ======================
-// SUBMIT FORM
-// ======================
-function submitRequestForm(e) {
+requestForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    const idJadwal = $("id_jadwal").value;
-    const hariBaru = $("hari_baru").value;
-    const jamBaru = $("jam_baru").value;
-    const alasan = $("alasan").value.trim();
+    const jadwalId = Number(jadwalDipilih.value);
+    const jadwal = jadwalData.find(item => item.id_jadwal === jadwalId);
 
-    if (!idJadwal || !hariBaru || !jamBaru || !alasan) {
-        alert("Lengkapi dulu formnya");
+    if (!jadwal) {
+        alert("Jadwal tidak ditemukan.");
         return;
     }
 
-    const jadwalDipilih = jadwalData.find(j => j.id_jadwal == idJadwal);
-    if (!jadwalDipilih) return;
+    const request = {
+        id_request: requestData.length + 1,
+        jadwalLama: `${jadwal.hari}, ${jadwal.jam}`,
+        guru: jadwal.guru,
+        kelas: jadwal.kelas,
+        mapel: jadwal.mapel,
+        hari_baru: hariBaru.value,
+        jam_baru: jamBaru.value,
+        alasan: alasanRequest.value,
+        status: "Menunggu",
+        tanggal_request: new Date().toLocaleDateString("id-ID")
+    };
 
-    requestData.unshift({
-        id_request: Date.now(),
-        nama_mapel: jadwalDipilih.nama_mapel,
-        nama_kelas: jadwalDipilih.nama_kelas,
-        hari_lama: jadwalDipilih.hari,
-        jam_lama: jadwalDipilih.jam,
-        hari_baru: hariBaru,
-        jam_baru: jamBaru,
-        alasan: alasan,
-        status: "menunggu",
-        tanggal_request: new Date().toLocaleString("id-ID")
-    });
-
-    renderRequest(requestData);
+    requestData.unshift(request);
+    renderRequest();
     closeRequestModal();
-    $("requestForm").reset();
-    $("validationInfo").innerHTML = "";
-}
 
-function renderRequest(data) {
-    const container = $("requestContainer");
-    if (!container) return;
+    alert("Pengajuan ganti jadwal berhasil dibuat secara UI. Belum tersimpan ke database.");
+});
 
-    container.innerHTML = "";
-
-    if (data.length === 0) {
-        container.innerHTML = `<div style="background:#fff;padding:20px;border-radius:16px;">Belum ada riwayat pengajuan.</div>`;
-        return;
-    }
-
-    data.forEach(item => {
-        container.innerHTML += `
-            <div class="card-schedule" style="margin-bottom:15px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                    <span class="status-badge status-menunggu">${item.status}</span>
-                    <small>${item.tanggal_request}</small>
-                </div>
-                <div style="font-weight:700;">${item.nama_mapel} (${item.nama_kelas})</div>
-                <div style="margin:10px 0;">
-                    <span style="text-decoration:line-through;color:#999;">${item.hari_lama} (${item.jam_lama})</span>
-                    <i class="bi bi-arrow-right" style="margin:0 8px;"></i>
-                    <span style="font-weight:700;">${item.hari_baru} (${item.jam_baru})</span>
-                </div>
-                <div class="info-row">
-                    <i class="bi bi-chat-left-dots"></i>
-                    <span>"${item.alasan}"</span>
-                </div>
+function renderRequest() {
+    if (requestData.length === 0) {
+        requestContainer.innerHTML = `
+            <div class="request-empty">
+                <i class="bi bi-inbox"></i>
+                <p>Belum ada pengajuan ganti jadwal.</p>
             </div>
         `;
+        return;
+    }
+
+    requestContainer.innerHTML = requestData.map(item => `
+        <div class="request-card click-animate">
+            <div class="request-header">
+                <div>
+                    <h3>${item.mapel} - Kelas ${item.kelas}</h3>
+                    <p>${item.guru}</p>
+                </div>
+
+                <span class="status-badge status-menunggu">${item.status}</span>
+            </div>
+
+            <div class="request-grid">
+                <div>
+                    <span>Jadwal Lama</span>
+                    <strong>${item.jadwalLama}</strong>
+                </div>
+
+                <div>
+                    <span>Jadwal Baru</span>
+                    <strong>${item.hari_baru}, ${item.jam_baru}</strong>
+                </div>
+
+                <div>
+                    <span>Tanggal Request</span>
+                    <strong>${item.tanggal_request}</strong>
+                </div>
+            </div>
+
+            <div class="request-reason">
+                <span>Alasan</span>
+                <p>${item.alasan}</p>
+            </div>
+        </div>
+    `).join("");
+
+    setupClickAnimation();
+}
+
+function setupClickAnimation() {
+    const animatedCards = document.querySelectorAll(".click-animate");
+
+    animatedCards.forEach(card => {
+        card.onclick = function () {
+            card.classList.remove("card-active");
+            void card.offsetWidth;
+            card.classList.add("card-active");
+        };
     });
 }
