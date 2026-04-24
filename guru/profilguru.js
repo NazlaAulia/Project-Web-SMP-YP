@@ -1,3 +1,5 @@
+alert("profilguru.js kebaca");
+
 const uploadFoto = document.getElementById("uploadFoto");
 const previewFoto = document.getElementById("previewFoto");
 
@@ -29,51 +31,54 @@ if (uploadFoto) {
 }
 
 function isiProfilGuru(guru) {
-  if (displayNamaGuru) displayNamaGuru.textContent = guru.nama ?? "-";
-  if (displayMapelGuru) displayMapelGuru.textContent = `Guru ${guru.nama_mapel ?? "-"}`;
-  if (displayNipGuru) displayNipGuru.textContent = guru.nip ?? "-";
-  if (displayEmailGuru) displayEmailGuru.textContent = guru.email ?? "-";
+  console.log("Data guru yang diisi:", guru);
 
-  if (namaGuru) namaGuru.value = guru.nama ?? "";
-  if (nipGuru) nipGuru.value = guru.nip ?? "";
-  if (emailGuru) emailGuru.value = guru.email ?? "";
-  if (mapelGuru) mapelGuru.value = guru.nama_mapel ?? "-";
-  if (mapelAkademikGuru) mapelAkademikGuru.value = guru.nama_mapel ?? "-";
+  if (displayNamaGuru) displayNamaGuru.textContent = guru.nama || "-";
+  if (displayMapelGuru) displayMapelGuru.textContent = "Guru " + (guru.nama_mapel || "-");
+  if (displayNipGuru) displayNipGuru.textContent = guru.nip || "-";
+  if (displayEmailGuru) displayEmailGuru.textContent = guru.email || "-";
+
+  if (namaGuru) namaGuru.value = guru.nama || "";
+  if (nipGuru) nipGuru.value = guru.nip || "";
+  if (emailGuru) emailGuru.value = guru.email || "";
+  if (mapelGuru) mapelGuru.value = guru.nama_mapel || "-";
+  if (mapelAkademikGuru) mapelAkademikGuru.value = guru.nama_mapel || "-";
 }
 
 function loadProfilGuru() {
   fetch("get_profil_guru.php")
     .then(response => response.json())
     .then(result => {
-      console.log("get_profil_guru:", result);
+      console.log("Hasil get_profil_guru.php:", result);
 
       if (result.status === "success") {
         isiProfilGuru(result.data);
-      } else {
-        const idGuru = localStorage.getItem("id_guru");
-
-        if (!idGuru) {
-          alert(result.message);
-          window.location.href = "login.html";
-          return;
-        }
-
-        fetch(`get_guru.php?id_guru=${encodeURIComponent(idGuru)}`)
-          .then(response => response.json())
-          .then(resultGuru => {
-            console.log("get_guru:", resultGuru);
-
-            if (resultGuru.status === "success") {
-              isiProfilGuru(resultGuru.data);
-            } else {
-              alert(resultGuru.message);
-            }
-          });
+        return;
       }
+
+      const idGuru = localStorage.getItem("id_guru");
+      console.log("id_guru dari localStorage:", idGuru);
+
+      if (!idGuru) {
+        alert("Session gagal dan id_guru localStorage kosong");
+        return;
+      }
+
+      fetch("get_guru.php?id_guru=" + encodeURIComponent(idGuru))
+        .then(response => response.json())
+        .then(resultGuru => {
+          console.log("Hasil get_guru.php:", resultGuru);
+
+          if (resultGuru.status === "success") {
+            isiProfilGuru(resultGuru.data);
+          } else {
+            alert(resultGuru.message);
+          }
+        });
     })
     .catch(error => {
-      console.error(error);
-      alert("Gagal memuat profil guru");
+      console.error("Error profil guru:", error);
+      alert("Gagal memuat profil guru. Cek Console.");
     });
 }
 
