@@ -39,22 +39,14 @@ function isiProfilGuru(guru) {
   if (emailGuru) emailGuru.value = guru.email || "";
 
   // karena mapelGuru adalah <select>, value-nya harus id_mapel
-  if (mapelGuru) mapelGuru.value = guru.id_mapel || "";
+  if (mapelGuru) mapelGuru.value = guru.nama_mapel || "-";
 
   // ini hanya untuk tampilan nama mapel di Informasi Akademik
   if (mapelAkademikGuru) mapelAkademikGuru.value = guru.nama_mapel || "-";
 }
 
 function loadProfilGuru() {
-  const idGuru = localStorage.getItem("id_guru");
-
-  if (!idGuru) {
-    alert("Data login guru tidak ditemukan. Silakan login ulang.");
-    window.location.href = "login.html";
-    return;
-  }
-
-  fetch("get_guru.php?id_guru=" + encodeURIComponent(idGuru))
+  fetch("get_guru.php")
     .then(response => response.json())
     .then(result => {
       console.log("Hasil get_guru.php:", result);
@@ -63,6 +55,7 @@ function loadProfilGuru() {
         isiProfilGuru(result.data);
       } else {
         alert(result.message || "Data guru tidak ditemukan");
+        window.location.href = "login.html";
       }
     })
     .catch(error => {
@@ -70,21 +63,13 @@ function loadProfilGuru() {
       alert("Gagal memuat data profil guru");
     });
 }
-
 loadProfilGuru();
 const btnSimpanProfil = document.getElementById("btnSimpanProfil");
 
 if (btnSimpanProfil) {
   btnSimpanProfil.addEventListener("click", function () {
-    const idGuru = localStorage.getItem("id_guru");
-
-    if (!idGuru) {
-      alert("ID guru tidak ditemukan. Silakan login ulang.");
-      return;
-    }
-
     const formData = new FormData();
-    formData.append("id_guru", idGuru);
+
     formData.append("nama", namaGuru.value);
     formData.append("nip", nipGuru.value);
     formData.append("email", emailGuru.value);
