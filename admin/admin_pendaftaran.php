@@ -41,7 +41,7 @@ $result = mysqli_query($conn, $query);
                             <th>No</th>
                             <th>Nama Lengkap</th>
                             <th>NISN</th>
-                            <th>JK</th>
+                            <th>Jenis Kelamin</th>
                             <th>Tanggal Lahir</th>
                             <th>No HP Wali</th>
                             <th>Asal Sekolah</th>

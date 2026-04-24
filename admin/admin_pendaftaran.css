@@ -145,9 +145,9 @@ body {
 .table-card {
     background: var(--white);
     border-radius: 20px;
-    padding: 25px;
+    padding: 20px;
     box-shadow: 0 3px 14px rgba(0,0,0,0.03);
-    overflow-x: auto;
+    overflow: hidden;
 }
 
 .table-title {
@@ -170,12 +170,12 @@ body {
     color: var(--muted);
 }
 
-/* TABLE */
+/* TABLE FIX TANPA SCROLL */
 table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0 10px;
-    min-width: 1200px;
+    table-layout: fixed;
 }
 
 thead tr {
@@ -184,11 +184,12 @@ thead tr {
 
 thead th {
     color: var(--primary-teal);
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
-    padding: 14px 12px;
+    padding: 12px 7px;
     text-align: left;
-    white-space: nowrap;
+    white-space: normal;
+    line-height: 1.3;
 }
 
 thead th:first-child {
@@ -206,14 +207,17 @@ tbody tr {
 
 tbody tr:hover {
     background: #ddebea;
-    transform: scale(1.002);
 }
 
 td {
-    padding: 15px 12px;
-    font-size: 13px;
+    padding: 13px 7px;
+    font-size: 11px;
     color: var(--text-dark);
     vertical-align: middle;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    line-height: 1.4;
 }
 
 tbody td:first-child {
@@ -222,6 +226,62 @@ tbody td:first-child {
 
 tbody td:last-child {
     border-radius: 0 14px 14px 0;
+}
+
+/* UKURAN KOLOM */
+th:nth-child(1),
+td:nth-child(1) {
+    width: 4%;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+    width: 12%;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+    width: 8%;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+    width: 8%;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+    width: 9%;
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+    width: 9%;
+}
+
+th:nth-child(7),
+td:nth-child(7) {
+    width: 12%;
+}
+
+th:nth-child(8),
+td:nth-child(8) {
+    width: 9%;
+}
+
+th:nth-child(9),
+td:nth-child(9) {
+    width: 10%;
+}
+
+th:nth-child(10),
+td:nth-child(10) {
+    width: 8%;
+}
+
+th:nth-child(11),
+td:nth-child(11) {
+    width: 11%;
 }
 
 .student-name {
@@ -236,9 +296,9 @@ tbody td:last-child {
 
 /* BADGE STATUS */
 .badge {
-    padding: 6px 11px;
+    padding: 6px 9px;
     border-radius: 8px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     white-space: nowrap;
     display: inline-block;
@@ -264,7 +324,7 @@ tbody td:last-child {
 /* ACTION BUTTON */
 .action-cell {
     display: flex;
-    gap: 7px;
+    gap: 5px;
     flex-wrap: wrap;
 }
 
@@ -272,17 +332,19 @@ tbody td:last-child {
 .btn-accept,
 .btn-reject {
     border: none;
-    padding: 8px 11px;
-    border-radius: 10px;
+    padding: 7px 8px;
+    border-radius: 9px;
     text-decoration: none;
     color: white;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: 0.3s;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
 }
 
 .btn-detail {
@@ -318,11 +380,33 @@ tbody td:last-child {
     .admin-stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .table-card {
+        padding: 16px;
+    }
+
+    thead th,
+    td {
+        font-size: 10px;
+        padding: 10px 5px;
+    }
+
+    .btn-detail,
+    .btn-accept,
+    .btn-reject {
+        font-size: 9px;
+        padding: 6px 6px;
+    }
+
+    .badge {
+        font-size: 9px;
+        padding: 5px 7px;
+    }
 }
 
 @media (max-width: 768px) {
     .admin-container {
-        width: 92%;
+        width: 94%;
         margin: 20px auto;
     }
 
@@ -356,7 +440,7 @@ tbody td:last-child {
     }
 
     .table-card {
-        padding: 18px;
+        padding: 12px;
         border-radius: 16px;
     }
 
@@ -367,12 +451,25 @@ tbody td:last-child {
     }
 
     table {
-        min-width: 1100px;
+        table-layout: fixed;
     }
 
-    td,
-    thead th {
-        font-size: 12px;
-        padding: 12px 10px;
+    thead th,
+    td {
+        font-size: 8.5px;
+        padding: 8px 3px;
+    }
+
+    .btn-detail,
+    .btn-accept,
+    .btn-reject {
+        font-size: 8px;
+        padding: 5px 5px;
+        border-radius: 7px;
+    }
+
+    .badge {
+        font-size: 8px;
+        padding: 4px 5px;
     }
 }
