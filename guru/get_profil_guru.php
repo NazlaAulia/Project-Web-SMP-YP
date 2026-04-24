@@ -4,22 +4,21 @@ include "koneksi.php";
 
 header("Content-Type: application/json");
 
-if (isset($_SESSION['id_guru']) && $_SESSION['id_guru'] != '') {
-    $id_guru = $_SESSION['id_guru'];
+if (isset($_SESSION['id_user']) && $_SESSION['id_user'] != '') {
+    $id_user = $_SESSION['id_user'];
 } else {
-    // sementara untuk akun Murni
-    $id_guru = 4;
+    // sementara untuk akun Murni kalau session belum kebaca
+    $id_user = 36;
 }
 
 $query = mysqli_query($conn, "
     SELECT 
-        id_guru,
-        nip,
-        nama,
-        email,
-        id_mapel
-    FROM guru
-    WHERE id_guru = '$id_guru'
+        id_user,
+        username,
+        role_id,
+        id_guru
+    FROM user
+    WHERE id_user = '$id_user'
     LIMIT 1
 ");
 
@@ -34,14 +33,27 @@ if (!$query) {
 $data = mysqli_fetch_assoc($query);
 
 if ($data) {
+
+    if ($data['username'] == 'murnispd') {
+        $nama = 'Murni S.Pd';
+    } else {
+        $nama = $data['username'];
+    }
+
     echo json_encode([
         "status" => "success",
-        "data" => $data
+        "data" => [
+            "id_user" => $data['id_user'],
+            "id_guru" => $data['id_guru'],
+            "username" => $data['username'],
+            "nama" => $nama
+        ]
     ]);
+
 } else {
     echo json_encode([
         "status" => "error",
-        "message" => "Data guru tidak ditemukan"
+        "message" => "Data user tidak ditemukan"
     ]);
 }
 ?>
