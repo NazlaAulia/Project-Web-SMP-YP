@@ -117,7 +117,7 @@ if (forgotPasswordLink) {
 
         const { value: username } = await Swal.fire({
             title: 'Lupa Sandi',
-            text: 'Masukkan username akunmu. Permintaan reset akan dikirim ke admin.',
+            text: 'Masukkan username akunmu.',
             input: 'text',
             inputPlaceholder: 'Masukkan username',
             confirmButtonText: 'Kirim',
@@ -149,14 +149,29 @@ if (forgotPasswordLink) {
             try {
                 result = JSON.parse(text);
             } catch (e) {
+                console.error('Balasan server:', text);
                 throw new Error('Response server tidak valid.');
             }
 
-            Swal.fire({
-                icon: result.status === 'success' ? 'success' : 'error',
-                title: result.status === 'success' ? 'Berhasil' : 'Gagal',
-                text: result.message
-            });
+            if (result.status === 'success' && result.wa_link) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    html: `
+                        <p>${result.message}</p>
+                        <a href="${result.wa_link}" target="_blank" class="swal2-confirm swal2-styled">
+                            Konfirmasi ke Admin
+                        </a>
+                    `,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    icon: result.status === 'success' ? 'success' : 'error',
+                    title: result.status === 'success' ? 'Berhasil' : 'Gagal',
+                    text: result.message || 'Terjadi kesalahan.'
+                });
+            }
 
         } catch (error) {
             Swal.fire({
