@@ -1,6 +1,6 @@
 const namaGuruEl = document.getElementById("namaGuru");
 const avatarGuruEl = document.getElementById("avatarGuru");
-const welcomeGuruEl = document.getElementById("welcomeGuru");
+const namaGuruDashboardEl = document.getElementById("namaGuruDashboard");
 
 function tampilkanGuru(nama) {
     const namaFix = nama || "Bapak/Ibu Guru";
@@ -8,7 +8,7 @@ function tampilkanGuru(nama) {
 
     if (namaGuruEl) namaGuruEl.textContent = namaFix;
     if (avatarGuruEl) avatarGuruEl.textContent = huruf;
-    if (welcomeGuruEl) welcomeGuruEl.textContent = `Halo, ${namaFix}! 🌟`;
+    if (namaGuruDashboardEl) namaGuruDashboardEl.textContent = namaFix;
 }
 
 fetch("get_guru.php")
@@ -26,3 +26,15 @@ fetch("get_guru.php")
         console.error(err);
         alert("Gagal load data guru");
     });
+
+const bannerGuru = document.getElementById("bannerGuru");
+
+if (bannerGuru) {
+    bannerGuru.addEventListener("click", function () {
+        bannerGuru.classList.remove("banner-active");
+
+        void bannerGuru.offsetWidth;
+
+        bannerGuru.classList.add("banner-active");
+    });
+}

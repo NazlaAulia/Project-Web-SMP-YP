@@ -71,68 +71,58 @@
       </header>
 
       <section class="card">
-        <h3>Pengaturan Nilai</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="tahunAjaran">Tahun Ajaran</label>
-            <select id="tahunAjaran">
-              <option value="2025/2026">2025/2026</option>
-              <option value="2026/2027">2026/2027</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="semester">Semester</label>
-            <select id="semester">
-              <option value="Ganjil">Ganjil</option>
-              <option value="Genap" selected>Genap</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="kelas">Kelas</label>
-            <select id="kelas">
-              <option value="VII A">VII A</option>
-              <option value="VII B">VII B</option>
-              <option value="VIII A">VIII A</option>
-              <option value="VIII B">VIII B</option>
-              <option value="IX A">IX A</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="mapel">Mata Pelajaran</label>
-            <select id="mapel">
-              <option value="Matematika">Matematika</option>
-              <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-              <option value="IPA">IPA</option>
-              <option value="IPS">IPS</option>
-            </select>
-          </div>
+      <h3>Pengaturan Nilai</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="tahunAjaran">Tahun Ajaran</label>
+          <select id="tahunAjaran">
+            <option value="2025/2026">2025/2026</option>
+            <option value="2026/2027">2026/2027</option>
+          </select>
         </div>
-      </section>
 
-      <section class="card">
-        <h3>Bobot Nilai</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="bobotTugas">Bobot Tugas (%)</label>
-            <input type="number" id="bobotTugas" value="30" min="0" max="100" />
-          </div>
-          <div class="form-group">
-            <label for="bobotUTS">Bobot UTS (%)</label>
-            <input type="number" id="bobotUTS" value="30" min="0" max="100" />
-          </div>
-          <div class="form-group">
-            <label for="bobotUAS">Bobot UAS (%)</label>
-            <input type="number" id="bobotUAS" value="40" min="0" max="100" />
-          </div>
-          <div class="form-group button-align">
-            <button id="applyWeightBtn" class="btn btn-secondary">Terapkan Bobot</button>
-          </div>
+        <div class="form-group">
+          <label for="semester">Semester</label>
+          <select id="semester">
+            <option value="Ganjil">Ganjil</option>
+            <option value="Genap" selected>Genap</option>
+          </select>
         </div>
-        <small id="weightInfo" class="info-text">Total bobot harus 100%.</small>
-      </section>
+
+        <div class="form-group">
+          <label for="kelas">Kelas</label>
+          <select id="kelas">
+            <option value="7A">7A</option>
+            <option value="7B">7B</option>
+            <option value="7C">7C</option>
+            <option value="8A">8A</option>
+            <option value="8B">8B</option>
+            <option value="8C">8C</option>
+            <option value="9A">9A</option>
+            <option value="9B">9B</option>
+            <option value="9C">9C</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="mapel">Mata Pelajaran</label>
+          <select id="mapel">
+            <option value="BIN">BIN</option>
+            <option value="B. JAWA">B. JAWA</option>
+            <option value="PKN">PKN</option>
+            <option value="INFOR">INFOR</option>
+            <option value="MAT">MAT</option>
+            <option value="BIG">BIG</option>
+            <option value="IPA">IPA</option>
+            <option value="IPS">IPS</option>
+            <option value="BK">BK</option>
+            <option value="INFO/BK">INFO/BK</option>
+            <option value="PAI/BHQ">PAI/BHQ</option>
+            <option value="PJOK">PJOK</option>
+          </select>
+        </div>
+      </div>
+    </section>
 
       <section class="card">
         <h3>Import Nilai</h3>
@@ -144,7 +134,7 @@
           </div>
           <p class="upload-note">
             Format file: <strong>CSV</strong> dengan kolom:
-            <code>nisn,nama,tugas,uts,uas</code>
+            <code>id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa</code>
           </p>
         </div>
         <div id="messageBox" class="message-box"></div>
@@ -153,62 +143,33 @@
       <section class="card">
         <div class="table-header">
           <h3>Data Nilai Siswa</h3>
-          <input type="text" id="searchInput" placeholder="Cari nama atau NISN..." />
+          <input type="text" id="searchInput" placeholder="Cari ID siswa, ID mapel, atau semester..." />
         </div>
 
         <div class="table-wrapper">
           <table id="nilaiTable">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>NISN</th>
-                <th>Nama</th>
-                <th>Tugas</th>
-                <th>UTS</th>
-                <th>UAS</th>
-                <th>Nilai Akhir</th>
-                <th>Predikat</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="nilaiTableBody">
-              <tr>
-                <td colspan="9" class="empty-state">Belum ada data nilai yang diupload.</td>
-              </tr>
-            </tbody>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>ID Siswa</th>
+              <th>ID Mapel</th>
+              <th>Semester</th>
+              <th>Nilai Angka</th>
+              <th>Hadir</th>
+              <th>Izin</th>
+              <th>Sakit</th>
+              <th>Alfa</th>
+            </tr>
+          </thead>
+          <tbody id="nilaiTableBody">
+            <tr>
+              <td colspan="9" class="empty-state">Belum ada data nilai yang diupload.</td>
+            </tr>
+          </tbody>
           </table>
         </div>
       </section>
 
-      <section class="card">
-        <h3>Rekap Nilai</h3>
-        <div class="rekap-grid">
-          <div class="rekap-item">
-            <span>Total Siswa</span>
-            <strong id="totalSiswa">0</strong>
-          </div>
-          <div class="rekap-item">
-            <span>Rata-rata Kelas</span>
-            <strong id="rataRata">0</strong>
-          </div>
-          <div class="rekap-item">
-            <span>Nilai Tertinggi</span>
-            <strong id="nilaiTertinggi">0</strong>
-          </div>
-          <div class="rekap-item">
-            <span>Nilai Terendah</span>
-            <strong id="nilaiTerendah">0</strong>
-          </div>
-          <div class="rekap-item">
-            <span>Tuntas</span>
-            <strong id="jumlahTuntas">0</strong>
-          </div>
-          <div class="rekap-item">
-            <span>Belum Tuntas</span>
-            <strong id="jumlahBelumTuntas">0</strong>
-          </div>
-        </div>
-      </section>
     </main>
   </div>
 

@@ -136,34 +136,180 @@ body {
 }
 /* Layout Konten ala SkillSet */
 .main-banner {
-    background: linear-gradient(135deg, var(--primary) 0%, #0a5f62 100%);
-    border-radius: 24px;
-    padding: 40px;
+    background: linear-gradient(135deg, #07484a 0%, #0a6668 55%, #0c7779 100%);
+    border-radius: 30px;
+    padding: 42px 48px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: white;
-    margin-bottom: 30px;
+    margin-bottom: 34px;
     overflow: hidden;
     position: relative;
-}
-
-.banner-content { flex: 1; z-index: 2; }
-.banner-content h1 { font-size: 2.2rem; margin-bottom: 15px; }
-.banner-content p { opacity: 0.8; margin-bottom: 25px; max-width: 500px; }
-
-.btn-banner {
-    background: white;
-    color: var(--primary);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 700;
+    min-height: 280px;
+    box-shadow: 0 18px 45px rgba(7, 72, 74, 0.18);
     cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.banner-img img { width: 250px; z-index: 1; }
+.main-banner::before {
+    content: "";
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    top: -90px;
+    right: -70px;
+}
 
+.main-banner::after {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    background: rgba(245, 164, 37, 0.18);
+    border-radius: 50%;
+    bottom: -80px;
+    left: 45%;
+}
+
+.main-banner:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 55px rgba(7, 72, 74, 0.24);
+}
+
+.banner-content {
+    flex: 1;
+    z-index: 2;
+    max-width: 650px;
+}
+
+.banner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    padding: 9px 15px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    backdrop-filter: blur(10px);
+}
+
+.banner-content h1 {
+    font-size: 2.65rem;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+}
+
+.banner-content p {
+    opacity: 0.9;
+    margin-bottom: 0;
+    max-width: 560px;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.emoji-star {
+    display: inline-block;
+    transform-origin: center;
+}
+
+.banner-img {
+    position: relative;
+    z-index: 2;
+    width: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.banner-img img {
+    width: 260px;
+    max-width: 100%;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.22));
+    transition: transform 0.35s ease;
+}
+
+.image-glow {
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.main-banner.banner-active {
+    animation: bannerPulse 0.65s ease;
+}
+
+.main-banner.banner-active .banner-img img {
+    animation: teacherFloat 0.75s ease;
+}
+
+.main-banner.banner-active .emoji-star {
+    animation: starSpin 0.75s ease;
+}
+
+@keyframes bannerPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    35% {
+        transform: scale(1.015) translateY(-5px);
+    }
+
+    70% {
+        transform: scale(0.995) translateY(2px);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes teacherFloat {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+
+    35% {
+        transform: translateY(-18px) rotate(-4deg) scale(1.06);
+    }
+
+    70% {
+        transform: translateY(5px) rotate(3deg) scale(0.98);
+    }
+
+    100% {
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+}
+
+@keyframes starSpin {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(20deg) scale(1.35);
+    }
+
+    100% {
+        transform: rotate(0deg) scale(1);
+    }
+}
 .content-row { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
 
 .section-header {
@@ -719,57 +865,79 @@ header {
         text-align: left;
     }
 }
+.content-row {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) 360px;
+    gap: 30px;
+    align-items: start;
+}
 
-@media (max-width: 480px) {
-    .main-content {
-        padding: 12px;
+.left-column,
+.right-column {
+    min-width: 0;
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.course-card {
+    background: white;
+    padding: 16px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+
+.course-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 35px rgba(0, 79, 79, 0.12);
+}
+
+.course-thumb {
+    height: 95px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.course-info h4 {
+    margin: 0 0 5px;
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.course-info p {
+    color: #6b7777;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+@media (max-width: 1200px) {
+    .content-row {
+        grid-template-columns: 1fr;
     }
 
-    .main-banner {
-        padding: 18px;
-        border-radius: 18px;
+    .course-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
+}
 
-    .banner-content h1 {
-        font-size: 1.3rem;
+@media (max-width: 900px) {
+    .course-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
+}
 
-    .banner-content p {
-        font-size: 0.88rem;
-    }
-
-    .btn-banner,
-    .btn-action {
-        width: 100%;
-        padding: 12px;
-        font-size: 0.9rem;
-    }
-
-    .avatar-circle {
-        width: 36px;
-        height: 36px;
-        font-size: 0.9rem;
-    }
-
-    .user-name {
-        font-size: 0.85rem;
-    }
-
-    .user-role {
-        font-size: 0.75rem;
-    }
-
-    .stat-circle strong {
-        font-size: 2rem;
-    }
-
-    .rank-item {
-        gap: 10px;
-    }
-
-    .rank-avatar {
-        width: 34px;
-        height: 34px;
-        font-size: 0.75rem;
+@media (max-width: 600px) {
+    .course-grid {
+        grid-template-columns: 1fr;
     }
 }

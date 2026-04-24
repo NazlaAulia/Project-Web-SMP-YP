@@ -1,11 +1,9 @@
 let dataNilai = [];
-const kkm = 75;
 
 const fileInput = document.getElementById("fileInput");
 const uploadBtn = document.getElementById("uploadBtn");
 const exportBtn = document.getElementById("exportBtn");
 const downloadTemplateBtn = document.getElementById("downloadTemplateBtn");
-const applyWeightBtn = document.getElementById("applyWeightBtn");
 const searchInput = document.getElementById("searchInput");
 const messageBox = document.getElementById("messageBox");
 const nilaiTableBody = document.getElementById("nilaiTableBody");
@@ -20,75 +18,51 @@ function clearMessage() {
   messageBox.className = "message-box";
 }
 
-function getWeights() {
-  const tugas = Number(document.getElementById("bobotTugas").value);
-  const uts = Number(document.getElementById("bobotUTS").value);
-  const uas = Number(document.getElementById("bobotUAS").value);
-  return { tugas, uts, uas };
-}
-
-function validateWeights() {
-  const { tugas, uts, uas } = getWeights();
-  const total = tugas + uts + uas;
-
-  if (total !== 100) {
-    showMessage("Total bobot harus tepat 100%.", "error");
-    return false;
-  }
-
-  clearMessage();
-  return true;
-}
-
-function getPredikat(nilaiAkhir) {
-  if (nilaiAkhir >= 90) return "A";
-  if (nilaiAkhir >= 80) return "B";
-  if (nilaiAkhir >= 70) return "C";
-  if (nilaiAkhir >= 60) return "D";
-  return "E";
-}
-
-function hitungNilaiAkhir(tugas, uts, uas) {
-  const bobot = getWeights();
-  return (
-    (tugas * bobot.tugas) / 100 +
-    (uts * bobot.uts) / 100 +
-    (uas * bobot.uas) / 100
-  );
-}
-
 function updateRekap() {
   const totalSiswaEl = document.getElementById("totalSiswa");
   const rataRataEl = document.getElementById("rataRata");
   const nilaiTertinggiEl = document.getElementById("nilaiTertinggi");
   const nilaiTerendahEl = document.getElementById("nilaiTerendah");
-  const jumlahTuntasEl = document.getElementById("jumlahTuntas");
-  const jumlahBelumTuntasEl = document.getElementById("jumlahBelumTuntas");
+  const totalHadirEl = document.getElementById("totalHadir");
+  const totalAlfaEl = document.getElementById("totalAlfa");
+
+  if (
+    !totalSiswaEl ||
+    !rataRataEl ||
+    !nilaiTertinggiEl ||
+    !nilaiTerendahEl ||
+    !totalHadirEl ||
+    !totalAlfaEl
+  ) {
+    return;
+  }
 
   if (dataNilai.length === 0) {
     totalSiswaEl.textContent = "0";
     rataRataEl.textContent = "0";
     nilaiTertinggiEl.textContent = "0";
     nilaiTerendahEl.textContent = "0";
-    jumlahTuntasEl.textContent = "0";
-    jumlahBelumTuntasEl.textContent = "0";
+    totalHadirEl.textContent = "0";
+    totalAlfaEl.textContent = "0";
     return;
   }
 
-  const nilaiAkhirList = dataNilai.map(item => item.nilaiAkhir);
-  const total = nilaiAkhirList.reduce((sum, n) => sum + n, 0);
-  const rataRata = total / dataNilai.length;
-  const tertinggi = Math.max(...nilaiAkhirList);
-  const terendah = Math.min(...nilaiAkhirList);
-  const tuntas = dataNilai.filter(item => item.nilaiAkhir >= kkm).length;
-  const belum = dataNilai.length - tuntas;
+  const nilaiList = dataNilai.map(item => item.nilai_angka);
+  const totalNilai = nilaiList.reduce((sum, nilai) => sum + nilai, 0);
+  const rataRata = totalNilai / dataNilai.length;
+
+  const nilaiTertinggi = Math.max(...nilaiList);
+  const nilaiTerendah = Math.min(...nilaiList);
+
+  const totalHadir = dataNilai.reduce((sum, item) => sum + item.hadir, 0);
+  const totalAlfa = dataNilai.reduce((sum, item) => sum + item.alfa, 0);
 
   totalSiswaEl.textContent = dataNilai.length;
   rataRataEl.textContent = rataRata.toFixed(2);
-  nilaiTertinggiEl.textContent = tertinggi.toFixed(2);
-  nilaiTerendahEl.textContent = terendah.toFixed(2);
-  jumlahTuntasEl.textContent = tuntas;
-  jumlahBelumTuntasEl.textContent = belum;
+  nilaiTertinggiEl.textContent = nilaiTertinggi;
+  nilaiTerendahEl.textContent = nilaiTerendah;
+  totalHadirEl.textContent = totalHadir;
+  totalAlfaEl.textContent = totalAlfa;
 }
 
 function renderTable(filteredData = dataNilai) {
@@ -103,20 +77,17 @@ function renderTable(filteredData = dataNilai) {
 
   nilaiTableBody.innerHTML = filteredData
     .map((item, index) => {
-      const status = item.nilaiAkhir >= kkm ? "Tuntas" : "Belum Tuntas";
-      const statusClass = item.nilaiAkhir >= kkm ? "status-tuntas" : "status-belum";
-
       return `
         <tr>
           <td>${index + 1}</td>
-          <td>${item.nisn}</td>
-          <td>${item.nama}</td>
-          <td>${item.tugas}</td>
-          <td>${item.uts}</td>
-          <td>${item.uas}</td>
-          <td>${item.nilaiAkhir.toFixed(2)}</td>
-          <td>${item.predikat}</td>
-          <td class="${statusClass}">${status}</td>
+          <td>${item.id_siswa}</td>
+          <td>${item.id_mapel}</td>
+          <td>${item.semester}</td>
+          <td>${item.nilai_angka}</td>
+          <td>${item.hadir}</td>
+          <td>${item.izin}</td>
+          <td>${item.sakit}</td>
+          <td>${item.alfa}</td>
         </tr>
       `;
     })
@@ -124,24 +95,41 @@ function renderTable(filteredData = dataNilai) {
 }
 
 function parseCSV(text) {
-  const lines = text.trim().split("\n");
+  const lines = text.trim().split(/\r?\n/);
+
   if (lines.length < 2) {
     throw new Error("File CSV kosong atau tidak valid.");
   }
 
-  const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
-  const requiredHeaders = ["nisn", "nama", "tugas", "uts", "uas"];
+  const headers = lines[0].split(",").map(header => header.trim().toLowerCase());
+
+  const requiredHeaders = [
+    "id_siswa",
+    "id_mapel",
+    "semester",
+    "nilai_angka",
+    "hadir",
+    "izin",
+    "sakit",
+    "alfa"
+  ];
 
   const valid = requiredHeaders.every(header => headers.includes(header));
+
   if (!valid) {
-    throw new Error("Header CSV harus: nisn,nama,tugas,uts,uas");
+    throw new Error(
+      "Header CSV harus: id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa"
+    );
   }
 
-  const nisnIndex = headers.indexOf("nisn");
-  const namaIndex = headers.indexOf("nama");
-  const tugasIndex = headers.indexOf("tugas");
-  const utsIndex = headers.indexOf("uts");
-  const uasIndex = headers.indexOf("uas");
+  const idSiswaIndex = headers.indexOf("id_siswa");
+  const idMapelIndex = headers.indexOf("id_mapel");
+  const semesterIndex = headers.indexOf("semester");
+  const nilaiAngkaIndex = headers.indexOf("nilai_angka");
+  const hadirIndex = headers.indexOf("hadir");
+  const izinIndex = headers.indexOf("izin");
+  const sakitIndex = headers.indexOf("sakit");
+  const alfaIndex = headers.indexOf("alfa");
 
   const result = [];
 
@@ -150,27 +138,37 @@ function parseCSV(text) {
 
     if (row.length < headers.length) continue;
 
-    const nisn = row[nisnIndex];
-    const nama = row[namaIndex];
-    const tugas = Number(row[tugasIndex]);
-    const uts = Number(row[utsIndex]);
-    const uas = Number(row[uasIndex]);
+    const id_siswa = row[idSiswaIndex];
+    const id_mapel = row[idMapelIndex];
+    const semester = row[semesterIndex];
+    const nilai_angka = Number(row[nilaiAngkaIndex]);
+    const hadir = Number(row[hadirIndex]);
+    const izin = Number(row[izinIndex]);
+    const sakit = Number(row[sakitIndex]);
+    const alfa = Number(row[alfaIndex]);
 
-    if (!nisn || !nama || isNaN(tugas) || isNaN(uts) || isNaN(uas)) {
+    if (
+      !id_siswa ||
+      !id_mapel ||
+      !semester ||
+      isNaN(nilai_angka) ||
+      isNaN(hadir) ||
+      isNaN(izin) ||
+      isNaN(sakit) ||
+      isNaN(alfa)
+    ) {
       continue;
     }
 
-    const nilaiAkhir = hitungNilaiAkhir(tugas, uts, uas);
-    const predikat = getPredikat(nilaiAkhir);
-
     result.push({
-      nisn,
-      nama,
-      tugas,
-      uts,
-      uas,
-      nilaiAkhir,
-      predikat
+      id_siswa,
+      id_mapel,
+      semester,
+      nilai_angka,
+      hadir,
+      izin,
+      sakit,
+      alfa
     });
   }
 
@@ -180,9 +178,8 @@ function parseCSV(text) {
 uploadBtn.addEventListener("click", () => {
   clearMessage();
 
-  if (!validateWeights()) return;
-
   const file = fileInput.files[0];
+
   if (!file) {
     showMessage("Pilih file CSV terlebih dahulu.", "error");
     return;
@@ -199,9 +196,11 @@ uploadBtn.addEventListener("click", () => {
     try {
       const text = e.target.result;
       dataNilai = parseCSV(text);
+
       renderTable();
       updateRekap();
-      showMessage(`Berhasil upload ${dataNilai.length} data siswa.`, "success");
+
+      showMessage(`Berhasil upload ${dataNilai.length} data nilai.`, "success");
     } catch (error) {
       showMessage(error.message, "error");
     }
@@ -210,46 +209,34 @@ uploadBtn.addEventListener("click", () => {
   reader.readAsText(file);
 });
 
-applyWeightBtn.addEventListener("click", () => {
-  if (!validateWeights()) return;
-
-  if (dataNilai.length > 0) {
-    dataNilai = dataNilai.map(item => {
-      const nilaiAkhir = hitungNilaiAkhir(item.tugas, item.uts, item.uas);
-      return {
-        ...item,
-        nilaiAkhir,
-        predikat: getPredikat(nilaiAkhir)
-      };
-    });
-
-    renderTable();
-    updateRekap();
-    showMessage("Bobot berhasil diterapkan dan nilai diperbarui.", "success");
-  } else {
-    showMessage("Bobot berhasil disimpan.", "success");
-  }
-});
-
 searchInput.addEventListener("input", (e) => {
   const keyword = e.target.value.toLowerCase();
 
   const filtered = dataNilai.filter(item =>
-    item.nama.toLowerCase().includes(keyword) ||
-    item.nisn.toLowerCase().includes(keyword)
+    String(item.id_siswa).toLowerCase().includes(keyword) ||
+    String(item.id_mapel).toLowerCase().includes(keyword) ||
+    String(item.semester).toLowerCase().includes(keyword)
   );
 
   renderTable(filtered);
 });
 
 downloadTemplateBtn.addEventListener("click", () => {
-  const template = "nisn,nama,tugas,uts,uas\n12345,Andi,80,85,90\n12346,Budi,78,88,84";
-  const blob = new Blob([template], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
+  const template =
+    "id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa\n" +
+    "1,5,Ganjil,88,20,0,1,0\n" +
+    "2,5,Ganjil,76,18,1,1,0\n" +
+    "3,5,Ganjil,92,21,0,0,0\n";
 
+  const blob = new Blob([template], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+
   link.href = url;
-  link.download = "template_nilai.csv";
+  link.download = "template_nilai_siswa.csv";
   link.click();
 
   URL.revokeObjectURL(url);
@@ -262,27 +249,27 @@ exportBtn.addEventListener("click", () => {
   }
 
   const tahunAjaran = document.getElementById("tahunAjaran").value;
-  const semester = document.getElementById("semester").value;
   const kelas = document.getElementById("kelas").value;
   const mapel = document.getElementById("mapel").value;
 
   let csvContent = "Tahun Ajaran," + tahunAjaran + "\n";
-  csvContent += "Semester," + semester + "\n";
   csvContent += "Kelas," + kelas + "\n";
   csvContent += "Mata Pelajaran," + mapel + "\n\n";
-  csvContent += "No,NISN,Nama,Tugas,UTS,UAS,Nilai Akhir,Predikat,Status\n";
+  csvContent += "No,ID Siswa,ID Mapel,Semester,Nilai Angka,Hadir,Izin,Sakit,Alfa\n";
 
   dataNilai.forEach((item, index) => {
-    const status = item.nilaiAkhir >= kkm ? "Tuntas" : "Belum Tuntas";
-    csvContent += `${index + 1},${item.nisn},${item.nama},${item.tugas},${item.uts},${item.uas},${item.nilaiAkhir.toFixed(2)},${item.predikat},${status}\n`;
+    csvContent += `${index + 1},${item.id_siswa},${item.id_mapel},${item.semester},${item.nilai_angka},${item.hadir},${item.izin},${item.sakit},${item.alfa}\n`;
   });
 
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;"
+  });
 
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+
   link.href = url;
-  link.download = `nilai_${kelas}_${mapel}_${semester}.csv`;
+  link.download = `nilai_${kelas}_${mapel}.csv`;
   link.click();
 
   URL.revokeObjectURL(url);
