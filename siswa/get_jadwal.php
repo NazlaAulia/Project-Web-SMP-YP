@@ -6,10 +6,10 @@ require_once '../koneksi.php';
 
 $id_siswa = 0;
 
-if (isset($_SESSION['id_siswa']) && (int)$_SESSION['id_siswa'] > 0) {
-    $id_siswa = (int) $_SESSION['id_siswa'];
-} elseif (isset($_GET['id_siswa']) && (int)$_GET['id_siswa'] > 0) {
+if (isset($_GET['id_siswa']) && (int)$_GET['id_siswa'] > 0) {
     $id_siswa = (int) $_GET['id_siswa'];
+} elseif (isset($_SESSION['id_siswa']) && (int)$_SESSION['id_siswa'] > 0) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
 }
 
 if ($id_siswa <= 0) {
@@ -174,18 +174,23 @@ if (!$queryJadwal) {
     exit;
 }
 
-$jadwalMinggu = [];
-while ($rowJadwal = mysqli_fetch_assoc($queryJadwal)) {
-    $jadwalMinggu[] = [
-        "hari" => $rowJadwal['hari'],
-        "jam_mulai" => substr($rowJadwal['jam_mulai'], 0, 5),
-        "jam_selesai" => substr($rowJadwal['jam_selesai'], 0, 5),
-        "mapel" => $rowJadwal['nama_mapel'],
-        "guru" => $rowJadwal['nama_guru'],
-        "ruangan" => $rowJadwal['ruangan'],
-        "status" => $rowJadwal['status_jadwal'] ?: 'Mendatang'
-    ];
-}
+$jamMulai = substr($rowJadwal['jam_mulai'], 0, 5);
+$jamSelesai = substr($rowJadwal['jam_selesai'], 0, 5);
+
+$jadwalMinggu[] = [
+    "hari" => $rowJadwal['hari'],
+
+    "jam" => $jamMulai . " - " . $jamSelesai,
+    "mata_pelajaran" => $rowJadwal['nama_mapel'],
+
+    "jam_mulai" => $jamMulai,
+    "jam_selesai" => $jamSelesai,
+    "mapel" => $rowJadwal['nama_mapel'],
+
+    "guru" => $rowJadwal['nama_guru'],
+    "ruangan" => $rowJadwal['ruangan'],
+    "status" => $rowJadwal['status_jadwal'] ?: 'Mendatang'
+];
 
 echo json_encode([
     "success" => true,
