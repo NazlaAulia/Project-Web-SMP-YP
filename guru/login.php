@@ -2,8 +2,18 @@
 session_start();
 include "koneksi.php";
 
-$username = $_POST['username'];
-$password = $_POST['password'];
+header("Content-Type: application/json");
+
+$username = $_POST['username'] ?? '';
+$password = $_POST['password'] ?? '';
+
+if ($username == '' || $password == '') {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Username dan password wajib diisi"
+    ]);
+    exit;
+}
 
 $query = mysqli_query($conn, "
     SELECT user.*, guru.nama, guru.nip
@@ -15,6 +25,14 @@ $query = mysqli_query($conn, "
     LIMIT 1
 ");
 
+if (!$query) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Query login error: " . mysqli_error($conn)
+    ]);
+    exit;
+}
+
 $data = mysqli_fetch_assoc($query);
 
 if ($data) {
@@ -23,12 +41,17 @@ if ($data) {
     $_SESSION['username'] = $data['username'];
     $_SESSION['role'] = $data['role'];
 
-    header("Location: guru.html");
+    echo json_encode([
+        "status" => "success",
+        "message" => "Login berhasil",
+        "redirect" => "/guru/guru.html"
+    ]);
     exit;
 } else {
-    echo "<script>
-        alert('Username atau password salah');
-        window.location.href='/';
-    </script>";
+    echo json_encode([
+        "status" => "error",
+        "message" => "Username atau password salah"
+    ]);
+    exit;
 }
 ?>
