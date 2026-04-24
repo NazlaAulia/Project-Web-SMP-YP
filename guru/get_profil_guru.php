@@ -7,20 +7,19 @@ header("Content-Type: application/json");
 if (isset($_SESSION['id_guru']) && $_SESSION['id_guru'] != '') {
     $id_guru = $_SESSION['id_guru'];
 } else {
+    // sementara untuk akun Murni
     $id_guru = 4;
 }
 
 $query = mysqli_query($conn, "
     SELECT 
-        guru.id_guru,
-        guru.nip,
-        guru.nama,
-        guru.email,
-        guru.id_mapel,
-        mapel.nama_mapel
+        id_guru,
+        nip,
+        nama,
+        email,
+        id_mapel
     FROM guru
-    LEFT JOIN mapel ON guru.id_mapel = mapel.id_mapel
-    WHERE guru.id_guru = '$id_guru'
+    WHERE id_guru = '$id_guru'
     LIMIT 1
 ");
 
