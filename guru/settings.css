@@ -3,9 +3,14 @@
     --white: #ffffff;
     --bg-soft: #f4f7f6;
     --text-dark: #102a2a;
+    --text-gray: #6b7a7a;
     --text-muted: #6b7a7a;
     --border: #dfe7e5;
     --shadow: 0 8px 32px rgba(7, 72, 74, 0.08);
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
@@ -14,15 +19,32 @@ body {
     margin: 0;
 }
 
-/* MAIN */
+/* MAIN CONTENT */
 .main-content {
-    padding: 40px;
+    flex: 1;
     margin-left: 260px;
+    width: calc(100% - 260px);
+    min-height: 100vh;
+    padding: 42px 48px;
 }
 
-/* HAPUS JARAK HEADER */
-.content-header {
-    display: none;
+/* PAGE HEADER */
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 0 0 8px;
+}
+
+.page-header p {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin: 0;
 }
 
 /* CARD */
@@ -30,7 +52,7 @@ body {
     background: var(--white);
     padding: 32px;
     border-radius: 22px;
-    margin-bottom: 26px;
+    margin-bottom: 28px;
     box-shadow: var(--shadow);
 }
 
@@ -54,6 +76,7 @@ body {
 }
 
 .form-group input {
+    width: 100%;
     padding: 14px 16px;
     border-radius: 12px;
     border: 1px solid var(--border);
@@ -83,144 +106,22 @@ body {
     background: #053f41;
 }
 
-/* TOGGLE */
-.toggle-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* RESPONSIVE TABLET */
-@media (max-width: 992px) {
+/* RESPONSIVE */
+@media (max-width: 900px) {
     .main-content {
-        margin-left: 220px;
-        padding: 30px;
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 80px 20px 20px !important;
     }
 
-    .card {
-        padding: 28px;
-    }
-}
-@media (max-width: 768px) {
-    .app-container {
-        display: flex;
-    }
-
-    .sidebar {
-        position: fixed;
-        right: 0;
-        left: auto;
-        top: 0;
-        width: 80px;
-        height: 100vh;
-        min-height: 100vh;
-        padding: 18px 10px;
-        overflow: hidden;
-        border-radius: 0;
-        box-sizing: border-box;
-        z-index: 999;
-    }
-
-    .logo-container-elegant {
-        padding-bottom: 20px !important;
-        text-align: center;
-    }
-
-    .logo-container-elegant img {
-        width: 55px;
-        height: auto;
-        object-fit: contain;
-    }
-
-    .sidebar-menu {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .nav-link {
-        justify-content: center;
-        padding: 13px 10px;
-        border-radius: 14px;
-    }
-
-    .nav-link span {
-        display: none;
-    }
-
-    .nav-link i {
-        font-size: 20px;
-        margin: 0;
-    }
-
-    .sidebar-bottom {
-        margin-top: 18px;
-    }
-
-    .main-content {
-        margin-left: 0;
-        margin-right: 80px;
-        padding: 22px 14px;
-        width: calc(100% - 80px);
-        box-sizing: border-box;
-    }
-
-    .card {
-        padding: 24px 18px;
-        border-radius: 18px;
-        margin-bottom: 22px;
-    }
-
-    .card h3 {
-        font-size: 1.2rem;
-        margin-bottom: 20px;
-    }
-
-    .form-group {
-        margin-bottom: 16px;
-    }
-
-    .form-group label {
-        font-size: 14px;
-    }
-
-    .form-group input {
-        padding: 13px 14px;
-        font-size: 14px;
-        border-radius: 10px;
-    }
-
-    .btn-save {
-        width: 100%;
-        padding: 13px;
-        font-size: 14px;
-        border-radius: 10px;
+    .page-header h1 {
+        font-size: 2.2rem;
     }
 }
 
 @media (max-width: 480px) {
-    .sidebar {
-        width: 70px;
-        padding: 16px 8px;
-    }
-
-    .logo-container-elegant img {
-        width: 48px;
-    }
-
-    .nav-link {
-        padding: 12px 8px;
-    }
-
-    .nav-link i {
-        font-size: 19px;
-    }
-
     .main-content {
-        margin-left: 0;
-        margin-right: 70px;
-        width: calc(100% - 70px);
-        padding: 18px 12px;
+        padding: 80px 14px 18px !important;
     }
 
     .card {
@@ -235,56 +136,11 @@ body {
     .form-group input {
         padding: 12px 13px;
     }
-}
-/* =========================
-   SETTINGS PAGE HEADER FIX
-========================= */
 
-.main-content {
-    flex: 1;
-    margin-left: 260px;
-    width: calc(100% - 260px);
-    padding: 42px 48px;
-}
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.page-header h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--primary);
-    margin-bottom: 8px;
-}
-
-.page-header p {
-    font-size: 1rem;
-    color: var(--text-gray);
-    font-weight: 500;
-}
-
-.card {
-    margin-bottom: 28px;
-}
-
-@media (max-width: 900px) {
-    .main-content {
-        margin-left: 0 !important;
-        width: 100% !important;
-        padding: 80px 20px 20px !important;
-    }
-
-    .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .page-header h1 {
-        font-size: 2.2rem;
+    .btn-save {
+        width: 100%;
+        padding: 13px;
+        font-size: 14px;
+        border-radius: 10px;
     }
 }
