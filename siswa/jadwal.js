@@ -142,7 +142,6 @@ function renderTabel(jadwalList, kelas) {
     `;
   }).join("");
 }
-
 function renderError(message) {
   document.getElementById("jadwalTableBody").innerHTML = `
     <tr>
