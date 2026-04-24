@@ -1,6 +1,6 @@
 const namaGuruEl = document.getElementById("namaGuru");
 const avatarGuruEl = document.getElementById("avatarGuru");
-const welcomeGuruEl = document.getElementById("welcomeGuru");
+const welcomeGuruEl = document.getElementById("namaGuruDashboard");
 
 function tampilkanGuru(nama) {
     const namaFix = nama || "Bapak/Ibu Guru";
@@ -8,10 +8,10 @@ function tampilkanGuru(nama) {
 
     if (namaGuruEl) namaGuruEl.textContent = namaFix;
     if (avatarGuruEl) avatarGuruEl.textContent = huruf;
-    if (welcomeGuruEl) welcomeGuruEl.textContent = `Halo, ${namaFix}! 🌟`;
+    if (welcomeGuruEl) welcomeGuruEl.textContent = namaFix;
 }
 
-fetch("get_guru.php")
+fetch("get_profil_guru.php")
     .then(res => res.json())
     .then(result => {
         console.log("Data guru dashboard:", result);
@@ -20,7 +20,7 @@ fetch("get_guru.php")
             tampilkanGuru(result.data.nama);
         } else {
             alert(result.message);
-            window.location.href = "login.html";
+            window.location.href = "../login.html";
         }
     })
     .catch(err => {
