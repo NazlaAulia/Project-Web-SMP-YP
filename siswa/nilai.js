@@ -223,15 +223,36 @@ function aktifkanExportAnimasi() {
   });
 }
 
-async function exportNilaiPdf() {
+function aktifkanExportAnimasi() {
+  const exportBtn = document.getElementById("exportBtn");
+
+  if (!exportBtn) return;
+
+  exportBtn.addEventListener("click", async () => {
+    exportBtn.classList.add("pulse-click");
+
+    setTimeout(() => {
+      exportBtn.classList.remove("pulse-click");
+    }, 350);
+
+    await exportNilaiPdfFinal();
+  });
+}
+
+async function exportNilaiPdfFinal() {
   try {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert("Library jsPDF belum terbaca. Pastikan script jsPDF sudah ada di HTML sebelum nilai.js.");
+      return;
+    }
+
     const { jsPDF } = window.jspdf;
 
     const idSiswa = localStorage.getItem("id_siswa") || "";
-    const semesterText = document.getElementById("semester")?.value || "";
+    const semesterText = document.getElementById("semester")?.value || "2025/2026 - Genap";
 
     if (!idSiswa) {
-      alert("ID siswa tidak ditemukan.");
+      alert("ID siswa tidak ditemukan. Silakan login ulang.");
       return;
     }
 
@@ -243,10 +264,19 @@ async function exportNilaiPdf() {
       }
     );
 
-    const result = await response.json();
+    const text = await response.text();
+    console.log("RAW export nilai:", text);
+
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch (error) {
+      alert("Data export dari PHP bukan JSON. Cek file get_detail_nilai_export.php atau lihat Console.");
+      return;
+    }
 
     if (!result.success) {
-      alert(result.message || "Gagal mengambil data export.");
+      alert(result.message || "Gagal mengambil data nilai export.");
       return;
     }
 
@@ -256,85 +286,118 @@ async function exportNilaiPdf() {
     const doc = new jsPDF("p", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    // ===== LOAD LOGO =====
-    let logoData = null;
-    try {
-      logoData = await loadImageAsDataURL("../img/logo.webp");
-    } catch (e) {
-      console.warn("Logo gagal dimuat:", e);
-    }
-
-    // ===== BORDER LUAR =====
+    // =========================
+    // BORDER LUAR
+    // =========================
     doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.5);
+    doc.setLineWidth(0.4);
     doc.rect(10, 10, 190, 277);
 
-    // ===== HEADER BOX =====
-    doc.setLineWidth(0.4);
-    doc.rect(14, 14, 182, 34);
+    // =========================
+    // HEADER SEKOLAH
+    // =========================
+    let logoData = null;
+
+    try {
+      logoData = await loadImageAsDataURL("../img/logo.webp");
+    } catch (error) {
+      console.warn("Logo tidak berhasil dimuat, PDF tetap dibuat tanpa logo.", error);
+    }
 
     if (logoData) {
-      doc.addImage(logoData, "PNG", 18, 17, 22, 22);
+      doc.addImage(logoData, "PNG", 18, 15, 24, 24);
     }
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
-    doc.text("YAYASAN PENDIDIKAN TUNAS PERTIWI", pageWidth / 2 + 8, 21, { align: "center" });
+    doc.text("YAYASAN PENDIDIKAN TUNAS PERTIWI", pageWidth / 2 + 8, 17, {
+      align: "center"
+    });
 
     doc.setFontSize(18);
-    doc.text("SMP YP 17 SURABAYA", pageWidth / 2 + 8, 29, { align: "center" });
+    doc.text("SMP YP 17 SURABAYA", pageWidth / 2 + 8, 25, {
+      align: "center"
+    });
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
-    doc.text("Jl. Randu No.17, Sidotopo Wetan,", pageWidth / 2 + 8, 35, { align: "center" });
-    doc.text("Kec. Kenjeran, Surabaya, Jawa Timur 60128", pageWidth / 2 + 8, 40, { align: "center" });
-    doc.text("Telepon : (031) 376 3721", pageWidth / 2 + 8, 45, { align: "center" });
+    doc.text("Jl. Randu No.17, Sidotopo Wetan,", pageWidth / 2 + 8, 31, {
+      align: "center"
+    });
+    doc.text("Kec. Kenjeran, Surabaya, Jawa Timur 60128", pageWidth / 2 + 8, 36, {
+      align: "center"
+    });
+    doc.text("Telepon : (031) 376 3721", pageWidth / 2 + 8, 41, {
+      align: "center"
+    });
 
-    // ===== DATA SISWA =====
+    // Batas header
+    doc.setLineWidth(0.8);
+    doc.line(16, 46, 194, 46);
+
+    doc.setLineWidth(0.3);
+    doc.line(16, 48, 194, 48);
+
+    // =========================
+    // IDENTITAS SISWA
+    // =========================
     let y = 58;
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
 
     doc.text("Nama Siswa", 16, y);
-    doc.text(`: ${siswa.nama || "-"}`, 50, y);
+    doc.text(`: ${siswa.nama || "-"}`, 52, y);
 
-    doc.text("Kelas", 130, y);
-    doc.text(`: ${siswa.kelas || "-"}`, 152, y);
+    doc.text("Kelas", 132, y);
+    doc.text(`: ${siswa.kelas || "-"}`, 160, y);
 
     y += 7;
+
     doc.text("NIS", 16, y);
-    doc.text(`: ${siswa.nis || "-"}`, 50, y);
+    doc.text(`: ${siswa.nis || "-"}`, 52, y);
 
-    doc.text("NISN", 130, y);
-    doc.text(`: ${siswa.nisn || "-"}`, 152, y);
+    doc.text("NISN", 132, y);
+    doc.text(`: ${siswa.nisn || "-"}`, 160, y);
 
     y += 7;
+
     doc.text("Nama Sekolah", 16, y);
-    doc.text(": SMP YP 17 Surabaya", 50, y);
+    doc.text(": SMP YP 17 Surabaya", 52, y);
 
     y += 7;
-    doc.text("Tahun Ajaran", 16, y);
-    doc.text(`: ${formatTahunAjaranLengkap(semesterText, siswa.tahun_ajaran)}`, 50, y);
 
-    // ===== JUDUL =====
+    doc.text("Tahun Ajaran", 16, y);
+    doc.text(`: ${formatTahunAjaranFinal(semesterText, siswa.tahun_ajaran)}`, 52, y);
+
+    y += 7;
+
+    doc.text("Alamat Sekolah", 16, y);
+    doc.text(": Jl. Randu No.17, Sidotopo Wetan, Kec. Kenjeran, Surabaya", 52, y);
+
+    // =========================
+    // JUDUL NILAI
+    // =========================
     y += 12;
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.text("A. Nilai Akhir Semester", 16, y);
 
-    // ===== TABEL NILAI PER MAPEL =====
-    const bodyNilai = detailNilai.length
+    // =========================
+    // TABEL NILAI PER MAPEL
+    // =========================
+    const bodyNilai = detailNilai.length > 0
       ? detailNilai.map((item, index) => [
           index + 1,
-          item.mapel || "-",
+          ubahNamaMapel(item.mapel || "-"),
           item.nilai || "-",
           item.keterangan || "-"
         ])
-      : [[1, "-", "-", "-"]];
+      : [[1, "Data nilai belum tersedia", "-", "-"]];
 
     doc.autoTable({
-      startY: y + 4,
+      startY: y + 5,
       head: [[
         "No",
         "Mata Pelajaran",
@@ -343,11 +406,14 @@ async function exportNilaiPdf() {
       ]],
       body: bodyNilai,
       theme: "grid",
-      margin: { left: 16, right: 16 },
+      margin: {
+        left: 16,
+        right: 16
+      },
       styles: {
         font: "helvetica",
         fontSize: 9,
-        cellPadding: 2.5,
+        cellPadding: 2.4,
         lineWidth: 0.2,
         lineColor: [0, 0, 0],
         textColor: [0, 0, 0],
@@ -360,49 +426,127 @@ async function exportNilaiPdf() {
         fontStyle: "bold"
       },
       columnStyles: {
-        0: { cellWidth: 14 },
-        1: { cellWidth: 90, halign: "left" },
-        2: { cellWidth: 30 },
-        3: { cellWidth: 40 }
+        0: {
+          cellWidth: 14
+        },
+        1: {
+          cellWidth: 100,
+          halign: "left"
+        },
+        2: {
+          cellWidth: 25
+        },
+        3: {
+          cellWidth: 39
+        }
       }
     });
 
     let afterTableY = doc.lastAutoTable.finalY + 10;
 
-    // ===== CATATAN =====
+    // =========================
+    // PENILAIAN SIKAP / ABSENSI
+    // =========================
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("B. Ketidakhadiran", 16, afterTableY);
+
+    const absensi = ambilAbsensiDariDetailNilai(detailNilai);
+
+    doc.autoTable({
+      startY: afterTableY + 5,
+      head: [[
+        "No",
+        "Keterangan",
+        "Jumlah"
+      ]],
+      body: [
+        [1, "Hadir", absensi.hadir],
+        [2, "Izin", absensi.izin],
+        [3, "Sakit", absensi.sakit],
+        [4, "Alfa", absensi.alfa]
+      ],
+      theme: "grid",
+      margin: {
+        left: 16,
+        right: 16
+      },
+      styles: {
+        font: "helvetica",
+        fontSize: 9,
+        cellPadding: 2.4,
+        lineWidth: 0.2,
+        lineColor: [0, 0, 0],
+        textColor: [0, 0, 0],
+        halign: "center"
+      },
+      headStyles: {
+        fillColor: [255, 255, 255],
+        textColor: [0, 0, 0],
+        fontStyle: "bold"
+      },
+      columnStyles: {
+        0: {
+          cellWidth: 14
+        },
+        1: {
+          cellWidth: 100,
+          halign: "left"
+        },
+        2: {
+          cellWidth: 64
+        }
+      }
+    });
+
+    afterTableY = doc.lastAutoTable.finalY + 10;
+
+    // =========================
+    // CATATAN
+    // =========================
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.text("Catatan :", 16, afterTableY);
 
     doc.setFont("helvetica", "normal");
-    doc.rect(16, afterTableY + 3, 168, 18);
+    doc.rect(16, afterTableY + 3, 178, 18);
     doc.text("Pertahankan semangat belajar dan terus tingkatkan prestasi.", 18, afterTableY + 10);
 
-    // ===== TANDA TANGAN =====
-    const ttdY = afterTableY + 34;
+    // =========================
+    // TANDA TANGAN
+    // =========================
+    const ttdY = afterTableY + 35;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
 
     doc.text("Mengetahui,", 16, ttdY);
     doc.text("Kepala Sekolah", 16, ttdY + 6);
 
-    doc.text(`Surabaya, ${formatTanggalIndonesia(new Date())}`, 126, ttdY);
-    doc.text("Wali Kelas", 126, ttdY + 6);
+    doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
+    doc.text("Wali Kelas", 124, ttdY + 6);
 
     doc.setFont("helvetica", "bold");
-    doc.text("(............................)", 16, ttdY + 30);
-    doc.text("(............................)", 126, ttdY + 30);
+    doc.text("(............................)", 16, ttdY + 32);
+    doc.text("(............................)", 124, ttdY + 32);
 
-    const namaFile = `Nilai_Semester_${(siswa.nama || "Siswa").replace(/\s+/g, "_")}.pdf`;
+    // =========================
+    // SAVE PDF
+    // =========================
+    const namaSiswa = siswa.nama || "Siswa";
+    const namaFile = `Nilai_Akhir_Semester_${namaSiswa.replace(/\s+/g, "_")}.pdf`;
+
     doc.save(namaFile);
 
   } catch (error) {
-    console.error("Error export PDF:", error);
-    alert("Gagal membuat PDF.");
+    console.error("Error export PDF final:", error);
+    alert("Gagal membuat PDF: " + error.message);
   }
 }
 
-function formatTahunAjaranLengkap(semesterText, tahunAjaranBackend) {
+function formatTahunAjaranFinal(semesterText, tahunAjaranBackend) {
   const match = semesterText.match(/\d{4}\/\d{4}/);
-  const tahunAjaran = match ? match[0] : (tahunAjaranBackend || "-");
+  const tahunAjaran = match ? match[0] : (tahunAjaranBackend || "2025/2026");
 
   if (/genap/i.test(semesterText)) {
     return `${tahunAjaran} - Genap`;
@@ -412,22 +556,73 @@ function formatTahunAjaranLengkap(semesterText, tahunAjaranBackend) {
     return `${tahunAjaran} - Ganjil`;
   }
 
-  return tahunAjaran;
+  return `${tahunAjaran} - Genap`;
 }
 
-function formatTanggalIndonesia(date) {
+function formatTanggalIndonesiaFinal(date) {
   const bulan = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember"
   ];
 
   return `${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
 }
 
+function ubahNamaMapel(mapel) {
+  const daftarMapel = {
+    "BIN": "Bahasa Indonesia",
+    "B. JAWA": "Bahasa Jawa",
+    "PKN": "Pendidikan Kewarganegaraan",
+    "INFOR": "Informatika",
+    "MAT": "Matematika",
+    "BIG": "Bahasa Inggris",
+    "IPA": "Ilmu Pengetahuan Alam",
+    "IPS": "Ilmu Pengetahuan Sosial",
+    "BK": "Bimbingan Konseling",
+    "INFO/BK": "Informatika / Bimbingan Konseling",
+    "PAI/BHQ": "Pendidikan Agama Islam / Baca Hafal Quran",
+    "PJOK": "Pendidikan Jasmani, Olahraga dan Kesehatan"
+  };
+
+  return daftarMapel[mapel] || mapel;
+}
+
+function ambilAbsensiDariDetailNilai(detailNilai) {
+  let hadir = "-";
+  let izin = "-";
+  let sakit = "-";
+  let alfa = "-";
+
+  if (detailNilai && detailNilai.length > 0) {
+    const item = detailNilai[0];
+
+    hadir = item.hadir ?? "-";
+    izin = item.izin ?? "-";
+    sakit = item.sakit ?? "-";
+    alfa = item.alfa ?? "-";
+  }
+
+  return {
+    hadir,
+    izin,
+    sakit,
+    alfa
+  };
+}
+
 function loadImageAsDataURL(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
 
     img.onload = function () {
       const canvas = document.createElement("canvas");
@@ -440,7 +635,10 @@ function loadImageAsDataURL(src) {
       resolve(canvas.toDataURL("image/png"));
     };
 
-    img.onerror = reject;
+    img.onerror = function () {
+      reject(new Error("Gagal memuat gambar logo."));
+    };
+
     img.src = src;
   });
 }
