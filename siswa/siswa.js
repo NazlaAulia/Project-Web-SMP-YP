@@ -20,17 +20,23 @@ const nilai = {
 
 function singkatNamaMapel(nama) {
   const mapping = {
-    "Matematika": "Mat",
     "MAT": "Mat",
-    "Bahasa Indonesia": "Ind",
+    "Matematika": "Mat",
     "BIN": "Ind",
-    "Bahasa Inggris": "Ing",
+    "Bahasa Indonesia": "Ind",
     "BIG": "Ing",
+    "Bahasa Inggris": "Ing",
     "IPA": "Ipa",
     "IPS": "Ips",
+    "INFOR": "Infor",
+    "Informatika": "Infor",
     "INFO/BK": "Info/BK",
     "BK": "BK",
-    "Informatika": "Info"
+    "PAI/BHQ": "PAI",
+    "PJOK": "PJOK",
+    "PKN": "PKN",
+    "B. JAWA": "B. Jawa",
+    "Bahasa Jawa": "B. Jawa"
   };
 
   return mapping[nama] || nama;
@@ -61,16 +67,20 @@ function renderChart(dataNilai = null) {
     return;
   }
 
+  const maxNilai = Math.max(...nilaiFinal.map((item) => Number(item.nilai_angka) || 0), 100);
+
   barChartEl.innerHTML = nilaiFinal.map((item) => {
     const nilaiAngka = Number(item.nilai_angka) || 0;
+    const tinggiPersen = Math.max((nilaiAngka / maxNilai) * 100, 8);
     const label = singkatNamaMapel(item.nama_mapel);
 
     return `
       <div class="bar-group">
-        <div class="bar-fill" style="height: ${nilaiAngka}%;">
-          <span>${nilaiAngka}</span>
+        <div class="bar-value">${nilaiAngka}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="height: ${tinggiPersen}%"></div>
         </div>
-        <span class="bar-label">${label}</span>
+        <div class="bar-label" title="${item.nama_mapel}">${label}</div>
       </div>
     `;
   }).join("");
