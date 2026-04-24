@@ -34,6 +34,16 @@ let currentSiswa = null;
 let currentUserDocId = null;
 let currentUserData = null;
 
+function isiHeaderDariLocalStorage() {
+  const nama = localStorage.getItem("nama_siswa") || "Siswa";
+  const kelas = localStorage.getItem("kelas_siswa") || "-";
+  const avatar = nama && nama !== "-" ? nama.charAt(0).toUpperCase() : "S";
+
+  if (namaSiswaEl) namaSiswaEl.textContent = nama;
+  if (namaKelasEl) namaKelasEl.textContent = kelas;
+  if (avatarHurufEl) avatarHurufEl.textContent = avatar;
+}
+
 function showAlert(type, message) {
   alertBox.innerHTML = `
     <div class="settings-alert ${type === "success" ? "success-alert" : "error-alert"}">
@@ -139,6 +149,14 @@ async function loadSiswaDanUser() {
     avatarHurufEl.textContent = hurufAwal;
     namaKelasEl.textContent = namaKelas;
 
+    if (nama && nama !== "Siswa") {
+      localStorage.setItem("nama_siswa", nama);
+    }
+
+    if (namaKelas && namaKelas !== "-") {
+      localStorage.setItem("kelas_siswa", namaKelas);
+    }
+
     const qUser = query(collection(db, "user"), where("id_siswa", "==", Number(idSiswa)));
     const userSnap = await getDocs(qUser);
 
@@ -239,5 +257,6 @@ passwordBaruEl.addEventListener("input", (e) => {
   checkPasswordStrength(e.target.value);
 });
 
+isiHeaderDariLocalStorage();
 checkPasswordStrength("");
 loadSiswaDanUser();
