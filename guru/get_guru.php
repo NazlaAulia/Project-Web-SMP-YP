@@ -4,16 +4,30 @@ include "koneksi.php";
 
 header("Content-Type: application/json");
 
-if (!isset($_SESSION['id_guru'])) {
+$id_guru = "";
+
+// 1. Ambil dari URL kalau ada: get_guru.php?id_guru=4
+if (isset($_GET['id_guru']) && $_GET['id_guru'] != "") {
+    $id_guru = $_GET['id_guru'];
+}
+
+// 2. Kalau URL kosong, ambil dari session login
+if ($id_guru == "" && isset($_SESSION['id_guru'])) {
+    $id_guru = $_SESSION['id_guru'];
+}
+
+// 3. Kalau masih kosong, baru error
+if ($id_guru == "") {
     echo json_encode([
         "status" => "error",
-        "message" => "ID guru tidak ditemukan"
+        "message" => "Silakan login ulang"
     ]);
     exit;
 }
 
-$id_guru = $_SESSION['id_guru'];
+$id_guru = mysqli_real_escape_string($conn, $id_guru);
 
+// Ambil data guru
 $queryGuru = mysqli_query($conn, "
     SELECT 
         id_guru,
@@ -44,10 +58,11 @@ if (!$data) {
     exit;
 }
 
+// Ambil nama mapel
 $data['nama_mapel'] = "-";
 
 if (!empty($data['id_mapel'])) {
-    $id_mapel = $data['id_mapel'];
+    $id_mapel = mysqli_real_escape_string($conn, $data['id_mapel']);
 
     $queryMapel = mysqli_query($conn, "
         SELECT nama_mapel
