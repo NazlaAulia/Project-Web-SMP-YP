@@ -63,33 +63,28 @@ function loadProfilGuru() {
       alert("Gagal memuat data profil guru");
     });
 }
-loadProfilGuru();
-const btnSimpanProfil = document.getElementById("btnSimpanProfil");
+function loadProfilGuru() {
+  const idGuru = localStorage.getItem("id_guru");
 
-if (btnSimpanProfil) {
-  btnSimpanProfil.addEventListener("click", function () {
-    const formData = new FormData();
+  if (!idGuru) {
+    alert("Data login guru tidak ditemukan. Silakan login ulang.");
+    window.location.href = "../login.html";
+    return;
+  }
 
-    formData.append("nama", namaGuru.value);
-    formData.append("nip", nipGuru.value);
-    formData.append("email", emailGuru.value);
-    formData.append("id_mapel", mapelGuru.value);
+  fetch("get_guru.php?id_guru=" + encodeURIComponent(idGuru))
+    .then(response => response.json())
+    .then(result => {
+      console.log("Hasil get_guru.php:", result);
 
-    fetch("update_profil_guru.php", {
-      method: "POST",
-      body: formData
+      if (result.status === "success") {
+        isiProfilGuru(result.data);
+      } else {
+        alert(result.message || "Data guru tidak ditemukan");
+      }
     })
-      .then(response => response.json())
-      .then(result => {
-        alert(result.message);
-
-        if (result.status === "success") {
-          loadProfilGuru();
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        alert("Gagal menyimpan profil guru");
-      });
-  });
+    .catch(error => {
+      console.error(error);
+      alert("Gagal memuat data profil guru");
+    });
 }
