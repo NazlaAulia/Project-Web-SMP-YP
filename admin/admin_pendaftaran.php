@@ -8,6 +8,10 @@ $page = max($page, 1);
 $offset = ($page - 1) * $limit;
 
 $search = isset($_GET['q']) ? trim($_GET['q']) : '';
+$filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+
+$isMenungguMode = ($filter === 'menunggu');
+
 $searchLike = '%' . $search . '%';
 
 $where = "";
@@ -41,9 +45,17 @@ if ($search !== '') {
     $types = "sssssssss";
 }
 
+$orderBy = $isMenungguMode
+    ? "ORDER BY CASE WHEN status = 'menunggu' THEN 0 ELSE 1 END, id_pendaftaran DESC"
+    : "ORDER BY id_pendaftaran DESC";
+
 /* HITUNG TOTAL DATA */
 $countSql = "SELECT COUNT(*) AS total FROM pendaftaran $where";
 $countStmt = mysqli_prepare($conn, $countSql);
+
+if (!$countStmt) {
+    die("Query count gagal: " . mysqli_error($conn));
+}
 
 if ($search !== '') {
     mysqli_stmt_bind_param($countStmt, $types, ...$params);
@@ -56,9 +68,13 @@ $totalData = mysqli_fetch_assoc($countResult)['total'];
 $totalPages = ceil($totalData / $limit);
 $totalPages = max($totalPages, 1);
 
-/* AMBIL DATA PER HALAMAN */
-$dataSql = "SELECT * FROM pendaftaran $where ORDER BY id_pendaftaran DESC LIMIT ? OFFSET ?";
+/* AMBIL DATA */
+$dataSql = "SELECT * FROM pendaftaran $where $orderBy LIMIT ? OFFSET ?";
 $dataStmt = mysqli_prepare($conn, $dataSql);
+
+if (!$dataStmt) {
+    die("Query data gagal: " . mysqli_error($conn));
+}
 
 if ($search !== '') {
     $typesData = $types . "ii";
@@ -74,7 +90,7 @@ $result = mysqli_stmt_get_result($dataStmt);
 $startData = $totalData > 0 ? $offset + 1 : 0;
 $endData = min($offset + $limit, $totalData);
 
-function buildPageUrl($pageNumber, $search)
+function buildPageUrl($pageNumber, $search, $filter = '')
 {
     $query = [
         'page' => $pageNumber
@@ -82,6 +98,10 @@ function buildPageUrl($pageNumber, $search)
 
     if ($search !== '') {
         $query['q'] = $search;
+    }
+
+    if ($filter !== '') {
+        $query['filter'] = $filter;
     }
 
     return '?' . http_build_query($query);
@@ -95,7 +115,7 @@ function buildPageUrl($pageNumber, $search)
     <title>Data Pendaftaran Siswa</title>
 
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=50">
+    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=80">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
@@ -125,12 +145,29 @@ function buildPageUrl($pageNumber, $search)
                             value="<?= htmlspecialchars($search); ?>"
                         >
 
+                        <?php if ($filter !== '') { ?>
+                            <input type="hidden" name="filter" value="<?= htmlspecialchars($filter); ?>">
+                        <?php } ?>
+
                         <?php if ($search !== '') { ?>
-                            <a href="/admin/admin_pendaftaran.php" class="search-clear">
+                            <a 
+                                href="<?= $filter !== '' ? buildPageUrl(1, '', $filter) : '/admin/admin_pendaftaran.php'; ?>" 
+                                class="search-clear"
+                            >
                                 <i class="fas fa-times"></i>
                             </a>
                         <?php } ?>
                     </form>
+                </div>
+
+                <div class="header-filter-actions">
+                    <a 
+                        href="<?= buildPageUrl(1, $search, $isMenungguMode ? '' : 'menunggu'); ?>" 
+                        class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>"
+                    >
+                        <i class="fas fa-clock"></i>
+                        Menunggu
+                    </a>
                 </div>
             </div>
 
@@ -230,7 +267,7 @@ function buildPageUrl($pageNumber, $search)
 
                     <div class="pagination">
                         <?php if ($page > 1) { ?>
-                            <a href="<?= buildPageUrl($page - 1, $search); ?>" class="page-btn">
+                            <a href="<?= buildPageUrl($page - 1, $search, $filter); ?>" class="page-btn">
                                 <i class="fas fa-chevron-left"></i>
                             </a>
                         <?php } else { ?>
@@ -256,12 +293,14 @@ function buildPageUrl($pageNumber, $search)
                             <?php if ($i == $page) { ?>
                                 <span class="page-btn active"><?= $i; ?></span>
                             <?php } else { ?>
-                                <a href="<?= buildPageUrl($i, $search); ?>" class="page-btn"><?= $i; ?></a>
+                                <a href="<?= buildPageUrl($i, $search, $filter); ?>" class="page-btn">
+                                    <?= $i; ?>
+                                </a>
                             <?php } ?>
                         <?php } ?>
 
                         <?php if ($page < $totalPages) { ?>
-                            <a href="<?= buildPageUrl($page + 1, $search); ?>" class="page-btn">
+                            <a href="<?= buildPageUrl($page + 1, $search, $filter); ?>" class="page-btn">
                                 <i class="fas fa-chevron-right"></i>
                             </a>
                         <?php } else { ?>
