@@ -151,13 +151,11 @@ while ($rowHariIni = mysqli_fetch_assoc($queryHariIni)) {
 
 $queryJadwal = mysqli_query($conn, "
     SELECT 
-        j.hari,
-        j.jam AS jam_mulai,
-        j.jam AS jam_selesai,
-        mp.nama_mapel,
-        COALESCE(g.nama, '-') AS nama_guru,
-        '-' AS ruangan,
-        'Mendatang' AS status_jadwal
+        j.hari AS hari,
+        j.jam AS jam,
+        mp.nama_mapel AS mata_pelajaran,
+        COALESCE(g.nama, '-') AS guru,
+        'Mendatang' AS status
     FROM jadwal j
     INNER JOIN mapel mp ON j.id_mapel = mp.id_mapel
     LEFT JOIN guru g ON j.id_guru = g.id_guru
@@ -177,20 +175,17 @@ if (!$queryJadwal) {
 $jamMulai = substr($rowJadwal['jam_mulai'], 0, 5);
 $jamSelesai = substr($rowJadwal['jam_selesai'], 0, 5);
 
-$jadwalMinggu[] = [
-    "hari" => $rowJadwal['hari'],
+$jadwalMinggu = [];
 
-    "jam" => $jamMulai . " - " . $jamSelesai,
-    "mata_pelajaran" => $rowJadwal['nama_mapel'],
-
-    "jam_mulai" => $jamMulai,
-    "jam_selesai" => $jamSelesai,
-    "mapel" => $rowJadwal['nama_mapel'],
-
-    "guru" => $rowJadwal['nama_guru'],
-    "ruangan" => $rowJadwal['ruangan'],
-    "status" => $rowJadwal['status_jadwal'] ?: 'Mendatang'
-];
+while ($rowJadwal = mysqli_fetch_assoc($queryJadwal)) {
+    $jadwalMinggu[] = [
+        "hari" => $rowJadwal['hari'],
+        "jam" => $rowJadwal['jam'],
+        "mata_pelajaran" => $rowJadwal['mata_pelajaran'],
+        "guru" => $rowJadwal['guru'],
+        "status" => $rowJadwal['status']
+    ];
+}
 
 echo json_encode([
     "success" => true,
@@ -212,3 +207,4 @@ echo json_encode([
 
 $conn->close();
 ?>
+
