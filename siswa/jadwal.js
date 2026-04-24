@@ -152,9 +152,9 @@ function renderTabel(jadwalList, kelas) {
       <tr class="show-row">
         <td>
           <strong>${item.hari}</strong><br>
-          ${item.jam_mulai} - ${item.jam_selesai}
+          ${item.jam}
         </td>
-        <td>${item.mapel}</td>
+        <td>${item.mata_pelajaran}</td>
         <td>${item.guru}</td>
         <td>
           <span class="status-badge ${statusClass}">${item.status || "Mendatang"}</span>
