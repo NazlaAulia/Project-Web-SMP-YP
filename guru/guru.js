@@ -11,19 +11,22 @@ function tampilkanGuru(nama) {
     if (welcomeGuruEl) welcomeGuruEl.textContent = `Halo, ${namaFix}! 🌟`;
 }
 
-fetch("get_guru.php")
-    .then(res => res.json())
-    .then(result => {
-        console.log("Data guru dashboard:", result);
+const idGuru = localStorage.getItem("id_guru");
 
-        if (result.status === "success") {
-            tampilkanGuru(result.data.nama);
-        } else {
-            alert(result.message);
-            window.location.href = "login.html";
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Gagal load data guru");
-    });
+if (!idGuru) {
+    tampilkanGuru("Bapak/Ibu Guru");
+} else {
+    fetch(`get_guru.php?id_guru=${encodeURIComponent(idGuru)}`)
+        .then(res => res.json())
+        .then(result => {
+            if (result.status === "success") {
+                tampilkanGuru(result.data.nama);
+            } else {
+                alert(result.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Gagal load data guru");
+        });
+}
