@@ -4,15 +4,19 @@ include "koneksi.php";
 
 header("Content-Type: application/json");
 
-// Prioritas utama: ambil dari session login
-if (isset($_SESSION['id_guru'])) {
+$id_guru = "";
+
+// ambil dari session kalau ada
+if (isset($_SESSION['id_guru']) && $_SESSION['id_guru'] != "") {
     $id_guru = $_SESSION['id_guru'];
-} 
-// Cadangan kalau masih ada halaman yang kirim ?id_guru=
-else if (isset($_GET['id_guru'])) {
+}
+
+// kalau session kosong, ambil dari URL ?id_guru=
+if ($id_guru == "" && isset($_GET['id_guru']) && $_GET['id_guru'] != "") {
     $id_guru = $_GET['id_guru'];
-} 
-else {
+}
+
+if ($id_guru == "") {
     echo json_encode([
         "status" => "error",
         "message" => "ID guru tidak ditemukan"
