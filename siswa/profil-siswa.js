@@ -85,7 +85,7 @@ function setProfileUI(data) {
 
 async function loadProfilSiswa() {
   try {
-    const response = await fetch(`get-profil-siswa.php?id_siswa=${encodeURIComponent(idSiswa)}`);
+    const response = await fetch(`get_profil_siswa.php?id_siswa=${encodeURIComponent(idSiswa)}`);
     const result = await response.json();
 
     if (!result.success) {
