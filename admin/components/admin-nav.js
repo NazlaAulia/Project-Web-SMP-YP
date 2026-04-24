@@ -2,10 +2,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const navMount = document.getElementById("admin-nav-root");
     if (!navMount) return;
 
-    const navPath = document.body.getAttribute("data-nav-path") || "components/admin-nav.html";
+    // Pakai path absolut supaya tidak salah folder
+    const navPath = document.body.getAttribute("data-nav-path") || "/admin/components/admin-nav.html";
 
     try {
-        const response = await fetch(navPath);
+        // Tambahan ?v=999 supaya browser tidak pakai cache navbar lama
+        const response = await fetch(navPath + "?v=999");
+
+        if (!response.ok) {
+            throw new Error("Navbar tidak ditemukan: " + navPath);
+        }
+
         const html = await response.text();
         navMount.innerHTML = html;
 
@@ -29,6 +36,7 @@ function setActiveMenu() {
     document.querySelectorAll("[data-subpage]").forEach(el => {
         if (el.getAttribute("data-subpage") === page) {
             el.classList.add("active-submenu");
+
             const parent = el.closest("details");
             if (parent) parent.open = true;
         }
