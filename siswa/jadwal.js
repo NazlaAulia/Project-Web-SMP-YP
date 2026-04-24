@@ -68,6 +68,7 @@ async function loadJadwal() {
   }
 }
 
+
 function renderProfil(siswa) {
   document.getElementById("kelasBadge").textContent = siswa.kelas || "-";
   document.getElementById("profileName").textContent = siswa.nama || "-";
