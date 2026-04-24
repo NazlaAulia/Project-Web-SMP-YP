@@ -53,6 +53,10 @@ $orderBy = $isMenungguMode
 $countSql = "SELECT COUNT(*) AS total FROM pendaftaran $where";
 $countStmt = mysqli_prepare($conn, $countSql);
 
+if (!$countStmt) {
+    die("Query count gagal: " . mysqli_error($conn));
+}
+
 if ($search !== '') {
     mysqli_stmt_bind_param($countStmt, $types, ...$params);
 }
@@ -67,6 +71,10 @@ $totalPages = max($totalPages, 1);
 /* AMBIL DATA */
 $dataSql = "SELECT * FROM pendaftaran $where $orderBy LIMIT ? OFFSET ?";
 $dataStmt = mysqli_prepare($conn, $dataSql);
+
+if (!$dataStmt) {
+    die("Query data gagal: " . mysqli_error($conn));
+}
 
 if ($search !== '') {
     $typesData = $types . "ii";
@@ -107,7 +115,7 @@ function buildPageUrl($pageNumber, $search, $filter = '')
     <title>Data Pendaftaran Siswa</title>
 
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=60">
+    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=80">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
@@ -142,7 +150,10 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                         <?php } ?>
 
                         <?php if ($search !== '') { ?>
-                            <a href="<?= $filter !== '' ? buildPageUrl(1, '', $filter) : '/admin/admin_pendaftaran.php'; ?>" class="search-clear">
+                            <a 
+                                href="<?= $filter !== '' ? buildPageUrl(1, '', $filter) : '/admin/admin_pendaftaran.php'; ?>" 
+                                class="search-clear"
+                            >
                                 <i class="fas fa-times"></i>
                             </a>
                         <?php } ?>
@@ -282,7 +293,9 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                             <?php if ($i == $page) { ?>
                                 <span class="page-btn active"><?= $i; ?></span>
                             <?php } else { ?>
-                                <a href="<?= buildPageUrl($i, $search, $filter); ?>" class="page-btn"><?= $i; ?></a>
+                                <a href="<?= buildPageUrl($i, $search, $filter); ?>" class="page-btn">
+                                    <?= $i; ?>
+                                </a>
                             <?php } ?>
                         <?php } ?>
 
