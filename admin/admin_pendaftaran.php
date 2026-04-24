@@ -12,7 +12,7 @@ $result = mysqli_query($conn, $query);
     <title>Data Pendaftaran Siswa</title>
 
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=30">
+    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=32">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
@@ -28,10 +28,8 @@ $result = mysqli_query($conn, $query);
                 <div>
                     <h1>Data Pendaftaran Siswa</h1>
                     <p>Daftar siswa yang telah mengisi formulir pendaftaran online.</p>
-                </div>
 
-                <div class="header-actions">
-                    <div class="search-container-elegant">
+                    <div class="search-container-elegant search-below-title">
                         <span class="search-icon">
                             <i class="fas fa-search"></i>
                         </span>
@@ -42,8 +40,6 @@ $result = mysqli_query($conn, $query);
                             placeholder="Cari nama, NISN, sekolah..."
                         >
                     </div>
-
-                    <a href="/admin/index.html" class="btn-back">Kembali</a>
                 </div>
             </div>
 
@@ -102,12 +98,6 @@ $result = mysqli_query($conn, $query);
                                         <span class="badge rejected">Ditolak</span>
                                     <?php } ?>
                                 </td>
-
-                                <td class="action-cell">
-                                    <a href="/admin/detail_pendaftaran.php?id=<?= $row['id_pendaftaran']; ?>" class="btn-detail">
-                                        Detail
-                                    </a>
-
                                     <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima" 
                                        class="btn-accept"
                                        onclick="return confirm('Terima pendaftaran ini?')">
