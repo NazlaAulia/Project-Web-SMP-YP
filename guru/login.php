@@ -7,7 +7,11 @@ $password = $_POST['password'];
 
 $query = mysqli_query($conn, "
     SELECT 
-        user.*,
+        user.id_user,
+        user.username,
+        user.password,
+        user.role,
+        guru.id_guru,
         guru.nama,
         guru.nip
     FROM user
@@ -28,7 +32,7 @@ if ($data) {
 
     echo "<script>
         localStorage.setItem('id_guru', '" . $data['id_guru'] . "');
-        localStorage.setItem('nama_guru', '" . addslashes($data['nama']) . "');
+        localStorage.setItem('nama_guru', " . json_encode($data['nama']) . ");
         localStorage.setItem('role', '" . $data['role'] . "');
         window.location.href = 'guru.html';
     </script>";
