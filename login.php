@@ -1,7 +1,23 @@
 <?php
-header('Content-Type: application/json');
+ob_start();
+header('Content-Type: application/json; charset=utf-8');
+
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
+function kirim_json($status, $message, $extra = []) {
+    if (ob_get_length()) {
+        ob_clean();
+    }
+
+    echo json_encode(array_merge([
+        "status" => $status,
+        "message" => $message
+    ], $extra));
+
+    exit;
+}
 
 $host = "localhost";
 $dbname = "osbebslk_sekolahyp";
@@ -11,103 +27,70 @@ $dbpass = "semangatgaes";
 $conn = new mysqli($host, $dbuser, $dbpass, $dbname);
 
 if ($conn->connect_error) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Koneksi database gagal."
-    ]);
-    exit;
+    kirim_json("error", "Koneksi database gagal: " . $conn->connect_error);
 }
+
+$conn->set_charset("utf8mb4");
 
 $raw = file_get_contents("php://input");
 $data = json_decode($raw, true);
 
 if (!is_array($data)) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Permintaan login tidak valid."
+    kirim_json("error", "Permintaan login tidak valid.", [
+        "raw" => $raw
     ]);
-    exit;
 }
 
 $username = trim($data["username"] ?? "");
 $password = trim($data["password"] ?? "");
 
 if ($username === "" && $password === "") {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Username dan password wajib diisi."
-    ]);
-    exit;
+    kirim_json("error", "Username dan password wajib diisi.");
 }
 
 if ($username === "") {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Username wajib diisi."
-    ]);
-    exit;
+    kirim_json("error", "Username wajib diisi.");
 }
 
 if ($password === "") {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Password wajib diisi."
-    ]);
-    exit;
+    kirim_json("error", "Password wajib diisi.");
 }
 
-$stmt = $conn->prepare("SELECT id_user, username, password, role_id, id_guru, id_siswa FROM `user` WHERE username = ? LIMIT 1");
+$stmt = $conn->prepare("
+    SELECT id_user, username, password, role_id, id_guru, id_siswa
+    FROM `user`
+    WHERE username = ?
+    LIMIT 1
+");
 
 if (!$stmt) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Terjadi kesalahan saat memproses login."
-    ]);
-    exit;
+    kirim_json("error", "Query gagal: " . $conn->error);
 }
 
 $stmt->bind_param("s", $username);
 
 if (!$stmt->execute()) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Login gagal diproses."
-    ]);
-    exit;
+    kirim_json("error", "Login gagal diproses: " . $stmt->error);
 }
 
 $stmt->store_result();
 
 if ($stmt->num_rows === 0) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Username tidak ditemukan."
-    ]);
-    exit;
+    kirim_json("error", "Username tidak ditemukan.");
 }
 
 $stmt->bind_result($id_user, $db_username, $db_password, $role_id, $id_guru, $id_siswa);
 $stmt->fetch();
 
 if ($db_password !== $password) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Password yang kamu masukkan salah."
-    ]);
-    exit;
+    kirim_json("error", "Password yang kamu masukkan salah.");
 }
 
 if (!in_array((int)$role_id, [1, 2, 3])) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Role akun tidak valid."
-    ]);
-    exit;
+    kirim_json("error", "Role akun tidak valid.");
 }
 
-echo json_encode([
-    "status" => "success",
-    "message" => "Login berhasil.",
+kirim_json("success", "Login berhasil.", [
     "user" => [
         "id_user" => $id_user,
         "username" => $db_username,
@@ -116,7 +99,3 @@ echo json_encode([
         "id_siswa" => $id_siswa
     ]
 ]);
-
-$stmt->close();
-$conn->close();
-?>
