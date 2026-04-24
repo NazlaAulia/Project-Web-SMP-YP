@@ -50,7 +50,7 @@ $stmt = $conn->prepare("
     FROM password_reset_requests
     WHERE reset_token = ?
     AND status = 'pending'
-    AND token_expires_at >= NOW()
+    AND created_at >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)
     LIMIT 1
 ");
 
@@ -61,13 +61,13 @@ if (!$stmt) {
 $stmt->bind_param("s", $token);
 
 if (!$stmt->execute()) {
-    kirim_json("error", "Token gagal diproses.");
+    kirim_json("error", "Token gagal diproses: " . $stmt->error);
 }
 
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    kirim_json("error", "Link reset tidak valid atau sudah kedaluwarsa.");
+    kirim_json("error", "Link reset tidak valid atau sudah kedaluwarsa. Silakan klik Lupa Sandi lagi.");
 }
 
 $request = $result->fetch_assoc();
@@ -90,7 +90,7 @@ if (!$updateUser) {
 $updateUser->bind_param("si", $password, $request["id_user"]);
 
 if (!$updateUser->execute()) {
-    kirim_json("error", "Password gagal diperbarui.");
+    kirim_json("error", "Password gagal diperbarui: " . $updateUser->error);
 }
 
 $updateUser->close();
