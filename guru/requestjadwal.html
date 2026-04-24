@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajukan Ganti Jadwal</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="components/sidebar.css">
+    <link rel="stylesheet" href="requestjadwal.css">
+</head>
+<body>
+    <div class="app-container">
+
+    <main class="main-content request-page">
+    <section class="request-hero">
+        <div class="request-hero-left">
+            <div class="request-chip" id="requestChip">
+                <span>✦</span>
+                <span>Form Pengajuan</span>
+            </div>
+
+            <div class="request-title-wrap">
+                <div class="title-rectangle" id="titleRectangle"></div>
+
+                <div class="request-title-content">
+                    <h1>Ajukan Ganti Jadwal</h1>
+                    <p>
+                        Gunakan bantuan AI untuk mencari jadwal pengganti yang
+                        lebih sesuai, cepat, dan rapi.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <a href="jadwalmengajar.html" class="btn-back-request">
+            ← Kembali
+        </a>
+    </section>
+
+    <section class="request-layout">
+        <div class="request-card glass-card hover-lift" id="requestFormCard">
+            <div class="card-title">
+                <h2>Form Ganti Jadwal</h2>
+                <p>
+                    Pilih jadwal lama, tentukan hari dan jam baru, lalu gunakan
+                    Generate AI bila ingin rekomendasi cepat.
+                </p>
+            </div>
+
+            <form id="formGantiJadwal">
+                <div class="form-group">
+                    <label for="jadwalLama">Jadwal yang Ingin Diganti</label>
+                    <select id="jadwalLama">
+                        <option value="">Pilih jadwal</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hariBaru">Hari Baru</label>
+                        <select id="hariBaru">
+                            <option value="">Pilih hari</option>
+                            <option>Senin</option>
+                            <option>Selasa</option>
+                            <option>Rabu</option>
+                            <option>Kamis</option>
+                            <option>Jumat</option>
+                            <option>Sabtu</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jamBaru">Jam Baru</label>
+                        <select id="jamBaru">
+                            <option value="">Pilih jam</option>
+                            <option>07:00-08:00</option>
+                            <option>08:00-09:00</option>
+                            <option>09:00-10:00</option>
+                            <option>10:00-11:00</option>
+                            <option>11:00-12:00</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="alasanGanti">Alasan Ganti Jadwal</label>
+                    <textarea
+                        id="alasanGanti"
+                        placeholder="Contoh: Bentrok dengan kegiatan sekolah, rapat, atau agenda mendadak..."
+                    ></textarea>
+                </div>
+
+                <div class="ai-box hover-lift" id="aiBox">
+                    <div class="ai-box-text">
+                        <h3>✨ AI Rekomendasi Jadwal</h3>
+                        <p>
+                            Klik Generate AI untuk melihat saran jadwal pengganti.
+                        </p>
+                    </div>
+                    <button type="button" class="btn-ai" id="btnGenerateAI">
+                        Generate AI
+                    </button>
+                </div>
+
+                <div class="ai-result" id="hasilAI">
+                    <h4>Hasil Rekomendasi AI</h4>
+                    <div id="isiHasilAI">
+                        Belum ada rekomendasi.
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="btnResetForm">
+                        Reset
+                    </button>
+                    <button type="submit" class="btn-primary" id="btnKirimRequest">
+                        Kirim Pengajuan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <aside class="info-panel glass-card hover-lift" id="guideCard">
+            <div class="info-icon">🗓</div>
+            <h2>Panduan Pengajuan</h2>
+            <p>
+                Halaman ini masih berupa simulasi UI. Data belum disimpan ke database.
+            </p>
+
+            <div class="info-list">
+                <div><span>✓</span> Pilih jadwal yang ingin diganti</div>
+                <div><span>✓</span> Tentukan hari dan jam baru</div>
+                <div><span>✓</span> Gunakan Generate AI bila butuh saran</div>
+                <div><span>✓</span> Kirim pengajuan untuk simulasi riwayat</div>
+            </div>
+        </aside>
+    </section>
+</main>
+    </div>
+    <script src="requestjadwal.js"></script>
+</body>
+</html>

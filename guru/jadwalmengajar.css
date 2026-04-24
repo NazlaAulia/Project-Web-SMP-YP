@@ -498,3 +498,339 @@ body {
 .info-row i {
     color: var(--secondary);
 }
+.schedule-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.time-badge {
+    background: rgba(7, 72, 74, 0.08);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.card-schedule h3 {
+    font-size: 1.35rem;
+    color: var(--primary);
+    margin-bottom: 14px;
+}
+
+.schedule-actions {
+    margin-top: 18px;
+}
+
+.schedule-actions button {
+    width: 100%;
+    border: none;
+    background: var(--primary);
+    color: white;
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s ease;
+}
+
+.schedule-actions button:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.ai-suggestion-box {
+    background: #f8fbfb;
+    border: 1px solid #dfe7e6;
+    border-radius: 18px;
+    padding: 18px;
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.ai-suggestion-box strong {
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.ai-suggestion-box p {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.btn-ai {
+    border: none;
+    background: linear-gradient(135deg, var(--primary), #0b7779);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.request-empty,
+.empty-card {
+    background: white;
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    color: var(--text-gray);
+    text-align: center;
+    font-weight: 700;
+}
+
+.request-empty i,
+.empty-card i {
+    display: block;
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.request-card {
+    background: white;
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    border-left: 6px solid var(--secondary);
+}
+
+.request-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.request-header h3 {
+    color: var(--primary);
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+}
+
+.request-header p {
+    color: var(--text-gray);
+    font-weight: 600;
+}
+
+.request-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.request-grid div {
+    background: #f8fbfb;
+    border: 1px solid #edf2f2;
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.request-grid span,
+.request-reason span {
+    display: block;
+    color: var(--text-gray);
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.request-grid strong {
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+.request-reason {
+    background: #f8fbfb;
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.request-reason p {
+    color: var(--primary);
+    line-height: 1.5;
+    font-weight: 600;
+}
+
+.click-animate {
+    cursor: pointer;
+}
+
+.click-animate.card-active {
+    animation: schedulePop 0.5s ease;
+}
+
+@keyframes schedulePop {
+    0% {
+        transform: scale(1);
+    }
+
+    35% {
+        transform: scale(1.025) translateY(-4px);
+        box-shadow: 0 16px 38px rgba(7, 72, 74, 0.16);
+    }
+
+    70% {
+        transform: scale(0.99);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 700px) {
+    .ai-suggestion-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-ai {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .request-header {
+        flex-direction: column;
+    }
+
+    .request-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* =========================
+   FIX MODAL AJUKAN JADWAL
+   Background tetap clean seperti halaman
+========================= */
+
+.modal {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(244, 247, 246, 0.72) !important;
+    backdrop-filter: blur(3px) !important;
+    -webkit-backdrop-filter: blur(3px) !important;
+    display: none;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 3000 !important;
+    padding: 28px !important;
+    overflow-y: auto !important;
+}
+
+.modal-content {
+    width: 100% !important;
+    max-width: 760px !important;
+    max-height: 88vh !important;
+    background: #ffffff !important;
+    border-radius: 26px !important;
+    overflow: hidden !important;
+    box-shadow: 0 24px 70px rgba(7, 72, 74, 0.18) !important;
+    border: 1px solid rgba(7, 72, 74, 0.08) !important;
+}
+
+.modal-header {
+    background: var(--primary) !important;
+    color: #ffffff !important;
+    padding: 22px 28px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2 !important;
+}
+
+.modal-header h2 {
+    margin: 0 !important;
+    font-size: 1.55rem !important;
+    font-weight: 800 !important;
+}
+
+.btn-close {
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 2rem !important;
+    cursor: pointer !important;
+}
+
+.modal-content form {
+    padding: 26px 28px !important;
+    max-height: calc(88vh - 80px) !important;
+    overflow-y: auto !important;
+}
+
+.form-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 18px !important;
+}
+
+.ai-suggestion-box {
+    margin-top: 18px !important;
+    border-radius: 18px !important;
+}
+
+/* Hilangkan scrollbar kasar di dalam modal */
+.modal-content form::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content form::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content form::-webkit-scrollbar-thumb {
+    background: rgba(7, 72, 74, 0.22);
+    border-radius: 999px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .modal {
+        padding: 16px !important;
+        align-items: flex-start !important;
+    }
+
+    .modal-content {
+        max-width: 100% !important;
+        max-height: 92vh !important;
+        border-radius: 22px !important;
+        margin-top: 18px !important;
+    }
+
+    .modal-header {
+        padding: 18px 20px !important;
+    }
+
+    .modal-header h2 {
+        font-size: 1.25rem !important;
+    }
+
+    .modal-content form {
+        padding: 20px !important;
+        max-height: calc(92vh - 68px) !important;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+}

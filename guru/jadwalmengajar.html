@@ -9,55 +9,54 @@
     <link rel="stylesheet" href="components/sidebar.css">
 </head>
 <body>
-    <div class="app-container">
-        <div id="sidebar-container"></div>
+        <div class="app-container">
+            <div id="sidebar-container"></div>
 
-        <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
-            <i class="bi bi-list"></i>
-        </button>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+                <i class="bi bi-list"></i>
+            </button>
 
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <main class="main-content">
-            <header class="content-header">
-                <div class="header-title">
-                    <h1>Jadwal Mengajar</h1>
-                    <p>Tahun Ajaran 2025/2026 - Semester Genap</p>
-                </div>
-                <button class="btn-request" onclick="openRequestModal()">
-                    <i class="bi bi-plus-circle"></i> Ajukan Ganti Jadwal
-                </button>
-            </header>
+            <main class="main-content">
+                <header class="content-header">
+                    <div class="header-title">
+                        <h1>Jadwal Mengajar</h1>
+                        <p>Tahun Ajaran 2025/2026 - Semester Genap</p>
+                    </div>
+                    <a href="requestjadwal.html" class="btn-request">
+                        <i class="bi bi-plus-circle"></i> Ajukan Ganti Jadwal
+                    </a>
+                </header>
 
-            <section class="filter-section">
-                <div class="filter-group">
-                    <label><i class="bi bi-filter"></i> Filter Hari</label>
-                    <select id="filterHari" onchange="filterData()">
-                        <option value="Semua">Semua Hari</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label><i class="bi bi-building"></i> Kelas</label>
-                    <select id="filterKelas" onchange="filterData()">
-                        <option value="Semua">Semua Kelas</option>
-                    </select>
-                </div>
-            </section>
+                <section class="filter-section">
+                    <div class="filter-group">
+                        <label><i class="bi bi-filter"></i> Filter Hari</label>
+                        <select id="filterHari" onchange="filterData()">
+                            <option value="Semua">Semua Hari</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label><i class="bi bi-building"></i> Kelas</label>
+                        <select id="filterKelas" onchange="filterData()">
+                            <option value="Semua">Semua Kelas</option>
+                        </select>
+                    </div>
+                </section>
 
-            <section>
-                <h2 style="margin-bottom: 18px;">Jadwal Aktif</h2>
-                <div class="schedule-grid" id="scheduleContainer"></div>
-            </section>
+                <section>
+                    <h2 style="margin-bottom: 18px;">Jadwal Aktif</h2>
+                    <div class="schedule-grid" id="scheduleContainer"></div>
+                </section>
 
-            <section style="margin-top: 40px;">
-                <h2 style="margin-bottom: 18px;">Riwayat Pengajuan Ganti Jadwal</h2>
-                <div id="requestContainer"></div>
-            </section>
-        </main>
-    </div>
-
-    <div id="requestModal" class="modal" style="display:none;">
-        <!-- isi modal kamu tetap sama -->
+                <section style="margin-top: 40px;">
+                    <h2 style="margin-bottom: 18px;">Riwayat Pengajuan Ganti Jadwal</h2>
+                    <div id="requestContainer"></div>
+                </section>
+            </main>
+        </div>
+            </form>
+        </div>
     </div>
 
     <script src="components/sidebar-guru.js"></script>
