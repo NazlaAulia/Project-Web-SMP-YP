@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     setActiveMenu();
     setupMobileSidebar();
+    setupSmoothMenuMove();
   } catch (error) {
     console.error("Gagal memuat sidebar:", error);
   }
@@ -35,29 +36,13 @@ function setActiveMenu() {
   });
 }
 
-function setupMobileSidebar() {
-  const menuBtn = document.getElementById("mobileMenuBtn");
-  const overlay = document.getElementById("sidebarOverlay");
-  const sidebar = document.querySelector(".sidebar");
-
-  if (!menuBtn || !overlay || !sidebar) return;
-
-  menuBtn.addEventListener("click", () => {
-    sidebar.classList.add("show");
-    overlay.classList.add("show");
-  });
-
-  overlay.addEventListener("click", () => {
-    sidebar.classList.remove("show");
-    overlay.classList.remove("show");
-  });
-
+function setupSmoothMenuMove() {
   const navLinks = document.querySelectorAll(".sidebar .nav-link");
 
   navLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      sidebar.classList.remove("show");
-      overlay.classList.remove("show");
+    link.addEventListener("click", function () {
+      navLinks.forEach((item) => item.classList.remove("active"));
+      this.classList.add("active");
     });
   });
 }

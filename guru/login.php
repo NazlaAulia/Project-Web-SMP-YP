@@ -1,74 +1,87 @@
 <?php
+/*ob_start();
 session_start();
-include "koneksi.php";
 
-header("Content-Type: application/json");
+header("Content-Type: application/json; charset=utf-8");
 
-$username = $_POST['username'] ?? '';
-$password = $_POST['password'] ?? '';
+error_reporting(E_ALL);
+ini_set("display_errors", 0);
+ini_set("log_errors", 1);
 
-if ($username == '' || $password == '') {
-    echo json_encode([
-        "status" => "error",
-        "success" => false,
-        "message" => "Username dan password wajib diisi"
-    ]);
+require_once "koneksi.php";
+
+function kirim_json($status, $message, $extra = []) {
+    if (ob_get_length()) {
+        ob_clean();
+    }
+
+    echo json_encode(array_merge([
+        "status" => $status,
+        "message" => $message
+    ], $extra));
+
     exit;
 }
 
-$query = mysqli_query($conn, "
-    SELECT 
-        user.*,
-        guru.id_guru,
-        guru.nama,
-        guru.nip
+if (!isset($conn)) {
+    kirim_json("error", "Variabel koneksi database tidak ditemukan.");
+}
+
+$username = trim($_POST["username"] ?? "");
+$password = trim($_POST["password"] ?? "");
+
+if ($username === "" && $password === "") {
+    kirim_json("error", "Username dan password wajib diisi.");
+}
+
+if ($username === "") {
+    kirim_json("error", "Username wajib diisi.");
+}
+
+if ($password === "") {
+    kirim_json("error", "Password wajib diisi.");
+}
+
+$stmt = mysqli_prepare($conn, "
+    SELECT id_user, username, password, role_id, id_guru, id_siswa
     FROM user
-    JOIN guru ON user.id_guru = guru.id_guru
-    WHERE user.username = '$username'
-    AND user.password = '$password'
-    AND user.role = 'guru'
+    WHERE username = ?
     LIMIT 1
 ");
 
-if (!$query) {
-    echo json_encode([
-        "status" => "error",
-        "success" => false,
-        "message" => "Query login error: " . mysqli_error($conn)
-    ]);
-    exit;
+if (!$stmt) {
+    kirim_json("error", "Query gagal: " . mysqli_error($conn));
 }
 
-$data = mysqli_fetch_assoc($query);
+mysqli_stmt_bind_param($stmt, "s", $username);
 
-if ($data) {
-    $_SESSION['id_user'] = $data['id_user'];
-    $_SESSION['id_guru'] = $data['id_guru'];
-    $_SESSION['username'] = $data['username'];
-    $_SESSION['role'] = $data['role'];
-
-    echo json_encode([
-        "status" => "success",
-        "success" => true,
-        "message" => "Login berhasil",
-        "role" => "guru",
-        "redirect" => "guru/guru.html",
-        "data" => [
-            "id_user" => $data['id_user'],
-            "id_guru" => $data['id_guru'],
-            "username" => $data['username'],
-            "nama" => $data['nama'],
-            "nip" => $data['nip'],
-            "role" => $data['role']
-        ]
-    ]);
-    exit;
-} else {
-    echo json_encode([
-        "status" => "error",
-        "success" => false,
-        "message" => "Username atau password salah"
-    ]);
-    exit;
+if (!mysqli_stmt_execute($stmt)) {
+    kirim_json("error", "Login gagal diproses: " . mysqli_stmt_error($stmt));
 }
+
+$result = mysqli_stmt_get_result($stmt);
+
+if (!$result || mysqli_num_rows($result) === 0) {
+    kirim_json("error", "Username tidak ditemukan.");
+}
+
+$user = mysqli_fetch_assoc($result);
+
+if ($password !== $user["password"]) {
+    kirim_json("error", "Password yang kamu masukkan salah.");
+}
+
+if ((int)$user["role_id"] !== 2) {
+    kirim_json("error", "Akun ini bukan role guru.");
+}
+
+$_SESSION["id_user"] = $user["id_user"];
+$_SESSION["username"] = $user["username"];
+$_SESSION["role_id"] = $user["role_id"];
+$_SESSION["id_guru"] = $user["id_guru"];
+$_SESSION["id_siswa"] = $user["id_siswa"];
+
+kirim_json("success", "Login guru berhasil.", [
+    "redirect" => "guru/guru.html"
+]);}*/
 ?>
