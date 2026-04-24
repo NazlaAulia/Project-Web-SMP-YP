@@ -82,5 +82,41 @@ if (btnSimpanProfil) {
       });
   });
 }
+const displayNamaGuru = document.getElementById("displayNamaGuru");
+const displayMapelGuru = document.getElementById("displayMapelGuru");
+const displayNipGuru = document.getElementById("displayNipGuru");
+const displayEmailGuru = document.getElementById("displayEmailGuru");
+
+const namaGuru = document.getElementById("namaGuru");
+const nipGuru = document.getElementById("nipGuru");
+const emailGuru = document.getElementById("emailGuru");
+const mapelGuru = document.getElementById("mapelGuru");
+
+function loadProfilGuru() {
+  fetch("get_profil_guru.php")
+    .then(response => response.json())
+    .then(result => {
+      if (result.status === "success") {
+        const guru = result.data;
+
+        displayNamaGuru.textContent = guru.nama;
+        displayMapelGuru.textContent = `Guru ${guru.nama_mapel ?? "-"}`;
+        displayNipGuru.textContent = guru.nip;
+        displayEmailGuru.textContent = guru.email;
+
+        namaGuru.value = guru.nama;
+        nipGuru.value = guru.nip;
+        emailGuru.value = guru.email;
+        mapelGuru.value = guru.nama_mapel ?? "-";
+      } else {
+        alert(result.message);
+        window.location.href = "../login.html";
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      alert("Gagal memuat profil guru");
+    });
+}
 
 loadProfilGuru();
