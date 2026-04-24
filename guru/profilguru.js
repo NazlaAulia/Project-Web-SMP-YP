@@ -20,7 +20,7 @@ if (uploadFoto) {
       const reader = new FileReader();
 
       reader.onload = function (e) {
-        previewFoto.src = e.target.result;
+        if (previewFoto) previewFoto.src = e.target.result;
       };
 
       reader.readAsDataURL(file);
@@ -38,7 +38,6 @@ function isiProfilGuru(guru) {
   if (nipGuru) nipGuru.value = guru.nip || "";
   if (emailGuru) emailGuru.value = guru.email || "";
 
-  // mapelGuru di HTML kamu adalah <select>, jadi value-nya harus id_mapel
   if (mapelGuru) mapelGuru.value = guru.id_mapel || "";
 
   if (mapelAkademikGuru) mapelAkademikGuru.value = guru.nama_mapel || "-";
@@ -63,4 +62,33 @@ function loadProfilGuru() {
     });
 }
 
+function setupProfileAnimation() {
+  document.addEventListener("click", function (event) {
+    const item = event.target.closest(".click-animate");
+
+    if (!item) return;
+
+    item.classList.remove("profile-active");
+
+    void item.offsetWidth;
+
+    item.classList.add("profile-active");
+  });
+}
+
+function setupProfileAnimation() {
+  document.addEventListener("click", function (event) {
+    const item = event.target.closest(".click-animate");
+
+    if (!item) return;
+
+    item.classList.remove("profile-active");
+
+    void item.offsetWidth;
+
+    item.classList.add("profile-active");
+  });
+}
+
 loadProfilGuru();
+setupProfileAnimation();

@@ -23,164 +23,196 @@
     <main class="main-content">
       <header class="page-header">
         <div>
+          <span class="page-chip">
+            <i class="bi bi-person-check"></i>
+            Data Profil Guru
+          </span>
           <h1>Profil Guru</h1>
-          <p>Kelola informasi profil, bidang ajar, dan data pribadi guru</p>
+          <p>Kelola identitas guru, data pribadi, bidang ajar, dan akses akun.</p>
         </div>
 
-        <button class="btn-primary" id="btnSimpanProfil">
+        <button class="btn-primary" id="btnSimpanProfil" type="button">
           <i class="bi bi-check2-circle"></i>
           Simpan Perubahan
         </button>
       </header>
 
-      <section class="profile-hero">
-        <div class="profile-main">
-          <div class="profile-photo-box">
+      <section class="profile-card-main click-animate">
+        <div class="profile-photo-section">
+          <div class="photo-wrap">
             <img id="previewFoto" src="https://i.pravatar.cc/300?img=12" alt="Foto Guru">
-
-            <label for="uploadFoto" class="btn-upload">
-              <i class="bi bi-camera-fill"></i>
-              Ubah Foto
-            </label>
-
-            <input type="file" id="uploadFoto" accept="image/*">
           </div>
 
-          <div class="profile-info">
-            <span class="role-badge">Profil Guru</span>
+          <label for="uploadFoto" class="btn-upload">
+            <i class="bi bi-camera-fill"></i>
+            Ubah Foto
+          </label>
 
-            <h2 id="displayNamaGuru">Memuat...</h2>
-            <p class="teacher-subtitle" id="displayMapelGuru">Memuat data guru...</p>
-
-            <div class="info-tags">
-              <span>
-                <i class="bi bi-person-badge"></i>
-                NIP: <b id="displayNipGuru">-</b>
-              </span>
-
-              <span>
-                <i class="bi bi-envelope"></i>
-                Email: <b id="displayEmailGuru">-</b>
-              </span>
-            </div>
-          </div>
+          <input type="file" id="uploadFoto" accept="image/*">
         </div>
 
-        <div class="quick-stats">
-          <div class="stat-card">
-            <i class="bi bi-book-half"></i>
-            <div>
-              <strong>4</strong>
-              <span>Kelas Diampu</span>
-            </div>
-          </div>
+        <div class="profile-identity">
+          <span class="role-badge">
+            <i class="bi bi-mortarboard-fill"></i>
+            Profil Guru
+          </span>
 
-          <div class="stat-card">
-            <i class="bi bi-journal-check"></i>
-            <div>
-              <strong>128</strong>
-              <span>Total Siswa</span>
-            </div>
-          </div>
+          <h2 id="displayNamaGuru">Memuat...</h2>
+          <p id="displayMapelGuru">Memuat data guru...</p>
 
-          <div class="stat-card">
-            <i class="bi bi-calendar-week"></i>
-            <div>
-              <strong>18</strong>
-              <span>Jam Mengajar</span>
-            </div>
+          <div class="profile-tags">
+            <span>
+              <i class="bi bi-person-vcard"></i>
+              NIP:
+              <b id="displayNipGuru">-</b>
+            </span>
+
+            <span>
+              <i class="bi bi-envelope"></i>
+              Email:
+              <b id="displayEmailGuru">-</b>
+            </span>
           </div>
         </div>
       </section>
 
-      <section class="content-grid">
-        <div class="left-column">
-          <div class="card">
-            <div class="card-title">
+      <section class="stats-grid">
+        <div class="stat-card click-animate">
+          <i class="bi bi-book-half"></i>
+          <div>
+            <strong>4</strong>
+            <span>Kelas Diampu</span>
+          </div>
+        </div>
+
+        <div class="stat-card click-animate">
+          <i class="bi bi-people-fill"></i>
+          <div>
+            <strong>128</strong>
+            <span>Total Siswa</span>
+          </div>
+        </div>
+
+        <div class="stat-card click-animate">
+          <i class="bi bi-calendar-week"></i>
+          <div>
+            <strong>18</strong>
+            <span>Jam Mengajar</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="profile-layout">
+        <div class="profile-panel main-panel click-animate">
+          <div class="panel-title">
+            <div>
               <h3>Informasi Pribadi</h3>
-              <p>Perbarui data utama guru</p>
+              <p>Data utama guru yang nantinya dapat disinkronkan dari database.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="namaGuru">Nama Lengkap</label>
+              <input type="text" id="namaGuru" placeholder="Masukkan nama lengkap">
             </div>
 
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Nama Lengkap</label>
-                <input type="text" id="namaGuru">
-              </div>
+            <div class="form-group">
+              <label for="nipGuru">NIP</label>
+              <input type="text" id="nipGuru" placeholder="Masukkan NIP">
+            </div>
 
-              <div class="form-group">
-                <label>NIP</label>
-                <input type="text" id="nipGuru">
-              </div>
+            <div class="form-group">
+              <label for="emailGuru">Email</label>
+              <input type="email" id="emailGuru" placeholder="Masukkan email">
+            </div>
 
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="emailGuru">
-              </div>
+            <div class="form-group">
+              <label for="mapelGuru">Mata Pelajaran</label>
+              <select id="mapelGuru">
+                <option value="">Pilih Mapel</option>
+                <option value="1">BIN</option>
+                <option value="2">B. JAWA</option>
+                <option value="3">PKN</option>
+                <option value="4">INFOR</option>
+                <option value="5">MAT</option>
+                <option value="6">BIG</option>
+                <option value="7">IPA</option>
+                <option value="8">IPS</option>
+                <option value="9">BK</option>
+                <option value="10">INFO/BK</option>
+                <option value="11">PAI/BHQ</option>
+                <option value="12">PJOK</option>
+              </select>
+            </div>
 
-              <div class="form-group">
-                <label>Mata Pelajaran</label>
-                <select id="mapelGuru">
-                  <option value="1">BIN</option>
-                  <option value="2">B. JAWA</option>
-                  <option value="3">PKN</option>
-                  <option value="4">INFOR</option>
-                  <option value="5">MAT</option>
-                  <option value="6">BIG</option>
-                  <option value="7">IPA</option>
-                  <option value="8">IPS</option>
-                  <option value="9">BK</option>
-                  <option value="10">INFO/BK</option>
-                  <option value="11">PAI/BHQ</option>
-                  <option value="12">PJOK</option>
-                </select>
-              </div>
+            <div class="form-group">
+              <label for="noHpGuru">Nomor HP</label>
+              <input type="text" id="noHpGuru" placeholder="Masukkan nomor HP">
+            </div>
 
-              <div class="form-group">
-                <label>Nomor HP</label>
-                <input type="text" id="noHpGuru">
-              </div>
+            <div class="form-group">
+              <label for="jenisKelaminGuru">Jenis Kelamin</label>
+              <select id="jenisKelaminGuru">
+                <option value="">Pilih jenis kelamin</option>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
+            </div>
 
-              <div class="form-group">
-                <label>Jenis Kelamin</label>
-                <select id="jenisKelaminGuru">
-                  <option value="Laki-laki">Laki-laki</option>
-                  <option value="Perempuan">Perempuan</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label>Tanggal Lahir</label>
-                <input type="date" id="tanggalLahirGuru">
-              </div>
+            <div class="form-group">
+              <label for="tanggalLahirGuru">Tanggal Lahir</label>
+              <input type="date" id="tanggalLahirGuru">
             </div>
           </div>
         </div>
 
-        <div class="right-column">
-          <div class="card">
-            <div class="card-title">
-              <h3>Keamanan Akun</h3>
-              <p>Pengaturan akses akun guru</p>
+        <aside class="side-panel">
+          <div class="profile-panel click-animate">
+            <div class="panel-title">
+              <div>
+                <h3>Keamanan Akun</h3>
+                <p>Kelola username dan password akun guru.</p>
+              </div>
             </div>
 
             <div class="security-box">
               <div class="form-group">
-                <label>Username</label>
+                <label for="usernameGuru">Username</label>
                 <input type="text" id="usernameGuru" placeholder="Username akun guru">
               </div>
 
               <div class="form-group">
-                <label>Password Baru</label>
+                <label for="passwordGuru">Password Baru</label>
                 <input type="password" id="passwordGuru" placeholder="Kosongkan jika tidak diubah">
               </div>
 
-              <button class="btn-outline" id="btnSimpanAkun">
-                <i class="bi bi-shield-lock-fill"></i>
+              <button class="btn-outline" id="btnSimpanAkun" type="button">
+                <i class="bi bi-shield-check"></i>
                 Simpan Akun
               </button>
             </div>
           </div>
-        </div>
+
+          <div class="profile-panel status-panel click-animate">
+            <h3>Status Profil</h3>
+
+            <div class="status-row">
+              <span>Status Akun</span>
+              <strong class="active-text">Aktif</strong>
+            </div>
+
+            <div class="status-row">
+              <span>Role</span>
+              <strong>Guru</strong>
+            </div>
+
+            <div class="status-row">
+              <span>Sinkron Database</span>
+              <strong>Siap</strong>
+            </div>
+          </div>
+        </aside>
       </section>
     </main>
   </div>
