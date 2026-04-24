@@ -1,12 +1,14 @@
 <?php
 $host = "localhost";
-$user = "USERNAME_DATABASE_KAMU";
-$pass = "PASSWORD_DATABASE_KAMU";
-$db   = "osbebslk_sekolahyp";
+$dbname = "osbebslk_sekolahyp";
+$dbuser = "osbebslk_aliyahzz";
+$dbpass = "semangatgaes";
 
-$conn = mysqli_connect($host, $user, $pass, $db);
+$conn = new mysqli($host, $dbuser, $dbpass, $dbname);
 
-if (!$conn) {
-    die("Koneksi database gagal: " . mysqli_connect_error());
+if ($conn->connect_error) {
+    die("Koneksi database gagal: " . $conn->connect_error);
 }
+
+$conn->set_charset("utf8mb4");
 ?>

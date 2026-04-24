@@ -23,7 +23,7 @@
           <li><a href="nilai.html" class="active"><i class="fa-solid fa-file-lines"></i> Nilai</a></li>
           <li><a href="jadwal.html"><i class="fa-solid fa-calendar-days"></i> Jadwal</a></li>
           <li><a href="peringkat.html"><i class="fa-solid fa-trophy"></i> Peringkat</a></li>
-          <li><a href="profil_siswa.html"><i class="fa-solid fa-user"></i> Profil Siswa</a></li>
+        <a href="profil-siswa.html"><i class="fa-solid fa-user"></i> Profil Siswa</a></li>
           <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Pengaturan</a></li>
         </ul>
 
@@ -167,13 +167,29 @@
   });
 
   confirmLogout.addEventListener("click", function () {
-    window.location.href = "keluar.html";
+    window.location.href = "keluar.php";
   });
 
   logoutModal.addEventListener("click", function (e) {
     if (e.target === logoutModal) {
       logoutModal.classList.remove("show");
     }
+  });
+</script>
+
+<script>
+  const profilSiswaLink = document.getElementById("profilSiswaLink");
+  const idSiswa = localStorage.getItem("id_siswa");
+
+  profilSiswaLink.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    if (!idSiswa) {
+      alert("ID siswa tidak ditemukan. Silakan login ulang.");
+      return;
+    }
+
+    window.location.href = "profil_siswa.html?id_siswa=" + idSiswa;
   });
 </script>
 </body>

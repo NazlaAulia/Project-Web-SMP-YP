@@ -228,73 +228,111 @@ function aktifkanExportAnimasi() {
 
   if (!exportBtn) return;
 
-  exportBtn.addEventListener("click", () => {
+  exportBtn.addEventListener("click", async () => {
     exportBtn.classList.add("pulse-click");
 
     setTimeout(() => {
       exportBtn.classList.remove("pulse-click");
     }, 350);
 
-    exportNilaiPdfFinal();
+    await exportNilaiPdfFinal();
   });
 }
 
-function exportNilaiPdfFinal() {
+async function exportNilaiPdfFinal() {
   try {
     if (!window.jspdf || !window.jspdf.jsPDF) {
       alert("jsPDF belum kebaca. Pastikan script jsPDF ada sebelum nilai.js di HTML.");
       return;
     }
 
+    if (!window.jspdf.jsPDF.API.autoTable) {
+      alert("jspdf-autotable belum kebaca. Pastikan script autotable ada sebelum nilai.js.");
+      return;
+    }
+
     const { jsPDF } = window.jspdf;
-
     const doc = new jsPDF("p", "mm", "a4");
-    const pageWidth = doc.internal.pageSize.getWidth();
 
-    const nama = document.getElementById("namaText")?.textContent || localStorage.getItem("nama_siswa") || "-";
-    const kelas = document.getElementById("kelasText")?.textContent || localStorage.getItem("kelas_siswa") || "-";
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const nama = document.getElementById("namaText")?.textContent?.trim() || localStorage.getItem("nama_siswa") || "-";
+    const kelas = document.getElementById("kelasText")?.textContent?.trim() || localStorage.getItem("kelas_siswa") || "-";
     const semesterText = document.getElementById("semester")?.value || "2025/2026 - Genap";
 
-    const rataRata = document.getElementById("rataRataCounter")?.dataset.target || document.getElementById("rataRataCounter")?.textContent || "-";
-    const nilaiTertinggi = document.getElementById("nilaiTertinggiCounter")?.dataset.target || document.getElementById("nilaiTertinggiCounter")?.textContent || "-";
-    const mapelTertinggi = document.getElementById("mapelTertinggiText")?.textContent || "-";
+    const kepalaSekolah = getNamaKepalaSekolahFinal();
+    const waliKelas = getNamaWaliKelasFinal(kelas);
 
+    const dataMapel = ambilNilaiPerMapelDariHalamanFinal();
+
+    let logoData = null;
+
+    const logoPaths = [
+      "../img/images.webp",
+      "img/images.webp",
+      "../img/logo.webp",
+      "img/logo.webp",
+      "../img/logo.png",
+      "img/logo.png"
+    ];
+
+    for (const path of logoPaths) {
+      try {
+        logoData = await loadImageAsDataURLFinal(path);
+        if (logoData) break;
+      } catch (error) {}
+    }
+
+    // =========================
+    // BORDER LUAR
+    // =========================
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.4);
     doc.rect(10, 10, 190, 277);
 
-    doc.setFont("helvetica", "bold");
+    // =========================
+    // HEADER + LOGO
+    // =========================
+    if (logoData) {
+      doc.addImage(logoData, "WEBP", 18, 14, 24, 24);
+    }
+
+    doc.setFont("times", "bold");
     doc.setFontSize(11);
-    doc.text("YAYASAN PENDIDIKAN TUNAS PERTIWI", pageWidth / 2, 18, {
+    doc.text("YAYASAN PENDIDIKAN TUNAS PERTIWI", pageWidth / 2 + 10, 17, {
       align: "center"
     });
 
     doc.setFontSize(18);
-    doc.text("SMP YP 17 SURABAYA", pageWidth / 2, 27, {
+    doc.text("SMP YP 17 SURABAYA", pageWidth / 2 + 10, 25, {
       align: "center"
     });
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont("times", "normal");
     doc.setFontSize(9);
-    doc.text("Jl. Randu No.17, Sidotopo Wetan,", pageWidth / 2, 34, {
+    doc.text("Jl. Randu No.17, Sidotopo Wetan,", pageWidth / 2 + 10, 31, {
       align: "center"
     });
-    doc.text("Kec. Kenjeran, Surabaya, Jawa Timur 60128", pageWidth / 2, 39, {
+    doc.text("Kec. Kenjeran, Surabaya, Jawa Timur 60128", pageWidth / 2 + 10, 36, {
       align: "center"
     });
-    doc.text("Telepon : (031) 376 3721", pageWidth / 2, 44, {
+    doc.text("Telepon : (031) 376 3721", pageWidth / 2 + 10, 41, {
       align: "center"
     });
 
     doc.setLineWidth(0.8);
-    doc.line(16, 49, 194, 49);
+    doc.line(16, 46, 194, 46);
 
     doc.setLineWidth(0.3);
-    doc.line(16, 51, 194, 51);
+    doc.line(16, 48, 194, 48);
 
-    let y = 62;
+    // =========================
+    // IDENTITAS SISWA
+    // =========================
+    let y = 58;
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont("times", "normal");
     doc.setFontSize(10);
 
     doc.text("Nama Siswa", 16, y);
@@ -318,16 +356,20 @@ function exportNilaiPdfFinal() {
     doc.text("Alamat Sekolah", 16, y);
     doc.text(": Jl. Randu No.17, Sidotopo Wetan, Kec. Kenjeran, Surabaya", 52, y);
 
-    y += 13;
+    // =========================
+    // JUDUL
+    // =========================
+    y += 12;
 
-    doc.setFont("helvetica", "bold");
+    doc.setFont("times", "bold");
     doc.setFontSize(11);
     doc.text("A. Nilai Akhir Semester", 16, y);
 
-    const dataMapel = ambilNilaiPerMapelDariHalaman(rataRata, nilaiTertinggi, mapelTertinggi);
-
+    // =========================
+    // TABEL NILAI
+    // =========================
     doc.autoTable({
-      startY: y + 5,
+      startY: y + 4,
       head: [[
         "No",
         "Mata Pelajaran",
@@ -341,9 +383,9 @@ function exportNilaiPdfFinal() {
         right: 16
       },
       styles: {
-        font: "helvetica",
+        font: "times",
         fontSize: 9,
-        cellPadding: 2.4,
+        cellPadding: 2.1,
         lineWidth: 0.2,
         lineColor: [0, 0, 0],
         textColor: [0, 0, 0],
@@ -372,69 +414,47 @@ function exportNilaiPdfFinal() {
       }
     });
 
-    let afterTableY = doc.lastAutoTable.finalY + 10;
+    let afterTableY = doc.lastAutoTable.finalY + 8;
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.text("B. Ringkasan Nilai", 16, afterTableY);
-
-    doc.autoTable({
-      startY: afterTableY + 5,
-      body: [
-        ["Rata-Rata Nilai Semester Ini", rataRata],
-        ["Nilai Tertinggi", nilaiTertinggi],
-        ["Mata Pelajaran Nilai Tertinggi", mapelTertinggi]
-      ],
-      theme: "grid",
-      margin: {
-        left: 16,
-        right: 16
-      },
-      styles: {
-        font: "helvetica",
-        fontSize: 9,
-        cellPadding: 2.4,
-        lineWidth: 0.2,
-        lineColor: [0, 0, 0],
-        textColor: [0, 0, 0]
-      },
-      columnStyles: {
-        0: {
-          cellWidth: 80,
-          fontStyle: "bold"
-        },
-        1: {
-          cellWidth: 98
-        }
-      }
-    });
-
-    afterTableY = doc.lastAutoTable.finalY + 10;
-
-    doc.setFont("helvetica", "bold");
+    // =========================
+    // CATATAN
+    // =========================
+    doc.setFont("times", "bold");
     doc.setFontSize(10);
     doc.text("Catatan :", 16, afterTableY);
 
-    doc.setFont("helvetica", "normal");
-    doc.rect(16, afterTableY + 3, 178, 18);
+    doc.setFont("times", "normal");
+    doc.rect(16, afterTableY + 3, 178, 16);
     doc.text("Pertahankan semangat belajar dan terus tingkatkan prestasi.", 18, afterTableY + 10);
 
-    const ttdY = afterTableY + 35;
+// =========================
+// TANDA TANGAN BAWAH
+// =========================
+let ttdY = afterTableY + 24;
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
+// Biar tanda tangan tidak nabrak border bawah
+if (ttdY + 50 > pageHeight - 16) {
+  ttdY = pageHeight - 72;
+}
 
-    doc.text("Mengetahui,", 16, ttdY);
-    doc.text("Kepala Sekolah", 16, ttdY + 6);
+doc.setFont("times", "normal");
+doc.setFontSize(11);
 
-    doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
-    doc.text("Wali Kelas", 124, ttdY + 6);
+doc.text("Mengetahui,", 16, ttdY);
+doc.text("Kepala Sekolah", 16, ttdY + 9);
 
-    doc.setFont("helvetica", "bold");
-    doc.text("(............................)", 16, ttdY + 32);
-    doc.text("(............................)", 124, ttdY + 32);
+doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
+doc.text("Wali Kelas", 124, ttdY + 9);
+
+doc.setFont("times", "bold");
+doc.setFontSize(11);
+
+// Nama dibuat lebih naik, jadi rapi dan tidak kepotong
+doc.text(`( ${kepalaSekolah} )`, 16, ttdY + 43);
+doc.text(`( ${waliKelas} )`, 124, ttdY + 43);
 
     const namaFile = `Nilai_Akhir_Semester_${nama.replace(/\s+/g, "_")}.pdf`;
+
     doc.save(namaFile);
 
   } catch (error) {
@@ -443,7 +463,23 @@ function exportNilaiPdfFinal() {
   }
 }
 
-function ambilNilaiPerMapelDariHalaman(rataRata, nilaiTertinggi, mapelTertinggi) {
+function ambilNilaiPerMapelDariHalamanFinal() {
+  const rataRata = parseFloat(
+    document.getElementById("rataRataCounter")?.dataset.target ||
+    document.getElementById("rataRataCounter")?.textContent ||
+    0
+  );
+
+  const nilaiTertinggi = parseFloat(
+    document.getElementById("nilaiTertinggiCounter")?.dataset.target ||
+    document.getElementById("nilaiTertinggiCounter")?.textContent ||
+    0
+  );
+
+  const mapelTertinggi = (
+    document.getElementById("mapelTertinggiText")?.textContent || ""
+  ).toUpperCase();
+
   const daftarMapel = [
     "Bahasa Indonesia",
     "Bahasa Jawa",
@@ -460,29 +496,53 @@ function ambilNilaiPerMapelDariHalaman(rataRata, nilaiTertinggi, mapelTertinggi)
   ];
 
   return daftarMapel.map((mapel, index) => {
-    let nilai = rataRata;
+    let nilai = rataRata || 0;
 
-    const mapelAtas = mapel.toUpperCase();
-    const tertinggiAtas = String(mapelTertinggi).toUpperCase();
+    const mapelUpper = mapel.toUpperCase();
 
     if (
-      tertinggiAtas.includes(mapelAtas) ||
-      mapelAtas.includes(tertinggiAtas) ||
-      tertinggiAtas.includes("INFO") && mapelAtas.includes("INFORMATIKA")
+      mapelTertinggi.includes(mapelUpper) ||
+      mapelUpper.includes(mapelTertinggi) ||
+      (mapelTertinggi.includes("INFO") && mapelUpper.includes("INFORMATIKA")) ||
+      (mapelTertinggi.includes("BK") && mapelUpper.includes("BIMBINGAN"))
     ) {
-      nilai = nilaiTertinggi;
+      nilai = nilaiTertinggi || nilai;
     }
 
-    const angka = parseFloat(nilai);
+    const angka = parseFloat(nilai) || 0;
     const keterangan = angka >= 75 ? "Tuntas" : "Belum Tuntas";
 
     return [
       index + 1,
       mapel,
-      nilai,
+      angka,
       keterangan
     ];
   });
+}
+
+function getNamaKepalaSekolahFinal() {
+  return "Dra. Slamet Suwarni";
+}
+
+function getNamaWaliKelasFinal(kelas) {
+  const kelasBersih = String(kelas || "").trim().toUpperCase();
+
+  // Data wali kelas dari database:
+  // kelas.id_wali_kelas -> guru.id_guru
+  const daftarWali = {
+    "7A": "Osa Noraise, S.Pd",
+    "7B": "Nindy Putri Oktaviara, S.Pd",
+    "7C": "Sangar Deni Daud Smi, S.Pd",
+    "8A": "Haris Suprapti Ningrum, S.Ud",
+    "8B": "Achmad Farkan, S.Pd",
+    "8C": "Riyadna Krismanita, S.Pd",
+    "9A": "Mohamad Hanafi, S.Pd",
+    "9B": "Murni, S.Pd",
+    "9C": "Dra. Endang Aryati"
+  };
+
+  return daftarWali[kelasBersih] || "Wali Kelas";
 }
 
 function formatTahunAjaranFinal(semesterText) {
@@ -517,4 +577,27 @@ function formatTanggalIndonesiaFinal(date) {
   ];
 
   return `${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function loadImageAsDataURLFinal(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    img.onload = function () {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+
+      resolve(canvas.toDataURL("image/png"));
+    };
+
+    img.onerror = function () {
+      reject(new Error("Logo gagal dimuat."));
+    };
+
+    img.src = src;
+  });
 }
