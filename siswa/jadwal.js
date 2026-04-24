@@ -94,6 +94,26 @@ function renderProfil(siswa) {
     `Jadwal Pelajaran Kelas ${siswa.kelas} (Minggu Ini)`;
 }
 
+function renderRingkasan(ringkasan) {
+  if (!ringkasan) return;
+
+  const hariIni = document.getElementById("hariIni");
+  const totalPelajaran = document.getElementById("totalPelajaran");
+  const pelajaranUtama = document.getElementById("pelajaranUtama");
+
+  if (hariIni) {
+    hariIni.textContent = ringkasan.hari_ini || "-";
+  }
+
+  if (totalPelajaran) {
+    totalPelajaran.textContent = `${ringkasan.total_pelajaran || 0} Jam`;
+  }
+
+  if (pelajaranUtama) {
+    pelajaranUtama.textContent = ringkasan.pelajaran_utama || "-";
+  }
+}
+
 function renderUpdate(updateList) {
   const container = document.getElementById("updateJadwal");
 
@@ -132,9 +152,9 @@ function renderTabel(jadwalList, kelas) {
       <tr class="show-row">
         <td>
           <strong>${item.hari}</strong><br>
-          ${item.jam}
+          ${item.jam_mulai} - ${item.jam_selesai}
         </td>
-        <td>${item.mata_pelajaran}</td>
+        <td>${item.mapel}</td>
         <td>${item.guru}</td>
         <td>
           <span class="status-badge ${statusClass}">${item.status || "Mendatang"}</span>
@@ -143,6 +163,7 @@ function renderTabel(jadwalList, kelas) {
     `;
   }).join("");
 }
+
 function renderError(message) {
   document.getElementById("jadwalTableBody").innerHTML = `
     <tr>
