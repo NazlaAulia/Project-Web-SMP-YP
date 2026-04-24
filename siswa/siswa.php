@@ -145,11 +145,6 @@ $sqlNilai = "SELECT
              FROM nilai n
              LEFT JOIN mapel m ON n.id_mapel = m.id_mapel
              WHERE n.id_siswa = ?
-             AND n.semester = (
-                SELECT MAX(semester)
-                FROM nilai
-                WHERE id_siswa = ?
-             )
              ORDER BY n.id_mapel ASC";
 
 $stmtNilai = $conn->prepare($sqlNilai);
