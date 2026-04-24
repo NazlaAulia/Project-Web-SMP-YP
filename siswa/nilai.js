@@ -210,15 +210,244 @@ function aktifkanFilterAnimasi() {
 function aktifkanExportAnimasi() {
   const exportBtn = document.getElementById("exportBtn");
 
-  if (exportBtn) {
-    exportBtn.addEventListener("click", () => {
-      exportBtn.classList.add("pulse-click");
+  if (!exportBtn) return;
 
-      setTimeout(() => {
-        exportBtn.classList.remove("pulse-click");
-      }, 350);
+  exportBtn.addEventListener("click", async () => {
+    exportBtn.classList.add("pulse-click");
 
-      alert("Tombol export siap dihubungkan ke backend PDF/Excel.");
+    setTimeout(() => {
+      exportBtn.classList.remove("pulse-click");
+    }, 350);
+
+    await exportNilaiPdf();
+  });
+}
+
+async function exportNilaiPdf() {
+  try {
+    const { jsPDF } = window.jspdf;
+
+    const nama = document.getElementById("namaText")?.textContent || "-";
+    const kelas = document.getElementById("kelasText")?.textContent || "-";
+    const semester = document.getElementById("semester")?.value || "-";
+
+    const rataRata = document.getElementById("rataRataCounter")?.dataset.target || "-";
+    const nilaiTertinggi = document.getElementById("nilaiTertinggiCounter")?.dataset.target || "-";
+    const mapelTertinggi = document.getElementById("mapelTertinggiText")?.textContent || "-";
+
+    const doc = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // ===== HEADER SEKOLAH =====
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("SMP YP 17 SURABAYA", pageWidth / 2, 18, { align: "center" });
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Sistem Informasi Akademik", pageWidth / 2, 24, { align: "center" });
+
+    doc.setLineWidth(0.8);
+    doc.line(20, 30, 190, 30);
+
+    doc.setLineWidth(0.3);
+    doc.line(20, 32, 190, 32);
+
+    // ===== IDENTITAS SISWA =====
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+
+    let y = 42;
+
+    doc.text("Nama Siswa", 20, y);
+    doc.text(": " + nama, 55, y);
+
+    doc.text("Kelas", 125, y);
+    doc.text(": " + kelas, 155, y);
+
+    y += 7;
+
+    doc.text("Semester", 20, y);
+    doc.text(": " + semester, 55, y);
+
+    doc.text("Tahun Pelajaran", 125, y);
+    doc.text(": " + ambilTahunPelajaran(semester), 155, y);
+
+    y += 7;
+
+    doc.text("Nama Sekolah", 20, y);
+    doc.text(": SMP YP 17 Surabaya", 55, y);
+
+    y += 7;
+
+    doc.text("Alamat Sekolah", 20, y);
+    doc.text(": Surabaya", 55, y);
+
+    // ===== JUDUL TABEL =====
+    y += 14;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("A. Nilai Akhir Semester", 20, y);
+
+    // ===== DATA NILAI =====
+    const nilaiRows = ambilDataNilaiDariTabel();
+
+    const tableBody = nilaiRows.length > 0
+      ? nilaiRows.map((row, index) => [
+          index + 1,
+          row.nama,
+          row.kelas,
+          row.nilaiRataRata,
+          row.predikat,
+          row.absensi
+        ])
+      : [[1, nama, kelas, rataRata, "-", "-"]];
+
+    doc.autoTable({
+      startY: y + 5,
+      head: [[
+        "No",
+        "Nama Siswa",
+        "Kelas",
+        "Nilai Rata-Rata",
+        "Predikat",
+        "Absensi"
+      ]],
+      body: tableBody,
+      theme: "grid",
+      styles: {
+        font: "helvetica",
+        fontSize: 9,
+        cellPadding: 2,
+        valign: "middle",
+        halign: "center",
+        lineColor: [60, 60, 60],
+        lineWidth: 0.2
+      },
+      headStyles: {
+        fillColor: [230, 230, 230],
+        textColor: [0, 0, 0],
+        fontStyle: "bold"
+      },
+      columnStyles: {
+        0: { cellWidth: 12 },
+        1: { cellWidth: 55, halign: "left" },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 },
+        5: { cellWidth: 40, halign: "left" }
+      }
     });
+
+    let afterTableY = doc.lastAutoTable.finalY + 10;
+
+    // ===== RINGKASAN =====
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("B. Ringkasan Nilai", 20, afterTableY);
+
+    doc.autoTable({
+      startY: afterTableY + 5,
+      body: [
+        ["Rata-Rata Nilai", rataRata],
+        ["Nilai Tertinggi", nilaiTertinggi],
+        ["Mata Pelajaran Tertinggi", mapelTertinggi]
+      ],
+      theme: "grid",
+      styles: {
+        font: "helvetica",
+        fontSize: 9,
+        cellPadding: 2,
+        lineColor: [60, 60, 60],
+        lineWidth: 0.2
+      },
+      columnStyles: {
+        0: { cellWidth: 60, fontStyle: "bold" },
+        1: { cellWidth: 110 }
+      }
+    });
+
+    afterTableY = doc.lastAutoTable.finalY + 12;
+
+    // ===== CATATAN =====
+    doc.setFont("helvetica", "bold");
+    doc.text("Catatan:", 20, afterTableY);
+
+    doc.setFont("helvetica", "normal");
+    doc.rect(20, afterTableY + 3, 170, 20);
+    doc.text("Terus tingkatkan semangat belajar dan pertahankan prestasi.", 23, afterTableY + 10);
+
+    // ===== TANDA TANGAN =====
+    const ttdY = afterTableY + 38;
+
+    doc.text("Mengetahui,", 20, ttdY);
+    doc.text("Kepala Sekolah", 20, ttdY + 6);
+
+    doc.text("Surabaya, " + formatTanggalIndonesia(new Date()), 130, ttdY);
+    doc.text("Wali Kelas", 130, ttdY + 6);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("( Kepala Sekolah )", 20, ttdY + 32);
+    doc.text("( Wali Kelas )", 130, ttdY + 32);
+
+    // ===== SAVE PDF =====
+    const namaFile = `Nilai_Akhir_Semester_${nama.replace(/\s+/g, "_")}.pdf`;
+    doc.save(namaFile);
+
+  } catch (error) {
+    console.error("Error export PDF:", error);
+    alert("Gagal membuat PDF. Pastikan library jsPDF sudah dimasukkan di HTML.");
   }
+}
+
+function ambilDataNilaiDariTabel() {
+  const rows = document.querySelectorAll("#nilaiTableBody tr");
+  const data = [];
+
+  rows.forEach((tr) => {
+    const td = tr.querySelectorAll("td");
+
+    if (td.length < 7) return;
+
+    data.push({
+      peringkat: td[0]?.innerText.trim() || "-",
+      nama: td[1]?.innerText.trim() || "-",
+      kelas: td[2]?.innerText.trim() || "-",
+      nilaiRataRata: td[3]?.innerText.trim() || "-",
+      predikat: td[5]?.innerText.trim() || "-",
+      absensi: td[6]?.innerText.trim() || "-"
+    });
+  });
+
+  return data;
+}
+
+function ambilTahunPelajaran(semesterText) {
+  const match = semesterText.match(/\d{4}\/\d{4}/);
+  return match ? match[0] : "-";
+}
+
+function formatTanggalIndonesia(date) {
+  const bulan = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember"
+  ];
+
+  const tanggal = date.getDate();
+  const namaBulan = bulan[date.getMonth()];
+  const tahun = date.getFullYear();
+
+  return `${tanggal} ${namaBulan} ${tahun}`;
 }
