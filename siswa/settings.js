@@ -1,15 +1,3 @@
-import { db } from "./firebase-config.js";
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { supabase } from "./supabase-config.js";
-
 const idSiswa = localStorage.getItem("id_siswa");
 
 if (!idSiswa) {
@@ -30,21 +18,61 @@ const btnSimpanPassword = document.getElementById("btnSimpanPassword");
 const strengthFill = document.getElementById("strengthFill");
 const strengthText = document.getElementById("strengthText");
 
-let currentSiswa = null;
-let currentUserDocId = null;
-let currentUserData = null;
+function isiHeader(nama, kelas) {
+  const namaFinal = nama || "Siswa";
+  const kelasFinal = kelas || "-";
+  const avatar = namaFinal && namaFinal !== "-" ? namaFinal.charAt(0).toUpperCase() : "S";
+
+  if (namaSiswaEl) namaSiswaEl.textContent = namaFinal;
+  if (namaKelasEl) namaKelasEl.textContent = kelasFinal;
+  if (avatarHurufEl) avatarHurufEl.textContent = avatar;
+}
 
 function isiHeaderDariLocalStorage() {
   const nama = localStorage.getItem("nama_siswa") || "Siswa";
   const kelas = localStorage.getItem("kelas_siswa") || "-";
-  const avatar = nama && nama !== "-" ? nama.charAt(0).toUpperCase() : "S";
 
-  if (namaSiswaEl) namaSiswaEl.textContent = nama;
-  if (namaKelasEl) namaKelasEl.textContent = kelas;
-  if (avatarHurufEl) avatarHurufEl.textContent = avatar;
+  isiHeader(nama, kelas);
+}
+
+async function loadSettingsSiswa() {
+  try {
+    const response = await fetch(
+      `get_settings_siswa.php?id_siswa=${encodeURIComponent(idSiswa)}`,
+      {
+        method: "GET",
+        credentials: "same-origin"
+      }
+    );
+
+    const text = await response.text();
+    console.log("RAW get_settings_siswa:", text);
+
+    const result = JSON.parse(text);
+    console.log("JSON get_settings_siswa:", result);
+
+    if (!result.success) {
+      showAlert("error", result.message || "Gagal mengambil data siswa.");
+      return;
+    }
+
+    const siswa = result.siswa || {};
+    const nama = siswa.nama || "Siswa";
+    const kelas = siswa.kelas || "-";
+
+    localStorage.setItem("nama_siswa", nama);
+    localStorage.setItem("kelas_siswa", kelas);
+
+    isiHeader(nama, kelas);
+  } catch (error) {
+    console.error("Gagal load settings siswa:", error);
+    showAlert("error", "Terjadi kesalahan saat memuat data settings.");
+  }
 }
 
 function showAlert(type, message) {
+  if (!alertBox) return;
+
   alertBox.innerHTML = `
     <div class="settings-alert ${type === "success" ? "success-alert" : "error-alert"}">
       ${message}
@@ -53,12 +81,15 @@ function showAlert(type, message) {
 }
 
 function clearAlert() {
+  if (!alertBox) return;
   alertBox.innerHTML = "";
 }
 
 function togglePassword(inputId, button) {
   const input = document.getElementById(inputId);
   const icon = button.querySelector("i");
+
+  if (!input || !icon) return;
 
   if (input.type === "password") {
     input.type = "text";
@@ -81,170 +112,86 @@ function checkPasswordStrength(password) {
   if (/[^A-Za-z0-9]/.test(password)) score++;
 
   if (password.length === 0) {
-    strengthFill.style.width = "0%";
-    strengthText.textContent = "Minimal 8 karakter";
+    if (strengthFill) strengthFill.style.width = "0%";
+    if (strengthText) strengthText.textContent = "Minimal 8 karakter";
   } else if (score <= 2) {
-    strengthFill.style.width = "35%";
-    strengthText.textContent = "Lemah";
+    if (strengthFill) strengthFill.style.width = "35%";
+    if (strengthText) strengthText.textContent = "Lemah";
   } else if (score <= 4) {
-    strengthFill.style.width = "70%";
-    strengthText.textContent = "Sedang";
+    if (strengthFill) strengthFill.style.width = "70%";
+    if (strengthText) strengthText.textContent = "Sedang";
   } else {
-    strengthFill.style.width = "100%";
-    strengthText.textContent = "Sangat kuat";
+    if (strengthFill) strengthFill.style.width = "100%";
+    if (strengthText) strengthText.textContent = "Sangat kuat";
   }
 }
 
-async function getNamaKelas(idKelas) {
-  if (!idKelas) return "-";
+if (formPassword) {
+  formPassword.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearAlert();
 
-  try {
-    const kelasRef = doc(db, "kelas", String(idKelas));
-    const kelasSnap = await getDoc(kelasRef);
+    const passwordLama = passwordLamaEl.value.trim();
+    const passwordBaru = passwordBaruEl.value.trim();
+    const konfirmasiPassword = konfirmasiPasswordEl.value.trim();
 
-    if (kelasSnap.exists()) {
-      const data = kelasSnap.data();
-      return data.nama_kelas || "-";
-    }
-
-    const q = query(collection(db, "kelas"), where("id_kelas", "==", Number(idKelas)));
-    const snap = await getDocs(q);
-
-    if (!snap.empty) {
-      return snap.docs[0].data().nama_kelas || "-";
-    }
-
-    return "-";
-  } catch (error) {
-    console.error("Gagal ambil kelas:", error);
-    return "-";
-  }
-}
-
-async function loadSiswaDanUser() {
-  if (!idSiswa) {
-    showAlert("error", "Sesi login tidak ditemukan. Silakan login dulu.");
-    namaSiswaEl.textContent = "Siswa";
-    avatarHurufEl.textContent = "S";
-    namaKelasEl.textContent = "-";
-    return;
-  }
-
-  try {
-    const siswaRef = doc(db, "siswa", String(idSiswa));
-    const siswaSnap = await getDoc(siswaRef);
-
-    if (!siswaSnap.exists()) {
-      showAlert("error", "Data siswa tidak ditemukan.");
+    if (!passwordLama || !passwordBaru || !konfirmasiPassword) {
+      showAlert("error", "Semua field wajib diisi.");
       return;
     }
 
-    currentSiswa = siswaSnap.data();
-
-    const nama = currentSiswa.nama || "Siswa";
-    const hurufAwal = nama.charAt(0).toUpperCase();
-    const namaKelas = await getNamaKelas(currentSiswa.id_kelas);
-
-    namaSiswaEl.textContent = nama;
-    avatarHurufEl.textContent = hurufAwal;
-    namaKelasEl.textContent = namaKelas;
-
-    if (nama && nama !== "Siswa") {
-      localStorage.setItem("nama_siswa", nama);
-    }
-
-    if (namaKelas && namaKelas !== "-") {
-      localStorage.setItem("kelas_siswa", namaKelas);
-    }
-
-    const qUser = query(collection(db, "user"), where("id_siswa", "==", Number(idSiswa)));
-    const userSnap = await getDocs(qUser);
-
-    if (userSnap.empty) {
-      showAlert("error", "Data user untuk siswa ini tidak ditemukan.");
+    if (passwordBaru.length < 8) {
+      showAlert("error", "Password baru minimal 8 karakter.");
       return;
     }
 
-    currentUserDocId = userSnap.docs[0].id;
-    currentUserData = userSnap.docs[0].data();
-  } catch (error) {
-    console.error(error);
-    showAlert("error", "Terjadi kesalahan saat memuat data settings.");
-  }
+    if (passwordBaru !== konfirmasiPassword) {
+      showAlert("error", "Konfirmasi password baru tidak cocok.");
+      return;
+    }
+
+    if (btnSimpanPassword) {
+      btnSimpanPassword.disabled = true;
+      btnSimpanPassword.textContent = "Menyimpan...";
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("id_siswa", idSiswa);
+      formData.append("password_lama", passwordLama);
+      formData.append("password_baru", passwordBaru);
+      formData.append("konfirmasi_password", konfirmasiPassword);
+
+      const response = await fetch("update_password_siswa.php", {
+        method: "POST",
+        body: formData,
+        credentials: "same-origin"
+      });
+
+      const text = await response.text();
+      console.log("RAW update_password_siswa:", text);
+
+      const result = JSON.parse(text);
+
+      if (!result.success) {
+        showAlert("error", result.message || "Gagal mengubah password.");
+        return;
+      }
+
+      formPassword.reset();
+      checkPasswordStrength("");
+      showAlert("success", result.message || "Password berhasil diubah.");
+    } catch (error) {
+      console.error("Gagal update password:", error);
+      showAlert("error", "Terjadi kesalahan saat mengubah password.");
+    } finally {
+      if (btnSimpanPassword) {
+        btnSimpanPassword.disabled = false;
+        btnSimpanPassword.textContent = "Simpan Password";
+      }
+    }
+  });
 }
-
-formPassword.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  clearAlert();
-
-  const passwordLama = passwordLamaEl.value.trim();
-  const passwordBaru = passwordBaruEl.value.trim();
-  const konfirmasiPassword = konfirmasiPasswordEl.value.trim();
-
-  if (!passwordLama || !passwordBaru || !konfirmasiPassword) {
-    showAlert("error", "Semua field wajib diisi.");
-    return;
-  }
-
-  if (passwordBaru.length < 8) {
-    showAlert("error", "Password baru minimal 8 karakter.");
-    return;
-  }
-
-  if (passwordBaru !== konfirmasiPassword) {
-    showAlert("error", "Konfirmasi password baru tidak cocok.");
-    return;
-  }
-
-  if (!currentUserDocId || !currentUserData) {
-    showAlert("error", "Data user belum siap.");
-    return;
-  }
-
-  if (passwordLama !== currentUserData.password) {
-    showAlert("error", "Password lama salah.");
-    return;
-  }
-
-  btnSimpanPassword.disabled = true;
-  btnSimpanPassword.textContent = "Menyimpan...";
-
-  try {
-    // 1. Pastikan session Supabase aktif
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !userData.user) {
-      throw new Error("Sesi Supabase tidak ditemukan. Silakan login ulang.");
-    }
-
-    // 2. Update password di Supabase Auth
-    const { error: updateAuthError } = await supabase.auth.updateUser({
-      password: passwordBaru
-    });
-
-    if (updateAuthError) {
-      throw new Error("Gagal update password di Supabase: " + updateAuthError.message);
-    }
-
-    // 3. Update password di Firestore
-    const userRef = doc(db, "user", currentUserDocId);
-    await updateDoc(userRef, {
-      password: passwordBaru
-    });
-
-    currentUserData.password = passwordBaru;
-
-    formPassword.reset();
-    checkPasswordStrength("");
-    showAlert("success", "Password berhasil diubah.");
-  } catch (error) {
-    console.error(error);
-    showAlert("error", error.message || "Gagal mengubah password.");
-  } finally {
-    btnSimpanPassword.disabled = false;
-    btnSimpanPassword.textContent = "Simpan Password";
-  }
-});
 
 document.querySelectorAll(".eye-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -253,10 +200,12 @@ document.querySelectorAll(".eye-btn").forEach((btn) => {
   });
 });
 
-passwordBaruEl.addEventListener("input", (e) => {
-  checkPasswordStrength(e.target.value);
-});
+if (passwordBaruEl) {
+  passwordBaruEl.addEventListener("input", (e) => {
+    checkPasswordStrength(e.target.value);
+  });
+}
 
 isiHeaderDariLocalStorage();
 checkPasswordStrength("");
-loadSiswaDanUser();
+loadSettingsSiswa();
