@@ -180,10 +180,10 @@ if ($role_id === 2) {
     $message .= "Link ini berlaku selama 30 menit.\n\n";
     $message .= "Jika kamu tidak meminta reset password, abaikan email ini.\n\n";
     $message .= "Terima kasih.";
-
-    $headers = "From: no-reply@DOMAIN-KAMU.com\r\n"; // GANTI domain email kamu
-    $headers .= "Reply-To: no-reply@DOMAIN-KAMU.com\r\n";
-    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    
+$headers = "From: osbebslk@projectsekolahyp.my.id\r\n";
+$headers .= "Reply-To: osbebslk@projectsekolahyp.my.id\r\n";
+$headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
     if (!mail($to, $subject, $message, $headers)) {
         kirim_json("error", "Email reset gagal dikirim. Cek fitur mail di hosting.");
