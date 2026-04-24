@@ -18,7 +18,7 @@
           <h1>Profil Guru</h1>
           <p>Kelola informasi profil, bidang ajar, dan data pribadi guru</p>
         </div>
-        <button class="btn-primary">
+        <button class="btn-primary" id="btnSimpanProfil">
           <i class="bi bi-check2-circle"></i>
           Simpan Perubahan
         </button>
@@ -28,25 +28,33 @@
         <div class="profile-main">
           <div class="profile-photo-box">
             <img id="previewFoto" src="https://i.pravatar.cc/300?img=12" alt="Foto Guru">
+
             <label for="uploadFoto" class="btn-upload">
               <i class="bi bi-camera-fill"></i>
               Ubah Foto
             </label>
+
             <input type="file" id="uploadFoto" accept="image/*">
           </div>
 
-        <div class="profile-info">
-            <h2 id="display-nama-guru">Bapak Andi Prasetyo, S.Pd</h2>
-            <p id="display-peran-guru">Guru Matematika • Wali Kelas 7A</p>
-            
-            <div class="edit-form" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="text" id="editNamaGuru" placeholder="Ubah Nama" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
-                <input type="text" id="editPeranGuru" placeholder="Ubah Peran/Mapel" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
-                <button id="btnSimpan" class="btn-simpan" style="background-color: #004d40; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">
-                    Simpan Perubahan
-                </button>
+          <div class="profile-info">
+            <span class="role-badge">Profil Guru</span>
+
+            <h2 id="displayNamaGuru">Memuat...</h2>
+            <p class="teacher-subtitle" id="displayMapelGuru">Memuat data guru...</p>
+
+            <div class="info-tags">
+              <span>
+                <i class="bi bi-person-badge"></i>
+                Username: <b id="displayUsername">-</b>
+              </span>
+
+              <span>
+                <i class="bi bi-key"></i>
+                Password: <b id="displayPassword">Sesuai NIP</b>
+              </span>
             </div>
-        </div>
+          </div>
         </div>
 
         <div class="quick-stats">
@@ -87,18 +95,24 @@
             <div class="form-grid">
               <div class="form-group">
                 <label>Nama Lengkap</label>
-                <input type="text" value="Andi Prasetyo, S.Pd">
+                <input type="text" id="namaGuru">
               </div>
 
               <div class="form-group">
-                <label>NIP / ID Guru</label>
-                <input type="text" value="GR2025007">
+                <label>NIP / Username</label>
+                <input type="text" id="nipGuru">
               </div>
 
               <div class="form-group">
                 <label>Email</label>
-                <input type="email" value="andi.prasetyo@smpyp17.sch.id">
+                <input type="email" id="emailGuru">
               </div>
+
+              <div class="form-group">
+                <label>Mata Pelajaran</label>
+                <input type="text" id="mapelGuru" readonly>
+              </div>
+            </div>
 
               <div class="form-group">
                 <label>Nomor HP</label>
@@ -130,38 +144,50 @@
               <h3>Informasi Akademik</h3>
               <p>Bidang ajar dan tanggung jawab guru</p>
             </div>
-
             <div class="form-grid">
               <div class="form-group">
-                <label>Mata Pelajaran</label>
-                <input type="text" value="Matematika">
+                <label>Nama Lengkap</label>
+                <input type="text" id="namaGuru">
               </div>
 
               <div class="form-group">
-                <label>Status Guru</label>
-                <select>
-                  <option selected>Aktif</option>
-                  <option>Nonaktif</option>
+                <label>NIP / Username</label>
+                <input type="text" id="nipGuru">
+              </div>
+
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="emailGuru">
+              </div>
+
+              <div class="form-group">
+                <label>Mata Pelajaran</label>
+                <input type="text" id="mapelGuru" readonly>
+              </div>
+
+              <div class="form-group">
+                <label>Nomor HP</label>
+                <input type="text" id="noHpGuru">
+              </div>
+
+              <div class="form-group">
+                <label>Jenis Kelamin</label>
+                <select id="jenisKelaminGuru">
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label>Wali Kelas</label>
-                <input type="text" value="Kelas 7A">
-              </div>
-
-              <div class="form-group">
-                <label>Tahun Bergabung</label>
-                <input type="number" value="2020">
+                <label>Tanggal Lahir</label>
+                <input type="date" id="tanggalLahirGuru">
               </div>
 
               <div class="form-group full">
-                <label>Catatan Tambahan</label>
-                <textarea rows="4">Bertanggung jawab pada pembinaan akademik kelas 7A dan mengajar Matematika untuk kelas 7A, 7B, 8A, dan 8B.</textarea>
+                <label>Alamat</label>
+                <textarea rows="4" id="alamatGuru"></textarea>
               </div>
             </div>
-          </div>
-        </div>
 
         <div class="right-column">
           <div class="card">
