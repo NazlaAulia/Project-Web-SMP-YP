@@ -8,7 +8,7 @@ const namaKelasEl = document.getElementById("namaKelas");
 const avatarPlaceholderEl = document.getElementById("avatarPlaceholder");
 const namaSiswaEl = document.getElementById("namaSiswa");
 const welcomeTextEl = document.getElementById("welcomeText");
-const barChartEl = document.getElementById("barChart");
+const barChartEl = document.getElementById("barChart") || document.querySelector(".chart-card .bar-chart");
 
 const nilai = {
   Matematika: 85,
@@ -20,23 +20,23 @@ const nilai = {
 
 function singkatNamaMapel(nama) {
   const mapping = {
-    "MAT": "Mat",
     "Matematika": "Mat",
-    "BIN": "Ind",
+    "MAT": "Mat",
     "Bahasa Indonesia": "Ind",
-    "BIG": "Ing",
+    "BIN": "Ind",
     "Bahasa Inggris": "Ing",
+    "BIG": "Ing",
     "IPA": "Ipa",
     "IPS": "Ips",
-    "INFOR": "Infor",
-    "Informatika": "Infor",
     "INFO/BK": "Info/BK",
     "BK": "BK",
-    "PAI/BHQ": "PAI",
-    "PJOK": "PJOK",
+    "Informatika": "Infor",
+    "INFOR": "Infor",
     "PKN": "PKN",
     "B. JAWA": "B. Jawa",
-    "Bahasa Jawa": "B. Jawa"
+    "Bahasa Jawa": "B. Jawa",
+    "PAI/BHQ": "PAI",
+    "PJOK": "PJOK"
   };
 
   return mapping[nama] || nama;
@@ -60,27 +60,23 @@ function renderChart(dataNilai = null) {
   if (!barChartEl) return;
 
   if (nilaiFinal.length === 0) {
-    barChartEl.innerHTML = `<p>Tidak ada data nilai.</p>`;
+    barChartEl.innerHTML = `<p class="chart-empty">Tidak ada data nilai.</p>`;
     document.getElementById("avgValue").textContent = "0";
     document.getElementById("maxValue").textContent = "-";
     document.getElementById("minValue").textContent = "-";
     return;
   }
 
-  const maxNilai = Math.max(...nilaiFinal.map((item) => Number(item.nilai_angka) || 0), 100);
-
   barChartEl.innerHTML = nilaiFinal.map((item) => {
     const nilaiAngka = Number(item.nilai_angka) || 0;
-    const tinggiPersen = Math.max((nilaiAngka / maxNilai) * 100, 8);
     const label = singkatNamaMapel(item.nama_mapel);
 
     return `
       <div class="bar-group">
-        <div class="bar-value">${nilaiAngka}</div>
-        <div class="bar-track">
-          <div class="bar-fill" style="height: ${tinggiPersen}%"></div>
+        <div class="bar-fill" style="height: ${nilaiAngka}%;">
+          <span>${nilaiAngka}</span>
         </div>
-        <div class="bar-label" title="${item.nama_mapel}">${label}</div>
+        <span class="bar-label" title="${item.nama_mapel}">${label}</span>
       </div>
     `;
   }).join("");
@@ -112,7 +108,7 @@ function renderChart(dataNilai = null) {
 
 function renderJadwalHariIni(jadwal) {
   const scheduleCard = document.querySelector(".schedule-card");
-  const oldScheduleItem = document.querySelector(".schedule-item");
+  const oldScheduleItem = document.querySelector(".schedule-card .schedule-item");
 
   if (!scheduleCard) return;
 
