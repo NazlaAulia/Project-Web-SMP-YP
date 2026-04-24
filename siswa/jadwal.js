@@ -128,18 +128,17 @@ function renderTabel(jadwalList, kelas) {
     }
 
     return `
-      <tr class="show-row" style="animation-delay:${index * 0.08}s">
-        <td>
-          <strong>${item.hari}</strong><br>
-          ${item.jam_mulai} - ${item.jam_selesai}
-        </td>
-        <td>${item.mapel}</td>
-        <td>${item.guru}</td>
-        <td>${item.ruangan}</td>
-        <td>
-          <span class="status-badge ${statusClass}">${item.status}</span>
-        </td>
-      </tr>
+      <tr class="show-row">
+  <td>
+    <strong>${item.hari}</strong><br>
+    ${item.jam}
+  </td>
+  <td>${item.mata_pelajaran}</td>
+  <td>${item.guru}</td>
+  <td>
+    <span class="status-badge status-waiting">Mendatang</span>
+  </td>
+</tr>
     `;
   }).join("");
 }
