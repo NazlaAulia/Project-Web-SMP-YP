@@ -8,6 +8,7 @@ const namaKelasEl = document.getElementById("namaKelas");
 const avatarPlaceholderEl = document.getElementById("avatarPlaceholder");
 const namaSiswaEl = document.getElementById("namaSiswa");
 const welcomeTextEl = document.getElementById("welcomeText");
+const barChartEl = document.getElementById("barChart");
 
 const nilai = {
   Matematika: 85,
@@ -17,40 +18,64 @@ const nilai = {
   IPS: 75
 };
 
-function setBar(barId, textId, value) {
-  const bar = document.getElementById(barId);
-  const text = document.getElementById(textId);
+function singkatNamaMapel(nama) {
+  const mapping = {
+    "Matematika": "Mat",
+    "MAT": "Mat",
+    "Bahasa Indonesia": "Ind",
+    "BIN": "Ind",
+    "Bahasa Inggris": "Ing",
+    "BIG": "Ing",
+    "IPA": "Ipa",
+    "IPS": "Ips",
+    "INFO/BK": "Info/BK",
+    "BK": "BK",
+    "Informatika": "Info"
+  };
 
-  const angka = Number(value) || 0;
-
-  if (bar) bar.style.height = `${angka}%`;
-  if (text) text.textContent = angka;
+  return mapping[nama] || nama;
 }
 
 function renderChart(dataNilai = null) {
-  let nilaiFinal = nilai;
+  let nilaiFinal = [];
 
   if (dataNilai && dataNilai.length > 0) {
-    nilaiFinal = {};
-
-    dataNilai.forEach((item) => {
-      nilaiFinal[item.nama_mapel] = Number(item.nilai_angka) || 0;
-    });
+    nilaiFinal = dataNilai.map((item) => ({
+      nama_mapel: item.nama_mapel,
+      nilai_angka: Number(item.nilai_angka) || 0
+    }));
+  } else {
+    nilaiFinal = Object.entries(nilai).map(([nama_mapel, nilai_angka]) => ({
+      nama_mapel,
+      nilai_angka: Number(nilai_angka) || 0
+    }));
   }
 
-  const nilaiMat = nilaiFinal.MAT || nilaiFinal.Matematika || 0;
-  const nilaiInd = nilaiFinal.BIN || nilaiFinal["Bahasa Indonesia"] || 0;
-  const nilaiIng = nilaiFinal.BIG || nilaiFinal["Bahasa Inggris"] || 0;
-  const nilaiIpa = nilaiFinal.IPA || 0;
-  const nilaiIps = nilaiFinal.IPS || 0;
+  if (!barChartEl) return;
 
-  setBar("barMat", "textMat", nilaiMat);
-  setBar("barInd", "textInd", nilaiInd);
-  setBar("barIng", "textIng", nilaiIng);
-  setBar("barIpa", "textIpa", nilaiIpa);
-  setBar("barIps", "textIps", nilaiIps);
+  if (nilaiFinal.length === 0) {
+    barChartEl.innerHTML = `<p>Tidak ada data nilai.</p>`;
+    document.getElementById("avgValue").textContent = "0";
+    document.getElementById("maxValue").textContent = "-";
+    document.getElementById("minValue").textContent = "-";
+    return;
+  }
 
-  const daftarNilai = Object.entries(nilaiFinal).filter((item) => Number(item[1]) > 0);
+  barChartEl.innerHTML = nilaiFinal.map((item) => {
+    const nilaiAngka = Number(item.nilai_angka) || 0;
+    const label = singkatNamaMapel(item.nama_mapel);
+
+    return `
+      <div class="bar-group">
+        <div class="bar-fill" style="height: ${nilaiAngka}%;">
+          <span>${nilaiAngka}</span>
+        </div>
+        <span class="bar-label">${label}</span>
+      </div>
+    `;
+  }).join("");
+
+  const daftarNilai = nilaiFinal.filter((item) => Number(item.nilai_angka) > 0);
 
   if (daftarNilai.length === 0) {
     document.getElementById("avgValue").textContent = "0";
@@ -59,20 +84,20 @@ function renderChart(dataNilai = null) {
     return;
   }
 
-  const total = daftarNilai.reduce((sum, item) => sum + Number(item[1]), 0);
+  const total = daftarNilai.reduce((sum, item) => sum + Number(item.nilai_angka), 0);
   const rataRata = (total / daftarNilai.length).toFixed(1);
 
   let tertinggi = daftarNilai[0];
   let terendah = daftarNilai[0];
 
   daftarNilai.forEach((item) => {
-    if (Number(item[1]) > Number(tertinggi[1])) tertinggi = item;
-    if (Number(item[1]) < Number(terendah[1])) terendah = item;
+    if (Number(item.nilai_angka) > Number(tertinggi.nilai_angka)) tertinggi = item;
+    if (Number(item.nilai_angka) < Number(terendah.nilai_angka)) terendah = item;
   });
 
   document.getElementById("avgValue").textContent = rataRata;
-  document.getElementById("maxValue").textContent = `${tertinggi[0]} (${tertinggi[1]})`;
-  document.getElementById("minValue").textContent = `${terendah[0]} (${terendah[1]})`;
+  document.getElementById("maxValue").textContent = `${tertinggi.nama_mapel} (${tertinggi.nilai_angka})`;
+  document.getElementById("minValue").textContent = `${terendah.nama_mapel} (${terendah.nilai_angka})`;
 }
 
 function renderJadwalHariIni(jadwal) {
