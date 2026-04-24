@@ -427,33 +427,33 @@ async function exportNilaiPdfFinal() {
     doc.rect(16, afterTableY + 3, 178, 16);
     doc.text("Pertahankan semangat belajar dan terus tingkatkan prestasi.", 18, afterTableY + 10);
 
-    // =========================
-    // TANDA TANGAN BAWAH
-    // =========================
-    let ttdY = afterTableY + 31;
+   // =========================
+// TANDA TANGAN BAWAH
+// =========================
+let ttdY = afterTableY + 28;
 
-    if (ttdY + 48 > pageHeight - 10) {
-      doc.addPage();
+// Kalau tanda tangan terlalu bawah, jangan sampai kepotong.
+if (ttdY + 45 > pageHeight - 18) {
+  ttdY = pageHeight - 72;
+}
 
-      doc.setDrawColor(0, 0, 0);
-      doc.setLineWidth(0.4);
-      doc.rect(10, 10, 190, 277);
+doc.setFont("times", "normal");
+doc.setFontSize(11);
 
-      ttdY = 35;
-    }
+doc.text("Mengetahui,", 16, ttdY);
+doc.text("Kepala Sekolah", 16, ttdY + 9);
 
-    doc.setFont("times", "normal");
-    doc.setFontSize(11);
+doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
+doc.text("Wali Kelas", 124, ttdY + 9);
 
-    doc.text("Mengetahui,", 16, ttdY);
-    doc.text("Kepala Sekolah", 16, ttdY + 9);
+// Nama tanda tangan dibuat lebih naik biar tidak nabrak border bawah
+const namaTtdY = ttdY + 43;
 
-    doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
-    doc.text("Wali Kelas", 124, ttdY + 9);
+doc.setFont("times", "bold");
+doc.setFontSize(11);
 
-    doc.setFont("times", "bold");
-    doc.text(`( ${kepalaSekolah} )`, 16, ttdY + 52);
-    doc.text(`( ${waliKelas} )`, 124, ttdY + 52);
+doc.text(`( ${kepalaSekolah} )`, 16, namaTtdY);
+doc.text(`( ${waliKelas} )`, 124, namaTtdY);
 
     const namaFile = `Nilai_Akhir_Semester_${nama.replace(/\s+/g, "_")}.pdf`;
 
