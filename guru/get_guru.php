@@ -6,44 +6,45 @@ header("Content-Type: application/json");
 
 $id_guru = "";
 
-// 1. Ambil dari URL kalau ada: get_guru.php?id_guru=4
-if (isset($_GET['id_guru']) && $_GET['id_guru'] != "") {
+// Ambil dari URL dulu, contoh: get_guru.php?id_guru=4
+if (isset($_GET['id_guru']) && $_GET['id_guru'] !== "") {
     $id_guru = $_GET['id_guru'];
 }
 
-// 2. Kalau URL kosong, ambil dari session login
-if ($id_guru == "" && isset($_SESSION['id_guru'])) {
+// Kalau URL kosong, ambil dari session
+if ($id_guru === "" && isset($_SESSION['id_guru']) && $_SESSION['id_guru'] !== "") {
     $id_guru = $_SESSION['id_guru'];
 }
 
-// 3. Kalau masih kosong, baru error
-if ($id_guru == "") {
+if ($id_guru === "") {
     echo json_encode([
         "status" => "error",
-        "message" => "Silakan login ulang"
+        "message" => "ID guru tidak ditemukan"
     ]);
     exit;
 }
 
 $id_guru = mysqli_real_escape_string($conn, $id_guru);
 
-// Ambil data guru
-$queryGuru = mysqli_query($conn, "
+$sqlGuru = "
     SELECT 
-        id_guru,
-        nip,
-        nama,
-        email,
-        id_mapel
-    FROM guru
-    WHERE id_guru = '$id_guru'
+        `id_guru`,
+        `nip`,
+        `nama`,
+        `email`,
+        `id_mapel`
+    FROM `guru`
+    WHERE `id_guru` = '$id_guru'
     LIMIT 1
-");
+";
+
+$queryGuru = mysqli_query($conn, $sqlGuru);
 
 if (!$queryGuru) {
     echo json_encode([
         "status" => "error",
-        "message" => "Query guru error: " . mysqli_error($conn)
+        "message" => "Query guru error: " . mysqli_error($conn),
+        "sql" => $sqlGuru
     ]);
     exit;
 }
@@ -58,18 +59,19 @@ if (!$data) {
     exit;
 }
 
-// Ambil nama mapel
 $data['nama_mapel'] = "-";
 
 if (!empty($data['id_mapel'])) {
     $id_mapel = mysqli_real_escape_string($conn, $data['id_mapel']);
 
-    $queryMapel = mysqli_query($conn, "
-        SELECT nama_mapel
-        FROM mapel
-        WHERE id_mapel = '$id_mapel'
+    $sqlMapel = "
+        SELECT `nama_mapel`
+        FROM `mapel`
+        WHERE `id_mapel` = '$id_mapel'
         LIMIT 1
-    ");
+    ";
+
+    $queryMapel = mysqli_query($conn, $sqlMapel);
 
     if ($queryMapel) {
         $mapel = mysqli_fetch_assoc($queryMapel);
