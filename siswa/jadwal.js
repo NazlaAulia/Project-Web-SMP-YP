@@ -77,20 +77,19 @@ function renderProfil(siswa) {
     semesterText.textContent = `Sesuai dengan Kelas ${siswa.kelas}, Semester Ini`;
   }
 
-  document.getElementById("kelasSelect").innerHTML =
-    `<option>${siswa.kelas || "-"}</option>`;
+  const kelasSelect = document.getElementById("kelasSelect");
+  if (kelasSelect) {
+    kelasSelect.innerHTML = `<option>${siswa.kelas || "-"}</option>`;
+  }
 
-  document.getElementById("semesterSelect").innerHTML =
-    `<option>${siswa.tahun_ajaran || "-"} - ${siswa.semester || "-"}</option>`;
+  const semesterSelect = document.getElementById("semesterSelect");
+  if (semesterSelect) {
+    semesterSelect.innerHTML =
+      `<option>${siswa.tahun_ajaran || "-"} - ${siswa.semester || "-"}</option>`;
+  }
 
   document.getElementById("judulTabel").textContent =
     `Jadwal Pelajaran Kelas ${siswa.kelas} (Minggu Ini)`;
-}
-
-function renderRingkasan(ringkasan) {
-  document.getElementById("hariIni").textContent = ringkasan.hari_ini || "-";
-  document.getElementById("totalPelajaran").textContent = `${ringkasan.total_pelajaran || 0} Jam`;
-  document.getElementById("pelajaranUtama").textContent = ringkasan.pelajaran_utama || "-";
 }
 
 function renderUpdate(updateList) {
@@ -102,7 +101,7 @@ function renderUpdate(updateList) {
   }
 
   container.innerHTML = updateList
-    .map(item => `<p>- Jam ${item.jam_mulai} ${item.mapel} di ${item.ruangan}</p>`)
+    .map(item => `<p>- Jam ${item.jam_mulai} ${item.mapel}</p>`)
     .join("");
 }
 
@@ -112,33 +111,33 @@ function renderTabel(jadwalList, kelas) {
   if (!jadwalList || jadwalList.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="empty-state">Belum ada jadwal untuk kelas ${kelas}.</td>
+        <td colspan="4" class="empty-state">Belum ada jadwal untuk kelas ${kelas}.</td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = jadwalList.map((item, index) => {
+  tbody.innerHTML = jadwalList.map((item) => {
     let statusClass = "status-waiting";
 
-    if (item.status.toLowerCase() === "selesai") {
+    if (item.status && item.status.toLowerCase() === "selesai") {
       statusClass = "status-done";
-    } else if (item.status.toLowerCase() === "berlangsung") {
+    } else if (item.status && item.status.toLowerCase() === "berlangsung") {
       statusClass = "status-live";
     }
 
     return `
       <tr class="show-row">
-  <td>
-    <strong>${item.hari}</strong><br>
-    ${item.jam}
-  </td>
-  <td>${item.mata_pelajaran}</td>
-  <td>${item.guru}</td>
-  <td>
-    <span class="status-badge status-waiting">Mendatang</span>
-  </td>
-</tr>
+        <td>
+          <strong>${item.hari}</strong><br>
+          ${item.jam}
+        </td>
+        <td>${item.mata_pelajaran}</td>
+        <td>${item.guru}</td>
+        <td>
+          <span class="status-badge ${statusClass}">${item.status || "Mendatang"}</span>
+        </td>
+      </tr>
     `;
   }).join("");
 }
@@ -146,7 +145,7 @@ function renderTabel(jadwalList, kelas) {
 function renderError(message) {
   document.getElementById("jadwalTableBody").innerHTML = `
     <tr>
-      <td colspan="5" class="empty-state">${message}</td>
+      <td colspan="4" class="empty-state">${message}</td>
     </tr>
   `;
 }
