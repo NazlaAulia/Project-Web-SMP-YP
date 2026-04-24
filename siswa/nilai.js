@@ -427,13 +427,13 @@ async function exportNilaiPdfFinal() {
     doc.rect(16, afterTableY + 3, 178, 16);
     doc.text("Pertahankan semangat belajar dan terus tingkatkan prestasi.", 18, afterTableY + 10);
 
-   // =========================
+// =========================
 // TANDA TANGAN BAWAH
 // =========================
-let ttdY = afterTableY + 28;
+let ttdY = afterTableY + 24;
 
-// Kalau tanda tangan terlalu bawah, jangan sampai kepotong.
-if (ttdY + 45 > pageHeight - 18) {
+// Biar tanda tangan tidak nabrak border bawah
+if (ttdY + 50 > pageHeight - 16) {
   ttdY = pageHeight - 72;
 }
 
@@ -446,14 +446,12 @@ doc.text("Kepala Sekolah", 16, ttdY + 9);
 doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
 doc.text("Wali Kelas", 124, ttdY + 9);
 
-// Nama tanda tangan dibuat lebih naik biar tidak nabrak border bawah
-const namaTtdY = ttdY + 43;
-
 doc.setFont("times", "bold");
 doc.setFontSize(11);
 
-doc.text(`( ${kepalaSekolah} )`, 16, namaTtdY);
-doc.text(`( ${waliKelas} )`, 124, namaTtdY);
+// Nama dibuat lebih naik, jadi rapi dan tidak kepotong
+doc.text(`( ${kepalaSekolah} )`, 16, ttdY + 43);
+doc.text(`( ${waliKelas} )`, 124, ttdY + 43);
 
     const namaFile = `Nilai_Akhir_Semester_${nama.replace(/\s+/g, "_")}.pdf`;
 
@@ -524,30 +522,27 @@ function ambilNilaiPerMapelDariHalamanFinal() {
 }
 
 function getNamaKepalaSekolahFinal() {
-  return (
-    localStorage.getItem("nama_kepala_sekolah") ||
-    "Kepala Sekolah"
-  );
+  return "Dra. Slamet Suwarni";
 }
 
 function getNamaWaliKelasFinal(kelas) {
+  const kelasBersih = String(kelas || "").trim().toUpperCase();
+
+  // Data wali kelas dari database:
+  // kelas.id_wali_kelas -> guru.id_guru
   const daftarWali = {
-    "7A": "Wali Kelas 7A",
-    "7B": "Wali Kelas 7B",
-    "7C": "Wali Kelas 7C",
-    "8A": "Wali Kelas 8A",
-    "8B": "Wali Kelas 8B",
-    "8C": "Wali Kelas 8C",
-    "9A": "Wali Kelas 9A",
-    "9B": "Wali Kelas 9B",
-    "9C": "Wali Kelas 9C"
+    "7A": "Osa Noraise, S.Pd",
+    "7B": "Nindy Putri Oktaviara, S.Pd",
+    "7C": "Sangar Deni Daud Smi, S.Pd",
+    "8A": "Haris Suprapti Ningrum, S.Ud",
+    "8B": "Achmad Farkan, S.Pd",
+    "8C": "Riyadna Krismanita, S.Pd",
+    "9A": "Mohamad Hanafi, S.Pd",
+    "9B": "Murni, S.Pd",
+    "9C": "Dra. Endang Aryati"
   };
 
-  return (
-    localStorage.getItem("nama_wali_kelas") ||
-    daftarWali[kelas] ||
-    "Wali Kelas"
-  );
+  return daftarWali[kelasBersih] || "Wali Kelas";
 }
 
 function formatTahunAjaranFinal(semesterText) {
