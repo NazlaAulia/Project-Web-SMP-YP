@@ -8,7 +8,6 @@ const namaKelasEl = document.getElementById("namaKelas");
 const avatarPlaceholderEl = document.getElementById("avatarPlaceholder");
 const namaSiswaEl = document.getElementById("namaSiswa");
 const welcomeTextEl = document.getElementById("welcomeText");
-
 const barChartEl = document.getElementById("barChart") || document.querySelector(".chart-card .bar-chart");
 
 const nilai = {
@@ -23,27 +22,20 @@ function singkatNamaMapel(nama) {
   const mapping = {
     "Matematika": "Mat",
     "MAT": "Mat",
-
-    "Bahasa Indonesia": "B. Indo",
-    "BIN": "B. Indo",
-
-    "Bahasa Inggris": "B. Ing",
-    "BIG": "B. Ing",
-
-    "Bahasa Jawa": "B. Jawa",
-    "B. JAWA": "B. Jawa",
-
-    "IPA": "IPA",
-    "IPS": "IPS",
-    "PKN": "PKN",
-
-    "Informatika": "Infor",
-    "INFOR": "Infor",
-
+    "Bahasa Indonesia": "Ind",
+    "BIN": "Ind",
+    "Bahasa Inggris": "Ing",
+    "BIG": "Ing",
+    "IPA": "Ipa",
+    "IPS": "Ips",
     "INFO/BK": "Info/BK",
     "BK": "BK",
-
-    "PAI/BHQ": "PAI/BHQ",
+    "Informatika": "Infor",
+    "INFOR": "Infor",
+    "PKN": "PKN",
+    "B. JAWA": "B. Jawa",
+    "Bahasa Jawa": "B. Jawa",
+    "PAI/BHQ": "PAI",
     "PJOK": "PJOK"
   };
 
@@ -74,8 +66,6 @@ function renderChart(dataNilai = null) {
     document.getElementById("minValue").textContent = "-";
     return;
   }
-
-  barChartEl.style.setProperty("--jumlah-bar", nilaiFinal.length);
 
   barChartEl.innerHTML = nilaiFinal.map((item) => {
     const nilaiAngka = Number(item.nilai_angka) || 0;
@@ -184,8 +174,7 @@ async function loadDashboard() {
     avatarPlaceholderEl.textContent = hurufAwal;
     namaKelasEl.textContent = s.nama_kelas || "-";
 
-    console.log("NILAI AKADEMIK:", s.nilai_akademik);
-renderChart(s.nilai_akademik);
+    renderChart(s.nilai_akademik);
     renderJadwalHariIni(s.jadwal_hari_ini);
 
   } catch (error) {
