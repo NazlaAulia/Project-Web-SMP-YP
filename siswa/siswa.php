@@ -134,6 +134,52 @@ while ($row = $resultJadwal->fetch_assoc()) {
 
 $stmtJadwal->close();
 
+/*
+  Ambil nilai akademik siswa
+*/
+$nilai = [];
+
+$sqlNilai = "SELECT 
+                m.nama_mapel,
+                n.nilai_angka
+             FROM nilai n
+             LEFT JOIN mapel m ON n.id_mapel = m.id_mapel
+             WHERE n.id_siswa = ?
+             AND n.semester = (
+                SELECT MAX(semester)
+                FROM nilai
+                WHERE id_siswa = ?
+             )
+             ORDER BY n.id_mapel ASC";
+
+$stmtNilai = $conn->prepare($sqlNilai);
+
+if (!$stmtNilai) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Prepare nilai gagal: " . $conn->error
+    ]);
+    exit;
+}
+
+$stmtNilai->bind_param("ii", $id_siswa, $id_siswa);
+
+if (!$stmtNilai->execute()) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Execute nilai gagal: " . $stmtNilai->error
+    ]);
+    exit;
+}
+
+$resultNilai = $stmtNilai->get_result();
+
+while ($row = $resultNilai->fetch_assoc()) {
+    $nilai[] = $row;
+}
+
+$stmtNilai->close();
+
 echo json_encode([
     "status" => "success",
     "data" => [
@@ -142,7 +188,8 @@ echo json_encode([
         "id_kelas" => $id_kelas,
         "nama_kelas" => $nama_kelas,
         "hari_ini" => $hariIni,
-        "jadwal_hari_ini" => $jadwal
+        "jadwal_hari_ini" => $jadwal,
+        "nilai_akademik" => $nilai
     ]
 ]);
 
