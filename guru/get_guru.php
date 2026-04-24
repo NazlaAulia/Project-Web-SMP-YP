@@ -14,70 +14,32 @@ if (!isset($_SESSION['id_guru'])) {
 
 $id_guru = $_SESSION['id_guru'];
 
-if (!isset($conn)) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Variabel koneksi \$conn tidak ditemukan. Cek koneksi.php"
-    ]);
-    exit;
-}
-
-$sqlGuru = "
+$query = mysqli_query($conn, "
     SELECT *
     FROM guru
     WHERE id_guru = '$id_guru'
     LIMIT 1
-";
+");
 
-$queryGuru = mysqli_query($conn, $sqlGuru);
-
-if (!$queryGuru) {
+if (!$query) {
     echo json_encode([
         "status" => "error",
-        "message" => "Query guru error: " . mysqli_error($conn),
-        "sql" => $sqlGuru
+        "message" => "Query guru error: " . mysqli_error($conn)
     ]);
     exit;
 }
 
-$data = mysqli_fetch_assoc($queryGuru);
+$data = mysqli_fetch_assoc($query);
 
-if (!$data) {
+if ($data) {
+    echo json_encode([
+        "status" => "success",
+        "data" => $data
+    ]);
+} else {
     echo json_encode([
         "status" => "error",
-        "message" => "Data guru tidak ditemukan",
-        "id_guru" => $id_guru
+        "message" => "Data guru tidak ditemukan"
     ]);
-    exit;
 }
-
-$data['nama_mapel'] = "-";
-
-if (!empty($data['id_mapel'])) {
-    $id_mapel = $data['id_mapel'];
-
-    $sqlMapel = "
-        SELECT *
-        FROM mapel
-        WHERE id_mapel = '$id_mapel'
-        LIMIT 1
-    ";
-
-    $queryMapel = mysqli_query($conn, $sqlMapel);
-
-    if ($queryMapel) {
-        $mapel = mysqli_fetch_assoc($queryMapel);
-
-        if ($mapel && isset($mapel['nama_mapel'])) {
-            $data['nama_mapel'] = $mapel['nama_mapel'];
-        }
-    } else {
-        $data['nama_mapel'] = "Mapel error: " . mysqli_error($conn);
-    }
-}
-
-echo json_encode([
-    "status" => "success",
-    "data" => $data
-]);
 ?>
