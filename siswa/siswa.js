@@ -21,27 +21,53 @@ function setBar(barId, textId, value) {
   const bar = document.getElementById(barId);
   const text = document.getElementById(textId);
 
-  if (bar) bar.style.height = `${value}%`;
-  if (text) text.textContent = value;
+  const angka = Number(value) || 0;
+
+  if (bar) bar.style.height = `${angka}%`;
+  if (text) text.textContent = angka;
 }
 
-function renderChart() {
-  setBar("barMat", "textMat", nilai.Matematika);
-  setBar("barInd", "textInd", nilai["Bahasa Indonesia"]);
-  setBar("barIng", "textIng", nilai["Bahasa Inggris"]);
-  setBar("barIpa", "textIpa", nilai.IPA);
-  setBar("barIps", "textIps", nilai.IPS);
+function renderChart(dataNilai = null) {
+  let nilaiFinal = nilai;
 
-  const daftarNilai = Object.entries(nilai);
-  const total = daftarNilai.reduce((sum, item) => sum + item[1], 0);
+  if (dataNilai && dataNilai.length > 0) {
+    nilaiFinal = {};
+
+    dataNilai.forEach((item) => {
+      nilaiFinal[item.nama_mapel] = Number(item.nilai_angka) || 0;
+    });
+  }
+
+  const nilaiMat = nilaiFinal.MAT || nilaiFinal.Matematika || 0;
+  const nilaiInd = nilaiFinal.BIN || nilaiFinal["Bahasa Indonesia"] || 0;
+  const nilaiIng = nilaiFinal.BIG || nilaiFinal["Bahasa Inggris"] || 0;
+  const nilaiIpa = nilaiFinal.IPA || 0;
+  const nilaiIps = nilaiFinal.IPS || 0;
+
+  setBar("barMat", "textMat", nilaiMat);
+  setBar("barInd", "textInd", nilaiInd);
+  setBar("barIng", "textIng", nilaiIng);
+  setBar("barIpa", "textIpa", nilaiIpa);
+  setBar("barIps", "textIps", nilaiIps);
+
+  const daftarNilai = Object.entries(nilaiFinal).filter((item) => Number(item[1]) > 0);
+
+  if (daftarNilai.length === 0) {
+    document.getElementById("avgValue").textContent = "0";
+    document.getElementById("maxValue").textContent = "-";
+    document.getElementById("minValue").textContent = "-";
+    return;
+  }
+
+  const total = daftarNilai.reduce((sum, item) => sum + Number(item[1]), 0);
   const rataRata = (total / daftarNilai.length).toFixed(1);
 
   let tertinggi = daftarNilai[0];
   let terendah = daftarNilai[0];
 
   daftarNilai.forEach((item) => {
-    if (item[1] > tertinggi[1]) tertinggi = item;
-    if (item[1] < terendah[1]) terendah = item;
+    if (Number(item[1]) > Number(tertinggi[1])) tertinggi = item;
+    if (Number(item[1]) < Number(terendah[1])) terendah = item;
   });
 
   document.getElementById("avgValue").textContent = rataRata;
@@ -117,6 +143,7 @@ async function loadDashboard() {
     avatarPlaceholderEl.textContent = hurufAwal;
     namaKelasEl.textContent = s.nama_kelas || "-";
 
+    renderChart(s.nilai_akademik);
     renderJadwalHariIni(s.jadwal_hari_ini);
 
   } catch (error) {
