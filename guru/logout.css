@@ -24,6 +24,19 @@ body {
     min-height: 100vh;
 }
 
+/* Layout sidebar + content */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    min-height: 100vh;
+}
+
 /* WRAPPER */
 .logout-wrapper {
     min-height: 100vh;
@@ -115,6 +128,13 @@ body {
 }
 
 /* TABLET */
+@media (max-width: 900px) {
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
 @media (max-width: 768px) {
     .logout-wrapper {
         padding: 24px;
@@ -139,7 +159,7 @@ body {
 @media (max-width: 480px) {
     .logout-wrapper {
         align-items: flex-start;
-        padding: 24px 16px;
+        padding: 80px 16px 24px;
     }
 
     .logout-card {
@@ -184,7 +204,7 @@ body {
 /* HP KECIL */
 @media (max-width: 360px) {
     .logout-wrapper {
-        padding: 18px 12px;
+        padding: 80px 12px 18px;
     }
 
     .logout-card {
