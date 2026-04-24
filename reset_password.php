@@ -1,52 +1,48 @@
 <?php
-header('Content-Type: application/json');
+ob_start();
+header('Content-Type: application/json; charset=utf-8');
 
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
-$host = "localhost";
-$dbname = "osbebslk_sekolahyp";
-$dbuser = "osbebslk_aliyahzz";
-$dbpass = "semangatgaes";
+include "koneksi.php";
 
-$conn = new mysqli($host, $dbuser, $dbpass, $dbname);
+function kirim_json($status, $message, $extra = []) {
+    if (ob_get_length()) {
+        ob_clean();
+    }
 
-if ($conn->connect_error) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Koneksi database gagal."
-    ]);
+    echo json_encode(array_merge([
+        "status" => $status,
+        "message" => $message
+    ], $extra));
+
     exit;
 }
+
+if ($conn->connect_error) {
+    kirim_json("error", "Koneksi database gagal.");
+}
+
+$conn->set_charset("utf8mb4");
 
 $raw = file_get_contents("php://input");
 $data = json_decode($raw, true);
 
 if (!is_array($data)) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Permintaan tidak valid."
-    ]);
-    exit;
+    kirim_json("error", "Permintaan tidak valid.");
 }
 
 $token = trim($data["token"] ?? "");
 $password = trim($data["password"] ?? "");
 
 if ($token === "" || $password === "") {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Token dan password wajib diisi."
-    ]);
-    exit;
+    kirim_json("error", "Token dan password wajib diisi.");
 }
 
 if (strlen($password) < 6) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Password minimal 6 karakter."
-    ]);
-    exit;
+    kirim_json("error", "Password minimal 6 karakter.");
 }
 
 $stmt = $conn->prepare("
@@ -54,39 +50,31 @@ $stmt = $conn->prepare("
     FROM password_reset_requests
     WHERE reset_token = ?
     AND status = 'pending'
-    AND token_expires_at >= NOW()
+    AND created_at >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)
     LIMIT 1
 ");
 
 if (!$stmt) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Query token gagal disiapkan."
-    ]);
-    exit;
+    kirim_json("error", "Query token gagal: " . $conn->error);
 }
 
 $stmt->bind_param("s", $token);
-$stmt->execute();
+
+if (!$stmt->execute()) {
+    kirim_json("error", "Token gagal diproses: " . $stmt->error);
+}
+
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Link reset tidak valid atau sudah kedaluwarsa."
-    ]);
-    exit;
+    kirim_json("error", "Link reset tidak valid atau sudah kedaluwarsa. Silakan klik Lupa Sandi lagi.");
 }
 
 $request = $result->fetch_assoc();
 $stmt->close();
 
 if ((int)$request["role_id"] !== 2) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Link reset ini hanya untuk akun guru."
-    ]);
-    exit;
+    kirim_json("error", "Link reset ini hanya untuk akun guru.");
 }
 
 $updateUser = $conn->prepare("
@@ -96,21 +84,13 @@ $updateUser = $conn->prepare("
 ");
 
 if (!$updateUser) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Query update password gagal disiapkan."
-    ]);
-    exit;
+    kirim_json("error", "Query update password gagal: " . $conn->error);
 }
 
 $updateUser->bind_param("si", $password, $request["id_user"]);
 
 if (!$updateUser->execute()) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Password gagal diperbarui."
-    ]);
-    exit;
+    kirim_json("error", "Password gagal diperbarui: " . $updateUser->error);
 }
 
 $updateUser->close();
@@ -129,8 +109,4 @@ if ($updateRequest) {
 
 $conn->close();
 
-echo json_encode([
-    "status" => "success",
-    "message" => "Password berhasil diganti. Silakan login dengan password baru."
-]);
-?>
+kirim_json("success", "Password berhasil diganti. Silakan login dengan password baru.");

@@ -1,342 +1,204 @@
 <?php
-header('Content-Type: application/json');
+ob_start();
+header('Content-Type: application/json; charset=utf-8');
 
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
-$host = "localhost";
-$dbname = "osbebslk_sekolahyp";
-$dbuser = "osbebslk_aliyahzz";
-$dbpass = "semangatgaes";
+include "koneksi.php";
 
-$adminWa = "6283123500258"; // GANTI nomor WA admin
-$baseUrl = "https://projectsekolahyp.my.id"; // GANTI kalau folder login kamu beda
-$fromEmail = "noreply@projectsekolahyp.my.id"; // ini cuma email pengirim sistem
+function kirim_json($status, $message, $extra = []) {
+    if (ob_get_length()) {
+        ob_clean();
+    }
 
-$conn = new mysqli($host, $dbuser, $dbpass, $dbname);
+    echo json_encode(array_merge([
+        "status" => $status,
+        "message" => $message
+    ], $extra));
 
-if ($conn->connect_error) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Koneksi database gagal."
-    ]);
     exit;
 }
+
+if ($conn->connect_error) {
+    kirim_json("error", "Koneksi database gagal.");
+}
+
+$conn->set_charset("utf8mb4");
 
 $raw = file_get_contents("php://input");
 $data = json_decode($raw, true);
 
 if (!is_array($data)) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Permintaan tidak valid."
-    ]);
-    exit;
+    kirim_json("error", "Permintaan tidak valid.");
 }
 
-$role = trim($data["role"] ?? "");
-$identifier = trim($data["identifier"] ?? "");
+$username = trim($data["username"] ?? "");
 
-if ($role === "" || $identifier === "") {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Jenis akun dan data akun wajib diisi."
-    ]);
-    exit;
+if ($username === "") {
+    kirim_json("error", "Username wajib diisi.");
 }
+
+$stmt = $conn->prepare("
+    SELECT 
+        u.id_user,
+        u.username,
+        u.role_id,
+        u.id_guru,
+        u.id_siswa,
+        g.nama AS nama_guru,
+        g.email AS email_guru,
+        s.nama AS nama_siswa
+    FROM `user` u
+    LEFT JOIN guru g ON u.id_guru = g.id_guru
+    LEFT JOIN siswa s ON u.id_siswa = s.id_siswa
+    WHERE u.username = ?
+    LIMIT 1
+");
+
+if (!$stmt) {
+    kirim_json("error", "Query user gagal: " . $conn->error);
+}
+
+$stmt->bind_param("s", $username);
+
+if (!$stmt->execute()) {
+    kirim_json("error", "Request gagal diproses.");
+}
+
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    kirim_json("error", "Username tidak ditemukan.");
+}
+
+$user = $result->fetch_assoc();
+$stmt->close();
+
+$role_id = (int)$user["role_id"];
+
+/*
+    role_id:
+    1 = admin
+    2 = guru
+    3 = siswa
+*/
 
 /* =========================
-   SISWA: USERNAME -> WA ADMIN
+   SISWA: KONFIRMASI VIA WA ADMIN
 ========================= */
-if ($role === "siswa") {
-    $stmt = $conn->prepare("
-        SELECT 
-            u.id_user,
-            u.username,
-            u.role_id,
-            u.id_guru,
-            u.id_siswa,
-            s.nama AS nama_lengkap
-        FROM `user` u
-        LEFT JOIN siswa s ON u.id_siswa = s.id_siswa
-        WHERE u.username = ?
-        AND u.role_id = 3
-        LIMIT 1
-    ");
+if ($role_id === 3) {
+    $nomor_admin = "6283123500258"; // GANTI NOMOR ADMIN, pakai 62 bukan 08
 
-    if (!$stmt) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Query siswa gagal disiapkan."
-        ]);
-        exit;
-    }
+    $nama_siswa = $user["nama_siswa"] ?: "-";
+    $id_siswa = $user["id_siswa"] ?: "-";
 
-    $stmt->bind_param("s", $identifier);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $pesan = "Halo Admin, saya ingin konfirmasi lupa password akun siswa.%0A%0A"
+        . "Username: " . rawurlencode($user["username"]) . "%0A"
+        . "Nama Siswa: " . rawurlencode($nama_siswa) . "%0A"
+        . "ID Siswa: " . rawurlencode($id_siswa) . "%0A%0A"
+        . "Mohon bantu reset password saya.";
 
-    if ($result->num_rows === 0) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Username siswa tidak ditemukan."
-        ]);
-        exit;
-    }
-
-    $user = $result->fetch_assoc();
-    $stmt->close();
-
-    $cek = $conn->prepare("
-        SELECT id_request
-        FROM password_reset_requests
-        WHERE id_user = ?
-        AND status = 'pending'
-        LIMIT 1
-    ");
-
-    $id_user = $user["id_user"];
-
-    $cek->bind_param("i", $id_user);
-    $cek->execute();
-    $cek->store_result();
-
-    $nama = $user["nama_lengkap"] ?: $user["username"];
-
-    $pesan = "Halo Admin, saya ingin konfirmasi reset password SIAKAD.\n\n" .
-             "Jenis Akun: SISWA\n" .
-             "Username: " . $user["username"] . "\n" .
-             "Nama: " . $nama . "\n\n" .
-             "Mohon dibantu untuk reset password akun saya.";
-
-    $wa_link = "https://wa.me/" . $adminWa . "?text=" . urlencode($pesan);
-
-    if ($cek->num_rows > 0) {
-        $cek->close();
-        $conn->close();
-
-        echo json_encode([
-            "status" => "success",
-            "message" => "Permintaan reset sandi sudah masuk. Silakan konfirmasi ke admin melalui WhatsApp.",
-            "wa_link" => $wa_link
-        ]);
-        exit;
-    }
-
-    $cek->close();
+    $wa_link = "https://wa.me/" . $nomor_admin . "?text=" . $pesan;
 
     $insert = $conn->prepare("
         INSERT INTO password_reset_requests
-        (id_user, id_siswa, id_guru, username, role_id, status)
-        VALUES (?, ?, ?, ?, ?, 'pending')
+        (id_user, id_siswa, id_guru, username, role_id, status, created_at)
+        VALUES (?, ?, NULL, ?, ?, 'pending', NOW())
     ");
 
-    if (!$insert) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Query insert siswa gagal disiapkan."
-        ]);
-        exit;
+    if ($insert) {
+        $insert->bind_param(
+            "iisi",
+            $user["id_user"],
+            $user["id_siswa"],
+            $user["username"],
+            $role_id
+        );
+        $insert->execute();
+        $insert->close();
     }
 
-    $id_siswa = $user["id_siswa"];
-    $id_guru = $user["id_guru"];
-    $username = $user["username"];
-    $role_id = $user["role_id"];
-
-    $insert->bind_param(
-        "iiisi",
-        $id_user,
-        $id_siswa,
-        $id_guru,
-        $username,
-        $role_id
-    );
-
-    if (!$insert->execute()) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Permintaan reset sandi gagal dikirim."
-        ]);
-        exit;
-    }
-
-    $insert->close();
-    $conn->close();
-
-    echo json_encode([
-        "status" => "success",
-        "message" => "Permintaan reset sandi berhasil dikirim. Silakan konfirmasi ke admin melalui WhatsApp.",
+    kirim_json("success", "Akun siswa harus konfirmasi ke admin melalui WhatsApp.", [
+        "tipe" => "siswa",
         "wa_link" => $wa_link
     ]);
-    exit;
 }
 
 /* =========================
-   GURU: EMAIL -> LINK RESET KE EMAIL GURU
+   GURU: RESET VIA EMAIL
 ========================= */
-if ($role === "guru") {
-    $stmt = $conn->prepare("
-        SELECT 
-            u.id_user,
-            u.username,
-            u.role_id,
-            u.id_guru,
-            u.id_siswa,
-            g.nama_guru AS nama_lengkap,
-            g.email
-        FROM `user` u
-        INNER JOIN guru g ON u.id_guru = g.id_guru
-        WHERE g.email = ?
-        AND u.role_id = 2
-        LIMIT 1
-    ");
-
-    if (!$stmt) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Query guru gagal disiapkan."
-        ]);
-        exit;
+if ($role_id === 2) {
+    if (empty($user["id_guru"])) {
+        kirim_json("error", "Data guru tidak ditemukan.");
     }
 
-    $stmt->bind_param("s", $identifier);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows === 0) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Email guru tidak ditemukan."
-        ]);
-        exit;
+    if (empty($user["email_guru"])) {
+        kirim_json("error", "Email guru belum terdaftar. Silakan hubungi admin.");
     }
-
-    $user = $result->fetch_assoc();
-    $stmt->close();
 
     $token = bin2hex(random_bytes(32));
     $expired = date("Y-m-d H:i:s", strtotime("+30 minutes"));
 
-    $id_user = $user["id_user"];
-
-    $cek = $conn->prepare("
-        SELECT id_request
-        FROM password_reset_requests
-        WHERE id_user = ?
-        AND status = 'pending'
-        LIMIT 1
+    $insert = $conn->prepare("
+        INSERT INTO password_reset_requests
+        (id_user, id_siswa, id_guru, username, role_id, reset_token, token_expires_at, status, created_at)
+        VALUES (?, NULL, ?, ?, ?, ?, ?, 'pending', NOW())
     ");
 
-    $cek->bind_param("i", $id_user);
-    $cek->execute();
-    $cek->store_result();
-
-    if ($cek->num_rows > 0) {
-        $cek->bind_result($id_request);
-        $cek->fetch();
-        $cek->close();
-
-        $update = $conn->prepare("
-            UPDATE password_reset_requests
-            SET reset_token = ?, token_expires_at = ?, created_at = CURRENT_TIMESTAMP
-            WHERE id_request = ?
-        ");
-
-        $update->bind_param("ssi", $token, $expired, $id_request);
-
-        if (!$update->execute()) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Token reset gagal diperbarui."
-            ]);
-            exit;
-        }
-
-        $update->close();
-    } else {
-        $cek->close();
-
-        $insert = $conn->prepare("
-            INSERT INTO password_reset_requests
-            (id_user, id_siswa, id_guru, username, role_id, status, reset_token, token_expires_at)
-            VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)
-        ");
-
-        if (!$insert) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Query insert guru gagal disiapkan."
-            ]);
-            exit;
-        }
-
-        $id_siswa = $user["id_siswa"];
-        $id_guru = $user["id_guru"];
-        $username = $user["username"];
-        $role_id = $user["role_id"];
-
-        $insert->bind_param(
-            "iiisiss",
-            $id_user,
-            $id_siswa,
-            $id_guru,
-            $username,
-            $role_id,
-            $token,
-            $expired
-        );
-
-        if (!$insert->execute()) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Permintaan reset sandi guru gagal dibuat."
-            ]);
-            exit;
-        }
-
-        $insert->close();
+    if (!$insert) {
+        kirim_json("error", "Gagal membuat request reset password: " . $conn->error);
     }
 
-    $resetLink = $baseUrl . "/reset_password.html?token=" . urlencode($token);
+    $insert->bind_param(
+        "iisiss",
+        $user["id_user"],
+        $user["id_guru"],
+        $user["username"],
+        $role_id,
+        $token,
+        $expired
+    );
 
-    $to = $user["email"];
-    $subject = "Reset Password SIAKAD";
-    $nama = $user["nama_lengkap"] ?: $user["username"];
-
-    $message = "Halo Bapak/Ibu " . $nama . ",\n\n" .
-               "Kami menerima permintaan reset password akun SIAKAD Anda.\n\n" .
-               "Silakan klik link berikut untuk mengganti password:\n" .
-               $resetLink . "\n\n" .
-               "Link ini berlaku selama 30 menit.\n\n" .
-               "Jika Anda tidak meminta reset password, abaikan email ini.\n\n" .
-               "Terima kasih.";
-
-    $headers = "From: SIAKAD <" . $fromEmail . ">\r\n";
-    $headers .= "Reply-To: " . $fromEmail . "\r\n";
-    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-
-    $sent = mail($to, $subject, $message, $headers);
-
-    if (!$sent) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Link reset sudah dibuat, tapi email gagal dikirim. Coba hubungi admin."
-        ]);
-        exit;
+    if (!$insert->execute()) {
+        kirim_json("error", "Request reset password gagal disimpan.");
     }
 
-    $conn->close();
+    $insert->close();
 
-    echo json_encode([
-        "status" => "success",
-        "message" => "Link reset password sudah dikirim ke email guru."
+  $base_url = "https://projectsekolahyp.my.id";// GANTI dengan domain website kamu
+    $reset_link = $base_url . "/reset_password.html?token=" . urlencode($token);
+
+    $to = $user["email_guru"];
+    $subject = "Reset Password SIAKAD SMP YP 17";
+
+    $message = "Halo " . ($user["nama_guru"] ?: "Bapak/Ibu Guru") . ",\n\n";
+    $message .= "Kami menerima permintaan reset password akun guru SIAKAD.\n\n";
+    $message .= "Klik link berikut untuk mengganti password:\n";
+    $message .= $reset_link . "\n\n";
+    $message .= "Link ini berlaku selama 30 menit.\n\n";
+    $message .= "Jika kamu tidak meminta reset password, abaikan email ini.\n\n";
+    $message .= "Terima kasih.";
+    
+$headers = "From: osbebslk@projectsekolahyp.my.id\r\n";
+$headers .= "Reply-To: osbebslk@projectsekolahyp.my.id\r\n";
+$headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+
+    if (!mail($to, $subject, $message, $headers)) {
+        kirim_json("error", "Email reset gagal dikirim. Cek fitur mail di hosting.");
+    }
+
+    kirim_json("success", "Link reset password sudah dikirim ke email guru.", [
+        "tipe" => "guru"
     ]);
-    exit;
 }
 
-echo json_encode([
-    "status" => "error",
-    "message" => "Jenis akun tidak valid."
-]);
-?>
+/* =========================
+   ADMIN
+========================= */
+if ($role_id === 1) {
+    kirim_json("error", "Reset password admin harus melalui pengelola sistem.");
+}
+
+kirim_json("error", "Role akun tidak valid.");

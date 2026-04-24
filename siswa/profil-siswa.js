@@ -46,6 +46,16 @@ function setImage(el, src) {
   if (el) el.src = src || DEFAULT_PHOTO;
 }
 
+function isiHeaderDariLocalStorage() {
+  const nama = localStorage.getItem("nama_siswa") || "Siswa";
+  const kelas = localStorage.getItem("kelas_siswa") || "-";
+  const avatar = nama && nama !== "-" ? nama.charAt(0).toUpperCase() : "-";
+
+  setText(elNamaSiswa, nama);
+  setText(elNamaKelas, kelas);
+  setText(elAvatarPlaceholder, avatar);
+}
+
 function showToast(message, type = "success") {
   if (!elUploadToast) return;
 
@@ -81,6 +91,14 @@ function setProfileUI(data) {
   setText(elNamaSiswa, nama);
   setText(elNamaKelas, kelas);
   setText(elAvatarPlaceholder, nama !== "-" ? nama.charAt(0).toUpperCase() : "-");
+
+  if (nama && nama !== "-") {
+    localStorage.setItem("nama_siswa", nama);
+  }
+
+  if (kelas && kelas !== "-") {
+    localStorage.setItem("kelas_siswa", kelas);
+  }
 }
 
 async function loadProfilSiswa() {
@@ -141,20 +159,20 @@ async function pilihDanUploadFoto(event) {
     formData.append("foto", file);
     formData.append("id_siswa", idSiswa);
 
-   const response = await fetch("upload-foto-profil.php", {
-  method: "POST",
-  body: formData
-});
+    const response = await fetch("upload-foto-profil.php", {
+      method: "POST",
+      body: formData
+    });
 
-const text = await response.text();
-console.log("RESPON upload-foto-profil.php:", text);
+    const text = await response.text();
+    console.log("RESPON upload-foto-profil.php:", text);
 
-let result;
-try {
-  result = JSON.parse(text);
-} catch (e) {
-  throw new Error(text);
-}
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      throw new Error(text);
+    }
 
     if (!result.success) {
       throw new Error(result.message || "Upload gagal.");
@@ -197,4 +215,5 @@ if (elBtnPilihFoto && elInputFoto) {
   elInputFoto.addEventListener("change", pilihDanUploadFoto);
 }
 
+isiHeaderDariLocalStorage();
 loadProfilSiswa();

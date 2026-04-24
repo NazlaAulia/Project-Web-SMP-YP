@@ -1,8 +1,111 @@
 <?php
 include '../koneksi.php';
 
-$query = "SELECT * FROM pendaftaran ORDER BY id_pendaftaran DESC";
-$result = mysqli_query($conn, $query);
+$limit = 10;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$page = max($page, 1);
+
+$offset = ($page - 1) * $limit;
+
+$search = isset($_GET['q']) ? trim($_GET['q']) : '';
+$filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+
+$isMenungguMode = ($filter === 'menunggu');
+
+$searchLike = '%' . $search . '%';
+
+$where = "";
+$params = [];
+$types = "";
+
+if ($search !== '') {
+    $where = "WHERE 
+        nama_lengkap LIKE ? OR
+        nisn LIKE ? OR
+        jenis_kelamin LIKE ? OR
+        tanggal_lahir LIKE ? OR
+        no_hp LIKE ? OR
+        asal_sekolah LIKE ? OR
+        nama_wali LIKE ? OR
+        pendapatan_ortu LIKE ? OR
+        status LIKE ?";
+
+    $params = [
+        $searchLike,
+        $searchLike,
+        $searchLike,
+        $searchLike,
+        $searchLike,
+        $searchLike,
+        $searchLike,
+        $searchLike,
+        $searchLike
+    ];
+
+    $types = "sssssssss";
+}
+
+$orderBy = $isMenungguMode
+    ? "ORDER BY CASE WHEN status = 'menunggu' THEN 0 ELSE 1 END, id_pendaftaran DESC"
+    : "ORDER BY id_pendaftaran DESC";
+
+/* HITUNG TOTAL DATA */
+$countSql = "SELECT COUNT(*) AS total FROM pendaftaran $where";
+$countStmt = mysqli_prepare($conn, $countSql);
+
+if (!$countStmt) {
+    die("Query count gagal: " . mysqli_error($conn));
+}
+
+if ($search !== '') {
+    mysqli_stmt_bind_param($countStmt, $types, ...$params);
+}
+
+mysqli_stmt_execute($countStmt);
+$countResult = mysqli_stmt_get_result($countStmt);
+$totalData = mysqli_fetch_assoc($countResult)['total'];
+
+$totalPages = ceil($totalData / $limit);
+$totalPages = max($totalPages, 1);
+
+/* AMBIL DATA */
+$dataSql = "SELECT * FROM pendaftaran $where $orderBy LIMIT ? OFFSET ?";
+$dataStmt = mysqli_prepare($conn, $dataSql);
+
+if (!$dataStmt) {
+    die("Query data gagal: " . mysqli_error($conn));
+}
+
+if ($search !== '') {
+    $typesData = $types . "ii";
+    $paramsData = array_merge($params, [$limit, $offset]);
+    mysqli_stmt_bind_param($dataStmt, $typesData, ...$paramsData);
+} else {
+    mysqli_stmt_bind_param($dataStmt, "ii", $limit, $offset);
+}
+
+mysqli_stmt_execute($dataStmt);
+$result = mysqli_stmt_get_result($dataStmt);
+
+$startData = $totalData > 0 ? $offset + 1 : 0;
+$endData = min($offset + $limit, $totalData);
+
+function buildPageUrl($pageNumber, $search, $filter = '')
+{
+    $query = [
+        'page' => $pageNumber
+    ];
+
+    if ($search !== '') {
+        $query['q'] = $search;
+    }
+
+    if ($filter !== '') {
+        $query['filter'] = $filter;
+    }
+
+    return '?' . http_build_query($query);
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +115,7 @@ $result = mysqli_query($conn, $query);
     <title>Data Pendaftaran Siswa</title>
 
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=40">
+    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=80">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
@@ -29,17 +132,42 @@ $result = mysqli_query($conn, $query);
                     <h1>Data Pendaftaran Siswa</h1>
                     <p>Daftar siswa yang telah mengisi formulir pendaftaran online.</p>
 
-                    <div class="search-container-elegant search-below-title">
+                    <form method="GET" action="" class="search-container-elegant search-below-title">
                         <span class="search-icon">
                             <i class="fas fa-search"></i>
                         </span>
+
                         <input 
                             type="text" 
-                            id="searchPendaftaran" 
+                            name="q"
                             class="search-input" 
                             placeholder="Cari nama, NISN, sekolah..."
+                            value="<?= htmlspecialchars($search); ?>"
                         >
-                    </div>
+
+                        <?php if ($filter !== '') { ?>
+                            <input type="hidden" name="filter" value="<?= htmlspecialchars($filter); ?>">
+                        <?php } ?>
+
+                        <?php if ($search !== '') { ?>
+                            <a 
+                                href="<?= $filter !== '' ? buildPageUrl(1, '', $filter) : '/admin/admin_pendaftaran.php'; ?>" 
+                                class="search-clear"
+                            >
+                                <i class="fas fa-times"></i>
+                            </a>
+                        <?php } ?>
+                    </form>
+                </div>
+
+                <div class="header-filter-actions">
+                    <a 
+                        href="<?= buildPageUrl(1, $search, $isMenungguMode ? '' : 'menunggu'); ?>" 
+                        class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>"
+                    >
+                        <i class="fas fa-clock"></i>
+                        Menunggu
+                    </a>
                 </div>
             </div>
 
@@ -63,7 +191,7 @@ $result = mysqli_query($conn, $query);
 
                     <tbody>
                         <?php
-                        $no = 1;
+                        $no = $offset + 1;
 
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
@@ -125,15 +253,62 @@ $result = mysqli_query($conn, $query);
                         ?>
                             <tr>
                                 <td colspan="11" class="empty-data">
-                                    Belum ada data pendaftaran.
+                                    Data tidak ditemukan.
                                 </td>
                             </tr>
                         <?php } ?>
                     </tbody>
                 </table>
 
-                <div id="noSearchResult" class="no-search-result" style="display: none;">
-                    Data tidak ditemukan.
+                <div class="pagination-wrapper">
+                    <p class="pagination-info">
+                        Menampilkan <?= $startData; ?> sampai <?= $endData; ?> dari <?= $totalData; ?> Pendaftar
+                    </p>
+
+                    <div class="pagination">
+                        <?php if ($page > 1) { ?>
+                            <a href="<?= buildPageUrl($page - 1, $search, $filter); ?>" class="page-btn">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        <?php } else { ?>
+                            <span class="page-btn disabled">
+                                <i class="fas fa-chevron-left"></i>
+                            </span>
+                        <?php } ?>
+
+                        <?php
+                        $startPage = max(1, $page - 2);
+                        $endPage = min($totalPages, $page + 2);
+
+                        if ($page <= 3) {
+                            $endPage = min($totalPages, 5);
+                        }
+
+                        if ($page > $totalPages - 2) {
+                            $startPage = max(1, $totalPages - 4);
+                        }
+
+                        for ($i = $startPage; $i <= $endPage; $i++) {
+                        ?>
+                            <?php if ($i == $page) { ?>
+                                <span class="page-btn active"><?= $i; ?></span>
+                            <?php } else { ?>
+                                <a href="<?= buildPageUrl($i, $search, $filter); ?>" class="page-btn">
+                                    <?= $i; ?>
+                                </a>
+                            <?php } ?>
+                        <?php } ?>
+
+                        <?php if ($page < $totalPages) { ?>
+                            <a href="<?= buildPageUrl($page + 1, $search, $filter); ?>" class="page-btn">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        <?php } else { ?>
+                            <span class="page-btn disabled">
+                                <i class="fas fa-chevron-right"></i>
+                            </span>
+                        <?php } ?>
+                    </div>
                 </div>
             </div>
 
@@ -142,44 +317,6 @@ $result = mysqli_query($conn, $query);
 </div>
 
 <script src="/admin/components/admin-nav.js?v=999"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("searchPendaftaran");
-    const table = document.getElementById("tablePendaftaran");
-    const noSearchResult = document.getElementById("noSearchResult");
-
-    if (!searchInput || !table) return;
-
-    searchInput.addEventListener("keyup", function () {
-        const keyword = this.value.toLowerCase().trim();
-        const rows = table.querySelectorAll("tbody tr");
-
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-            const isEmptyRow = row.querySelector(".empty-data");
-
-            if (isEmptyRow) {
-                return;
-            }
-
-            const rowText = row.textContent.toLowerCase();
-
-            if (rowText.includes(keyword)) {
-                row.style.display = "";
-                visibleCount++;
-            } else {
-                row.style.display = "none";
-            }
-        });
-
-        if (noSearchResult) {
-            noSearchResult.style.display = visibleCount === 0 && keyword !== "" ? "block" : "none";
-        }
-    });
-});
-</script>
 
 </body>
 </html>

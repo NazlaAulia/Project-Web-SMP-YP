@@ -3,18 +3,29 @@ session_start();
 header("Content-Type: application/json");
 require_once "koneksi.php";
 
-if (!isset($_SESSION['id_siswa'])) {
+$id_siswa = 0;
+
+// Ambil dari session dulu
+if (isset($_SESSION['id_siswa'])) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
+}
+
+// Kalau session kosong, ambil dari URL
+if ($id_siswa <= 0 && isset($_GET['id_siswa'])) {
+    $id_siswa = (int) $_GET['id_siswa'];
+}
+
+if ($id_siswa <= 0) {
     echo json_encode([
         "success" => false,
-        "message" => "Session siswa tidak ditemukan. Silakan login ulang."
+        "message" => "ID siswa tidak ditemukan."
     ]);
     exit;
 }
 
-$id_siswa = (int) $_SESSION['id_siswa'];
-
-$query = "
+$stmt = $conn->prepare("
     SELECT 
+        s.id_siswa,
         s.nama,
         s.nis,
         s.nisn,
@@ -30,21 +41,24 @@ $query = "
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
     LEFT JOIN pendaftaran p ON s.id_pendaftaran = p.id_pendaftaran
     LEFT JOIN user u ON s.id_siswa = u.id_siswa
-    WHERE s.id_siswa = $id_siswa
+    WHERE s.id_siswa = ?
     LIMIT 1
-";
+");
 
-$result = mysqli_query($conn, $query);
+$stmt->bind_param("i", $id_siswa);
+$stmt->execute();
+
+$result = $stmt->get_result();
 
 if (!$result) {
     echo json_encode([
         "success" => false,
-        "message" => "Query gagal: " . mysqli_error($conn)
+        "message" => "Query gagal."
     ]);
     exit;
 }
 
-$data = mysqli_fetch_assoc($result);
+$data = $result->fetch_assoc();
 
 if (!$data) {
     echo json_encode([
