@@ -6,7 +6,6 @@ const avatarText = document.getElementById("avatarText");
 const peringkatSaatIni = document.getElementById("peringkatSaatIni");
 const kelasCard = document.getElementById("kelasCard");
 const nilaiRataRata = document.getElementById("nilaiRataRata");
-const posisiSebelumnya = document.getElementById("posisiSebelumnya");
 
 const tableInfo = document.querySelector(".table-info");
 const paginationWrap = document.querySelector(".pagination");
@@ -29,8 +28,8 @@ function isiHeaderDariLocalStorage() {
 
 async function loadPeringkat() {
   try {
-    const kelas = document.getElementById("kelas").value;
-    const semester = document.getElementById("semester").value;
+const kelas = localStorage.getItem("kelas_siswa") || "";
+const semester = document.getElementById("semester").value;
     const idSiswa = localStorage.getItem("id_siswa") || "";
 
     const response = await fetch(
@@ -73,16 +72,6 @@ async function loadPeringkat() {
     if (peringkatSaatIni) peringkatSaatIni.textContent = `#${siswa.rank || 0}`;
     if (kelasCard) kelasCard.textContent = `Kelas ${siswa.kelas || "-"}`;
     if (nilaiRataRata) nilaiRataRata.textContent = siswa.nilai || 0;
-
-    if (posisiSebelumnya) {
-      const arrow = getStatusArrow(siswa.status);
-      posisiSebelumnya.textContent = `#${siswa.posisi_sebelumnya || 0} ${arrow}`;
-    }
-
-    if (siswa.kelas) {
-      document.getElementById("kelas").innerHTML = `<option value="${siswa.kelas}">${siswa.kelas}</option>`;
-      document.getElementById("kelas").value = siswa.kelas;
-    }
 
     currentPage = 1;
     renderPagination();
@@ -201,14 +190,13 @@ function renderPagination() {
 }
 
 function aktifkanFilter() {
-  const kelas = document.getElementById("kelas");
   const semester = document.getElementById("semester");
 
-  [kelas, semester].forEach((select) => {
-    select.addEventListener("change", async () => {
+  if (semester) {
+    semester.addEventListener("change", async () => {
       await loadPeringkat();
     });
-  });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
