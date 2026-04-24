@@ -21,7 +21,7 @@ function isiHeaderDariLocalStorage() {
 
 async function loadDataNilai() {
   try {
-    const kelas = document.getElementById("kelas").value;
+    const kelas = localStorage.getItem("kelas_siswa") || "";
     const semester = document.getElementById("semester").value;
     const idSiswa = localStorage.getItem("id_siswa") || "";
 
@@ -54,10 +54,6 @@ async function loadDataNilai() {
 
     if (result.siswa && result.siswa.kelas) {
       localStorage.setItem("kelas_siswa", result.siswa.kelas);
-
-      document.getElementById("kelas").innerHTML =
-        `<option value="${result.siswa.kelas}">${result.siswa.kelas}</option>`;
-      document.getElementById("kelas").value = result.siswa.kelas;
     }
 
     jalankanCounter();
@@ -192,23 +188,22 @@ function jalankanCounter() {
 }
 
 function aktifkanFilterAnimasi() {
-  const kelas = document.getElementById("kelas");
   const semester = document.getElementById("semester");
   const nilaiSection = document.querySelector(".nilai-section");
 
-  [kelas, semester].forEach((select) => {
-    select.addEventListener("change", async () => {
-      nilaiSection.style.transition = "0.3s ease";
-      nilaiSection.style.transform = "scale(0.98)";
-      nilaiSection.style.opacity = "0.7";
+  if (!semester) return;
 
-      await loadDataNilai();
+  semester.addEventListener("change", async () => {
+    nilaiSection.style.transition = "0.3s ease";
+    nilaiSection.style.transform = "scale(0.98)";
+    nilaiSection.style.opacity = "0.7";
 
-      setTimeout(() => {
-        nilaiSection.style.transform = "scale(1)";
-        nilaiSection.style.opacity = "1";
-      }, 180);
-    });
+    await loadDataNilai();
+
+    setTimeout(() => {
+      nilaiSection.style.transform = "scale(1)";
+      nilaiSection.style.opacity = "1";
+    }, 180);
   });
 }
 
