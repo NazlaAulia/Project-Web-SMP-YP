@@ -1800,3 +1800,15 @@ html, body {
     font-size: 0.92rem;
   }
 }
+
+#jadwalHariIniContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.schedule-empty {
+  color: #777;
+  font-size: 15px;
+  margin-top: 20px;
+}
