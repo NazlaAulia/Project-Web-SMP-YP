@@ -3,15 +3,15 @@ include "koneksi.php";
 
 header("Content-Type: application/json");
 
-if (!isset($_GET['id_guru'])) {
+$id_guru = isset($_GET['id_guru']) ? intval($_GET['id_guru']) : 0;
+
+if ($id_guru <= 0) {
     echo json_encode([
         "status" => "error",
-        "message" => "ID guru tidak ditemukan"
+        "message" => "ID guru tidak valid"
     ]);
     exit;
 }
-
-$id_guru = $_GET['id_guru'];
 
 $query = mysqli_query($conn, "
     SELECT 
@@ -23,7 +23,7 @@ $query = mysqli_query($conn, "
         mapel.nama_mapel
     FROM guru
     LEFT JOIN mapel ON guru.id_mapel = mapel.id_mapel
-    WHERE guru.id_guru = '$id_guru'
+    WHERE guru.id_guru = $id_guru
     LIMIT 1
 ");
 
