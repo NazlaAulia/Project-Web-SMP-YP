@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
-<link rel="icon" type="image/x-icon" href="img/images.webp">
+<link rel="icon" type="image/webp" href="img/images.webp">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="nilai.css" />
 </head>
@@ -86,29 +86,12 @@
         </div>
 
         <div class="nilai-filter-wrap">
-          <div class="filter-group">
-            <label for="kelas">Kelas</label>
-            <select id="kelas">
-              <option value="">Pilih kelas</option>
-              <option value="7A">7A</option>
-              <option value="7B">7B</option>
-              <option value="7C">7C</option>
-              <option value="8A">8A</option>
-              <option value="8B">8B</option>
-              <option value="8C">8C</option>
-              <option value="9A">9A</option>
-              <option value="9B">9B</option>
-              <option value="9C">9C</option>
-            </select>
-          </div>
 
           <div class="filter-group">
             <label for="semester">Tahun Ajaran/Semester</label>
             <select id="semester">
               <option selected>2025/2026 - Genap</option>
               <option>2025/2026 - Ganjil</option>
-              <option>2024/2025 - Genap</option>
-              <option>2024/2025 - Ganjil</option>
             </select>
           </div>
         </div>
@@ -163,7 +146,10 @@
   </div>
 </div>
 
-  <script src="nilai.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="nilai.js"></script>
+  
 
   <script>
   const logoutBtn = document.getElementById("logoutBtn");

@@ -204,3 +204,64 @@ body.login-mulus-page {
     user-select: none;
     white-space: nowrap;
 }
+
+/* Link Lupa Sandi */
+.forgot-link {
+    text-decoration: none;
+    color: var(--primary-mulus);
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.forgot-link:hover {
+    color: var(--secondary-mulus);
+    text-decoration: underline;
+}
+
+/* Custom SweetAlert biar nyambung sama tema login */
+.swal2-popup {
+    border-radius: 1.2rem !important;
+    font-family: 'Segoe UI', sans-serif !important;
+}
+
+.swal2-title {
+    color: var(--primary-mulus) !important;
+    font-size: 1.5rem !important;
+}
+
+.swal2-html-container {
+    color: #555 !important;
+    font-size: 0.95rem !important;
+}
+
+.swal2-input {
+    border-radius: 3rem !important;
+    border: 1px solid #ddd !important;
+    padding: 0.8rem 1.2rem !important;
+    font-size: 1rem !important;
+}
+
+.swal2-input:focus {
+    border-color: var(--primary-mulus) !important;
+    box-shadow: 0 0 0 3px rgba(7, 72, 74, 0.15) !important;
+}
+
+.swal2-confirm {
+    background-color: var(--secondary-mulus) !important;
+    color: var(--primary-mulus) !important;
+    border-radius: 3rem !important;
+    font-weight: bold !important;
+    padding: 0.7rem 1.4rem !important;
+}
+
+.swal2-confirm:hover {
+    background-color: #d48b1c !important;
+}
+
+.swal2-cancel {
+    background-color: #e5e5e5 !important;
+    color: #333 !important;
+    border-radius: 3rem !important;
+    font-weight: 600 !important;
+    padding: 0.7rem 1.4rem !important;
+}

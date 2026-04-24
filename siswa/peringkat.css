@@ -212,6 +212,10 @@ body {
   text-align: center;
 }
 
+.nilai-box {
+  grid-column: 3;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -325,8 +329,12 @@ tbody tr:hover {
     max-width: 100%;
   }
 
-  .stats {
-    flex-direction: column;
+    .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .nilai-box {
+    grid-column: auto;
   }
 }
 
