@@ -1832,32 +1832,17 @@ html, body {
 .chart-card .bar-chart {
   width: 100%;
   max-width: 100%;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  gap: 18px;
-  padding: 36px 8px 12px;
-  min-height: 300px;
-}
-
-.chart-card .bar-chart::-webkit-scrollbar {
-  height: 6px;
-}
-
-.chart-card .bar-chart::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.chart-card .bar-chart::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 20px;
+  display: grid !important;
+  grid-template-columns: repeat(var(--jumlah-bar, 5), minmax(0, 1fr));
+  align-items: end;
+  gap: 8px;
+  min-height: 270px;
+  padding: 35px 0 8px;
+  overflow: visible !important;
 }
 
 .chart-card .bar-group {
-  flex: 0 0 58px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1865,47 +1850,46 @@ html, body {
 }
 
 .chart-card .bar-fill {
-  width: 58px;
-  max-height: 230px;
-  min-height: 28px;
-  background: #074f4f;
-  border-radius: 16px 16px 0 0;
+  width: 70%;
+  max-width: 34px;
+  min-width: 18px;
+  min-height: 20px;
+  max-height: 200px;
+  background: #0b5557;
+  border-radius: 12px 12px 0 0;
   position: relative;
   transition: height 0.3s ease;
 }
 
 .chart-card .bar-fill span {
   position: absolute;
-  top: -34px;
+  top: -28px;
   left: 50%;
   transform: translateX(-50%);
-  color: #074f4f;
+  color: #0b5557;
+  font-size: 12px;
   font-weight: 700;
-  font-size: 15px;
+  white-space: nowrap;
 }
 
 .chart-card .bar-label {
-  display: block;
-  width: 72px;
-  margin-top: 14px;
+  width: 100%;
+  margin-top: 10px;
+  color: #8f8f8f;
+  font-size: 10.5px;
+  font-weight: 500;
   text-align: center;
-  color: #999;
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.15;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  word-break: normal;
 }
 
 .chart-empty {
   color: #777;
-  font-size: 15px;
-  margin: 40px auto;
-}
-
-.academic-summary {
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
+  font-size: 14px;
+  margin: 30px 0;
 }
 
 @media (max-width: 1100px) {
@@ -1915,5 +1899,27 @@ html, body {
 
   .right-column {
     width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-card .bar-chart {
+    gap: 5px;
+    min-height: 230px;
+  }
+
+  .chart-card .bar-fill {
+    max-width: 24px;
+    min-width: 12px;
+    max-height: 160px;
+  }
+
+  .chart-card .bar-fill span {
+    font-size: 9px;
+    top: -22px;
+  }
+
+  .chart-card .bar-label {
+    font-size: 8.5px;
   }
 }
