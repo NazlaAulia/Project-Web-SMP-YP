@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 $host = "localhost";
 $dbname = "osbebslk_sekolahyp";
@@ -56,7 +56,12 @@ if ($password === "") {
     exit;
 }
 
-$stmt = $conn->prepare("SELECT id_user, username, password, role_id, id_guru, id_siswa FROM `user` WHERE username = ? LIMIT 1");
+$stmt = $conn->prepare("
+    SELECT id_user, username, password, role_id, id_guru, id_siswa
+    FROM `user`
+    WHERE username = ?
+    LIMIT 1
+");
 
 if (!$stmt) {
     echo json_encode([
