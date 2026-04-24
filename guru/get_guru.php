@@ -4,9 +4,15 @@ include "koneksi.php";
 
 header("Content-Type: application/json");
 
-$id_guru = $_SESSION['id_guru'] ?? ($_GET['id_guru'] ?? '');
-
-if ($id_guru == '') {
+// Prioritas utama: ambil dari session login
+if (isset($_SESSION['id_guru'])) {
+    $id_guru = $_SESSION['id_guru'];
+} 
+// Cadangan kalau masih ada halaman yang kirim ?id_guru=
+else if (isset($_GET['id_guru'])) {
+    $id_guru = $_GET['id_guru'];
+} 
+else {
     echo json_encode([
         "status" => "error",
         "message" => "ID guru tidak ditemukan"
@@ -27,6 +33,14 @@ $query = mysqli_query($conn, "
     WHERE guru.id_guru = '$id_guru'
     LIMIT 1
 ");
+
+if (!$query) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Query error: " . mysqli_error($conn)
+    ]);
+    exit;
+}
 
 $data = mysqli_fetch_assoc($query);
 
