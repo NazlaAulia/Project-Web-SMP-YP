@@ -13,7 +13,7 @@ if (!isset($_SESSION['id_siswa'])) {
 
 $id_siswa = (int) $_SESSION['id_siswa'];
 
-$query = "
+$stmt = $conn->prepare("
     SELECT 
         s.nama,
         s.nis,
@@ -30,21 +30,24 @@ $query = "
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
     LEFT JOIN pendaftaran p ON s.id_pendaftaran = p.id_pendaftaran
     LEFT JOIN user u ON s.id_siswa = u.id_siswa
-    WHERE s.id_siswa = $id_siswa
+    WHERE s.id_siswa = ?
     LIMIT 1
-";
+");
 
-$result = mysqli_query($conn, $query);
+$stmt->bind_param("i", $id_siswa);
+$stmt->execute();
+
+$result = $stmt->get_result();
 
 if (!$result) {
     echo json_encode([
         "success" => false,
-        "message" => "Query gagal: " . mysqli_error($conn)
+        "message" => "Query gagal."
     ]);
     exit;
 }
 
-$data = mysqli_fetch_assoc($result);
+$data = $result->fetch_assoc();
 
 if (!$data) {
     echo json_encode([
