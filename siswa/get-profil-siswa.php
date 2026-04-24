@@ -1,16 +1,17 @@
 <?php
+session_start();
 header("Content-Type: application/json");
 require_once "koneksi.php";
 
-$id_siswa = isset($_GET['id_siswa']) ? (int) $_GET['id_siswa'] : 0;
-
-if ($id_siswa <= 0) {
+if (!isset($_SESSION['id_siswa'])) {
     echo json_encode([
         "success" => false,
-        "message" => "ID siswa tidak valid."
+        "message" => "Session siswa tidak ditemukan. Silakan login ulang."
     ]);
     exit;
 }
+
+$id_siswa = (int) $_SESSION['id_siswa'];
 
 $query = "
     SELECT 
