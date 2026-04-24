@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profil Guru</title>
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="components/sidebar.css">
   <link rel="stylesheet" href="profilguru.css">
 </head>
+
 <body>
   <div class="app-container">
     <div id="sidebar-container"></div>
@@ -18,6 +20,7 @@
           <h1>Profil Guru</h1>
           <p>Kelola informasi profil, bidang ajar, dan data pribadi guru</p>
         </div>
+
         <button class="btn-primary" id="btnSimpanProfil">
           <i class="bi bi-check2-circle"></i>
           Simpan Perubahan
@@ -44,15 +47,15 @@
             <p class="teacher-subtitle" id="displayMapelGuru">Memuat data guru...</p>
 
             <div class="info-tags">
-            <span>
-              <i class="bi bi-person-badge"></i>
-              NIP: <b id="displayNipGuru">-</b>
-            </span>
+              <span>
+                <i class="bi bi-person-badge"></i>
+                NIP: <b id="displayNipGuru">-</b>
+              </span>
 
-            <span>
-              <i class="bi bi-envelope"></i>
-              Email: <b id="displayEmailGuru">-</b>
-            </span>
+              <span>
+                <i class="bi bi-envelope"></i>
+                Email: <b id="displayEmailGuru">-</b>
+              </span>
             </div>
           </div>
         </div>
@@ -84,196 +87,128 @@
         </div>
       </section>
 
-    <section class="content-grid">
-      <div class="left-column">
-        <div class="card">
-          <div class="card-title">
-            <h3>Informasi Pribadi</h3>
-            <p>Perbarui data utama guru</p>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Nama Lengkap</label>
-              <input type="text" id="namaGuru">
+      <section class="content-grid">
+        <div class="left-column">
+          <div class="card">
+            <div class="card-title">
+              <h3>Informasi Pribadi</h3>
+              <p>Perbarui data utama guru</p>
             </div>
 
-            <div class="form-group">
-              <label>NIP</label>
-              <input type="text" id="nipGuru">
-            </div>
-
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" id="emailGuru">
-            </div>
-
-            <div class="form-group">
-              <label>Mata Pelajaran</label>
-              <select id="mapelGuru">
-              <option value="1">BIN</option>
-              <option value="2">B. JAWA</option>
-              <option value="3">PKN</option>
-              <option value="4">INFOR</option>
-              <option value="5">MAT</option>
-              <option value="6">BIG</option>
-              <option value="7">IPA</option>
-              <option value="8">IPS</option>
-              <option value="9">BK</option>
-              <option value="10">INFO/BK</option>
-              <option value="11">PAI/BHQ</option>
-              <option value="12">PJOK</option>
-            </select>
-            </div>
-
-            <div class="form-group">
-              <label>Nomor HP</label>
-              <input type="text" id="noHpGuru">
-            </div>
-
-            <div class="form-group">
-              <label>Jenis Kelamin</label>
-              <select id="jenisKelaminGuru">
-                <option value="Laki-laki">Laki-laki</option>
-                <option value="Perempuan">Perempuan</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Tanggal Lahir</label>
-              <input type="date" id="tanggalLahirGuru">
-            </div>
-
-            <div class="form-group full">
-              <label>Alamat</label>
-              <textarea rows="4" id="alamatGuru"></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">
-            <h3>Informasi Akademik</h3>
-            <p>Bidang ajar dan tanggung jawab guru</p>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Mata Pelajaran</label>
-              <input type="text" id="mapelAkademikGuru" readonly>
-            </div>
-
-            <div class="form-group">
-              <label>Status Guru</label>
-              <select id="statusGuru">
-                <option value="Aktif">Aktif</option>
-                <option value="Nonaktif">Nonaktif</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Wali Kelas</label>
-              <input type="text" id="waliKelasGuru" placeholder="Contoh: 7A">
-            </div>
-
-            <div class="form-group">
-              <label>Tahun Bergabung</label>
-              <input type="number" id="tahunBergabungGuru">
-            </div>
-
-            <div class="form-group full">
-              <label>Catatan Tambahan</label>
-              <textarea rows="4" id="catatanGuru"></textarea>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="right-column">
-        <div class="card">
-          <div class="card-title">
-            <h3>Ringkasan Mengajar</h3>
-            <p>Informasi cepat aktivitas guru</p>
-          </div>
-
-          <div class="summary-list">
-            <div class="summary-item">
-              <span>Kelas Diampu</span>
-              <strong>7A, 7B, 8A, 8B</strong>
-            </div>
-            <div class="summary-item">
-              <span>Mata Pelajaran</span>
-              <strong>Matematika</strong>
-            </div>
-            <div class="summary-item">
-              <span>Wali Kelas</span>
-              <strong>7A</strong>
-            </div>
-            <div class="summary-item">
-              <span>Status Akun</span>
-              <strong class="active-text">Aktif</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">
-            <h3>Jadwal Singkat</h3>
-            <p>Cuplikan jadwal mengajar</p>
-          </div>
-
-          <div class="schedule-mini">
-            <div class="schedule-item">
-              <div class="time-box">07:00</div>
-              <div>
-                <strong>Matematika - 7A</strong>
-                <p>Ruang 01 • Senin</p>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="namaGuru">
               </div>
-            </div>
 
-            <div class="schedule-item">
-              <div class="time-box">09:00</div>
-              <div>
-                <strong>Matematika - 7B</strong>
-                <p>Ruang 02 • Selasa</p>
+              <div class="form-group">
+                <label>NIP</label>
+                <input type="text" id="nipGuru">
               </div>
-            </div>
 
-            <div class="schedule-item">
-              <div class="time-box">10:30</div>
-              <div>
-                <strong>Matematika - 8A</strong>
-                <p>Ruang 03 • Rabu</p>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="emailGuru">
+              </div>
+
+              <div class="form-group">
+                <label>Mata Pelajaran</label>
+                <select id="mapelGuru">
+                  <option value="1">BIN</option>
+                  <option value="2">B. JAWA</option>
+                  <option value="3">PKN</option>
+                  <option value="4">INFOR</option>
+                  <option value="5">MAT</option>
+                  <option value="6">BIG</option>
+                  <option value="7">IPA</option>
+                  <option value="8">IPS</option>
+                  <option value="9">BK</option>
+                  <option value="10">INFO/BK</option>
+                  <option value="11">PAI/BHQ</option>
+                  <option value="12">PJOK</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Nomor HP</label>
+                <input type="text" id="noHpGuru">
+              </div>
+
+              <div class="form-group">
+                <label>Jenis Kelamin</label>
+                <select id="jenisKelaminGuru">
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Tanggal Lahir</label>
+                <input type="date" id="tanggalLahirGuru">
               </div>
             </div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">
-            <h3>Keamanan Akun</h3>
-            <p>Pengaturan akses akun guru</p>
+        <div class="right-column">
+          <div class="card">
+            <div class="card-title">
+              <h3>Jadwal Singkat</h3>
+              <p>Cuplikan jadwal mengajar</p>
+            </div>
+
+            <div class="schedule-mini">
+              <div class="schedule-item">
+                <div class="time-box">07:00</div>
+                <div>
+                  <strong>Matematika - 7A</strong>
+                  <p>Ruang 01 • Senin</p>
+                </div>
+              </div>
+
+              <div class="schedule-item">
+                <div class="time-box">09:00</div>
+                <div>
+                  <strong>Matematika - 7B</strong>
+                  <p>Ruang 02 • Selasa</p>
+                </div>
+              </div>
+
+              <div class="schedule-item">
+                <div class="time-box">10:30</div>
+                <div>
+                  <strong>Matematika - 8A</strong>
+                  <p>Ruang 03 • Rabu</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="security-box">
-            <div class="form-group">
-              <label>Username</label>
-              <input type="text" id="usernameGuru" placeholder="Username akun guru">
+          <div class="card">
+            <div class="card-title">
+              <h3>Keamanan Akun</h3>
+              <p>Pengaturan akses akun guru</p>
             </div>
 
-            <div class="form-group">
-              <label>Password Baru</label>
-              <input type="password" id="passwordGuru" placeholder="Kosongkan jika tidak diubah">
-            </div>
+            <div class="security-box">
+              <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="usernameGuru" placeholder="Username akun guru">
+              </div>
 
-            <button class="btn-outline" id="btnSimpanAkun">
-              <i class="bi bi-shield-lock-fill"></i>
-              Simpan Akun
-            </button>
+              <div class="form-group">
+                <label>Password Baru</label>
+                <input type="password" id="passwordGuru" placeholder="Kosongkan jika tidak diubah">
+              </div>
+
+              <button class="btn-outline" id="btnSimpanAkun">
+                <i class="bi bi-shield-lock-fill"></i>
+                Simpan Akun
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
     </main>
   </div>
 

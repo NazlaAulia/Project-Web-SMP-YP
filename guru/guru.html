@@ -171,13 +171,21 @@
     </main>
 
     <script>
-        lucide.createIcons();
-    </script>
-    <div id="sidebar-container"></div>
-    <script src="guru.js"></script>
-    <script src="components/sidebar-guru.js"></script>
-    <script>
-    lucide.createIcons();
+fetch("get_profil_guru.php")
+    .then(response => response.json())
+    .then(result => {
+        console.log(result);
+
+        if (result.status === "success") {
+            document.getElementById("nama").value = result.data.nama;
+            document.getElementById("nip").value = result.data.nip;
+            document.getElementById("email").value = result.data.email;
+            document.getElementById("id_mapel").value = result.data.id_mapel;
+        } else {
+            alert(result.message);
+            window.location.href = "login.html";
+        }
+    });
 </script>
 </body>
 </html>
