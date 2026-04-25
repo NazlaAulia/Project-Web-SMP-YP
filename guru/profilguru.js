@@ -79,34 +79,54 @@ if (uploadFoto && previewFoto) {
 /* Simpan foto profil ke database */
 if (btnSimpanProfil) {
     btnSimpanProfil.addEventListener("click", function () {
-        if (!fileFotoDipilih) {
-            alert("Pilih foto terlebih dahulu.");
-            return;
-        }
+        const formDataProfil = new FormData();
 
-        const formData = new FormData();
-        formData.append("id_guru", idGuruLogin);
-        formData.append("role_id", roleIdLogin);
-        formData.append("foto", fileFotoDipilih);
+        formDataProfil.append("id_guru", idGuruLogin);
+        formDataProfil.append("role_id", roleIdLogin);
+        formDataProfil.append("nama", namaGuruInput.value);
+        formDataProfil.append("nip", nipGuruInput.value);
+        formDataProfil.append("email", emailGuruInput.value);
+        formDataProfil.append("id_mapel", mapelGuruInput.value);
 
-        fetch("update_foto_guru.php", {
+        fetch("update_guru.php", {
             method: "POST",
-            body: formData
+            body: formDataProfil
         })
             .then(res => res.json())
             .then(result => {
-                console.log("Upload foto:", result);
-                alert(result.message);
-
-                if (result.status === "success") {
-                    previewFoto.src = result.foto_url;
-                    fileFotoDipilih = null;
-                    location.reload();
+                if (result.status !== "success") {
+                    alert(result.message);
+                    return;
                 }
+
+                if (!fileFotoDipilih) {
+                    alert(result.message);
+                    location.reload();
+                    return;
+                }
+
+                const formDataFoto = new FormData();
+                formDataFoto.append("id_guru", idGuruLogin);
+                formDataFoto.append("role_id", roleIdLogin);
+                formDataFoto.append("foto", fileFotoDipilih);
+
+                return fetch("update_foto_guru.php", {
+                    method: "POST",
+                    body: formDataFoto
+                })
+                    .then(res => res.json())
+                    .then(fotoResult => {
+                        alert(fotoResult.message);
+
+                        if (fotoResult.status === "success") {
+                            fileFotoDipilih = null;
+                            location.reload();
+                        }
+                    });
             })
             .catch(err => {
-                console.error("Gagal upload foto:", err);
-                alert("Gagal upload foto profil.");
+                console.error("Gagal menyimpan profil:", err);
+                alert("Gagal menyimpan profil guru.");
             });
     });
 }
