@@ -1048,3 +1048,181 @@ body {
         min-height: 220px !important;
     }
 }
+/* =========================
+   FINAL UI KONSISTEN PROFIL GURU
+   taruh paling bawah profilguru.css
+========================= */
+
+/* Profil akademik lebih formal: hilangkan efek loncat/klik */
+.click-animate,
+.click-animate:hover,
+.click-animate.profile-active {
+    cursor: default !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Layout utama kiri-kanan rapi */
+.profile-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.4fr) minmax(330px, 0.75fr) !important;
+    gap: 24px !important;
+    align-items: start !important;
+}
+
+/* Semua panel terasa satu sistem */
+.profile-panel {
+    background: #ffffff !important;
+    border-radius: 28px !important;
+    box-shadow: 0 8px 32px rgba(7, 72, 74, 0.08) !important;
+    padding: 32px !important;
+}
+
+/* Panel informasi pribadi tidak terlalu tinggi */
+.main-panel {
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+/* Form lebih konsisten */
+.form-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 22px 24px !important;
+    align-items: end !important;
+}
+
+/* Jenis kelamin dibuat full row agar tidak ada ruang kosong aneh */
+.form-group:has(#jenisKelaminGuru) {
+    grid-column: span 2 !important;
+    max-width: calc(50% - 12px) !important;
+}
+
+/* Input/select database mode */
+.form-group input,
+.form-group select {
+    min-height: 58px !important;
+    border-radius: 16px !important;
+    border: 1px solid #dfe7e6 !important;
+    background: #f6faf9 !important;
+    color: var(--primary) !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+
+/* Readonly/disabled harus kelihatan seperti data database, bukan field aktif */
+.form-group input[readonly],
+.form-group select:disabled,
+.security-box input[readonly] {
+    background: #f3f7f6 !important;
+    color: var(--primary) !important;
+    border-color: #dfe7e6 !important;
+    cursor: default !important;
+    opacity: 1 !important;
+}
+
+/* Hilangkan efek focus tebal di field readonly */
+.form-group input[readonly]:focus,
+.form-group select:disabled:focus,
+.security-box input[readonly]:focus {
+    border-color: #dfe7e6 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Select disabled tetap rapi */
+.form-group select:disabled {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: none !important;
+}
+
+/* Panel kanan */
+.side-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
+    height: auto !important;
+}
+
+/* Keamanan akun jangan terlalu tinggi */
+.security-panel,
+.side-panel > .profile-panel:first-child {
+    min-height: 250px !important;
+}
+
+/* Status akun konsisten dengan card keamanan */
+.status-panel-clean {
+    min-height: 300px !important;
+    padding: 34px 28px !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+}
+
+.status-panel-clean .status-icon {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 20px !important;
+    background: rgba(22, 163, 74, 0.12) !important;
+    color: var(--success) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.6rem !important;
+    margin-bottom: 8px !important;
+}
+
+.status-panel-clean .status-label {
+    color: var(--text-gray) !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+}
+
+.status-panel-clean .status-active-title {
+    color: var(--success) !important;
+    font-size: 2.15rem !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+}
+
+.status-panel-clean p {
+    color: var(--text-gray) !important;
+    font-size: 0.92rem !important;
+    line-height: 1.6 !important;
+    font-weight: 600 !important;
+    max-width: 240px !important;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .profile-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .form-group:has(#jenisKelaminGuru) {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .form-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .form-group:has(#jenisKelaminGuru) {
+        grid-column: span 1 !important;
+        max-width: 100% !important;
+    }
+}
+/* Hilangkan tanda dropdown pada mapel disabled */
+#mapelGuru:disabled {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: none !important;
+    cursor: default !important;
+}
