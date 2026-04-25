@@ -62,3 +62,140 @@ animatedCards.forEach((card) => {
         card.classList.add("card-active");
     });
 });
+
+/* =========================
+   DASHBOARD DATABASE
+   tempelan baru cukup 1 kali
+========================= */
+
+const courseGrid = document.getElementById("courseGrid");
+const dashboardPersenHadir = document.getElementById("dashboardPersenHadir");
+const dashboardKelasTerisi = document.getElementById("dashboardKelasTerisi");
+const dashboardRankingList = document.getElementById("dashboardRankingList");
+
+const iconMapel = {
+    "BIN": "bi-book",
+    "B. JAWA": "bi-journal-text",
+    "PKN": "bi-shield-check",
+    "INFOR": "bi-cpu",
+    "MAT": "bi-calculator",
+    "BIG": "bi-translate",
+    "IPA": "bi-flask",
+    "IPS": "bi-globe-asia-australia",
+    "BK": "bi-person-heart",
+    "INFO/BK": "bi-pc-display",
+    "PAI/BHQ": "bi-moon-stars",
+    "PJOK": "bi-dribbble"
+};
+
+const warnaMapel = [
+    "#e7f0f0",
+    "#fef4e6",
+    "#eaf7ec",
+    "#eef2ff",
+    "#fff3e6",
+    "#e8f7ff",
+    "#edf7ed",
+    "#fff7e6",
+    "#f0ecff",
+    "#e7f0f0",
+    "#fff0f0",
+    "#eef8f5"
+];
+
+function renderMapelDashboard(mapelList) {
+    if (!courseGrid) return;
+
+    if (!mapelList || mapelList.length === 0) {
+        courseGrid.innerHTML = `
+            <div class="course-card">
+                <div class="course-info">
+                    <h4>Belum Ada Mapel</h4>
+                    <p>Data mata pelajaran belum tersedia.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    courseGrid.innerHTML = mapelList.map((mapel, index) => {
+        const icon = iconMapel[mapel.nama_mapel] || "bi-book";
+        const warna = warnaMapel[index % warnaMapel.length];
+
+        return `
+            <div class="course-card">
+                <div class="course-thumb" style="background: ${warna};">
+                    <i class="bi ${icon}"></i>
+                </div>
+                <div class="course-info">
+                    <h4>${mapel.nama_mapel}</h4>
+                    <p>${mapel.deskripsi}</p>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function renderKehadiranDashboard(kehadiran) {
+    if (!kehadiran) return;
+
+    if (dashboardPersenHadir) {
+        dashboardPersenHadir.textContent = `${kehadiran.persen_hadir}%`;
+    }
+
+    if (dashboardKelasTerisi) {
+        dashboardKelasTerisi.textContent = `${kehadiran.kelas_terisi}/${kehadiran.total_kelas} Kelas`;
+    }
+}
+
+function renderRankingDashboard(peringkatList) {
+    if (!dashboardRankingList) return;
+
+    if (!peringkatList || peringkatList.length === 0) {
+        dashboardRankingList.innerHTML = `
+            <div class="rank-item">
+                <div class="rank-avatar">-</div>
+                <div class="rank-info">
+                    <span>Belum ada data</span>
+                    <small>Data nilai belum tersedia</small>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    dashboardRankingList.innerHTML = peringkatList.map(siswa => {
+        return `
+            <div class="rank-item">
+                <div class="rank-avatar">${siswa.inisial}</div>
+                <div class="rank-info">
+                    <span>${siswa.nama}</span>
+                    <small>Kelas ${siswa.kelas} • Rata-rata: ${siswa.rata_rata}</small>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function loadDashboardDatabase() {
+    if (!idGuruLogin || roleIdLogin !== "2") return;
+
+    fetch(`get_dashboard_guru.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
+        .then(res => res.json())
+        .then(result => {
+            console.log("Data dashboard database:", result);
+
+            if (result.status === "success") {
+                renderMapelDashboard(result.mapel);
+                renderKehadiranDashboard(result.kehadiran);
+                renderRankingDashboard(result.peringkat);
+            } else {
+                console.warn(result.message);
+            }
+        })
+        .catch(err => {
+            console.error("Gagal load dashboard database:", err);
+        });
+}
+
+loadDashboardDatabase();

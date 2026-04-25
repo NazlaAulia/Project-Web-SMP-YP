@@ -72,167 +72,45 @@
                 <h3>Mata Pelajaran SMP YP 17 SURABAYA</h3>
             </div>
 
-            <div class="course-grid">
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #e7f0f0;">
-                        <i class="bi bi-book" style="font-size: 2rem; color: var(--primary);"></i>
+            <div class="course-grid" id="courseGrid"></div>
+
+            <div class="right-column">
+                <div class="side-card dashboard-mini-card">
+                    <div class="mini-card-head">
+                        <div class="mini-card-icon hadir">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div>
+                            <h3>Kehadiran</h3>
+                            <p>Rekap dari data nilai</p>
+                        </div>
                     </div>
-                    <div class="course-info">
-                        <h4>BIN</h4>
-                        <p>Bahasa Indonesia</p>
+
+                    <div class="mini-card-main">
+                        <strong id="dashboardPersenHadir">0%</strong>
+                        <span>Siswa Hadir</span>
+                    </div>
+
+                    <div class="mini-card-footer">
+                        <span>Data terisi</span>
+                        <b id="dashboardKelasTerisi">0/0 Kelas</b>
                     </div>
                 </div>
 
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #fef4e6;">
-                        <i class="bi bi-journal-text" style="font-size: 2rem; color: var(--secondary);"></i>
+                <div class="side-card dashboard-mini-card ranking-card">
+                    <div class="mini-card-head">
+                        <div class="mini-card-icon rank">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                        <div>
+                            <h3>Peringkat Teratas</h3>
+                            <p>Berdasarkan rata-rata nilai</p>
+                        </div>
                     </div>
-                    <div class="course-info">
-                        <h4>B. JAWA</h4>
-                        <p>Bahasa Jawa</p>
-                    </div>
-                </div>
 
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #eaf7ec;">
-                        <i class="bi bi-shield-check" style="font-size: 2rem; color: var(--primary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>PKN</h4>
-                        <p>Pendidikan Kewarganegaraan</p>
-                    </div>
-                </div>
-
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #eef2ff;">
-                        <i class="bi bi-cpu" style="font-size: 2rem; color: var(--secondary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>INFOR</h4>
-                        <p>Informatika</p>
-                    </div>
-                </div>
-
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #fff3e6;">
-                        <i class="bi bi-calculator" style="font-size: 2rem; color: var(--primary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>MAT</h4>
-                        <p>Matematika</p>
-                    </div>
-                </div>
-
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #e8f7ff;">
-                        <i class="bi bi-translate" style="font-size: 2rem; color: var(--secondary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>BIG</h4>
-                        <p>Bahasa Inggris</p>
-                    </div>
-                </div>
-
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #edf7ed;">
-                        <i class="bi bi-flask" style="font-size: 2rem; color: var(--primary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>IPA</h4>
-                        <p>Ilmu Pengetahuan Alam</p>
-                    </div>
-                </div>
-
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #fff7e6;">
-                        <i class="bi bi-globe-asia-australia" style="font-size: 2rem; color: var(--secondary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>IPS</h4>
-                        <p>Ilmu Pengetahuan Sosial</p>
-                    </div>
-                </div>
-
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #f0ecff;">
-                        <i class="bi bi-person-heart" style="font-size: 2rem; color: var(--primary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>BK</h4>
-                        <p>Bimbingan Konseling</p>
-                    </div>
-                </div>
-
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #e7f0f0;">
-                        <i class="bi bi-pc-display" style="font-size: 2rem; color: var(--secondary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>INFO/BK</h4>
-                        <p>Informatika / BK</p>
-                    </div>
-                </div>
-
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #fff0f0;">
-                        <i class="bi bi-moon-stars" style="font-size: 2rem; color: var(--primary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>PAI/BHQ</h4>
-                        <p>PAI / BHQ</p>
-                    </div>
-                </div>
-
-                <div class="course-card click-animate">
-                    <div class="course-thumb" style="background: #eef8f5;">
-                        <i class="bi bi-dribbble" style="font-size: 2rem; color: var(--secondary);"></i>
-                    </div>
-                    <div class="course-info">
-                        <h4>PJOK</h4>
-                        <p>Pendidikan Jasmani</p>
-                    </div>
+                    <div id="dashboardRankingList" class="dashboard-ranking-list"></div>
                 </div>
             </div>
-        </div>
-
-        <div class="right-column">
-            <div class="side-card click-animate">
-                <h3>Kehadiran Hari Ini</h3>
-
-                <div class="stat-circle">
-                    <strong>92%</strong>
-                    <span>Siswa Hadir</span>
-                </div>
-
-                <div class="stat-list">
-                    <div class="stat-item">
-                        <span>Telah Terisi</span>
-                        <span class="val">12/15 Kelas</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="side-card ranking-card click-animate">
-                <h3>Peringkat Teratas</h3>
-
-                <div class="rank-item">
-                    <div class="rank-avatar">AW</div>
-                    <div class="rank-info">
-                        <span>Andi Wijaya</span>
-                        <small>Rata-rata: 95.8</small>
-                    </div>
-                </div>
-
-                <div class="rank-item">
-                    <div class="rank-avatar">SA</div>
-                    <div class="rank-info">
-                        <span>Siti Aminah</span>
-                        <small>Rata-rata: 94.2</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
         </main>
     </div>
     <script src="components/sidebar-guru.js"></script>

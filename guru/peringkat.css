@@ -427,3 +427,128 @@ body {
         height: 46px;
     }
 }
+/* =========================
+   PERINGKAT FINAL CLEAN
+   hanya UI, tidak ubah logika
+========================= */
+
+.rank-hero {
+    margin-bottom: 24px !important;
+}
+
+.performance-summary {
+    margin-bottom: 24px !important;
+}
+
+.table-card {
+    padding: 26px !important;
+    border-radius: 26px !important;
+}
+
+.rank-table-toolbar {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 18px !important;
+    margin: 20px 0 22px !important;
+}
+
+.search-container-elegant {
+    width: 100% !important;
+    max-width: 520px !important;
+    height: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 0 18px !important;
+    background: #ffffff !important;
+    border: 1px solid #dfe9e6 !important;
+    border-radius: 16px !important;
+    box-shadow: none !important;
+}
+
+.search-icon {
+    color: #07484a !important;
+    font-size: 1rem !important;
+    opacity: 0.78 !important;
+}
+
+.search-input,
+.search-input:focus {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    font-size: 0.95rem !important;
+    color: #07484a !important;
+}
+
+.filter-select {
+    min-width: 210px !important;
+    height: 50px !important;
+    border-radius: 16px !important;
+    border: 1px solid #dfe9e6 !important;
+    background: #ffffff !important;
+    color: #07484a !important;
+    font-weight: 800 !important;
+    padding: 0 14px !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.rank-table th {
+    padding: 15px 14px !important;
+    font-size: 0.88rem !important;
+}
+
+.rank-table td {
+    padding: 15px 14px !important;
+    font-size: 0.92rem !important;
+}
+
+.progress-container {
+    max-width: 240px !important;
+}
+
+.click-animate,
+.summary-box,
+.table-card,
+.rank-hero,
+.rank-table tr {
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease !important;
+}
+
+.click-animate:hover,
+.summary-box:hover,
+.table-card:hover,
+.rank-hero:hover,
+.rank-table tr:hover {
+    transform: none !important;
+}
+
+@media (max-width: 900px) {
+    .rank-table-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .search-container-elegant,
+    .filter-select {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .table-card {
+        padding: 18px !important;
+    }
+
+    .search-container-elegant,
+    .filter-select {
+        height: 46px !important;
+        border-radius: 14px !important;
+    }
+}
