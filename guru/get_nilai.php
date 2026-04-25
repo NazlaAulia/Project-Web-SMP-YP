@@ -47,7 +47,9 @@ $id_mapel_guru = (int) $guru["id_mapel"];
 $stmt = $conn->prepare("
     SELECT
         n.id_siswa,
+        s.nama AS nama_siswa,
         n.id_mapel,
+        m.nama_mapel,
         n.semester,
         n.nilai_angka,
         n.hadir,
@@ -55,6 +57,8 @@ $stmt = $conn->prepare("
         n.sakit,
         n.alfa
     FROM nilai n
+    LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
+    LEFT JOIN mapel m ON n.id_mapel = m.id_mapel
     WHERE n.id_mapel = ?
     ORDER BY n.id_siswa ASC, n.semester ASC
 ");
@@ -72,7 +76,9 @@ $data = [];
 while ($row = $result->fetch_assoc()) {
     $data[] = [
         "id_siswa" => (int) $row["id_siswa"],
+        "nama_siswa" => $row["nama_siswa"] ?? "-",
         "id_mapel" => (int) $row["id_mapel"],
+        "nama_mapel" => $row["nama_mapel"] ?? "-",
         "semester" => (int) $row["semester"],
         "nilai_angka" => (int) $row["nilai_angka"],
         "hadir" => (int) $row["hadir"],
