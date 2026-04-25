@@ -11,6 +11,12 @@ const idGuruLogin = localStorage.getItem("id_guru");
 const roleIdLogin = localStorage.getItem("role_id");
 const usernameLogin = localStorage.getItem("username");
 
+console.log("Cek settings:");
+console.log("id_guru:", idGuruLogin);
+console.log("role_id:", roleIdLogin);
+console.log("username localStorage:", usernameLogin);
+console.log("input usernameLama:", usernameLamaInput);
+
 /* Isi dulu dari localStorage supaya tidak kosong */
 if (usernameLamaInput) {
     usernameLamaInput.value = usernameLogin || "";
