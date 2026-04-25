@@ -18,6 +18,7 @@ $nama = trim($_POST["nama"] ?? "");
 $nip = trim($_POST["nip"] ?? "");
 $email = trim($_POST["email"] ?? "");
 $id_mapel = isset($_POST["id_mapel"]) ? (int) $_POST["id_mapel"] : 0;
+$jenis_kelamin = trim($_POST["jenis_kelamin"] ?? "");
 
 if ($role_id !== 2) {
     kirim_json("error", "Akses ditolak. Akun ini bukan guru.");
@@ -59,7 +60,8 @@ $update = $conn->prepare("
     SET nama = ?, 
         nip = ?, 
         email = ?, 
-        id_mapel = ?
+        id_mapel = ?,
+        jenis_kelamin = ?
     WHERE id_guru = ?
 ");
 
@@ -67,7 +69,15 @@ if (!$update) {
     kirim_json("error", "Query update gagal: " . $conn->error);
 }
 
-$update->bind_param("sssii", $nama, $nip, $email, $id_mapel, $id_guru);
+$update->bind_param(
+    "sssisi",
+    $nama,
+    $nip,
+    $email,
+    $id_mapel,
+    $jenis_kelamin,
+    $id_guru
+);
 
 if ($update->execute()) {
     kirim_json("success", "Profil guru berhasil diperbarui.");

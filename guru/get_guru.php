@@ -32,6 +32,7 @@ $stmt = $conn->prepare("
         g.nip,
         g.nama,
         g.email,
+        g.jenis_kelamin,
         g.id_mapel,
         m.nama_mapel,
         u.id_user,

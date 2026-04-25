@@ -2,6 +2,7 @@ const displayNamaGuru = document.getElementById("displayNamaGuru");
 const displayMapelGuru = document.getElementById("displayMapelGuru");
 const displayNipGuru = document.getElementById("displayNipGuru");
 const displayEmailGuru = document.getElementById("displayEmailGuru");
+const jenisKelaminGuruInput = document.getElementById("jenisKelaminGuru");
 
 const namaGuruInput = document.getElementById("namaGuru");
 const nipGuruInput = document.getElementById("nipGuru");
@@ -25,6 +26,7 @@ function isiProfilGuru(guru) {
     const mapel = guru.nama_mapel || "Belum ada mapel";
     const username = guru.username || "";
 
+    if (jenisKelaminGuruInput) jenisKelaminGuruInput.value = guru.jenis_kelamin || "";
     if (displayNamaGuru) displayNamaGuru.textContent = nama;
     if (displayMapelGuru) displayMapelGuru.textContent = mapel;
     if (displayNipGuru) displayNipGuru.textContent = nip;
@@ -87,6 +89,7 @@ if (btnSimpanProfil) {
         formDataProfil.append("nip", nipGuruInput.value);
         formDataProfil.append("email", emailGuruInput.value);
         formDataProfil.append("id_mapel", mapelGuruInput.value);
+        formDataProfil.append("jenis_kelamin", jenisKelaminGuruInput.value);
 
         fetch("update_guru.php", {
             method: "POST",
