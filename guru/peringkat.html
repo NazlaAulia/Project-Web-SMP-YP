@@ -6,7 +6,7 @@
     <title>Peringkat Siswa - SMP YP 17</title>
 
     <link rel="stylesheet" href="components/sidebar.css">
-    <link rel="stylesheet" href="peringkat.css">
+    <link rel="stylesheet" href="peringkat.css?v=3">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
@@ -21,31 +21,29 @@
 
         <main class="main-content">
             <div class="rank-shell">
-                <header class="rank-topbar">
-                    <div class="search-container-elegant">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" placeholder="Cari nama siswa..." class="search-input">
-                    </div>
 
-                    <div class="user-profile">
-                        <div class="profile-info">
-                            <span class="user-name">Bapak/Ibu Guru</span>
-                            <span class="user-role">Guru</span>
-                        </div>
-                        <div class="avatar-circle">B</div>
-                    </div>
-                </header>
-
-                <section class="section-header-rank">
-                    <div class="section-title-wrap">
+                <section class="rank-hero">
+                    <div>
                         <span class="page-chip">
                             <i class="bi bi-trophy"></i>
                             Peringkat Siswa
                         </span>
+
                         <h1>Peringkat Akademik Siswa</h1>
                         <p>
-                            Pantau performa siswa berdasarkan nilai rata-rata dari seluruh mata pelajaran.
+                            Pantau performa siswa berdasarkan nilai rata-rata dan status akademik.
                         </p>
+                    </div>
+
+                    <div class="rank-hero-icon">
+                        <i class="bi bi-award"></i>
+                    </div>
+                </section>
+
+                <section class="rank-toolbar">
+                    <div class="search-container-elegant">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" id="searchRanking" placeholder="Cari nama siswa..." class="search-input">
                     </div>
 
                     <select id="filterAngkatan" class="filter-select">
@@ -91,7 +89,7 @@
                         <div>
                             <span class="table-chip">Data Akademik</span>
                             <h3>Detail Peringkat Siswa</h3>
-                            <p>Data berdasarkan nilai rata-rata seluruh mata pelajaran</p>
+                            <p>Data berdasarkan nilai rata-rata seluruh mata pelajaran.</p>
                         </div>
                     </div>
 
@@ -115,6 +113,6 @@
     </div>
 
     <script src="components/sidebar-guru.js"></script>
-    <script src="peringkat.js"></script>
+    <script src="peringkat.js?v=3"></script>
 </body>
 </html>
