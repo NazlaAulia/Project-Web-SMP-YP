@@ -128,7 +128,7 @@ function buildPageUrl($pageNumber, $search, $filter = '')
 
 </head>
 
-
+<body data-page="pendaftaran" data-nav-path="/admin/components/admin-nav.html">
 
 <div class="container">
     <div id="admin-nav-root"></div>

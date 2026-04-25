@@ -98,7 +98,7 @@
                        <div class="action-row">
   <a href="export_excel.php" class="btn-secondary">
     <i class="fas fa-file-excel"></i>
-    Mengunduh Excel
+    Unduh Excel
 </a>
 
    
@@ -117,19 +117,7 @@
         </main>
     </div>
 
-    <div class="custom-popup-overlay" id="confirmPopup">
-        <div class="custom-popup-box">
-            <div class="custom-popup-header">
-                <h3>Konfirmasi Naik Kelas</h3>
-                <button type="button" class="custom-popup-close" id="closeConfirmPopup">&times;</button>
-            </div>
-
-           <div class="custom-popup-body">
-    <p>
-        Pastikan data siswa sudah di-download sebagai backup.
-        Proses ini akan mengubah kelas siswa dan meluluskan kelas 9.
-    </p>
-<div class="custom-popup-overlay" id="confirmPopup">
+  <div class="custom-popup-overlay" id="confirmPopup">
     <div class="custom-popup-box">
         <div class="custom-popup-header">
             <h3>Konfirmasi Naik Kelas</h3>
@@ -137,15 +125,13 @@
         </div>
 
         <div class="custom-popup-body">
-            <p>
-                Pastikan data siswa sudah di-download sebagai backup.
-                Proses ini akan mengubah kelas siswa dan meluluskan kelas 9.
-            </p>
 
             <div class="confirm-input-group">
                 <label for="confirmText">Ketik NAIKKELAS untuk melanjutkan</label>
                 <input type="text" id="confirmText" placeholder="NAIKKELAS">
             </div>
+
+            <div id="confirmMessage" class="confirm-message"></div>
         </div>
 
         <div class="custom-popup-footer">
