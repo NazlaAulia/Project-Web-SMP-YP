@@ -967,7 +967,7 @@ body,
   }
 }
 
-/* ===== RESPONSIVE TABLET ===== */
+/* ===== RESPONSIVE TABLET FINAL ===== */
 
 @media (max-width: 1200px) {
   .chart-card .bar-chart {
@@ -981,20 +981,9 @@ body,
   .chart-card .bar-label {
     font-size: 8.5px;
   }
-}
 
-@media (max-width: 1100px) {
-  .settings-modern-grid,
-  .academic-summary {
+  .settings-modern-grid {
     grid-template-columns: 1fr;
-  }
-
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .right-column {
-    width: 100%;
   }
 
   .main-content {
@@ -1002,7 +991,8 @@ body,
   }
 }
 
-@media (max-width: 900px) {
+/* ini jangan bikin dashboard jadi 1 kolom di desktop */
+@media (max-width: 900px) and (min-width: 769px) {
   .top-header {
     flex-direction: column;
     align-items: stretch;
@@ -1015,25 +1005,6 @@ body,
 
   .search-container input {
     width: 100%;
-  }
-
-  .banner-welcome {
-    padding: 30px 24px;
-    min-height: auto;
-    overflow: hidden;
-  }
-
-  .banner-content {
-    max-width: 100%;
-  }
-
-  .banner-image-wrap {
-    position: static;
-    margin-top: 20px;
-  }
-
-  .banner-img {
-    height: 220px;
   }
 
   .profil-content-box {
@@ -1558,5 +1529,112 @@ body,
 
   .logout-modal-content p {
     font-size: 0.92rem !important;
+  }
+}
+
+
+/* ===== FIX FINAL SISWA.HTML: NAVBAR GABUNG SAMA ISI HALAMAN ===== */
+@media (min-width: 769px) {
+  body.dashboard-body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  body.dashboard-body .dashboard-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  body.dashboard-body .sidebar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    bottom: auto !important;
+
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
+    flex: 0 0 320px !important;
+
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    padding: 18px 26px 24px !important;
+    margin: 0 !important;
+    background: #064547 !important;
+
+    overflow: visible !important;
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+  }
+
+  body.dashboard-body .main-content {
+    flex: 1 !important;
+    width: auto !important;
+    min-width: 0 !important;
+
+    display: block !important;
+    position: relative !important;
+
+    margin: 0 !important;
+    padding: 30px 40px !important;
+
+    overflow: visible !important;
+    overflow-x: hidden !important;
+  }
+
+  body.dashboard-body .sidebar-header {
+    display: block !important;
+    height: auto !important;
+    margin-bottom: 18px !important;
+  }
+
+  body.dashboard-body .logo {
+    width: 235px !important;
+    max-width: 100% !important;
+    margin: 8px auto 30px !important;
+    display: block !important;
+  }
+
+  body.dashboard-body .hamburger {
+    display: none !important;
+  }
+
+  body.dashboard-body .sidebar-menu {
+    display: block !important;
+    position: static !important;
+
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
+    overflow: visible !important;
+  }
+
+  body.dashboard-body .sidebar-footer {
+    display: block !important;
+    position: static !important;
+
+    margin-top: auto !important;
+    padding-top: 26px !important;
+  }
+
+  body.dashboard-body .dashboard-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr) !important;
+    gap: 28px !important;
+    align-items: start !important;
   }
 }
