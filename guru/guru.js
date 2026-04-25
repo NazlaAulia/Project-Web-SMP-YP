@@ -72,7 +72,9 @@ const courseGrid = document.getElementById("courseGrid");
 const dashboardPersenHadir = document.getElementById("dashboardPersenHadir");
 const dashboardKelasTerisi = document.getElementById("dashboardKelasTerisi");
 const dashboardRankingList = document.getElementById("dashboardRankingList");
+const dashboardSearchInput = document.getElementById("dashboardSearchInput");
 
+let semuaMapelDashboard = [];
 const iconMapel = {
     "BIN": "bi-book",
     "B. JAWA": "bi-journal-text",
@@ -136,6 +138,23 @@ function renderMapelDashboard(mapelList) {
     }).join("");
 }
 
+function setupSearchDashboard() {
+    if (!dashboardSearchInput) return;
+
+    dashboardSearchInput.addEventListener("input", function () {
+        const keyword = this.value.trim().toLowerCase();
+
+        const hasilFilter = semuaMapelDashboard.filter(mapel => {
+            return `
+                ${mapel.nama_mapel}
+                ${mapel.deskripsi}
+            `.toLowerCase().includes(keyword);
+        });
+
+        renderMapelDashboard(hasilFilter);
+    });
+}
+
 function renderKehadiranDashboard(kehadiran) {
     if (!kehadiran) return;
 
@@ -186,9 +205,12 @@ function loadDashboardDatabase() {
             console.log("Data dashboard database:", result);
 
             if (result.status === "success") {
-                renderMapelDashboard(result.mapel);
+                semuaMapelDashboard = result.mapel || [];
+
+                renderMapelDashboard(semuaMapelDashboard);
                 renderKehadiranDashboard(result.kehadiran);
                 renderRankingDashboard(result.peringkat);
+                setupSearchDashboard();
             } else {
                 console.warn(result.message);
             }
