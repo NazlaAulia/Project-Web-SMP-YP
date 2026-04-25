@@ -6,7 +6,7 @@ $pengumumanResult = $conn->query("
     FROM pengumuman
     WHERE status = 'tampil'
     ORDER BY tanggal DESC, id_pengumuman DESC
-    LIMIT 3
+    LIMIT 10
 ");
 ?>
 
@@ -306,6 +306,9 @@ Wassalamu alaikum wr wb, salam sehat,  salam sejahtera untuk kita semua.
 
 <div id="footer-container"></div>
 
+
+<a href="#" class="back-to-top"><i class="fas fa-chevron-up"></i></a>
+
 <div class="pengumuman-modal-overlay" id="pengumumanModal">
     <div class="pengumuman-modal-box">
         <button type="button" class="pengumuman-modal-close" id="closePengumumanModal">
@@ -359,9 +362,6 @@ pengumumanModal.addEventListener("click", (event) => {
     }
 });
 </script>
-
-<a href="#" class="back-to-top"><i class="fas fa-chevron-up"></i></a>
-
 
  <script src="components/include.js"></script>
   <script src="components/navbar.js"></script>
