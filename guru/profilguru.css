@@ -904,3 +904,32 @@ body {
 .security-link {
     text-decoration: none !important;
 }
+/* =========================
+   FIX PROFIL GURU LAYOUT RAPI
+========================= */
+
+.profile-layout {
+    align-items: start !important;
+}
+
+.main-panel {
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.side-panel {
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
+}
+
+.status-panel-clean {
+    height: auto !important;
+    min-height: 220px !important;
+    padding: 30px !important;
+}
+
+.status-panel-clean .status-icon {
+    margin-bottom: 10px !important;
+}
