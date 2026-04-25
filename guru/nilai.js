@@ -8,14 +8,30 @@ const searchInput = document.getElementById("searchInput");
 const messageBox = document.getElementById("messageBox");
 const nilaiTableBody = document.getElementById("nilaiTableBody");
 
+const idGuruLogin = localStorage.getItem("id_guru");
+const roleIdLogin = localStorage.getItem("role_id");
+
 function showMessage(text, type = "success") {
+  if (!messageBox) return;
+
   messageBox.textContent = text;
   messageBox.className = `message-box ${type}`;
 }
 
 function clearMessage() {
+  if (!messageBox) return;
+
   messageBox.textContent = "";
   messageBox.className = "message-box";
+}
+
+function normalisasiSemester(value) {
+  const semesterText = String(value).trim().toLowerCase();
+
+  if (semesterText === "ganjil") return 1;
+  if (semesterText === "genap") return 2;
+
+  return Number(value);
 }
 
 function updateRekap() {
@@ -47,15 +63,15 @@ function updateRekap() {
     return;
   }
 
-  const nilaiList = dataNilai.map(item => item.nilai_angka);
+  const nilaiList = dataNilai.map(item => Number(item.nilai_angka));
   const totalNilai = nilaiList.reduce((sum, nilai) => sum + nilai, 0);
   const rataRata = totalNilai / dataNilai.length;
 
   const nilaiTertinggi = Math.max(...nilaiList);
   const nilaiTerendah = Math.min(...nilaiList);
 
-  const totalHadir = dataNilai.reduce((sum, item) => sum + item.hadir, 0);
-  const totalAlfa = dataNilai.reduce((sum, item) => sum + item.alfa, 0);
+  const totalHadir = dataNilai.reduce((sum, item) => sum + Number(item.hadir), 0);
+  const totalAlfa = dataNilai.reduce((sum, item) => sum + Number(item.alfa), 0);
 
   totalSiswaEl.textContent = dataNilai.length;
   rataRataEl.textContent = rataRata.toFixed(2);
@@ -66,6 +82,8 @@ function updateRekap() {
 }
 
 function renderTable(filteredData = dataNilai) {
+  if (!nilaiTableBody) return;
+
   if (filteredData.length === 0) {
     nilaiTableBody.innerHTML = `
       <tr>
@@ -138,9 +156,9 @@ function parseCSV(text) {
 
     if (row.length < headers.length) continue;
 
-    const id_siswa = row[idSiswaIndex];
-    const id_mapel = row[idMapelIndex];
-    const semester = row[semesterIndex];
+    const id_siswa = Number(row[idSiswaIndex]);
+    const id_mapel = Number(row[idMapelIndex]);
+    const semester = normalisasiSemester(row[semesterIndex]);
     const nilai_angka = Number(row[nilaiAngkaIndex]);
     const hadir = Number(row[hadirIndex]);
     const izin = Number(row[izinIndex]);
@@ -175,102 +193,184 @@ function parseCSV(text) {
   return result;
 }
 
-uploadBtn.addEventListener("click", () => {
-  clearMessage();
-
-  const file = fileInput.files[0];
-
-  if (!file) {
-    showMessage("Pilih file CSV terlebih dahulu.", "error");
+function loadNilaiDatabase() {
+  if (!idGuruLogin || roleIdLogin !== "2") {
+    alert("Silakan login sebagai guru terlebih dahulu.");
+    window.location.href = "../login.html";
     return;
   }
 
-  if (!file.name.endsWith(".csv")) {
-    showMessage("File harus berformat .csv", "error");
-    return;
-  }
+  fetch(`get_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
+    .then(res => res.json())
+    .then(result => {
+      if (result.status === "success") {
+        dataNilai = result.data || [];
+        renderTable();
+        updateRekap();
+      } else {
+        console.warn(result.message);
+      }
+    })
+    .catch(err => {
+      console.error("Gagal load nilai:", err);
+    });
+}
 
-  const reader = new FileReader();
+function simpanNilaiKeDatabase() {
+  const formData = new FormData();
 
-  reader.onload = function (e) {
-    try {
-      const text = e.target.result;
-      dataNilai = parseCSV(text);
+  formData.append("id_guru", idGuruLogin);
+  formData.append("role_id", roleIdLogin);
+  formData.append("data_nilai", JSON.stringify(dataNilai));
 
-      renderTable();
-      updateRekap();
+  return fetch("upload_nilai.php", {
+    method: "POST",
+    body: formData
+  }).then(res => res.json());
+}
 
-      showMessage(`Berhasil upload ${dataNilai.length} data nilai.`, "success");
-    } catch (error) {
-      showMessage(error.message, "error");
+if (uploadBtn) {
+  uploadBtn.addEventListener("click", () => {
+    clearMessage();
+
+    if (!idGuruLogin || roleIdLogin !== "2") {
+      alert("Silakan login sebagai guru terlebih dahulu.");
+      window.location.href = "../login.html";
+      return;
     }
-  };
 
-  reader.readAsText(file);
-});
+    const file = fileInput.files[0];
 
-searchInput.addEventListener("input", (e) => {
-  const keyword = e.target.value.toLowerCase();
+    if (!file) {
+      showMessage("Pilih file CSV terlebih dahulu.", "error");
+      return;
+    }
 
-  const filtered = dataNilai.filter(item =>
-    String(item.id_siswa).toLowerCase().includes(keyword) ||
-    String(item.id_mapel).toLowerCase().includes(keyword) ||
-    String(item.semester).toLowerCase().includes(keyword)
-  );
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      showMessage("File harus berformat .csv", "error");
+      return;
+    }
 
-  renderTable(filtered);
-});
+    const reader = new FileReader();
 
-downloadTemplateBtn.addEventListener("click", () => {
-  const template =
-    "id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa\n" +
-    "1,5,Ganjil,88,20,0,1,0\n" +
-    "2,5,Ganjil,76,18,1,1,0\n" +
-    "3,5,Ganjil,92,21,0,0,0\n";
+    reader.onload = function (e) {
+      try {
+        const text = e.target.result;
+        dataNilai = parseCSV(text);
 
-  const blob = new Blob([template], {
-    type: "text/csv;charset=utf-8;"
+        if (dataNilai.length === 0) {
+          showMessage("Tidak ada data valid yang bisa diimport.", "error");
+          return;
+        }
+
+        renderTable();
+        updateRekap();
+
+        showMessage("Sedang menyimpan data nilai ke database...", "success");
+
+        simpanNilaiKeDatabase()
+          .then(result => {
+            if (result.status === "success") {
+              const inserted = result.inserted || 0;
+              const updated = result.updated || 0;
+              const skipped = result.skipped || 0;
+
+              showMessage(
+                `Import berhasil. Data baru: ${inserted}, diperbarui: ${updated}, dilewati: ${skipped}.`,
+                "success"
+              );
+
+              loadNilaiDatabase();
+            } else {
+              showMessage(result.message, "error");
+            }
+          })
+          .catch(err => {
+            console.error("Gagal simpan nilai:", err);
+            showMessage("Gagal menyimpan nilai ke database.", "error");
+          });
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    };
+
+    reader.readAsText(file);
   });
+}
 
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+if (searchInput) {
+  searchInput.addEventListener("input", (e) => {
+    const keyword = e.target.value.toLowerCase();
 
-  link.href = url;
-  link.download = "template_nilai_siswa.csv";
-  link.click();
+    const filtered = dataNilai.filter(item =>
+      String(item.id_siswa).toLowerCase().includes(keyword) ||
+      String(item.id_mapel).toLowerCase().includes(keyword) ||
+      String(item.semester).toLowerCase().includes(keyword)
+    );
 
-  URL.revokeObjectURL(url);
-});
-
-exportBtn.addEventListener("click", () => {
-  if (dataNilai.length === 0) {
-    showMessage("Belum ada data untuk diexport.", "error");
-    return;
-  }
-
-  const tahunAjaran = document.getElementById("tahunAjaran").value;
-  const kelas = document.getElementById("kelas").value;
-  const mapel = document.getElementById("mapel").value;
-
-  let csvContent = "Tahun Ajaran," + tahunAjaran + "\n";
-  csvContent += "Kelas," + kelas + "\n";
-  csvContent += "Mata Pelajaran," + mapel + "\n\n";
-  csvContent += "No,ID Siswa,ID Mapel,Semester,Nilai Angka,Hadir,Izin,Sakit,Alfa\n";
-
-  dataNilai.forEach((item, index) => {
-    csvContent += `${index + 1},${item.id_siswa},${item.id_mapel},${item.semester},${item.nilai_angka},${item.hadir},${item.izin},${item.sakit},${item.alfa}\n`;
+    renderTable(filtered);
   });
+}
+if (downloadTemplateBtn) {
+  downloadTemplateBtn.addEventListener("click", () => {
+    const template =
+      "id_siswa,nama_siswa,id_mapel,nama_mapel,semester,nilai_angka,hadir,izin,sakit,alfa\n" +
+      "1293,Aulia Rahma,3,PKN,1,88,20,0,1,0\n" +
+      "1294,Bagus Pratama,3,PKN,1,76,18,1,1,0\n" +
+      "1295,Citra Lestari,3,PKN,1,92,21,0,0,0\n";
 
-  const blob = new Blob([csvContent], {
-    type: "text/csv;charset=utf-8;"
+    const blob = new Blob([template], {
+      type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "template_import_nilai_siswa.csv";
+    link.click();
+
+    URL.revokeObjectURL(url);
   });
+}
 
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+if (exportBtn) {
+  exportBtn.addEventListener("click", () => {
+    if (dataNilai.length === 0) {
+      showMessage("Belum ada data untuk diexport.", "error");
+      return;
+    }
 
-  link.href = url;
-  link.download = `nilai_${kelas}_${mapel}.csv`;
-  link.click();
+    const tahunAjaranEl = document.getElementById("tahunAjaran");
+    const kelasEl = document.getElementById("kelas");
+    const mapelEl = document.getElementById("mapel");
 
-  URL.revokeObjectURL(url);
-});
+    const tahunAjaran = tahunAjaranEl ? tahunAjaranEl.value : "-";
+    const kelas = kelasEl ? kelasEl.value : "-";
+    const mapel = mapelEl ? mapelEl.value : "-";
+
+    let csvContent = "Tahun Ajaran," + tahunAjaran + "\n";
+    csvContent += "Kelas," + kelas + "\n";
+    csvContent += "Mata Pelajaran," + mapel + "\n\n";
+    csvContent += "No,ID Siswa,ID Mapel,Semester,Nilai Angka,Hadir,Izin,Sakit,Alfa\n";
+
+    dataNilai.forEach((item, index) => {
+      csvContent += `${index + 1},${item.id_siswa},${item.id_mapel},${item.semester},${item.nilai_angka},${item.hadir},${item.izin},${item.sakit},${item.alfa}\n`;
+    });
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `nilai_${kelas}_${mapel}.csv`;
+    link.click();
+
+    URL.revokeObjectURL(url);
+  });
+}
+
+loadNilaiDatabase();
