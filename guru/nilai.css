@@ -741,3 +741,320 @@ tbody tr:hover {
         padding-top: 78px !important;
     }
 }
+/* =========================
+   FIX FINAL NILAI CLEAN AKADEMIK
+   Jangan ubah logika, hanya UI
+========================= */
+
+/* Matikan animasi klik/hover berlebihan */
+.click-animate,
+.card,
+.rekap-item,
+.file-drop,
+.btn,
+tbody tr {
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.click-animate:active,
+.card:hover,
+.rekap-item:hover,
+.file-drop:hover,
+.btn:hover {
+    transform: none !important;
+}
+
+/* Header lebih compact */
+.page-header {
+    min-height: 165px !important;
+    padding: 30px 34px !important;
+    margin-bottom: 22px !important;
+}
+
+.page-chip {
+    margin-bottom: 12px !important;
+    font-size: 0.82rem !important;
+    padding: 8px 13px !important;
+}
+
+.page-header h1 {
+    font-size: 2.55rem !important;
+    line-height: 1.12 !important;
+}
+
+.page-header p {
+    font-size: 0.95rem !important;
+}
+
+/* Card lebih konsisten */
+.card {
+    border-radius: 24px !important;
+    padding: 24px 26px !important;
+    margin-bottom: 22px !important;
+    box-shadow: 0 8px 28px rgba(7, 72, 74, 0.08) !important;
+}
+
+/* Import card lebih clean */
+.import-card {
+    padding: 24px 26px !important;
+}
+
+.import-heading-clean {
+    margin-bottom: 18px !important;
+}
+
+.card-heading h3,
+.table-header h3 {
+    font-size: 1.22rem !important;
+    margin-bottom: 5px !important;
+}
+
+.card-heading p,
+.table-header p {
+    font-size: 0.9rem !important;
+}
+
+/* Upload area */
+.upload-area {
+    gap: 14px !important;
+}
+
+.clean-file-drop {
+    min-height: 92px !important;
+    padding: 18px 20px !important;
+    border-radius: 18px !important;
+    border: 1.5px dashed #dce8e5 !important;
+    background: #fbfdfc !important;
+    justify-content: space-between !important;
+}
+
+.clean-file-drop:hover {
+    background: #fbfdfc !important;
+    border-color: #b8cfca !important;
+}
+
+.file-info-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.file-icon-clean {
+    width: 46px;
+    height: 46px;
+    border-radius: 15px;
+    background: rgba(7, 72, 74, 0.08);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.clean-file-drop > i {
+    display: none !important;
+}
+
+.clean-file-drop strong {
+    font-size: 0.98rem !important;
+    margin-bottom: 3px !important;
+}
+
+.clean-file-drop span {
+    font-size: 0.86rem !important;
+}
+
+.clean-file-drop input[type="file"] {
+    max-width: 300px !important;
+    margin-left: 14px !important;
+    font-size: 0.86rem !important;
+}
+
+/* Button lebih formal */
+.clean-actions {
+    gap: 12px !important;
+}
+
+.btn {
+    border-radius: 14px !important;
+    padding: 12px 17px !important;
+    font-size: 0.9rem !important;
+    box-shadow: none !important;
+}
+
+.btn-primary {
+    background: var(--primary) !important;
+    color: var(--white) !important;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark) !important;
+}
+
+.btn-outline {
+    background: #ffffff !important;
+    color: var(--primary) !important;
+    border: 1.5px solid var(--primary) !important;
+}
+
+.btn-outline:hover {
+    background: #f8fbfb !important;
+}
+
+/* Format helper */
+.upload-note {
+    display: none !important;
+}
+
+.format-helper {
+    background: #f7faf9;
+    border: 1px solid #e3eeeb;
+    color: var(--text-gray);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 0.86rem;
+    line-height: 1.55;
+}
+
+.format-helper strong {
+    color: var(--primary);
+    margin-right: 4px;
+}
+
+.format-helper span {
+    color: #536767;
+}
+
+/* Rekap lebih kecil dan rapi */
+.rekap-grid {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+    gap: 16px !important;
+    margin-bottom: 22px !important;
+}
+
+.rekap-item {
+    min-height: 92px !important;
+    padding: 18px 20px !important;
+    border-radius: 22px !important;
+    gap: 14px !important;
+}
+
+.rekap-icon {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 16px !important;
+    font-size: 1.15rem !important;
+}
+
+.rekap-item span {
+    font-size: 0.84rem !important;
+    margin-bottom: 5px !important;
+}
+
+.rekap-item strong {
+    font-size: 1.55rem !important;
+}
+
+/* Table header + search */
+.table-header {
+    margin-bottom: 18px !important;
+}
+
+.search-box {
+    min-width: 340px;
+    height: 48px;
+    border: 1px solid var(--gray-light);
+    border-radius: 15px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+}
+
+.search-box i {
+    color: var(--primary);
+    font-size: 1rem;
+    opacity: 0.75;
+}
+
+.search-box input {
+    width: 100%;
+    min-width: 0 !important;
+    border: none !important;
+    outline: none !important;
+    padding: 0 !important;
+    font-size: 0.9rem !important;
+    color: var(--primary);
+    background: transparent;
+}
+
+.search-box:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(7, 72, 74, 0.08);
+}
+
+/* Table compact */
+.table-wrapper {
+    border-radius: 16px !important;
+}
+
+table {
+    min-width: 1080px !important;
+}
+
+th {
+    padding: 14px 12px !important;
+    font-size: 0.84rem !important;
+}
+
+td {
+    padding: 13px 12px !important;
+    font-size: 0.86rem !important;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+    .page-header {
+        padding: 24px !important;
+    }
+
+    .page-header h1 {
+        font-size: 2rem !important;
+    }
+
+    .clean-file-drop {
+        align-items: flex-start !important;
+    }
+
+    .clean-file-drop input[type="file"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    .search-box {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 520px) {
+    .card {
+        padding: 18px !important;
+        border-radius: 20px !important;
+    }
+
+    .file-info-left {
+        align-items: flex-start;
+    }
+
+    .clean-actions {
+        flex-direction: column;
+    }
+
+    .format-helper {
+        font-size: 0.8rem;
+    }
+}

@@ -77,47 +77,6 @@
     <div id="messageBox" class="message-box"></div>
   </section>
 
-      <section class="card import-card">
-        <div class="card-heading">
-          <div>
-            <h3>Import Nilai</h3>
-            <p>Upload file CSV berisi nilai angka dan rekap kehadiran siswa.</p>
-          </div>
-        </div>
-
-        <div class="upload-area">
-          <label class="file-drop" for="fileInput">
-            <i class="bi bi-file-earmark-spreadsheet"></i>
-            <div>
-              <strong>Pilih File CSV</strong>
-              <span>Gunakan template agar format data sesuai.</span>
-            </div>
-            <input type="file" id="fileInput" accept=".csv" />
-          </label>
-
-          <div class="upload-actions">
-            <button id="downloadTemplateBtn" class="btn btn-outline" type="button">
-              <i class="bi bi-file-earmark-arrow-down"></i>
-              Download Template CSV
-            </button>
-
-            <button id="uploadBtn" class="btn btn-primary" type="button">
-              <i class="bi bi-upload"></i>
-              Upload File
-            </button>
-          </div>
-
-          <p class="upload-note">
-            Format file:
-            <strong>CSV</strong>
-            dengan kolom:
-            <code>id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa</code>
-          </p>
-        </div>
-
-        <div id="messageBox" class="message-box"></div>
-      </section>
-
       <section class="rekap-grid">
         <div class="rekap-item">
           <div class="rekap-icon siswa">
@@ -187,35 +146,39 @@
             <p>Preview data nilai dari hasil import CSV.</p>
           </div>
 
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Cari ID siswa, ID mapel, atau semester..."
-          />
-        </div>
+          <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Cari Nilai Siswa"
+            />
+          </div>
 
         <div class="table-wrapper">
           <table id="nilaiTable">
             <thead>
-              <tr>
-                <th>No</th>
-                <th>ID Siswa</th>
-                <th>ID Mapel</th>
-                <th>Semester</th>
-                <th>Nilai Angka</th>
-                <th>Hadir</th>
-                <th>Izin</th>
-                <th>Sakit</th>
-                <th>Alfa</th>
-              </tr>
-            </thead>
-            <tbody id="nilaiTableBody">
-              <tr>
-                <td colspan="9" class="empty-state">
-                  Belum ada data nilai yang diupload.
-                </td>
-              </tr>
-            </tbody>
+            <tr>
+              <th>No</th>
+              <th>ID Siswa</th>
+              <th>Nama Siswa</th>
+              <th>ID Mapel</th>
+              <th>Nama Mapel</th>
+              <th>Semester</th>
+              <th>Nilai</th>
+              <th>Hadir</th>
+              <th>Izin</th>
+              <th>Sakit</th>
+              <th>Alfa</th>
+            </tr>
+          </thead>
+          <tbody id="nilaiTableBody">
+            <tr>
+              <td colspan="11" class="empty-state">
+                Belum ada data nilai yang diupload.
+              </td>
+            </tr>
+          </tbody>
           </table>
         </div>
       </section>
@@ -223,6 +186,6 @@
   </div>
 
   <script src="components/sidebar-guru.js"></script>
-  <script src="nilai.js?v=2"></script>
+  <script src="nilai.js?v=3"></script>
 </body>
 </html>
