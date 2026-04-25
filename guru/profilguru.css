@@ -890,3 +890,17 @@ body {
     font-weight: 600;
     max-width: 230px;
 }
+/* =========================
+   SECURITY ACCOUNT INFO
+========================= */
+
+.security-box input[readonly] {
+    background: #f3f7f6 !important;
+    color: var(--primary) !important;
+    cursor: not-allowed !important;
+    border-color: #dfe7e6 !important;
+}
+
+.security-link {
+    text-decoration: none !important;
+}
