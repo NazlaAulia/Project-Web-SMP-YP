@@ -212,13 +212,13 @@ $statusMessage = $_GET['status'] ?? '';
                                                     Edit
                                                 </a>
 
-                                                <a 
-                                                    href="hapus_pengumuman.php?id=<?= (int) $row['id_pengumuman']; ?>"
-                                                    class="btn-danger"
-                                                    onclick="return confirm('Hapus pengumuman ini?')"
-                                                >
-                                                    Hapus
-                                                </a>
+                                              <button
+    type="button"
+    class="btn-danger btn-open-delete"
+    data-url="hapus_pengumuman.php?id=<?= (int) $row['id_pengumuman']; ?>"
+>
+    Hapus
+</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -237,6 +237,56 @@ $statusMessage = $_GET['status'] ?? '';
     </main>
 </div>
 
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal-box">
+        <div class="delete-modal-icon">
+            <i class="fas fa-trash"></i>
+        </div>
+
+        <h3>Hapus Pengumuman?</h3>
+        <p>Data pengumuman ini akan dihapus permanen dari sistem.</p>
+
+        <div class="delete-modal-actions">
+            <button type="button" class="btn-cancel-delete" id="cancelDeleteBtn">
+                Batal
+            </button>
+
+            <a href="#" class="btn-confirm-delete" id="confirmDeleteBtn">
+                Ya, Hapus
+            </a>
+        </div>
+    </div>
+</div>
+
 <script src="/admin/components/admin-nav.js?v=99999"></script>
+
+
+<script>
+const deleteModal = document.getElementById("deleteModal");
+const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+const openDeleteButtons = document.querySelectorAll(".btn-open-delete");
+
+openDeleteButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        const deleteUrl = button.getAttribute("data-url");
+
+        confirmDeleteBtn.setAttribute("href", deleteUrl);
+        deleteModal.classList.add("active");
+    });
+});
+
+cancelDeleteBtn.addEventListener("click", () => {
+    deleteModal.classList.remove("active");
+    confirmDeleteBtn.setAttribute("href", "#");
+});
+
+deleteModal.addEventListener("click", (event) => {
+    if (event.target === deleteModal) {
+        deleteModal.classList.remove("active");
+        confirmDeleteBtn.setAttribute("href", "#");
+    }
+});
+</script>
 </body>
 </html>

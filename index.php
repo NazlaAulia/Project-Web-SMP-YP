@@ -1,3 +1,15 @@
+<?php
+require_once __DIR__ . '/admin/koneksi.php';
+
+$pengumumanResult = $conn->query("
+    SELECT *
+    FROM pengumuman
+    WHERE status = 'tampil'
+    ORDER BY tanggal DESC, id_pengumuman DESC
+    LIMIT 3
+");
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -132,50 +144,48 @@ Wassalamu alaikum wr wb, salam sehat,  salam sejahtera untuk kita semua.
     </div>
 
     <div class="announcement-grid">
-        <div class="announcement-card">
-            <div class="a-img">
-                <img src="img/pengumuman1.jpg" alt="Pengumuman 1">
-                <span class="category-label">Akademik</span>
-            </div>
-            <div class="a-content">
-                <div class="a-meta">
-                    <span><i class="far fa-calendar-alt"></i> 12 Maret 2026</span>
-                </div>
-                <h4>Jadwal Pelaksanaan Ujian Tengah Semester (UTS)</h4>
-                <p>Seluruh siswa diharapkan mempersiapkan diri dengan melihat jadwal ujian terbaru di sini...</p>
-                <a href="#" class="read-more">Baca Selengkapnya →</a>
-            </div>
-        </div>
+        <?php if ($pengumumanResult && $pengumumanResult->num_rows > 0) : ?>
+            <?php while ($p = $pengumumanResult->fetch_assoc()) : ?>
+                <?php
+                    $gambar = !empty($p['gambar'])
+                        ? 'admin/pengumuman/' . $p['gambar']
+                        : 'img/images.webp';
 
-        <div class="announcement-card">
-            <div class="a-img">
-                <img src="img/pengumuman2.jpg" alt="Pengumuman 2">
-                <span class="category-label">Kegiatan</span>
-            </div>
-            <div class="a-content">
-                <div class="a-meta">
-                    <span><i class="far fa-calendar-alt"></i> 10 Maret 2026</span>
-                </div>
-                <h4>Persiapan Lomba Porseni Tingkat Kota</h4>
-                <p>Bagi perwakilan kelas yang mengikuti seleksi, diharapkan berkumpul di lapangan...</p>
-                <a href="#" class="read-more">Baca Selengkapnya →</a>
-            </div>
-        </div>
+                    $tanggal = date('d M Y', strtotime($p['tanggal']));
+                    $isiPendek = mb_strimwidth(strip_tags($p['isi']), 0, 115, '...');
+                ?>
 
-        <div class="announcement-card">
-            <div class="a-img">
-                <img src="img/pengumuman3.jpg" alt="Pengumuman 3">
-                <span class="category-label">Info PPDB</span>
-            </div>
-            <div class="a-content">
-                <div class="a-meta">
-                    <span><i class="far fa-calendar-alt"></i> 05 Maret 2026</span>
+                <div class="announcement-card">
+                    <div class="a-img">
+                        <img src="<?= htmlspecialchars($gambar); ?>" alt="<?= htmlspecialchars($p['judul']); ?>">
+                        <span class="category-label"><?= htmlspecialchars($p['kategori']); ?></span>
+                    </div>
+
+                    <div class="a-content">
+                        <div class="a-meta">
+                            <span><i class="far fa-calendar-alt"></i> <?= htmlspecialchars($tanggal); ?></span>
+                        </div>
+
+                        <h4><?= htmlspecialchars($p['judul']); ?></h4>
+                        <p><?= htmlspecialchars($isiPendek); ?></p>
+
+                        <button
+                            type="button"
+                            class="read-more pengumuman-open-modal"
+                            data-judul="<?= htmlspecialchars($p['judul'], ENT_QUOTES); ?>"
+                            data-tanggal="<?= htmlspecialchars($tanggal, ENT_QUOTES); ?>"
+                            data-kategori="<?= htmlspecialchars($p['kategori'], ENT_QUOTES); ?>"
+                            data-isi="<?= htmlspecialchars($p['isi'], ENT_QUOTES); ?>"
+                            data-gambar="<?= htmlspecialchars($gambar, ENT_QUOTES); ?>"
+                        >
+                            Baca Selengkapnya →
+                        </button>
+                    </div>
                 </div>
-                <h4>Pembukaan Pendaftaran Siswa Baru (PPDB)</h4>
-                <p>SMP YP 17 Surabaya kini resmi membuka pendaftaran untuk tahun ajaran baru 2026/2027...</p>
-                <a href="#" class="read-more">Baca Selengkapnya →</a>
-            </div>
-        </div>
+            <?php endwhile; ?>
+        <?php else : ?>
+            <p>Belum ada pengumuman.</p>
+        <?php endif; ?>
     </div>
 </section>
 
@@ -295,6 +305,60 @@ Wassalamu alaikum wr wb, salam sehat,  salam sejahtera untuk kita semua.
 </section>
 
 <div id="footer-container"></div>
+
+<div class="pengumuman-modal-overlay" id="pengumumanModal">
+    <div class="pengumuman-modal-box">
+        <button type="button" class="pengumuman-modal-close" id="closePengumumanModal">
+            &times;
+        </button>
+
+        <div class="pengumuman-modal-image">
+            <img src="" alt="" id="modalPengumumanGambar">
+            <span id="modalPengumumanKategori"></span>
+        </div>
+
+        <div class="pengumuman-modal-content">
+            <div class="pengumuman-modal-date" id="modalPengumumanTanggal"></div>
+            <h2 id="modalPengumumanJudul"></h2>
+            <p id="modalPengumumanIsi"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+const pengumumanModal = document.getElementById("pengumumanModal");
+const closePengumumanModal = document.getElementById("closePengumumanModal");
+
+const modalPengumumanGambar = document.getElementById("modalPengumumanGambar");
+const modalPengumumanKategori = document.getElementById("modalPengumumanKategori");
+const modalPengumumanTanggal = document.getElementById("modalPengumumanTanggal");
+const modalPengumumanJudul = document.getElementById("modalPengumumanJudul");
+const modalPengumumanIsi = document.getElementById("modalPengumumanIsi");
+
+document.querySelectorAll(".pengumuman-open-modal").forEach((button) => {
+    button.addEventListener("click", () => {
+        modalPengumumanGambar.src = button.dataset.gambar;
+        modalPengumumanGambar.alt = button.dataset.judul;
+
+        modalPengumumanKategori.textContent = button.dataset.kategori;
+        modalPengumumanTanggal.innerHTML = `<i class="far fa-calendar-alt"></i> ${button.dataset.tanggal}`;
+        modalPengumumanJudul.textContent = button.dataset.judul;
+        modalPengumumanIsi.textContent = button.dataset.isi;
+
+        pengumumanModal.classList.add("active");
+    });
+});
+
+closePengumumanModal.addEventListener("click", () => {
+    pengumumanModal.classList.remove("active");
+});
+
+pengumumanModal.addEventListener("click", (event) => {
+    if (event.target === pengumumanModal) {
+        pengumumanModal.classList.remove("active");
+    }
+});
+</script>
 
 <a href="#" class="back-to-top"><i class="fas fa-chevron-up"></i></a>
 
