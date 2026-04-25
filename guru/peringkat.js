@@ -10,7 +10,7 @@ function renderPeringkat() {
 
     dataSiswa.forEach(siswa => {
         let colorClass = siswa.nilai >= 90 ? 'bg-excellent' : (siswa.nilai >= 75 ? 'bg-good' : 'bg-warning');
-        
+
         tbody.innerHTML += `
             <tr>
                 <td>#${siswa.rank}</td>
@@ -23,7 +23,11 @@ function renderPeringkat() {
                         </div>
                     </div>
                 </td>
-                <td><span class="status-badge ${colorClass}">${siswa.status}</span></td>
+                <td>
+                    <span class="status-badge ${colorClass}">
+                        ${siswa.status}
+                    </span>
+                </td>
             </tr>
         `;
     });
