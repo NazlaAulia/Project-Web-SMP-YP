@@ -1665,17 +1665,59 @@ header li,
     }
 }
 
+/* FIX MODAL PENGUMUMAN: hanya isi kotak yang scroll */
 .pengumuman-modal-overlay {
-    overflow-y: auto;
-    align-items: flex-start;
+    overflow: hidden !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .pengumuman-modal-box {
-    max-height: 90vh;
-    overflow-y: auto;
-    margin: 40px auto;
+    max-height: 82vh !important;
+    overflow: hidden !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
+.pengumuman-modal-image {
+    height: 220px !important;
+    flex-shrink: 0 !important;
+}
+
+.pengumuman-modal-content {
+    overflow-y: auto !important;
+    max-height: calc(82vh - 220px) !important;
+    padding: 26px 28px !important;
+}
+
+.pengumuman-modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.pengumuman-modal-content::-webkit-scrollbar-thumb {
+    background: rgba(6, 78, 75, 0.35);
+    border-radius: 999px;
+}
+
+body.modal-open {
+    overflow: hidden !important;
+}
+
+@media (max-width: 768px) {
+    .pengumuman-modal-box {
+        max-height: 85vh !important;
+    }
+
+    .pengumuman-modal-image {
+        height: 170px !important;
+    }
+
+    .pengumuman-modal-content {
+        max-height: calc(85vh - 170px) !important;
+        padding: 20px !important;
+    }
+}
 .pengumuman-modal-content {
     max-height: none;
 }
@@ -1701,5 +1743,46 @@ header li,
 
     .pengumuman-modal-image {
         height: 180px;
+    }
+}
+
+/* Pengumuman horizontal scroll */
+#pengumuman .announcement-grid {
+    display: flex !important;
+    gap: 28px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 18px;
+}
+
+#pengumuman .announcement-card {
+    flex: 0 0 calc((100% - 56px) / 3);
+    scroll-snap-align: start;
+}
+
+#pengumuman .announcement-grid::-webkit-scrollbar {
+    height: 8px;
+}
+
+#pengumuman .announcement-grid::-webkit-scrollbar-thumb {
+    background: rgba(6, 78, 75, 0.35);
+    border-radius: 999px;
+}
+
+#pengumuman .announcement-grid::-webkit-scrollbar-track {
+    background: #eef2f1;
+    border-radius: 999px;
+}
+
+@media (max-width: 992px) {
+    #pengumuman .announcement-card {
+        flex: 0 0 calc((100% - 28px) / 2);
+    }
+}
+
+@media (max-width: 768px) {
+    #pengumuman .announcement-card {
+        flex: 0 0 88%;
     }
 }
