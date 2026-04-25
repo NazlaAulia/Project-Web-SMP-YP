@@ -3,50 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Logout</title>
+  <title>Konfirmasi Logout</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="components/sidebar.css">
-  <link rel="stylesheet" href="logout.css">
+  <link rel="stylesheet" href="logout.css?v=10">
 </head>
 <body>
-  <div class="app-container">
-    <div id="sidebar-container"></div>
-
-    <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
-      <i class="bi bi-list"></i>
-    </button>
-
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <main class="main-content">
-      <div class="logout-wrapper">
-        <div class="logout-card">
-          <div class="logout-icon">
-            <i class="bi bi-box-arrow-right"></i>
+  <main class="logout-page">
+    <section class="logout-card">
+      <div class="logout-header">
+        <div class="school-brand">
+          <div class="school-logo-frame">
+            <img src="../img/logo.webp" alt="Logo Sekolah" class="school-logo">
           </div>
-
-          <h1>Keluar dari Akun?</h1>
-          <p>
-            Kamu akan keluar dari dashboard guru. Pastikan semua perubahan sudah disimpan sebelum logout.
-          </p>
-
-          <div class="logout-actions">
-            <a href="guru.html" class="btn-secondary">
-              <i class="bi bi-arrow-left"></i>
-              Batal
-            </a>
-
-            <a href="../index.html" class="btn-danger">
-              <i class="bi bi-check2-circle"></i>
-              Ya, Logout
-            </a>
+          <div class="school-text">
+            <h2>SMP YP 17 Surabaya</h2>
+            <p>Sistem Informasi Akademik</p>
           </div>
         </div>
       </div>
-    </main>
-  </div>
 
-  <script src="components/sidebar-guru.js"></script>
+      <div class="logout-body">
+        <div class="logout-badge">Konfirmasi Logout</div>
+
+        <h1>
+          Apakah Anda yakin ingin
+          <span>keluar akun?</span>
+        </h1>
+
+        <p class="logout-desc">
+          Anda akan keluar dari dasbor guru.
+        </p>
+
+        <div class="logout-actions">
+          <a href="guru.html" class="btn-cancel">Batal</a>
+          <a href="../index.html" class="btn-logout">Logout</a>
+        </div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>

@@ -35,7 +35,7 @@ function isiProfilGuru(guru) {
     if (namaGuruInput) namaGuruInput.value = nama;
     if (nipGuruInput) nipGuruInput.value = nip;
     if (emailGuruInput) emailGuruInput.value = email;
-    if (mapelGuruInput) mapelGuruInput.value = guru.id_mapel || "";
+    if (mapelGuruInput) mapelGuruInput.value = guru.nama_mapel || "Belum ada mapel";
     if (usernameGuruInput) usernameGuruInput.value = username;
 
     if (previewFoto && guru.foto_profil) {
