@@ -1630,3 +1630,76 @@ header li,
         font-size: 22px;
     }
 }
+
+.announcement-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    align-items: stretch;
+}
+
+.announcement-card {
+    width: 100%;
+}
+
+.a-img {
+    height: 220px;
+    overflow: hidden;
+}
+
+.a-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (max-width: 992px) {
+    .announcement-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .announcement-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.pengumuman-modal-overlay {
+    overflow-y: auto;
+    align-items: flex-start;
+}
+
+.pengumuman-modal-box {
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 40px auto;
+}
+
+.pengumuman-modal-content {
+    max-height: none;
+}
+
+.pengumuman-modal-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.pengumuman-modal-box::-webkit-scrollbar-thumb {
+    background: rgba(6, 78, 75, 0.35);
+    border-radius: 999px;
+}
+
+.pengumuman-modal-image {
+    height: 240px;
+}
+
+@media (max-width: 768px) {
+    .pengumuman-modal-box {
+        max-height: 88vh;
+        margin: 24px auto;
+    }
+
+    .pengumuman-modal-image {
+        height: 180px;
+    }
+}
