@@ -4,80 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peringkat Siswa - SMP YP 17</title>
-    <link rel="stylesheet" href="guru.css">
+
     <link rel="stylesheet" href="components/sidebar.css">
+    <link rel="stylesheet" href="peringkat.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
-  <div class="app-container">
-    <div id="sidebar-container"></div>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
 
-    <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
-      <i class="bi bi-list"></i>
-    </button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+            <i class="bi bi-list"></i>
+        </button>
 
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
         <main class="main-content">
-            <header>
-                <div class="search-container-elegant">
-                    <i class="bi bi-search search-icon"></i>
-                    <input type="text" placeholder="Cari nama siswa..." class="search-input">
-                </div>
-                <div class="user-profile">
-                    <div class="profile-info">
-                        <span class="user-name">Bapak/Ibu Guru</span>
-                        <span class="user-role">Guru</span>
+            <div class="rank-shell">
+                <header class="rank-topbar">
+                    <div class="search-container-elegant">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" placeholder="Cari nama siswa..." class="search-input">
                     </div>
-                    <div class="avatar-circle">B</div>
-                </div>
-            </header>
 
-            <div class="section-header-rank">
-                <h1>Peringkat Akademik Siswa</h1>
-                <select id="filterAngkatan" class="filter-select">
-                    <option value="2024">Angkatan 2024</option>
-                    <option value="2025">Angkatan 2025</option>
-                </select>
-            </div>
+                    <div class="user-profile">
+                        <div class="profile-info">
+                            <span class="user-name">Bapak/Ibu Guru</span>
+                            <span class="user-role">Guru</span>
+                        </div>
+                        <div class="avatar-circle">B</div>
+                    </div>
+                </header>
 
-            <div class="performance-summary">
-                <div class="summary-box excellent">
-                    <div class="val">15</div>
-                    <p>Siswa Unggul</p>
-                </div>
-                <div class="summary-box good">
-                    <div class="val">28</div>
-                    <p>Performa Baik</p>
-                </div>
-                <div class="summary-box needs-attention">
-                    <div class="val">5</div>
-                    <p>Butuh Perhatian</p>
-                </div>
-            </div>
+                <section class="section-header-rank">
+                    <div class="section-title-wrap">
+                        <span class="page-chip">
+                            <i class="bi bi-trophy"></i>
+                            Peringkat Siswa
+                        </span>
+                        <h1>Peringkat Akademik Siswa</h1>
+                        <p>
+                            Pantau performa siswa berdasarkan nilai rata-rata dari seluruh mata pelajaran.
+                        </p>
+                    </div>
 
-            <div class="card table-card">
-                <div class="card-header-flex">
-                    <h3>Detail Peringkat Siswa</h3>
-                    <p>Data berdasarkan nilai rata-rata seluruh mata pelajaran</p>
-                </div>
-                <table class="rank-table">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama</th>
-                            <th>Kelas</th>
-                            <th>Nilai Rata-rata</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rankingBody">
-                        </tbody>
-                </table>
+                    <select id="filterAngkatan" class="filter-select">
+                        <option value="2024">Angkatan 2024</option>
+                        <option value="2025">Angkatan 2025</option>
+                    </select>
+                </section>
+
+                <section class="performance-summary">
+                    <div class="summary-box excellent">
+                        <div class="summary-icon">
+                            <i class="bi bi-award"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="val">15</div>
+                            <p>Siswa Unggul</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-box good">
+                        <div class="summary-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="val">28</div>
+                            <p>Performa Baik</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-box needs-attention">
+                        <div class="summary-icon">
+                            <i class="bi bi-exclamation-circle"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="val">5</div>
+                            <p>Butuh Perhatian</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card table-card">
+                    <div class="card-header-flex">
+                        <div>
+                            <span class="table-chip">Data Akademik</span>
+                            <h3>Detail Peringkat Siswa</h3>
+                            <p>Data berdasarkan nilai rata-rata seluruh mata pelajaran</p>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="rank-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>Kelas</th>
+                                    <th>Nilai Rata-rata</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankingBody"></tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
-<script src="components/sidebar-guru.js"></script>
-<script src="peringkat.js"></script>
+
+    <script src="components/sidebar-guru.js"></script>
+    <script src="peringkat.js"></script>
 </body>
 </html>
