@@ -826,3 +826,51 @@ body {
         padding-top: 78px !important;
     }
 }
+/* =========================
+   STATUS PROFIL CLEAN
+========================= */
+
+.status-panel-clean {
+    min-height: auto !important;
+    padding: 28px !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+}
+
+.status-panel-clean .status-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: rgba(22, 163, 74, 0.12);
+    color: var(--success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.55rem;
+    margin-bottom: 4px;
+}
+
+.status-panel-clean .status-label {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.status-panel-clean .status-active-title {
+    color: var(--success) !important;
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+}
+
+.status-panel-clean p {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    font-weight: 600;
+    max-width: 230px;
+}
