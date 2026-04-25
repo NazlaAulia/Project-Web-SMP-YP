@@ -8,10 +8,15 @@ const nipGuruInput = document.getElementById("nipGuru");
 const emailGuruInput = document.getElementById("emailGuru");
 const mapelGuruInput = document.getElementById("mapelGuru");
 const usernameGuruInput = document.getElementById("usernameGuru");
+
 const previewFoto = document.getElementById("previewFoto");
+const uploadFoto = document.getElementById("uploadFoto");
+const btnSimpanProfil = document.getElementById("btnSimpanProfil");
 
 const idGuruLogin = localStorage.getItem("id_guru");
 const roleIdLogin = localStorage.getItem("role_id");
+
+let fileFotoDipilih = null;
 
 function isiProfilGuru(guru) {
     const nama = guru.nama || "-";
@@ -59,17 +64,54 @@ if (!idGuruLogin || roleIdLogin !== "2") {
         });
 }
 
-const uploadFoto = document.getElementById("uploadFoto");
-
+/* Preview foto saat dipilih */
 if (uploadFoto && previewFoto) {
     uploadFoto.addEventListener("change", function () {
         const file = this.files[0];
+
         if (!file) return;
 
+        fileFotoDipilih = file;
         previewFoto.src = URL.createObjectURL(file);
     });
 }
 
+/* Simpan foto profil ke database */
+if (btnSimpanProfil) {
+    btnSimpanProfil.addEventListener("click", function () {
+        if (!fileFotoDipilih) {
+            alert("Pilih foto terlebih dahulu.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("id_guru", idGuruLogin);
+        formData.append("role_id", roleIdLogin);
+        formData.append("foto", fileFotoDipilih);
+
+        fetch("update_foto_guru.php", {
+            method: "POST",
+            body: formData
+        })
+            .then(res => res.json())
+            .then(result => {
+                console.log("Upload foto:", result);
+                alert(result.message);
+
+                if (result.status === "success") {
+                    previewFoto.src = result.foto_url;
+                    fileFotoDipilih = null;
+                    location.reload();
+                }
+            })
+            .catch(err => {
+                console.error("Gagal upload foto:", err);
+                alert("Gagal upload foto profil.");
+            });
+    });
+}
+
+/* Animasi klik */
 const animatedItems = document.querySelectorAll(".click-animate");
 
 animatedItems.forEach((item) => {
