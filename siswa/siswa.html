@@ -5,47 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
 <link rel="icon" type="image/x-icon" href="img/images.webp">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=99999" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="dashboard-body">
 
- <nav class="sidebar">
-  <div class="sidebar-header">
-    <img src="../img/logo.webp" alt="Logo" class="logo" />
+  <div class="dashboard-wrapper">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <img src="../img/logo.webp" alt="Logo" class="logo" />
 
-    <button class="hamburger" id="hamburgerBtn" type="button">
-      <i class="fa-solid fa-bars"></i>
-    </button>
-  </div>
+        <button class="hamburger" id="hamburgerBtn" type="button">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
 
       <ul class="sidebar-menu">
-  <li class="active">
-  <a href="siswa.html"><i class="fa-solid fa-house"></i> Beranda Siswa</a>
-</li>
-  <li>
-    <a href="nilai.html"><i class="fa-solid fa-file-lines"></i> Nilai</a>
-  </li>
-  <li>
-    <a href="jadwal.html"><i class="fa-solid fa-calendar-days"></i> Jadwal</a>
-  </li>
-  <li>
-    <a href="peringkat.html"><i class="fa-solid fa-trophy"></i> Peringkat</a>
-  </li>
-  <li>
-    <a href="profil-siswa.html"><i class="fa-solid fa-user"></i> Profil Siswa</a>
-  </li>
-  <li>
-    <a href="settings.html"><i class="fa-solid fa-gear"></i> Pengaturan</a>
-  </li>
-</ul>
-
+        <li class="active">
+          <a href="siswa.html"><i class="fa-solid fa-house"></i> Beranda Siswa</a>
+        </li>
+        <li>
+          <a href="nilai.html"><i class="fa-solid fa-file-lines"></i> Nilai</a>
+        </li>
+        <li>
+          <a href="jadwal.html"><i class="fa-solid fa-calendar-days"></i> Jadwal</a>
+        </li>
+        <li>
+          <a href="peringkat.html"><i class="fa-solid fa-trophy"></i> Peringkat</a>
+        </li>
+        <li>
+          <a href="profil-siswa.html"><i class="fa-solid fa-user"></i> Profil Siswa</a>
+        </li>
+        <li>
+          <a href="settings.html"><i class="fa-solid fa-gear"></i> Pengaturan</a>
+        </li>
+      </ul>
 
       <div class="sidebar-footer">
-  <a href="#" class="logout-btn" id="logoutBtn">
-    <i class="fa-solid fa-right-from-bracket"></i> Keluar
-  </a>
-</div>
+        <a href="#" class="logout-btn" id="logoutBtn">
+          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        </a>
+      </div>
     </nav>
 
     <main class="main-content">
@@ -53,6 +53,7 @@
         <div class="search-container">
           <input type="text" placeholder="Cari info akademik, tugas, atau jadwal..." />
         </div>
+
         <div class="user-info">
           <span class="notif-badge" id="namaKelas">-</span>
           <div class="user-profile-top">
@@ -80,7 +81,7 @@
             <span class="year-label">Tahun Ini</span>
           </div>
 
-<div class="bar-chart" id="barChart"></div>
+          <div class="bar-chart" id="barChart"></div>
 
           <div class="academic-summary">
             <div class="summary-box">
@@ -100,15 +101,15 @@
 
         <div class="right-column">
           <div class="card schedule-card">
-  <div class="card-header">
-    <h3>Jadwal Hari Ini</h3>
-    <span class="day-label">Hari Ini</span>
-  </div>
+            <div class="card-header">
+              <h3>Jadwal Hari Ini</h3>
+              <span class="day-label">Hari Ini</span>
+            </div>
 
-  <div id="jadwalHariIniContainer">
-    <p class="schedule-empty">Memuat jadwal...</p>
-  </div>
-</div>
+            <div id="jadwalHariIniContainer">
+              <p class="schedule-empty">Memuat jadwal...</p>
+            </div>
+          </div>
         </div>
       </div>
     </main>
