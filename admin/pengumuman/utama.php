@@ -37,10 +37,10 @@ $statusMessage = $_GET['status'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengumuman - SMP YP 17 Surabaya</title>
 
-    <link rel="icon" type="image/x-icon" href="../datasiswa/images.webp">
+    <link rel="icon" type="image/x-icon" href="/admin/datasiswa/images.webp">
 
-    <link rel="stylesheet" href="../components/admin-nav.css?v=999">
-    <link rel="stylesheet" href="pengumuman.css?v=1">
+    <link rel="stylesheet" href="/admin/components/admin-nav.css?v=9999">
+    <link rel="stylesheet" href="/admin/pengumuman/pengumuman.css?v=9999">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,10 +48,8 @@ $statusMessage = $_GET['status'] ?? '';
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-
-    
 </head>
-<body data-page="informasi" data-subpage="pengumuman" data-nav-path="../components/admin-nav.html">
+<body data-page="informasi" data-subpage="pengumuman" data-nav-path="/admin/components/admin-nav.html">
 
 <div class="container">
     <div id="admin-nav-root"></div>
@@ -148,7 +146,7 @@ $statusMessage = $_GET['status'] ?? '';
 
                     <div class="form-actions">
                         <?php if ($editData) : ?>
-                            <a href="index.php" class="btn-secondary">Batal Edit</a>
+                            <a href="utama.php" class="btn-secondary">Batal Edit</a>
                         <?php endif; ?>
 
                         <button type="submit" class="btn-primary">
@@ -212,7 +210,7 @@ $statusMessage = $_GET['status'] ?? '';
 
                                         <td>
                                             <div class="action-buttons">
-                                                <a href="index.php?edit=<?= (int) $row['id_pengumuman']; ?>" class="btn-edit">
+                                                <a href="utama.php?edit=<?= (int) $row['id_pengumuman']; ?>" class="btn-edit">
                                                     Edit
                                                 </a>
 
@@ -241,6 +239,6 @@ $statusMessage = $_GET['status'] ?? '';
     </main>
 </div>
 
-<script src="../components/admin-nav.js?v=999"></script>
+<script src="/admin/components/admin-nav.js?v=9999"></script>
 </body>
 </html>
