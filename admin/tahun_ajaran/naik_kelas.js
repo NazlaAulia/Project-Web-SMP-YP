@@ -11,7 +11,7 @@ const confirmPopup = document.getElementById("confirmPopup");
 const closeConfirmPopup = document.getElementById("closeConfirmPopup");
 const cancelConfirmBtn = document.getElementById("cancelConfirmBtn");
 const confirmProcessBtn = document.getElementById("confirmProcessBtn");
-const previewNaikKelasBtn = document.getElementById("previewNaikKelasBtn");
+
 
 let pendingFormData = null;
 
@@ -167,33 +167,4 @@ function closePopup() {
 function showMessage(message, type) {
     formMessage.textContent = message;
     formMessage.className = `form-message ${type}`;
-}
-
-/* Preview aman: cuma lihat simulasi, tidak mengubah database */
-if (previewNaikKelasBtn) {
-    previewNaikKelasBtn.addEventListener("click", async () => {
-        try {
-            const response = await fetch("preview_naik_kelas.php");
-            const result = await response.json();
-
-            if (!result.success) {
-                showMessage(result.message || "Preview gagal.", "error");
-                return;
-            }
-
-            let text = "Preview Naik Kelas:\n\n";
-
-            result.data.slice(0, 25).forEach((item, index) => {
-                text += `${index + 1}. ${item.nama}: ${item.kelas_lama} -> ${item.kelas_baru}\n`;
-            });
-
-            if (result.data.length > 25) {
-                text += `\nDan ${result.data.length - 25} siswa lainnya...`;
-            }
-
-            alert(text);
-        } catch (error) {
-            showMessage("Gagal memuat preview naik kelas.", "error");
-        }
-    });
 }
