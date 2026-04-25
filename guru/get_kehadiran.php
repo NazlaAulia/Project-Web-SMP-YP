@@ -22,33 +22,6 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
-/* Ambil mapel guru login */
-$getGuru = $conn->prepare("
-    SELECT 
-        g.id_mapel,
-        m.nama_mapel
-    FROM guru g
-    LEFT JOIN mapel m ON g.id_mapel = m.id_mapel
-    WHERE g.id_guru = ?
-    LIMIT 1
-");
-
-if (!$getGuru) {
-    kirim_json("error", "Query guru gagal: " . $conn->error);
-}
-
-$getGuru->bind_param("i", $id_guru);
-$getGuru->execute();
-$resultGuru = $getGuru->get_result();
-
-if ($resultGuru->num_rows === 0) {
-    kirim_json("error", "Data guru tidak ditemukan.");
-}
-
-$guru = $resultGuru->fetch_assoc();
-$id_mapel_guru = (int) $guru["id_mapel"];
-$nama_mapel_guru = $guru["nama_mapel"] ?? "-";
-
 /* Ambil semua kelas untuk dropdown */
 $getKelas = $conn->prepare("
     SELECT nama_kelas
@@ -69,6 +42,26 @@ while ($kelas = $resultKelas->fetch_assoc()) {
     $kelasOptions[] = $kelas["nama_kelas"];
 }
 
+/* Ambil semua mapel untuk dropdown */
+$getMapel = $conn->prepare("
+    SELECT nama_mapel
+    FROM mapel
+    ORDER BY id_mapel ASC
+");
+
+if (!$getMapel) {
+    kirim_json("error", "Query mapel gagal: " . $conn->error);
+}
+
+$getMapel->execute();
+$resultMapel = $getMapel->get_result();
+
+$mapelOptions = [];
+
+while ($mapel = $resultMapel->fetch_assoc()) {
+    $mapelOptions[] = $mapel["nama_mapel"];
+}
+
 /* Ambil data kehadiran dari tabel nilai */
 $stmt = $conn->prepare("
     SELECT
@@ -84,15 +77,13 @@ $stmt = $conn->prepare("
     LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
     LEFT JOIN mapel m ON n.id_mapel = m.id_mapel
-    WHERE n.id_mapel = ?
-    ORDER BY k.nama_kelas ASC, s.nama ASC, n.semester ASC
+    ORDER BY k.nama_kelas ASC, m.nama_mapel ASC, s.nama ASC, n.semester ASC
 ");
 
 if (!$stmt) {
     kirim_json("error", "Query kehadiran gagal: " . $conn->error);
 }
 
-$stmt->bind_param("i", $id_mapel_guru);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -124,6 +115,6 @@ while ($row = $result->fetch_assoc()) {
 kirim_json("success", "Data kehadiran berhasil dimuat.", [
     "data" => $data,
     "kelas_options" => $kelasOptions,
-    "mapel_options" => [$nama_mapel_guru]
+    "mapel_options" => $mapelOptions
 ]);
 ?>
