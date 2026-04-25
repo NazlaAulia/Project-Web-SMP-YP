@@ -14,10 +14,33 @@ const usernameLogin = localStorage.getItem("username");
 if (!idGuruLogin || roleIdLogin !== "2") {
     alert("Silakan login sebagai guru terlebih dahulu.");
     window.location.href = "../login.html";
-}
+} else {
+    fetch(`get_guru.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
+        .then(res => res.json())
+        .then(result => {
+            console.log("Data settings guru:", result);
 
-if (usernameLamaInput) {
-    usernameLamaInput.value = usernameLogin || "";
+            if (result.status === "success") {
+                const usernameDb = result.data.username || usernameLogin || "";
+
+                if (usernameLamaInput) {
+                    usernameLamaInput.value = usernameDb;
+                }
+
+                if (usernameDb) {
+                    localStorage.setItem("username", usernameDb);
+                }
+            } else {
+                alert(result.message);
+            }
+        })
+        .catch(err => {
+            console.error("Gagal load username settings:", err);
+
+            if (usernameLamaInput) {
+                usernameLamaInput.value = usernameLogin || "";
+            }
+        });
 }
 
 /* =========================
