@@ -87,7 +87,7 @@ function renderTable(filteredData = dataNilai) {
   if (filteredData.length === 0) {
     nilaiTableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="empty-state">Belum ada data yang sesuai.</td>
+        <td colspan="11" class="empty-state">Belum ada data yang sesuai.</td>
       </tr>
     `;
     return;
@@ -99,7 +99,9 @@ function renderTable(filteredData = dataNilai) {
         <tr>
           <td>${index + 1}</td>
           <td>${item.id_siswa}</td>
+          <td>${item.nama_siswa || "-"}</td>
           <td>${item.id_mapel}</td>
+          <td>${item.nama_mapel || "-"}</td>
           <td>${item.semester}</td>
           <td>${item.nilai_angka}</td>
           <td>${item.hadir}</td>
@@ -113,10 +115,14 @@ function renderTable(filteredData = dataNilai) {
 }
 
 function parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/);
+  let lines = text.trim().split(/\r?\n/);
 
   if (lines.length < 2) {
     throw new Error("File CSV kosong atau tidak valid.");
+  }
+
+  if (lines[0].trim().toLowerCase() === "sep=,") {
+    lines = lines.slice(1);
   }
 
   const headers = lines[0].split(",").map(header => header.trim().toLowerCase());
@@ -136,12 +142,14 @@ function parseCSV(text) {
 
   if (!valid) {
     throw new Error(
-      "Header CSV harus: id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa"
+      "Header CSV harus memuat: id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa"
     );
   }
 
   const idSiswaIndex = headers.indexOf("id_siswa");
+  const namaSiswaIndex = headers.indexOf("nama_siswa");
   const idMapelIndex = headers.indexOf("id_mapel");
+  const namaMapelIndex = headers.indexOf("nama_mapel");
   const semesterIndex = headers.indexOf("semester");
   const nilaiAngkaIndex = headers.indexOf("nilai_angka");
   const hadirIndex = headers.indexOf("hadir");
@@ -152,12 +160,14 @@ function parseCSV(text) {
   const result = [];
 
   for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+
     const row = lines[i].split(",").map(item => item.trim());
 
-    if (row.length < headers.length) continue;
-
     const id_siswa = Number(row[idSiswaIndex]);
+    const nama_siswa = namaSiswaIndex >= 0 ? row[namaSiswaIndex] : "";
     const id_mapel = Number(row[idMapelIndex]);
+    const nama_mapel = namaMapelIndex >= 0 ? row[namaMapelIndex] : "";
     const semester = normalisasiSemester(row[semesterIndex]);
     const nilai_angka = Number(row[nilaiAngkaIndex]);
     const hadir = Number(row[hadirIndex]);
@@ -180,7 +190,9 @@ function parseCSV(text) {
 
     result.push({
       id_siswa,
+      nama_siswa,
       id_mapel,
+      nama_mapel,
       semester,
       nilai_angka,
       hadir,
@@ -304,22 +316,26 @@ if (searchInput) {
 
     const filtered = dataNilai.filter(item =>
       String(item.id_siswa).toLowerCase().includes(keyword) ||
+      String(item.nama_siswa || "").toLowerCase().includes(keyword) ||
       String(item.id_mapel).toLowerCase().includes(keyword) ||
+      String(item.nama_mapel || "").toLowerCase().includes(keyword) ||
       String(item.semester).toLowerCase().includes(keyword)
     );
 
     renderTable(filtered);
   });
 }
+
 if (downloadTemplateBtn) {
   downloadTemplateBtn.addEventListener("click", () => {
     const template =
+      "sep=,\n" +
       "id_siswa,nama_siswa,id_mapel,nama_mapel,semester,nilai_angka,hadir,izin,sakit,alfa\n" +
       "1293,Aulia Rahma,3,PKN,1,88,20,0,1,0\n" +
       "1294,Bagus Pratama,3,PKN,1,76,18,1,1,0\n" +
       "1295,Citra Lestari,3,PKN,1,92,21,0,0,0\n";
 
-    const blob = new Blob([template], {
+    const blob = new Blob(["\uFEFF" + template], {
       type: "text/csv;charset=utf-8;"
     });
 
@@ -352,13 +368,13 @@ if (exportBtn) {
     let csvContent = "Tahun Ajaran," + tahunAjaran + "\n";
     csvContent += "Kelas," + kelas + "\n";
     csvContent += "Mata Pelajaran," + mapel + "\n\n";
-    csvContent += "No,ID Siswa,ID Mapel,Semester,Nilai Angka,Hadir,Izin,Sakit,Alfa\n";
+    csvContent += "No,ID Siswa,Nama Siswa,ID Mapel,Nama Mapel,Semester,Nilai Angka,Hadir,Izin,Sakit,Alfa\n";
 
     dataNilai.forEach((item, index) => {
-      csvContent += `${index + 1},${item.id_siswa},${item.id_mapel},${item.semester},${item.nilai_angka},${item.hadir},${item.izin},${item.sakit},${item.alfa}\n`;
+      csvContent += `${index + 1},${item.id_siswa},${item.nama_siswa || "-"},${item.id_mapel},${item.nama_mapel || "-"},${item.semester},${item.nilai_angka},${item.hadir},${item.izin},${item.sakit},${item.alfa}\n`;
     });
 
-    const blob = new Blob([csvContent], {
+    const blob = new Blob(["\uFEFF" + csvContent], {
       type: "text/csv;charset=utf-8;"
     });
 
