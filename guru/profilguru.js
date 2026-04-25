@@ -2,13 +2,14 @@ const displayNamaGuru = document.getElementById("displayNamaGuru");
 const displayMapelGuru = document.getElementById("displayMapelGuru");
 const displayNipGuru = document.getElementById("displayNipGuru");
 const displayEmailGuru = document.getElementById("displayEmailGuru");
-const jenisKelaminGuruInput = document.getElementById("jenisKelaminGuru");
 
-const namaGuruInput = document.getElementById("namaGuru");
-const nipGuruInput = document.getElementById("nipGuru");
-const emailGuruInput = document.getElementById("emailGuru");
-const mapelGuruInput = document.getElementById("mapelGuru");
-const usernameGuruInput = document.getElementById("usernameGuru");
+/* Sesuai ID yang ada di profilguru.html */
+const namaGuruInput = document.getElementById("nama");
+const nipGuruInput = document.getElementById("nip");
+const emailGuruInput = document.getElementById("email");
+const mapelGuruInput = document.getElementById("namaMapel");
+const jenisKelaminGuruInput = document.getElementById("jenisKelamin");
+const usernameGuruInput = document.getElementById("username");
 
 const previewFoto = document.getElementById("previewFoto");
 const uploadFoto = document.getElementById("uploadFoto");
@@ -25,8 +26,8 @@ function isiProfilGuru(guru) {
     const email = guru.email || "-";
     const mapel = guru.nama_mapel || "Belum ada mapel";
     const username = guru.username || "";
+    const jenisKelamin = guru.jenis_kelamin || "Belum diisi";
 
-    if (jenisKelaminGuruInput) jenisKelaminGuruInput.value = guru.jenis_kelamin || "";
     if (displayNamaGuru) displayNamaGuru.textContent = nama;
     if (displayMapelGuru) displayMapelGuru.textContent = mapel;
     if (displayNipGuru) displayNipGuru.textContent = nip;
@@ -35,7 +36,8 @@ function isiProfilGuru(guru) {
     if (namaGuruInput) namaGuruInput.value = nama;
     if (nipGuruInput) nipGuruInput.value = nip;
     if (emailGuruInput) emailGuruInput.value = email;
-    if (mapelGuruInput) mapelGuruInput.value = guru.nama_mapel || "Belum ada mapel";
+    if (mapelGuruInput) mapelGuruInput.value = mapel;
+    if (jenisKelaminGuruInput) jenisKelaminGuruInput.value = jenisKelamin;
     if (usernameGuruInput) usernameGuruInput.value = username;
 
     if (previewFoto && guru.foto_profil) {
@@ -78,18 +80,17 @@ if (uploadFoto && previewFoto) {
     });
 }
 
-/* Simpan foto profil ke database */
+/* Simpan profil + foto profil ke database */
 if (btnSimpanProfil) {
     btnSimpanProfil.addEventListener("click", function () {
         const formDataProfil = new FormData();
 
         formDataProfil.append("id_guru", idGuruLogin);
         formDataProfil.append("role_id", roleIdLogin);
-        formDataProfil.append("nama", namaGuruInput.value);
-        formDataProfil.append("nip", nipGuruInput.value);
-        formDataProfil.append("email", emailGuruInput.value);
-        formDataProfil.append("id_mapel", mapelGuruInput.value);
-        formDataProfil.append("jenis_kelamin", jenisKelaminGuruInput.value);
+        formDataProfil.append("nama", namaGuruInput ? namaGuruInput.value : "");
+        formDataProfil.append("nip", nipGuruInput ? nipGuruInput.value : "");
+        formDataProfil.append("email", emailGuruInput ? emailGuruInput.value : "");
+        formDataProfil.append("jenis_kelamin", jenisKelaminGuruInput ? jenisKelaminGuruInput.value : "");
 
         fetch("update_guru.php", {
             method: "POST",
@@ -134,13 +135,11 @@ if (btnSimpanProfil) {
     });
 }
 
-/* Animasi klik */
+/* Animasi klik dikurangi agar profil akademik lebih formal */
 const animatedItems = document.querySelectorAll(".click-animate");
 
 animatedItems.forEach((item) => {
     item.addEventListener("click", function () {
         item.classList.remove("profile-active");
-        void item.offsetWidth;
-        item.classList.add("profile-active");
     });
 });
