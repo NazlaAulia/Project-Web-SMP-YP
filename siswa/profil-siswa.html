@@ -13,8 +13,12 @@
   <div class="dashboard-wrapper">
     <nav class="sidebar">
       <div class="sidebar-header">
-        <img src="../img/logo.webp" alt="Logo" class="logo" />
-      </div>
+  <img src="../img/logo.webp" alt="Logo" class="logo" />
+
+  <button class="hamburger" id="hamburgerBtn" type="button">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+</div>
 
      
   <ul class="sidebar-menu">
@@ -202,6 +206,21 @@
       logoutModal.classList.remove("show");
     }
   });
+</script>
+
+<script>
+  const profilHamburgerBtn = document.getElementById("hamburgerBtn");
+  const profilSidebar = document.querySelector(".sidebar");
+
+  if (profilHamburgerBtn && profilSidebar) {
+    profilHamburgerBtn.addEventListener("click", function () {
+      profilSidebar.classList.toggle("show-menu");
+
+      const icon = profilHamburgerBtn.querySelector("i");
+      icon.classList.toggle("fa-bars");
+      icon.classList.toggle("fa-xmark");
+    });
+  }
 </script>
 </body>
 </html>
