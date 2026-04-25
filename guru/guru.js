@@ -11,8 +11,15 @@ function tampilkanGuru(guru) {
     const huruf = namaFix.charAt(0).toUpperCase();
 
     if (namaGuruEl) namaGuruEl.textContent = namaFix;
-    if (avatarGuruEl) avatarGuruEl.textContent = huruf;
     if (namaGuruDashboardEl) namaGuruDashboardEl.textContent = namaFix;
+
+    if (avatarGuruEl) {
+        if (guru.foto_profil) {
+            avatarGuruEl.innerHTML = `<img src="${guru.foto_profil}" alt="${namaFix}">`;
+        } else {
+            avatarGuruEl.textContent = huruf;
+        }
+    }
 }
 
 if (!idGuruLogin || roleIdLogin !== "2") {

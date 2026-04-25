@@ -29,7 +29,7 @@ if (!isset($_FILES["foto"])) {
 $file = $_FILES["foto"];
 
 if ($file["error"] !== 0) {
-    kirim_json("error", "Upload file gagal. Kode error: " . $file["error"]);
+    kirim_json("error", "Upload file gagal.");
 }
 
 $allowedExt = ["jpg", "jpeg", "png", "webp"];
@@ -43,11 +43,11 @@ $fileSize = $file["size"];
 $ext = strtolower(pathinfo($namaFile, PATHINFO_EXTENSION));
 
 if (!in_array($ext, $allowedExt)) {
-    kirim_json("error", "Format file harus JPG, JPEG, PNG, atau WEBP.");
+    kirim_json("error", "Format foto harus JPG, JPEG, PNG, atau WEBP.");
 }
 
 if ($fileSize > $maxSize) {
-    kirim_json("error", "Ukuran file maksimal 2 MB.");
+    kirim_json("error", "Ukuran foto maksimal 2 MB.");
 }
 
 $mime = mime_content_type($tmpFile);
@@ -62,23 +62,23 @@ if (!is_dir($folderUpload)) {
     mkdir($folderUpload, 0777, true);
 }
 
-$queryOld = $conn->prepare("
+$stmtOld = $conn->prepare("
     SELECT foto_profil 
     FROM user 
     WHERE id_guru = ? AND role_id = 2 
     LIMIT 1
 ");
 
-if (!$queryOld) {
+if (!$stmtOld) {
     kirim_json("error", "Query foto lama gagal: " . $conn->error);
 }
 
-$queryOld->bind_param("i", $id_guru);
-$queryOld->execute();
-$resultOld = $queryOld->get_result();
+$stmtOld->bind_param("i", $id_guru);
+$stmtOld->execute();
+$resultOld = $stmtOld->get_result();
 
 if ($resultOld->num_rows === 0) {
-    kirim_json("error", "User untuk guru ini tidak ditemukan.");
+    kirim_json("error", "User guru tidak ditemukan.");
 }
 
 $dataOld = $resultOld->fetch_assoc();
@@ -88,16 +88,16 @@ $namaBaru = "guru_" . $id_guru . "_" . time() . "." . $ext;
 $pathSimpan = $folderUpload . $namaBaru;
 
 if (!move_uploaded_file($tmpFile, $pathSimpan)) {
-    kirim_json("error", "Gagal menyimpan file ke folder upload.");
+    kirim_json("error", "Gagal menyimpan foto ke folder upload.");
 }
 
-$update = $conn->prepare("
+$stmtUpdate = $conn->prepare("
     UPDATE user 
     SET foto_profil = ? 
     WHERE id_guru = ? AND role_id = 2
 ");
 
-if (!$update) {
+if (!$stmtUpdate) {
     if (file_exists($pathSimpan)) {
         @unlink($pathSimpan);
     }
@@ -105,14 +105,14 @@ if (!$update) {
     kirim_json("error", "Query update foto gagal: " . $conn->error);
 }
 
-$update->bind_param("si", $pathSimpan, $id_guru);
+$stmtUpdate->bind_param("si", $pathSimpan, $id_guru);
 
-if ($update->execute()) {
+if ($stmtUpdate->execute()) {
     if (!empty($fotoLama) && file_exists($fotoLama)) {
         @unlink($fotoLama);
     }
 
-    kirim_json("success", "Foto profil guru berhasil disimpan.", [
+    kirim_json("success", "Foto profil berhasil disimpan.", [
         "foto_url" => $pathSimpan
     ]);
 } else {
@@ -120,6 +120,6 @@ if ($update->execute()) {
         @unlink($pathSimpan);
     }
 
-    kirim_json("error", "Gagal update database.");
+    kirim_json("error", "Gagal menyimpan foto ke database.");
 }
 ?>
