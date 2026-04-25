@@ -15,7 +15,7 @@ function tampilkanGuru(guru) {
 
     if (avatarGuruEl) {
         if (guru.foto_profil) {
-            avatarGuruEl.innerHTML = `<img src="${guru.foto_profil}" alt="${namaFix}">`;
+            avatarGuruEl.innerHTML = `<img src="${guru.foto_profil}" alt="Foto ${namaFix}">`;
         } else {
             avatarGuruEl.textContent = huruf;
         }
