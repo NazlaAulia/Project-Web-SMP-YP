@@ -827,11 +827,27 @@ body {
     }
 }
 /* =========================
-   STATUS PROFIL CLEAN
+   STATUS PROFIL CLEAN + RIGHT PANEL RATA
 ========================= */
 
+.profile-layout {
+    align-items: stretch !important;
+}
+
+.main-panel {
+    height: 100% !important;
+}
+
+.side-panel {
+    height: 100% !important;
+    display: grid !important;
+    grid-template-rows: auto 1fr !important;
+    gap: 24px !important;
+}
+
 .status-panel-clean {
-    min-height: auto !important;
+    height: 100% !important;
+    min-height: 260px !important;
     padding: 28px !important;
     text-align: center !important;
     display: flex !important;
