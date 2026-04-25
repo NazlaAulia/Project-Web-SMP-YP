@@ -11,6 +11,11 @@ const idGuruLogin = localStorage.getItem("id_guru");
 const roleIdLogin = localStorage.getItem("role_id");
 const usernameLogin = localStorage.getItem("username");
 
+/* Isi dulu dari localStorage supaya tidak kosong */
+if (usernameLamaInput) {
+    usernameLamaInput.value = usernameLogin || "";
+}
+
 if (!idGuruLogin || roleIdLogin !== "2") {
     alert("Silakan login sebagai guru terlebih dahulu.");
     window.location.href = "../login.html";
@@ -31,7 +36,7 @@ if (!idGuruLogin || roleIdLogin !== "2") {
                     localStorage.setItem("username", usernameDb);
                 }
             } else {
-                alert(result.message);
+                console.warn(result.message);
             }
         })
         .catch(err => {
@@ -42,7 +47,6 @@ if (!idGuruLogin || roleIdLogin !== "2") {
             }
         });
 }
-
 /* =========================
    SIMPAN USERNAME
 ========================= */
