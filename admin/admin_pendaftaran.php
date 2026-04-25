@@ -114,18 +114,10 @@ function buildPageUrl($pageNumber, $search, $filter = '')
     <meta charset="UTF-8">
     <title>Data Pendaftaran Siswa</title>
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
-<link rel="icon" type="image/x-icon" href="img/admin/datasiswa/images.webp">
-    <link rel="stylesheet" href="../components/admin-nav.css">
-      <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=80">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <link rel="stylesheet" href="/admin/components/admin-nav.css">
+    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=80">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body data-page="pendaftaran" data-nav-path="/admin/components/admin-nav.html">
