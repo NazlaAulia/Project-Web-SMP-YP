@@ -1,79 +1,69 @@
 <?php
-/* session_start();
 header("Content-Type: application/json; charset=utf-8");
+
 require_once "koneksi.php";
 
-if (!isset($_SESSION["id_user"]) || !isset($_SESSION["id_guru"])) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Session guru tidak ditemukan. Silakan login ulang."
-    ]);
+function kirim_json($status, $message, $extra = []) {
+    echo json_encode(array_merge([
+        "status" => $status,
+        "message" => $message
+    ], $extra));
     exit;
 }
 
-$id_user = $_SESSION["id_user"];
-$id_guru = $_SESSION["id_guru"];
+if ($conn->connect_error) {
+    kirim_json("error", "Koneksi database gagal.");
+}
 
-$sql = "
+$id_guru = isset($_GET["id_guru"]) ? (int) $_GET["id_guru"] : 0;
+$role_id = isset($_GET["role_id"]) ? (int) $_GET["role_id"] : 0;
+
+if ($role_id !== 2) {
+    kirim_json("error", "Akses ditolak. Akun ini bukan guru.");
+}
+
+if ($id_guru <= 0) {
+    kirim_json("error", "ID guru tidak ditemukan. Silakan login ulang.");
+}
+
+$stmt = $conn->prepare("
     SELECT 
-        u.id_user,
-        u.username,
-        u.foto_profil,
         g.id_guru,
         g.nip,
         g.nama,
         g.email,
         g.id_mapel,
-        m.nama_mapel
-    FROM user u
-    LEFT JOIN guru g ON u.id_guru = g.id_guru
+        m.nama_mapel,
+        u.id_user,
+        u.username,
+        u.role_id,
+        u.foto_profil
+    FROM guru g
     LEFT JOIN mapel m ON g.id_mapel = m.id_mapel
-    WHERE u.id_user = ?
-      AND u.id_guru = ?
-      AND u.role_id = 2
+    LEFT JOIN user u ON u.id_guru = g.id_guru
+    WHERE g.id_guru = ? AND u.role_id = 2
     LIMIT 1
-";
-
-$stmt = mysqli_prepare($conn, $sql);
+");
 
 if (!$stmt) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Query gagal: " . mysqli_error($conn)
-    ]);
-    exit;
+    kirim_json("error", "Query gagal: " . $conn->error);
 }
 
-mysqli_stmt_bind_param($stmt, "ii", $id_user, $id_guru);
-mysqli_stmt_execute($stmt);
+$stmt->bind_param("i", $id_guru);
 
-$result = mysqli_stmt_get_result($stmt);
-
-if (!$result) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Gagal mengambil data guru."
-    ]);
-    exit;
+if (!$stmt->execute()) {
+    kirim_json("error", "Data guru gagal diproses.");
 }
 
-$guru = mysqli_fetch_assoc($result);
+$result = $stmt->get_result();
 
-if (!$guru) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Data guru tidak ditemukan."
-    ]);
-    exit;
+if ($result->num_rows === 0) {
+    kirim_json("error", "Data guru tidak ditemukan.");
 }
 
-if (empty($guru["foto_profil"])) {
-    $guru["foto_profil"] = "../img/default-profile.webp";
-}
+$guru = $result->fetch_assoc();
 
-echo json_encode([
-    "status" => "success",
+kirim_json("success", "Data guru berhasil diambil.", [
     "data" => $guru
 ]);
-exit;*/
 ?>
