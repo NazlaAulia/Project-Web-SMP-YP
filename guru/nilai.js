@@ -328,25 +328,19 @@ if (searchInput) {
 
 if (downloadTemplateBtn) {
   downloadTemplateBtn.addEventListener("click", () => {
-    const template =
-      "sep=,\n" +
-      "id_siswa,nama_siswa,id_mapel,nama_mapel,semester,nilai_angka,hadir,izin,sakit,alfa\n" +
-      "1293,Aulia Rahma,3,PKN,1,88,20,0,1,0\n" +
-      "1294,Bagus Pratama,3,PKN,1,76,18,1,1,0\n" +
-      "1295,Citra Lestari,3,PKN,1,92,21,0,0,0\n";
+    if (!idGuruLogin || roleIdLogin !== "2") {
+      alert("Silakan login sebagai guru terlebih dahulu.");
+      window.location.href = "../login.html";
+      return;
+    }
 
-    const blob = new Blob(["\uFEFF" + template], {
-      type: "text/csv;charset=utf-8;"
-    });
-
-    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
-    link.href = url;
+    link.href = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`;
     link.download = "template_import_nilai_siswa.csv";
+    document.body.appendChild(link);
     link.click();
-
-    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
   });
 }
 
