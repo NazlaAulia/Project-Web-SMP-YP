@@ -123,6 +123,12 @@ body {
   color: white;
 }
 
+/* ===== HAMBURGER DEFAULT DESKTOP ===== */
+
+.hamburger {
+  display: none;
+}
+
 /* ===== MAIN ===== */
 
 .main-content {
@@ -208,22 +214,51 @@ body {
 }
 
 .nilai-banner {
-  background: #e6f0ef;
-  border-radius: 20px;
-  padding: 16px 18px;
+  background: #dfeceb;
+  border-radius: 28px;
+  padding: 24px 28px;
   margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 170px;
+  overflow: hidden;
 }
 
+.nilai-banner-text {
+  flex: 1;
+  max-width: 60%;
+}
+
+.nilai-banner-text h2,
 .nilai-banner h2 {
-  font-size: 20px;
+  font-size: 30px;
   color: #111;
-  margin-bottom: 4px;
+  margin-bottom: 10px;
   font-weight: 800;
 }
 
+.nilai-banner-text p,
 .nilai-banner p {
-  font-size: 14px;
+  font-size: 20px;
   color: #555;
+  line-height: 1.5;
+}
+
+.nilai-banner-img {
+  width: 240px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nilai-banner-img img {
+  width: 280px;
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 .stats {
@@ -326,52 +361,6 @@ body {
   font-weight: 800;
   margin-bottom: 12px;
   color: #111;
-}
-
-.nilai-banner {
-  background: #dfeceb;
-  border-radius: 28px;
-  padding: 24px 28px;
-  margin-bottom: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 170px;
-  overflow: hidden;
-}
-
-.nilai-banner-text {
-  flex: 1;
-  max-width: 60%;
-}
-
-.nilai-banner-text h2 {
-  font-size: 30px;
-  color: #111;
-  margin-bottom: 10px;
-  font-weight: 800;
-}
-
-.nilai-banner-text p {
-  font-size: 20px;
-  color: #555;
-  line-height: 1.5;
-}
-
-.nilai-banner-img {
-  width: 240px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.nilai-banner-img img {
-  width: 280px;
-  max-width: 100%;
-  height: auto;
-  display: block;
 }
 
 .table-wrap {
@@ -569,304 +558,8 @@ tbody td:last-child {
   }
 }
 
-/* ===== RESPONSIVE ===== */
-
-@media (max-width: 768px) {
-  .container {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    min-height: 100vh;
-  }
-
-  .sidebar {
-    width: 152px;
-    min-height: 100vh;
-    padding: 10px 10px 18px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    flex-shrink: 0;
-  }
-
-  .sidebar-header {
-    margin-bottom: 16px;
-  }
-
-  .logo {
-    width: 110px;
-    margin: 4px auto 0;
-  }
-
-  .sidebar-menu li {
-    margin-bottom: 10px;
-  }
-
-  .sidebar-menu a {
-    font-size: 12px;
-    font-weight: 700;
-    padding: 14px 10px;
-    border-radius: 14px;
-    gap: 10px;
-    line-height: 1.2;
-    align-items: center;
-  }
-
-  .sidebar-menu a i {
-    font-size: 15px;
-    min-width: 18px;
-  }
-
-  .sidebar-menu a.active {
-    min-height: 46px;
-    padding: 14px 10px;
-    border-radius: 14px;
-  }
-
-  .logout-btn {
-    font-size: 12px;
-    font-weight: 700;
-    padding: 14px 10px;
-    border-radius: 14px;
-    gap: 10px;
-  }
-
-  .logout-btn i {
-    font-size: 15px;
-    min-width: 18px;
-  }
-
-  .main-content {
-    flex: 1;
-    padding: 10px 12px;
-    min-width: 0;
-    overflow-x: hidden;
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-
-  .search-box {
-    max-width: 100%;
-  }
-
-  .search-box input {
-    width: 100%;
-    font-size: 13px;
-    padding: 12px 14px;
-    border-radius: 18px;
-  }
-
-  .profile-top {
-    justify-content: flex-start;
-    gap: 10px;
-    flex-wrap: nowrap;
-  }
-
-  .kelas-badge {
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  .profile-avatar {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
-  }
-
-  .profile-name-wrap .profile {
-    font-size: 12px;
-    max-width: 100%;
-    line-height: 1.3;
-  }
-
-  .nilai-card {
-    padding: 12px;
-    border-radius: 16px;
-  }
-
-  .nilai-banner {
-    padding: 14px;
-    border-radius: 16px;
-    margin-bottom: 14px;
-  }
-
-  .nilai-banner h2 {
-    font-size: 15px;
-    margin-bottom: 4px;
-  }
-
-  .nilai-banner p {
-    font-size: 12px;
-    line-height: 1.4;
-  }
-
-  .stats {
-    flex-direction: column;
-    gap: 10px;
-    margin: 14px 0;
-  }
-
-  .box {
-    padding: 14px 12px;
-    border-radius: 14px;
-  }
-
-  .box-title {
-    font-size: 13px;
-  }
-
-  .box-value {
-    font-size: 24px;
-  }
-
-  .box-sub {
-    font-size: 12px;
-  }
-
-  .nilai-filter-wrap {
-  display: flex;
-  justify-content: flex-end;
-  gap: 28px;
-  margin: 22px 0 18px;
-  flex-wrap: wrap;
-}
-
-  .filter-group {
-    width: 100%;
-    min-width: 100%;
-  }
-
-  .filter-group label {
-    font-size: 13px;
-  }
-
-  .filter-group select,
-  #semester {
-    width: 100%;
-    min-width: 100%;
-    height: 42px;
-    font-size: 13px;
-    border-radius: 12px;
-  }
-
-  .nilai-section {
-    padding: 12px;
-    border-radius: 20px;
-  }
-
-  .nilai-section h3 {
-    font-size: 15px;
-  }
-
-  .nilai-section h4 {
-    font-size: 13px;
-    margin-bottom: 10px;
-  }
-
-  .table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  table {
-    min-width: 650px;
-  }
-
-  th {
-    font-size: 13px;
-    padding: 11px 10px;
-  }
-
-  td {
-    font-size: 12px;
-    padding: 11px 10px;
-  }
-
-  .rank-badge {
-    min-width: 26px;
-    height: 26px;
-    font-size: 12px;
-    padding: 0 8px;
-  }
-
-  .status-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 11px;
-  }
-
-  .export-wrap {
-    justify-content: stretch;
-    margin-top: 10px;
-  }
-
-  .export-btn {
-    width: 100%;
-    font-size: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
-  }
-
-  .table-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    margin-top: 12px;
-  }
-
-  .pagination {
-    flex-wrap: wrap;
-    font-size: 12px;
-    gap: 6px;
-  }
-
-  .pagination button {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
-  }
-
-  .table-info {
-    font-size: 12px;
-  }
-}
-
-.nilai-banner {
-  padding: 18px 16px;
-  border-radius: 20px;
-  min-height: 140px;
-  gap: 14px;
-}
-
-.nilai-banner-text {
-  max-width: 58%;
-}
-
-.nilai-banner-text h2 {
-  font-size: 20px;
-  margin-bottom: 6px;
-}
-
-.nilai-banner-text p {
-  font-size: 15px;
-  line-height: 1.4;
-}
-
-.nilai-banner-img {
-  width: 130px;
-}
-
-.nilai-banner-img img {
-  width: 120px;
-}
-
 /* ===== POPUP KONFIRMASI KELUAR ===== */
+
 .logout-modal {
   position: fixed;
   inset: 0;
@@ -875,7 +568,7 @@ tbody td:last-child {
   justify-content: center;
   align-items: center;
   padding: 20px;
-  z-index: 9999;
+  z-index: 99999;
 }
 
 .logout-modal.show {
@@ -975,8 +668,357 @@ tbody td:last-child {
   }
 }
 
-/* ===== RESPONSIVE HP ===== */
+/* ===== RESPONSIVE HP FINAL ===== */
+
 @media (max-width: 768px) {
+  html,
+  body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .container {
+    display: block !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    height: 74px !important;
+    min-height: 74px !important;
+    max-height: 74px !important;
+    padding: 10px 18px !important;
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 9999 !important;
+    background: #064547 !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .sidebar.show-menu {
+    height: 74px !important;
+    min-height: 74px !important;
+    max-height: 74px !important;
+  }
+
+  .sidebar-header {
+    height: 54px !important;
+    margin-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .logo {
+    width: 150px !important;
+    margin: 0 !important;
+  }
+
+  .hamburger {
+    display: flex !important;
+    width: 44px !important;
+    height: 44px !important;
+    border: none !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 24px !important;
+    cursor: pointer !important;
+  }
+
+  .sidebar nav {
+    display: none !important;
+    position: fixed !important;
+    top: 74px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 74px) !important;
+    background: #064547 !important;
+    padding: 24px 18px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    z-index: 9998 !important;
+    overflow-y: auto !important;
+  }
+
+  .sidebar.show-menu nav {
+    display: block !important;
+  }
+
+  .sidebar-menu {
+    width: 100% !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex-grow: unset !important;
+  }
+
+  .sidebar-menu li {
+    margin-bottom: 14px !important;
+  }
+
+  .sidebar-menu a {
+    width: 100% !important;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    padding: 16px 18px !important;
+    border-radius: 16px !important;
+    gap: 14px !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .sidebar-menu a i {
+    font-size: 18px !important;
+    min-width: 22px !important;
+  }
+
+  .sidebar-menu a.active {
+    min-height: auto !important;
+    padding: 16px 18px !important;
+    border-radius: 16px !important;
+    background: #f2f2f2 !important;
+    color: #083f45 !important;
+  }
+
+  .sidebar-menu a.active i {
+    color: #083f45 !important;
+  }
+
+  .spacer {
+    display: none !important;
+  }
+
+  .sidebar-footer {
+    margin-top: 18px !important;
+    padding-top: 10px !important;
+  }
+
+  .logout-btn {
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    padding: 16px 18px !important;
+    border-radius: 16px !important;
+    gap: 14px !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+  }
+
+  .main-content {
+    width: 100% !important;
+    padding: 16px !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .search-box {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .search-box input {
+    width: 100% !important;
+    font-size: 14px !important;
+    padding: 13px 16px !important;
+    border-radius: 20px !important;
+  }
+
+  .profile-top {
+    justify-content: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .kelas-badge {
+    font-size: 16px !important;
+  }
+
+  .profile-avatar {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 18px !important;
+  }
+
+  .profile-name-wrap .profile {
+    font-size: 16px !important;
+    max-width: 100% !important;
+  }
+
+  .nilai-card {
+    padding: 16px !important;
+    border-radius: 14px !important;
+  }
+
+  .nilai-banner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 16px !important;
+    border-radius: 18px !important;
+    min-height: auto !important;
+    gap: 14px !important;
+  }
+
+  .nilai-banner-text {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .nilai-banner-text h2,
+  .nilai-banner h2 {
+    font-size: 20px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .nilai-banner-text p,
+  .nilai-banner p {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+
+  .nilai-banner-img {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .nilai-banner-img img {
+    width: 140px !important;
+  }
+
+  .stats {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .box {
+    width: 100% !important;
+    padding: 14px !important;
+  }
+
+  .box-title {
+    font-size: 14px !important;
+  }
+
+  .box-value {
+    font-size: 26px !important;
+  }
+
+  .box-sub {
+    font-size: 13px !important;
+  }
+
+  .nilai-filter-wrap {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .filter-group {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .filter-group select,
+  #semester {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .nilai-section {
+    padding: 12px !important;
+    border-radius: 18px !important;
+  }
+
+  .nilai-section h3 {
+    font-size: 16px !important;
+  }
+
+  .nilai-section h4 {
+    font-size: 14px !important;
+  }
+
+  .table-wrap {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  table {
+    min-width: 760px !important;
+  }
+
+  th {
+    font-size: 13px !important;
+    padding: 11px 10px !important;
+  }
+
+  td {
+    font-size: 12px !important;
+    padding: 11px 10px !important;
+  }
+
+  .rank-badge {
+    min-width: 26px !important;
+    height: 26px !important;
+    font-size: 12px !important;
+    padding: 0 8px !important;
+  }
+
+  .status-icon {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 11px !important;
+  }
+
+  .export-wrap {
+    justify-content: stretch !important;
+  }
+
+  .export-btn {
+    width: 100% !important;
+    font-size: 13px !important;
+    padding: 13px 14px !important;
+  }
+
+  .table-footer {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    margin-top: 12px !important;
+  }
+
+  .pagination {
+    flex-wrap: wrap !important;
+    font-size: 12px !important;
+    gap: 6px !important;
+  }
+
+  .pagination button {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 12px !important;
+  }
+
+  .table-info {
+    font-size: 12px !important;
+  }
+
   .logout-modal-content {
     max-width: 92%;
     padding: 24px 18px;
@@ -1017,6 +1059,56 @@ tbody td:last-child {
 }
 
 @media (max-width: 480px) {
+  .sidebar {
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
+    padding: 9px 14px !important;
+  }
+
+  .sidebar.show-menu {
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
+  }
+
+  .sidebar-header {
+    height: 52px !important;
+  }
+
+  .sidebar nav {
+    top: 70px !important;
+    height: calc(100vh - 70px) !important;
+  }
+
+  .logo {
+    width: 135px !important;
+  }
+
+  .hamburger {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 22px !important;
+  }
+
+  .main-content {
+    padding: 12px !important;
+  }
+
+  .nilai-card {
+    padding: 14px !important;
+  }
+
+  .nilai-banner-text h2,
+  .nilai-banner h2 {
+    font-size: 18px !important;
+  }
+
+  .nilai-banner-text p,
+  .nilai-banner p {
+    font-size: 13px !important;
+  }
+
   .logout-modal-content h2 {
     font-size: 1.4rem;
   }

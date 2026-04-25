@@ -13,9 +13,14 @@
     <!-- SIDEBAR menu menu 
      -->
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <img src="../img/logo.webp" alt="Logo" class="logo" />
-      </div>
+  <div class="sidebar-header">
+    <img src="../img/logo.webp" alt="Logo" class="logo" />
+
+    <button class="hamburger" id="hamburgerBtn" type="button">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
 
       <nav>
         <ul class="sidebar-menu">
@@ -23,7 +28,7 @@
           <li><a href="nilai.html" class="active"><i class="fa-solid fa-file-lines"></i> Nilai</a></li>
           <li><a href="jadwal.html"><i class="fa-solid fa-calendar-days"></i> Jadwal</a></li>
           <li><a href="peringkat.html"><i class="fa-solid fa-trophy"></i> Peringkat</a></li>
-        <a href="profil-siswa.html"><i class="fa-solid fa-user"></i> Profil Siswa</a></li>
+        <li><a href="profil-siswa.html" id="profilSiswaLink"><i class="fa-solid fa-user"></i> Profil Siswa</a></li>
           <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Pengaturan</a></li>
         </ul>
 
@@ -178,19 +183,36 @@
 </script>
 
 <script>
+  const nilaiHamburgerBtn = document.getElementById("hamburgerBtn");
+  const nilaiSidebar = document.querySelector(".sidebar");
+
+  if (nilaiHamburgerBtn && nilaiSidebar) {
+    nilaiHamburgerBtn.addEventListener("click", function () {
+      nilaiSidebar.classList.toggle("show-menu");
+
+      const icon = nilaiHamburgerBtn.querySelector("i");
+      icon.classList.toggle("fa-bars");
+      icon.classList.toggle("fa-xmark");
+    });
+  }
+</script>
+
+<script>
   const profilSiswaLink = document.getElementById("profilSiswaLink");
   const idSiswa = localStorage.getItem("id_siswa");
 
-  profilSiswaLink.addEventListener("click", function (e) {
-    e.preventDefault();
+  if (profilSiswaLink) {
+    profilSiswaLink.addEventListener("click", function (e) {
+      e.preventDefault();
 
-    if (!idSiswa) {
-      alert("ID siswa tidak ditemukan. Silakan login ulang.");
-      return;
-    }
+      if (!idSiswa) {
+        alert("ID siswa tidak ditemukan. Silakan login ulang.");
+        return;
+      }
 
-    window.location.href = "profil_siswa.html?id_siswa=" + idSiswa;
-  });
+      window.location.href = "profil_siswa.html?id_siswa=" + idSiswa;
+    });
+  }
 </script>
 </body>
 </html>
