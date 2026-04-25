@@ -1,4 +1,6 @@
 let dataKehadiran = [];
+let kelasOptions = [];
+let mapelOptions = [];
 
 const filterSemester = document.getElementById("filterSemester");
 const filterKelas = document.getElementById("filterKelas");
@@ -197,21 +199,17 @@ function renderTable(data) {
 
 function isiFilterDariDatabase() {
   if (filterKelas) {
-    const kelasUnik = [...new Set(dataKehadiran.map(item => item.kelas).filter(Boolean))];
-
     filterKelas.innerHTML = `<option value="Semua">Semua Kelas</option>`;
 
-    kelasUnik.forEach(kelas => {
+    kelasOptions.forEach(kelas => {
       filterKelas.innerHTML += `<option value="${kelas}">Kelas ${kelas}</option>`;
     });
   }
 
   if (filterMapel) {
-    const mapelUnik = [...new Set(dataKehadiran.map(item => item.mapel).filter(Boolean))];
-
     filterMapel.innerHTML = `<option value="Semua">Semua Mapel</option>`;
 
-    mapelUnik.forEach(mapel => {
+    mapelOptions.forEach(mapel => {
       filterMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
     });
   }
@@ -249,6 +247,8 @@ function loadKehadiranDatabase() {
 
       if (result.status === "success") {
         dataKehadiran = result.data || [];
+        kelasOptions = result.kelas_options || [];
+        mapelOptions = result.mapel_options || [];
 
         isiFilterDariDatabase();
         renderSemua();

@@ -22,11 +22,14 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
-/* Ambil mapel guru yang sedang login */
+/* Ambil mapel guru login */
 $getGuru = $conn->prepare("
-    SELECT id_mapel
-    FROM guru
-    WHERE id_guru = ?
+    SELECT 
+        g.id_mapel,
+        m.nama_mapel
+    FROM guru g
+    LEFT JOIN mapel m ON g.id_mapel = m.id_mapel
+    WHERE g.id_guru = ?
     LIMIT 1
 ");
 
@@ -44,6 +47,27 @@ if ($resultGuru->num_rows === 0) {
 
 $guru = $resultGuru->fetch_assoc();
 $id_mapel_guru = (int) $guru["id_mapel"];
+$nama_mapel_guru = $guru["nama_mapel"] ?? "-";
+
+/* Ambil semua kelas untuk dropdown */
+$getKelas = $conn->prepare("
+    SELECT nama_kelas
+    FROM kelas
+    ORDER BY nama_kelas ASC
+");
+
+if (!$getKelas) {
+    kirim_json("error", "Query kelas gagal: " . $conn->error);
+}
+
+$getKelas->execute();
+$resultKelas = $getKelas->get_result();
+
+$kelasOptions = [];
+
+while ($kelas = $resultKelas->fetch_assoc()) {
+    $kelasOptions[] = $kelas["nama_kelas"];
+}
 
 /* Ambil data kehadiran dari tabel nilai */
 $stmt = $conn->prepare("
@@ -98,6 +122,8 @@ while ($row = $result->fetch_assoc()) {
 }
 
 kirim_json("success", "Data kehadiran berhasil dimuat.", [
-    "data" => $data
+    "data" => $data,
+    "kelas_options" => $kelasOptions,
+    "mapel_options" => [$nama_mapel_guru]
 ]);
 ?>
