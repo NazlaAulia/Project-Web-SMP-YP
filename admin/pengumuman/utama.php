@@ -1,13 +1,11 @@
 <?php
 require_once __DIR__ . '/../koneksi.php';
 
-$query = "
+$result = $conn->query("
     SELECT *
     FROM pengumuman
     ORDER BY tanggal DESC, id_pengumuman DESC
-";
-
-$result = $conn->query($query);
+");
 
 if (!$result) {
     die("Query gagal: " . $conn->error);
@@ -39,8 +37,8 @@ $statusMessage = $_GET['status'] ?? '';
 
     <link rel="icon" type="image/x-icon" href="/admin/datasiswa/images.webp">
 
-    <link rel="stylesheet" href="/admin/components/admin-nav.css?v=9999">
-    <link rel="stylesheet" href="/admin/pengumuman/pengumuman.css?v=9999">
+    <link rel="stylesheet" href="/admin/components/admin-nav.css?v=99999">
+    <link rel="stylesheet" href="/admin/pengumuman/pengumuman.css?v=99999">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -239,6 +237,6 @@ $statusMessage = $_GET['status'] ?? '';
     </main>
 </div>
 
-<script src="/admin/components/admin-nav.js?v=9999"></script>
+<script src="/admin/components/admin-nav.js?v=99999"></script>
 </body>
 </html>
