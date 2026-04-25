@@ -1,21 +1,4 @@
-const dataKehadiran = [
-  { nama: "Alya Putri", kelas: "7A", mapel: "BIN", semester: "Genap", hadir: 14, izin: 1, sakit: 0, alfa: 0 },
-  { nama: "Bagas Pratama", kelas: "7A", mapel: "BIN", semester: "Genap", hadir: 12, izin: 2, sakit: 1, alfa: 0 },
-  { nama: "Citra Lestari", kelas: "7B", mapel: "MAT", semester: "Genap", hadir: 15, izin: 0, sakit: 0, alfa: 0 },
-  { nama: "Dimas Saputra", kelas: "7C", mapel: "IPA", semester: "Genap", hadir: 10, izin: 1, sakit: 2, alfa: 2 },
-
-  { nama: "Eka Rahma", kelas: "8A", mapel: "BIG", semester: "Genap", hadir: 13, izin: 1, sakit: 1, alfa: 0 },
-  { nama: "Farel Akbar", kelas: "8B", mapel: "IPS", semester: "Genap", hadir: 11, izin: 2, sakit: 1, alfa: 1 },
-  { nama: "Gina Maharani", kelas: "8C", mapel: "PKN", semester: "Genap", hadir: 15, izin: 0, sakit: 0, alfa: 0 },
-
-  { nama: "Hana Putri", kelas: "9A", mapel: "INFOR", semester: "Genap", hadir: 14, izin: 0, sakit: 1, alfa: 0 },
-  { nama: "Iqbal Ramadhan", kelas: "9B", mapel: "PJOK", semester: "Genap", hadir: 11, izin: 1, sakit: 2, alfa: 1 },
-  { nama: "Jovan Kurnia", kelas: "9C", mapel: "PAI/BHQ", semester: "Genap", hadir: 13, izin: 1, sakit: 0, alfa: 1 },
-
-  { nama: "Kirana Salsabila", kelas: "7A", mapel: "MAT", semester: "Ganjil", hadir: 13, izin: 1, sakit: 1, alfa: 0 },
-  { nama: "Lutfi Maulana", kelas: "8C", mapel: "BK", semester: "Ganjil", hadir: 12, izin: 2, sakit: 0, alfa: 1 },
-  { nama: "Mira Anjani", kelas: "9A", mapel: "IPS", semester: "Ganjil", hadir: 14, izin: 1, sakit: 0, alfa: 0 }
-];
+let dataKehadiran = [];
 
 const filterSemester = document.getElementById("filterSemester");
 const filterKelas = document.getElementById("filterKelas");
@@ -38,6 +21,9 @@ const chartHadirBar = document.getElementById("chartHadirBar");
 const chartIzinBar = document.getElementById("chartIzinBar");
 const chartSakitBar = document.getElementById("chartSakitBar");
 const chartAlfaBar = document.getElementById("chartAlfaBar");
+
+const idGuruLogin = localStorage.getItem("id_guru");
+const roleIdLogin = localStorage.getItem("role_id");
 
 function getStatus(item) {
   if (item.alfa >= 2) return "Perlu Perhatian";
@@ -62,10 +48,10 @@ function formatStatusClass(status) {
 }
 
 function getFilteredData() {
-  const semester = filterSemester.value;
-  const kelas = filterKelas.value;
-  const mapel = filterMapel.value;
-  const keyword = searchInput.value.trim().toLowerCase();
+  const semester = filterSemester ? filterSemester.value : "Semua";
+  const kelas = filterKelas ? filterKelas.value : "Semua";
+  const mapel = filterMapel ? filterMapel.value : "Semua";
+  const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
   return dataKehadiran.filter(item => {
     const status = getStatus(item);
@@ -94,20 +80,20 @@ function getFilteredData() {
 
 function hitungTotal(data) {
   return {
-    hadir: data.reduce((sum, item) => sum + item.hadir, 0),
-    izin: data.reduce((sum, item) => sum + item.izin, 0),
-    sakit: data.reduce((sum, item) => sum + item.sakit, 0),
-    alfa: data.reduce((sum, item) => sum + item.alfa, 0)
+    hadir: data.reduce((sum, item) => sum + Number(item.hadir), 0),
+    izin: data.reduce((sum, item) => sum + Number(item.izin), 0),
+    sakit: data.reduce((sum, item) => sum + Number(item.sakit), 0),
+    alfa: data.reduce((sum, item) => sum + Number(item.alfa), 0)
   };
 }
 
 function updateSummary(data) {
   const total = hitungTotal(data);
 
-  totalHadirEl.textContent = total.hadir;
-  totalIzinEl.textContent = total.izin;
-  totalSakitEl.textContent = total.sakit;
-  totalAlfaEl.textContent = total.alfa;
+  if (totalHadirEl) totalHadirEl.textContent = total.hadir;
+  if (totalIzinEl) totalIzinEl.textContent = total.izin;
+  if (totalSakitEl) totalSakitEl.textContent = total.sakit;
+  if (totalAlfaEl) totalAlfaEl.textContent = total.alfa;
 
   updateChart(total);
 }
@@ -115,17 +101,20 @@ function updateSummary(data) {
 function updateChart(total) {
   const maxValue = Math.max(total.hadir, total.izin, total.sakit, total.alfa, 1);
 
-  chartHadirValue.textContent = total.hadir;
-  chartIzinValue.textContent = total.izin;
-  chartSakitValue.textContent = total.sakit;
-  chartAlfaValue.textContent = total.alfa;
+  if (chartHadirValue) chartHadirValue.textContent = total.hadir;
+  if (chartIzinValue) chartIzinValue.textContent = total.izin;
+  if (chartSakitValue) chartSakitValue.textContent = total.sakit;
+  if (chartAlfaValue) chartAlfaValue.textContent = total.alfa;
 
-  chartHadirBar.style.width = `${(total.hadir / maxValue) * 100}%`;
-  chartIzinBar.style.width = `${(total.izin / maxValue) * 100}%`;
-  chartSakitBar.style.width = `${(total.sakit / maxValue) * 100}%`;
-  chartAlfaBar.style.width = `${(total.alfa / maxValue) * 100}%`;
+  if (chartHadirBar) chartHadirBar.style.width = `${(total.hadir / maxValue) * 100}%`;
+  if (chartIzinBar) chartIzinBar.style.width = `${(total.izin / maxValue) * 100}%`;
+  if (chartSakitBar) chartSakitBar.style.width = `${(total.sakit / maxValue) * 100}%`;
+  if (chartAlfaBar) chartAlfaBar.style.width = `${(total.alfa / maxValue) * 100}%`;
 }
+
 function renderKelasCards(data) {
+  if (!kelasContainer) return;
+
   if (data.length === 0) {
     kelasContainer.innerHTML = `
       <div class="empty-kelas-card">
@@ -170,6 +159,8 @@ function renderKelasCards(data) {
 }
 
 function renderTable(data) {
+  if (!detailTableBody) return;
+
   if (data.length === 0) {
     detailTableBody.innerHTML = `
       <tr>
@@ -204,6 +195,28 @@ function renderTable(data) {
   }).join("");
 }
 
+function isiFilterDariDatabase() {
+  if (filterKelas) {
+    const kelasUnik = [...new Set(dataKehadiran.map(item => item.kelas).filter(Boolean))];
+
+    filterKelas.innerHTML = `<option value="Semua">Semua Kelas</option>`;
+
+    kelasUnik.forEach(kelas => {
+      filterKelas.innerHTML += `<option value="${kelas}">Kelas ${kelas}</option>`;
+    });
+  }
+
+  if (filterMapel) {
+    const mapelUnik = [...new Set(dataKehadiran.map(item => item.mapel).filter(Boolean))];
+
+    filterMapel.innerHTML = `<option value="Semua">Semua Mapel</option>`;
+
+    mapelUnik.forEach(mapel => {
+      filterMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
+    });
+  }
+}
+
 function renderSemua() {
   const filteredData = getFilteredData();
 
@@ -216,18 +229,53 @@ function setupCardAnimation() {
   const cards = document.querySelectorAll(".click-animate");
 
   cards.forEach(card => {
-    card.addEventListener("click", function (event) {
+    card.addEventListener("click", function () {
       card.classList.remove("card-active");
-
-      void card.offsetWidth;
-
-      card.classList.add("card-active");
     });
   });
 }
-filterSemester.addEventListener("change", renderSemua);
-filterKelas.addEventListener("change", renderSemua);
-filterMapel.addEventListener("change", renderSemua);
-searchInput.addEventListener("input", renderSemua);
 
-renderSemua();
+function loadKehadiranDatabase() {
+  if (!idGuruLogin || roleIdLogin !== "2") {
+    alert("Silakan login sebagai guru terlebih dahulu.");
+    window.location.href = "../login.html";
+    return;
+  }
+
+  fetch(`get_kehadiran.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
+    .then(res => res.json())
+    .then(result => {
+      console.log("Data kehadiran:", result);
+
+      if (result.status === "success") {
+        dataKehadiran = result.data || [];
+
+        isiFilterDariDatabase();
+        renderSemua();
+      } else {
+        alert(result.message);
+      }
+    })
+    .catch(err => {
+      console.error("Gagal load kehadiran:", err);
+      alert("Gagal memuat data kehadiran.");
+    });
+}
+
+if (filterSemester) {
+  filterSemester.addEventListener("change", renderSemua);
+}
+
+if (filterKelas) {
+  filterKelas.addEventListener("change", renderSemua);
+}
+
+if (filterMapel) {
+  filterMapel.addEventListener("change", renderSemua);
+}
+
+if (searchInput) {
+  searchInput.addEventListener("input", renderSemua);
+}
+
+loadKehadiranDatabase();
