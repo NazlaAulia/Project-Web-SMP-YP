@@ -1435,3 +1435,162 @@ body {
     min-height: 240px;
   }
 }
+/* =========================
+   FIX FINAL PROFIL GURU COMPACT
+   Jangan ubah logika, hanya rapikan UI
+========================= */
+
+/* layout kiri kanan dibuat lebih proporsional */
+.profil-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.65fr) !important;
+    gap: 22px !important;
+    align-items: start !important;
+}
+
+/* card kiri dan kanan jangan terlalu besar */
+.profil-main-card,
+.side-card {
+    background: #ffffff !important;
+    border-radius: 24px !important;
+    padding: 24px 26px !important;
+    box-shadow: 0 8px 28px rgba(7, 72, 74, 0.08) !important;
+}
+
+/* judul card jangan jumbo */
+.card-header h2,
+.side-card h2 {
+    font-size: 1.45rem !important;
+    line-height: 1.25 !important;
+    margin: 0 0 8px !important;
+    color: var(--primary) !important;
+    font-weight: 800 !important;
+}
+
+/* deskripsi lebih rapat */
+.card-header p,
+.side-card p {
+    font-size: 0.92rem !important;
+    line-height: 1.55 !important;
+    margin: 0 0 20px !important;
+    color: var(--text-gray) !important;
+}
+
+/* grid form lebih rapi */
+.profil-form-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 18px 22px !important;
+    align-items: start !important;
+}
+
+/* label normal */
+.form-group label {
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    color: var(--primary) !important;
+    margin-bottom: 9px !important;
+}
+
+/* input jangan tinggi banget */
+.form-group input,
+.form-group select {
+    width: 100% !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    border-radius: 16px !important;
+    border: 1px solid #dfe7e6 !important;
+    background: #f6faf9 !important;
+    padding: 0 16px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: var(--primary) !important;
+    box-shadow: none !important;
+}
+
+/* readonly tetap terlihat rapi */
+.form-group input[readonly],
+.form-group select:disabled {
+    background: #f3f7f6 !important;
+    cursor: default !important;
+    opacity: 1 !important;
+}
+
+/* tombol pengaturan jangan terlalu tinggi */
+.btn-pengaturan {
+    min-height: 54px !important;
+    border-radius: 16px !important;
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    margin-top: 6px !important;
+    padding: 13px 16px !important;
+}
+
+/* kolom kanan */
+.profil-side-column {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 22px !important;
+}
+
+/* status card jangan jumbo */
+.status-card {
+    min-height: 220px !important;
+    padding: 26px 24px !important;
+}
+
+.status-icon-wrap {
+    width: 58px !important;
+    height: 58px !important;
+    border-radius: 18px !important;
+    margin-bottom: 14px !important;
+}
+
+.status-icon-wrap i {
+    font-size: 1.45rem !important;
+}
+
+.status-card h3 {
+    font-size: 0.95rem !important;
+    margin: 0 0 8px !important;
+    color: var(--text-gray) !important;
+    font-weight: 800 !important;
+}
+
+.status-card h2 {
+    font-size: 2rem !important;
+    line-height: 1.1 !important;
+    margin: 0 0 10px !important;
+    color: var(--success) !important;
+    font-weight: 800 !important;
+}
+
+.status-card p {
+    font-size: 0.9rem !important;
+    line-height: 1.55 !important;
+    max-width: 230px !important;
+    margin: 0 !important;
+    color: var(--text-gray) !important;
+}
+
+/* responsive */
+@media (max-width: 1100px) {
+    .profil-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .profil-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .profil-form-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .profil-main-card,
+    .side-card {
+        padding: 22px 20px !important;
+    }
+}
