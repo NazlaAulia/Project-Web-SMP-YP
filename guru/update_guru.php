@@ -56,7 +56,10 @@ if ($resultCek->num_rows === 0) {
 
 $update = $conn->prepare("
     UPDATE guru 
-    SET nama = ?, nip = ?, email = ?, id_mapel = ?
+    SET nama = ?, 
+        nip = ?, 
+        email = ?, 
+        id_mapel = ?
     WHERE id_guru = ?
 ");
 
