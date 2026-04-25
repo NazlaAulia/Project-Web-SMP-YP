@@ -24,16 +24,18 @@
 }
 
 .logo {
-    padding: 0 25px 30px;
+    padding: 0 18px 30px;
     display: flex;
     flex-direction: column;
 }
 
 .logo strong {
-    font-size: 18px;
-    letter-spacing: 1px;
+    font-size: 17px;
+    letter-spacing: 0.3px;
     font-weight: 700;
     color: #fff;
+    white-space: nowrap;
+    line-height: 1.25;
 }
 
 .logo span {
@@ -345,8 +347,13 @@ details[open] .arrow {
     }
 
     /* Tambahno nang baris paling dhuwur file admin-nav.css */
-#admin-nav-root * {
-    font-family: 'Poppins', sans-serif !important;
+#admin-nav-root,
+#admin-nav-root span,
+#admin-nav-root strong,
+#admin-nav-root h2,
+#admin-nav-root a,
+#admin-nav-root button {
+    font-family: 'Poppins', sans-serif;
 }
 
 .logo strong {

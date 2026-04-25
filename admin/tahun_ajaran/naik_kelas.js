@@ -11,7 +11,8 @@ const confirmPopup = document.getElementById("confirmPopup");
 const closeConfirmPopup = document.getElementById("closeConfirmPopup");
 const cancelConfirmBtn = document.getElementById("cancelConfirmBtn");
 const confirmProcessBtn = document.getElementById("confirmProcessBtn");
-
+const confirmText = document.getElementById("confirmText");
+const confirmMessage = document.getElementById("confirmMessage");
 
 let pendingFormData = null;
 
@@ -97,7 +98,6 @@ function renderWaliKelas(kelas, guru) {
     });
 }
 
-/* Submit form: buka popup dulu, belum proses database */
 naikKelasForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
@@ -110,14 +110,11 @@ naikKelasForm.addEventListener("submit", (event) => {
     openPopup();
 });
 
-/* Tombol Ya, Proses: baru cek NAIKKELAS dan proses database */
 confirmProcessBtn.addEventListener("click", async () => {
     if (!pendingFormData) return;
 
-    const confirmText = document.getElementById("confirmText");
-
-    if (!confirmText || confirmText.value.trim() !== "NAIKKELAS") {
-        showMessage("Ketik NAIKKELAS dulu untuk melanjutkan.", "error");
+    if (!confirmText || confirmText.value.trim().toUpperCase() !== "NAIKKELAS") {
+        showConfirmMessage("Ketik NAIKKELAS dulu untuk melanjutkan.");
         return;
     }
 
@@ -137,10 +134,10 @@ confirmProcessBtn.addEventListener("click", async () => {
             showMessage(result.message || "Proses naik kelas berhasil.", "success");
             loadNaikKelasData();
         } else {
-            showMessage(result.message || "Proses naik kelas gagal.", "error");
+            showConfirmMessage(result.message || "Proses naik kelas gagal.");
         }
     } catch (error) {
-        showMessage("Terjadi kesalahan server saat proses naik kelas.", "error");
+        showConfirmMessage("Terjadi kesalahan server saat proses naik kelas.");
     } finally {
         confirmProcessBtn.disabled = false;
         confirmProcessBtn.textContent = "Ya, Proses";
@@ -153,18 +150,39 @@ cancelConfirmBtn.addEventListener("click", closePopup);
 
 function openPopup() {
     confirmPopup.classList.add("active");
+
+    if (confirmText) {
+        confirmText.value = "";
+        setTimeout(() => confirmText.focus(), 100);
+    }
+
+    if (confirmMessage) {
+        confirmMessage.textContent = "";
+    }
 }
 
 function closePopup() {
     confirmPopup.classList.remove("active");
+    pendingFormData = null;
 
-    const confirmText = document.getElementById("confirmText");
     if (confirmText) {
         confirmText.value = "";
+    }
+
+    if (confirmMessage) {
+        confirmMessage.textContent = "";
     }
 }
 
 function showMessage(message, type) {
     formMessage.textContent = message;
     formMessage.className = `form-message ${type}`;
+}
+
+function showConfirmMessage(message) {
+    if (confirmMessage) {
+        confirmMessage.textContent = message;
+    } else {
+        showMessage(message, "error");
+    }
 }

@@ -410,3 +410,11 @@ button,
     border-color: var(--primary-teal);
     box-shadow: 0 0 0 3px rgba(6, 78, 75, 0.08);
 }
+
+
+.confirm-message {
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #b91c1c;
+}
