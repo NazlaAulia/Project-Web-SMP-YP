@@ -10,11 +10,14 @@
 </head>
 <body class="dashboard-body">
 
-  <div class="dashboard-wrapper">
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <img src="../img/logo.webp" alt="Logo" class="logo" />
-      </div>
+ <nav class="sidebar">
+  <div class="sidebar-header">
+    <img src="../img/logo.webp" alt="Logo" class="logo" />
+
+    <button class="hamburger" id="hamburgerBtn" type="button">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
 
       <ul class="sidebar-menu">
   <li class="active">
@@ -154,6 +157,21 @@
       logoutModal.classList.remove("show");
     }
   });
+</script>
+
+<script>
+  const siswaHamburgerBtn = document.getElementById("hamburgerBtn");
+  const siswaSidebar = document.querySelector(".sidebar");
+
+  if (siswaHamburgerBtn && siswaSidebar) {
+    siswaHamburgerBtn.addEventListener("click", function () {
+      siswaSidebar.classList.toggle("show-menu");
+
+      const icon = siswaHamburgerBtn.querySelector("i");
+      icon.classList.toggle("fa-bars");
+      icon.classList.toggle("fa-xmark");
+    });
+  }
 </script>
 </body>
 </html>

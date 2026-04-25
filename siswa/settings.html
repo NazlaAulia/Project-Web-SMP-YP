@@ -12,9 +12,13 @@
 
 <div class="dashboard-wrapper">
     <nav class="sidebar">
-        <div class="sidebar-header">
-            <img src="../img/logo.webp" alt="Logo" class="logo" />
-        </div>
+       <div class="sidebar-header">
+    <img src="../img/logo.webp" alt="Logo" class="logo" />
+
+    <button class="hamburger" id="hamburgerBtn" type="button">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+</div>
 
  <ul class="sidebar-menu">
   <li>
@@ -196,5 +200,19 @@
     });
 </script>
 
+<script>
+  const settingsHamburgerBtn = document.getElementById("hamburgerBtn");
+  const settingsSidebar = document.querySelector(".sidebar");
+
+  if (settingsHamburgerBtn && settingsSidebar) {
+    settingsHamburgerBtn.addEventListener("click", function () {
+      settingsSidebar.classList.toggle("show-menu");
+
+      const icon = settingsHamburgerBtn.querySelector("i");
+      icon.classList.toggle("fa-bars");
+      icon.classList.toggle("fa-xmark");
+    });
+  }
+</script>
 </body>
 </html>
