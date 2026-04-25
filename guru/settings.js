@@ -11,6 +11,23 @@ const idGuruLogin = localStorage.getItem("id_guru");
 const roleIdLogin = localStorage.getItem("role_id");
 const usernameLogin = localStorage.getItem("username");
 
+const togglePasswordButtons = document.querySelectorAll(".toggle-password");
+
+togglePasswordButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+        const targetId = this.getAttribute("data-target");
+        const input = document.getElementById(targetId);
+        const icon = this.querySelector("i");
+
+        if (!input || !icon) return;
+
+        const isPassword = input.type === "password";
+
+        input.type = isPassword ? "text" : "password";
+        icon.className = isPassword ? "bi bi-eye-slash" : "bi bi-eye";
+    });
+});
+
 function isiUsernameLama(username) {
     if (usernameLamaInput) {
         usernameLamaInput.value = username || "";
