@@ -47,7 +47,8 @@ $statusMessage = $_GET['status'] ?? '';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
-<a href="/admin/pengumuman/utama.php" data-subpage="pengumuman">Pengumuman</a>
+</head>
+<body data-page="pengumuman" data-nav-path="/admin/components/admin-nav.html">
 
 <div class="container">
     <div id="admin-nav-root"></div>
