@@ -1412,3 +1412,162 @@ header {
     border-radius: 50% !important;
     display: block !important;
 }
+/* =========================
+   DASHBOARD CLEAN AKADEMIK
+   hanya UI, tidak ubah logika
+========================= */
+
+.main-banner,
+.course-card,
+.side-card,
+.click-animate {
+    cursor: default !important;
+    transition: box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease !important;
+}
+
+.main-banner:hover,
+.course-card:hover,
+.side-card:hover,
+.click-animate:hover {
+    transform: none !important;
+}
+
+.main-banner.banner-active,
+.course-card.card-active,
+.side-card.card-active,
+.ranking-card.card-active .rank-item,
+.course-card.card-active .course-thumb i,
+.side-card.card-active h3 {
+    animation: none !important;
+}
+
+/* Mapel dibuat lebih compact */
+.course-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+}
+
+.course-card {
+    min-height: auto !important;
+    padding: 18px !important;
+    border: 1px solid #e4ece9 !important;
+    box-shadow: 0 8px 24px rgba(7, 72, 74, 0.07) !important;
+}
+
+.course-thumb {
+    height: 88px !important;
+    border-radius: 16px !important;
+}
+
+.course-info h4 {
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    color: var(--primary) !important;
+    margin-bottom: 4px !important;
+}
+
+.course-info p {
+    font-size: 0.88rem !important;
+    color: var(--text-gray) !important;
+    line-height: 1.4 !important;
+}
+
+/* Kehadiran dan peringkat dashboard lebih terlihat */
+.right-column {
+    margin-top: 2px !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 22px !important;
+}
+
+.side-card {
+    border: 1px solid #e4ece9 !important;
+    border-radius: 24px !important;
+    padding: 26px !important;
+    min-height: 220px !important;
+    box-shadow: 0 10px 28px rgba(7, 72, 74, 0.08) !important;
+}
+
+.side-card h3 {
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    color: var(--primary) !important;
+    margin-bottom: 18px !important;
+}
+
+.stat-circle {
+    background: #f4f8f7 !important;
+    border: 1px solid #e4ece9 !important;
+    border-radius: 22px !important;
+    padding: 22px !important;
+    margin-bottom: 18px !important;
+}
+
+.stat-circle strong {
+    font-size: 2.8rem !important;
+    color: var(--primary) !important;
+}
+
+.stat-circle span {
+    color: var(--text-gray) !important;
+    font-weight: 700 !important;
+}
+
+.stat-item {
+    padding-top: 12px !important;
+    border-top: 1px solid #edf2f0 !important;
+}
+
+.rank-item {
+    background: #f7fbfa !important;
+    border: 1px solid #e7efed !important;
+    border-radius: 16px !important;
+    padding: 14px !important;
+    margin-top: 12px !important;
+}
+
+.rank-avatar {
+    background: #e8f3f2 !important;
+    color: var(--primary) !important;
+}
+
+.rank-info span {
+    font-weight: 800 !important;
+    color: var(--primary) !important;
+}
+
+.rank-info small {
+    color: var(--text-gray) !important;
+}
+
+/* responsive */
+@media (max-width: 1300px) {
+    .course-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 950px) {
+    .course-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .right-column {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .course-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .course-thumb {
+        height: 92px !important;
+    }
+
+    .side-card {
+        min-height: auto !important;
+        padding: 20px !important;
+    }
+}

@@ -4,12 +4,25 @@ const dataSiswa = [
     { rank: 3, nama: "Budi Santoso", kelas: "9A", nilai: 72, status: "Need Attention" }
 ];
 
-function renderPeringkat() {
-    const tbody = document.getElementById('rankingBody');
-    tbody.innerHTML = '';
+function renderPeringkat(data = dataSiswa) {
+    const tbody = document.getElementById("rankingBody");
+    if (!tbody) return;
 
-    dataSiswa.forEach(siswa => {
-        let colorClass = siswa.nilai >= 90 ? 'bg-excellent' : (siswa.nilai >= 75 ? 'bg-good' : 'bg-warning');
+    tbody.innerHTML = "";
+
+    if (data.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center; color:#667784;">
+                    Data peringkat tidak ditemukan.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    data.forEach(siswa => {
+        let colorClass = siswa.nilai >= 90 ? "bg-excellent" : (siswa.nilai >= 75 ? "bg-good" : "bg-warning");
 
         tbody.innerHTML += `
             <tr>
@@ -33,4 +46,28 @@ function renderPeringkat() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', renderPeringkat);
+function setupSearchPeringkat() {
+    const searchInput = document.getElementById("searchRanking");
+    if (!searchInput) return;
+
+    searchInput.addEventListener("input", function () {
+        const keyword = this.value.trim().toLowerCase();
+
+        const hasilFilter = dataSiswa.filter(siswa => {
+            return `
+                ${siswa.rank}
+                ${siswa.nama}
+                ${siswa.kelas}
+                ${siswa.nilai}
+                ${siswa.status}
+            `.toLowerCase().includes(keyword);
+        });
+
+        renderPeringkat(hasilFilter);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    renderPeringkat();
+    setupSearchPeringkat();
+});
