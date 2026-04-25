@@ -2,14 +2,13 @@
 
 :root {
     --primary: #07484a;
-    --white: #ffffff;
-    --bg-soft: #f4f7f6;
-    --danger: #dc2626;
-    --danger-hover: #b91c1c;
-    --text-dark: #102a2a;
-    --text-gray: #6b7a7a;
-    --border: #dfe7e5;
-    --shadow: 0 8px 28px rgba(7, 72, 74, 0.08);
+    --text-soft: #6f7f80;
+    --success: #0f8b7f;
+    --success-dark: #0b6f67;
+    --danger: #e11d2e;
+    --danger-dark: #b91c1c;
+    --border: #e4ece9;
+    --shadow: 0 18px 45px rgba(7, 72, 74, 0.10);
 }
 
 * {
@@ -19,203 +18,223 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
+html,
 body {
-    background: var(--bg-soft);
+    width: 100%;
     min-height: 100vh;
 }
 
-/* Layout sidebar + content */
-.app-container {
-    display: flex;
-    min-height: 100vh;
+body {
+    background: linear-gradient(90deg, #f6f4ed 0%, #edf4f2 100%);
+    overflow-x: hidden;
 }
 
-.main-content {
-    flex: 1;
-    margin-left: 260px;
-    width: calc(100% - 260px);
+/* PAGE CENTER */
+.logout-page {
+    width: 100%;
     min-height: 100vh;
-}
-
-/* WRAPPER */
-.logout-wrapper {
-    min-height: 100vh;
+    padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px;
 }
 
 /* CARD */
 .logout-card {
     width: 100%;
     max-width: 460px;
-    background: var(--white);
-    border-radius: 22px;
+    background: #ffffff;
+    border: 1px solid #edf2f0;
+    border-radius: 26px;
     box-shadow: var(--shadow);
-    padding: 32px;
+    padding: 24px 30px 30px;
+}
+
+/* HEADER */
+.logout-header {
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.school-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     text-align: left;
 }
 
-/* ICON */
-.logout-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    background: #fff1f1;
-    color: var(--danger);
+.school-logo-frame {
+    width: 92px;
+    height: 92px;
+    min-width: 92px;
+    overflow: visible;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.7rem;
-    margin-bottom: 22px;
+    margin-right: -10px;
 }
 
-/* TEXT */
-.logout-card h1 {
-    font-size: 1.65rem;
+.school-logo {
+    width: 92px !important;
+    height: 92px !important;
+    object-fit: contain !important;
+    display: block !important;
+    transform: scale(1.35);
+    transform-origin: center;
+}
+.school-text h2 {
+    font-size: 1.18rem;
     font-weight: 800;
     color: var(--primary);
-    margin-bottom: 10px;
+    line-height: 1.2;
+    margin: 0 0 3px;
 }
 
-.logout-card p {
-    color: var(--text-gray);
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 26px;
+.school-text p {
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    line-height: 1.35;
+    margin: 0;
 }
 
-/* BUTTON AREA */
-.logout-actions {
-    display: flex;
-    gap: 12px;
+/* BODY */
+.logout-body {
+    text-align: center;
 }
 
-/* BUTTON */
-.btn-secondary,
-.btn-danger {
-    flex: 1;
-    text-decoration: none;
-    border-radius: 12px;
-    padding: 13px 18px;
-    font-size: 15px;
-    font-weight: 700;
+.logout-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 9px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: #f4e8d1;
+    color: #ad700f;
+    font-size: 0.88rem;
+    font-weight: 800;
+    margin-bottom: 14px;
+}
+
+.logout-body h1 {
+    max-width: 430px;
+    margin: 0 auto 12px;
+    font-size: 1.72rem;
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--primary);
+}
+
+.logout-body h1 span {
+    display: block;
+}
+
+.logout-desc {
+    max-width: 390px;
+    margin: 0 auto 22px;
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    line-height: 1.65;
+}
+
+/* BUTTONS */
+.logout-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+.btn-cancel,
+.btn-logout {
+    min-width: 155px;
+    padding: 13px 20px;
+    border-radius: 15px;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.98rem;
+    font-weight: 800;
     transition: 0.2s ease;
 }
 
-.btn-secondary {
-    background: #eef4f3;
-    color: var(--primary);
-    border: 1px solid var(--border);
+.btn-cancel {
+    background: linear-gradient(180deg, #159687 0%, #0f7c71 100%);
+    color: #ffffff;
+    box-shadow: 0 10px 22px rgba(15, 124, 113, 0.2);
 }
 
-.btn-secondary:hover {
-    background: #e3eeec;
+.btn-cancel:hover {
+    background: linear-gradient(180deg, #13897c 0%, #0b6f67 100%);
 }
 
-.btn-danger {
-    background: var(--danger);
-    color: var(--white);
+.btn-logout {
+    background: linear-gradient(180deg, #ff3b3b 0%, #df1717 100%);
+    color: #ffffff;
+    box-shadow: 0 12px 26px rgba(223, 23, 23, 0.25);
 }
 
-.btn-danger:hover {
-    background: var(--danger-hover);
-}
-
-/* TABLET */
-@media (max-width: 900px) {
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-    }
-}
-
-@media (max-width: 768px) {
-    .logout-wrapper {
-        padding: 24px;
-    }
-
-    .logout-card {
-        max-width: 420px;
-        padding: 28px;
-        border-radius: 20px;
-    }
-
-    .logout-card h1 {
-        font-size: 1.45rem;
-    }
-
-    .logout-card p {
-        font-size: 14px;
-    }
+.btn-logout:hover {
+    background: linear-gradient(180deg, #f63333 0%, #b91c1c 100%);
 }
 
 /* MOBILE */
-@media (max-width: 480px) {
-    .logout-wrapper {
-        align-items: flex-start;
-        padding: 80px 16px 24px;
+@media (max-width: 560px) {
+    .logout-page {
+        padding: 16px;
     }
 
     .logout-card {
         max-width: 100%;
-        padding: 24px 20px;
-        border-radius: 18px;
+        padding: 22px 18px 26px;
+        border-radius: 22px;
     }
 
-    .logout-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-        border-radius: 14px;
-        margin-bottom: 18px;
+    .school-brand {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
     }
 
-    .logout-card h1 {
-        font-size: 1.3rem;
-        margin-bottom: 8px;
+    .school-logo-frame {
+        width: 82px;
+        height: 82px;
+        min-width: 82px;
     }
 
-    .logout-card p {
-        font-size: 14px;
-        line-height: 1.6;
-        margin-bottom: 22px;
+    .school-logo {
+        width: 82px !important;
+        height: 82px !important;
+        transform: scale(1.8);
+    }
+
+    .school-text {
+        text-align: center;
+    }
+
+    .school-text h2 {
+        font-size: 1.08rem;
+    }
+
+    .school-text p {
+        font-size: 0.86rem;
+    }
+
+    .logout-body h1 {
+        font-size: 1.45rem;
+    }
+
+    .logout-desc {
+        font-size: 0.9rem;
     }
 
     .logout-actions {
         flex-direction: column;
-        gap: 10px;
+        gap: 11px;
     }
 
-    .btn-secondary,
-    .btn-danger {
+    .btn-cancel,
+    .btn-logout {
         width: 100%;
-        padding: 13px;
-        font-size: 14px;
-        border-radius: 11px;
-    }
-}
-
-/* HP KECIL */
-@media (max-width: 360px) {
-    .logout-wrapper {
-        padding: 80px 12px 18px;
-    }
-
-    .logout-card {
-        padding: 22px 16px;
-    }
-
-    .logout-card h1 {
-        font-size: 1.2rem;
-    }
-
-    .logout-card p {
-        font-size: 13.5px;
+        min-width: 0;
     }
 }

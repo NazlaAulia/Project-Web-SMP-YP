@@ -466,3 +466,50 @@ body {
         width: 100%;
     }
 }
+/* =========================
+   FINAL SETTINGS ACADEMIC CLEAN
+   Kurangi animasi klik agar lebih formal
+========================= */
+
+.card,
+.btn-save,
+.input-with-icon,
+.toggle-password {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease !important;
+}
+
+/* Matikan efek card naik saat hover */
+.card:hover {
+    transform: none !important;
+    box-shadow: var(--shadow) !important;
+}
+
+/* Matikan animasi klik pop */
+.click-animate,
+.click-animate:hover,
+.click-animate.settings-active {
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Cursor card jangan seperti tombol */
+.click-animate {
+    cursor: default !important;
+}
+
+/* Tombol tetap ada feedback kecil, tapi tidak lompat */
+.btn-save:hover {
+    transform: none !important;
+    background: var(--primary-dark) !important;
+}
+
+/* Input fokus tetap elegan */
+.input-with-icon:focus-within {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(7, 72, 74, 0.06) !important;
+}
+
+/* Icon mata hover cukup soft */
+.toggle-password:hover {
+    background: rgba(7, 72, 74, 0.06) !important;
+}
