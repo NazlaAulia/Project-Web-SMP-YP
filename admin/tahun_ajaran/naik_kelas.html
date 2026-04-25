@@ -31,10 +31,7 @@
                         <p>Proses tahun ajaran baru, set wali kelas, luluskan kelas 9, dan tempatkan siswa baru.</p>
                     </div>
 
-                    <a href="index.html" class="btn-secondary">
-                        <i class="fas fa-arrow-left"></i>
-                        Kembali
-                    </a>
+                   
                 </header>
 
                 <section class="summary-grid">
@@ -98,17 +95,22 @@
                             </div>
                         </div>
 
-                        <div class="action-row">
-                            <a href="../datasiswa/export_excel.php" class="btn-secondary">
-                                <i class="fas fa-file-excel"></i>
-                                Download Excel
-                            </a>
+                       <div class="action-row">
+    <a href="../datasiswa/export_excel.php" class="btn-secondary">
+        <i class="fas fa-file-excel"></i>
+        Download Excel
+    </a>
 
-                            <button type="submit" class="btn-primary">
-                                <i class="fas fa-arrow-up"></i>
-                                Proses Naik Kelas
-                            </button>
-                        </div>
+    <button type="button" class="btn-secondary" id="previewNaikKelasBtn">
+        <i class="fas fa-eye"></i>
+        Preview
+    </button>
+
+    <button type="submit" class="btn-primary">
+        <i class="fas fa-arrow-up"></i>
+        Proses Naik Kelas
+    </button>
+</div>
 
                         <div id="formMessage" class="form-message"></div>
                     </form>
@@ -125,12 +127,18 @@
                 <button type="button" class="custom-popup-close" id="closeConfirmPopup">&times;</button>
             </div>
 
-            <div class="custom-popup-body">
-                <p>
-                    Pastikan data siswa sudah di-download sebagai backup.
-                    Proses ini akan mengubah kelas siswa dan meluluskan kelas 9.
-                </p>
-            </div>
+           <div class="custom-popup-body">
+    <p>
+        Pastikan data siswa sudah di-download sebagai backup.
+        Proses ini akan mengubah kelas siswa dan meluluskan kelas 9.
+    </p>
+
+    <div class="confirm-input-group">
+        <label for="confirmText">Ketik NAIKKELAS untuk melanjutkan</label>
+        <input type="text" id="confirmText" placeholder="NAIKKELAS">
+    </div>
+</div>
+</div>
 
             <div class="custom-popup-footer">
                 <button type="button" class="custom-btn-secondary" id="cancelConfirmBtn">Batal</button>

@@ -384,3 +384,29 @@ button,
         width: 100%;
     }
 }
+
+.confirm-input-group {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.confirm-input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.confirm-input-group input {
+    border: 1px solid #d9e3e0;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 14px;
+    outline: none;
+}
+
+.confirm-input-group input:focus {
+    border-color: var(--primary-teal);
+    box-shadow: 0 0 0 3px rgba(6, 78, 75, 0.08);
+}
