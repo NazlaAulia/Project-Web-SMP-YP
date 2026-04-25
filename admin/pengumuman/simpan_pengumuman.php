@@ -15,7 +15,7 @@ $status = trim($_POST['status'] ?? 'tampil');
 $gambar_lama = trim($_POST['gambar_lama'] ?? '');
 
 if ($judul === '' || $isi === '' || $tanggal === '') {
-    header("Location: index.php?status=gagal");
+    header("Location: utama.php?status=gagal");
     exit;
 }
 
@@ -36,12 +36,12 @@ if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === UPLOAD_ERR_OK) {
     $ekstensiValid = ['jpg', 'jpeg', 'png', 'webp'];
 
     if (!in_array($ekstensi, $ekstensiValid)) {
-        header("Location: index.php?status=gagal");
+        header("Location: utama.php?status=gagal");
         exit;
     }
 
     if ($ukuranFile > 2 * 1024 * 1024) {
-        header("Location: index.php?status=gagal");
+        header("Location: utama.php?status=gagal");
         exit;
     }
 
@@ -60,7 +60,7 @@ if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === UPLOAD_ERR_OK) {
 if ($id_pengumuman > 0) {
     $stmt = $conn->prepare("
         UPDATE pengumuman
-        SET judul = ?, isi = ?, tanggal = ?, gambar = ?, kategori = ?, status = ?
+        SET judul = ?, isi = ?, gambar = ?, kategori = ?, status = ?, tanggal = ?
         WHERE id_pengumuman = ?
     ");
 
@@ -68,15 +68,15 @@ if ($id_pengumuman > 0) {
         "ssssssi",
         $judul,
         $isi,
-        $tanggal,
         $gambarPath,
         $kategori,
         $status,
+        $tanggal,
         $id_pengumuman
     );
 } else {
     $stmt = $conn->prepare("
-        INSERT INTO pengumuman (judul, isi, tanggal, gambar, kategori, status)
+        INSERT INTO pengumuman (judul, isi, gambar, kategori, status, tanggal)
         VALUES (?, ?, ?, ?, ?, ?)
     ");
 
@@ -84,19 +84,19 @@ if ($id_pengumuman > 0) {
         "ssssss",
         $judul,
         $isi,
-        $tanggal,
         $gambarPath,
         $kategori,
-        $status
+        $status,
+        $tanggal
     );
 }
 
 if ($stmt->execute()) {
     $stmt->close();
-    header("Location: index.php?status=sukses");
+    header("Location: utama.php?status=sukses");
     exit;
 }
 
 $stmt->close();
-header("Location: index.php?status=gagal");
+header("Location: utama.php?status=gagal");
 exit;
