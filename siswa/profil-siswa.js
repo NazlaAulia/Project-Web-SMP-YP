@@ -99,9 +99,7 @@ function showToast(message, type = "success") {
 
 function setProfileUI(data) {
   const nama = data?.nama || "-";
-  const nisn = data?.nis || data?.nisn
-    ? `${data?.nis || "-"} / ${data?.nisn || "-"}`
-    : "-";
+  const nisn = `${data?.nis || "-"} / ${data?.nisn || "-"}`;
   const kelas = data?.kelas || getKelasLabel(data?.id_kelas);
   const email = "-";
   const noHp = "-";
@@ -110,7 +108,7 @@ function setProfileUI(data) {
     ? "Laki-laki"
     : data?.jenis_kelamin === "P"
       ? "Perempuan"
-      : data?.jenis_kelamin || "-";
+      : "-";
   const tanggalLahir = data?.tanggal_lahir || "-";
 
   setText(elNama, nama);
