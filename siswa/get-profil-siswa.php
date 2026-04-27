@@ -28,14 +28,6 @@ if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
     }
 }
 
-if ($id_siswa <= 0 && isset($_GET['foto_profil'])) {
-    $foto_profil = $_GET['foto_profil'];
-
-    if (preg_match('/siswa_(\d+)_/', $foto_profil, $match)) {
-        $id_siswa = (int) $match[1];
-    }
-}
-
 if ($id_siswa <= 0) {
     echo json_encode([
         "success" => false,
