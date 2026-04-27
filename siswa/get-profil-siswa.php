@@ -6,7 +6,7 @@ require_once "koneksi.php";
 if (!isset($_SESSION['id_siswa']) || empty($_SESSION['id_siswa'])) {
     echo json_encode([
         "success" => false,
-        "message" => "Session id_siswa tidak ada. Login ulang."
+        "message" => "Session id_siswa kosong. Login belum menyimpan id_siswa."
     ]);
     exit;
 }
