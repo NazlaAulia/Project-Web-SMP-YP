@@ -124,13 +124,8 @@ function setProfileUI(data) {
   setText(elNamaKelas, kelas);
   setText(elAvatarPlaceholder, nama !== "-" ? nama.charAt(0).toUpperCase() : "-");
 
-  if (nama && nama !== "-") {
-    localStorage.setItem("nama_siswa", nama);
-  }
-
-  if (kelas && kelas !== "-") {
-    localStorage.setItem("kelas_siswa", kelas);
-  }
+  localStorage.setItem("nama_siswa", nama);
+  localStorage.setItem("kelas_siswa", kelas);
 
   if (data?.id_siswa) {
     localStorage.setItem("id_siswa", data.id_siswa);
@@ -138,22 +133,8 @@ function setProfileUI(data) {
 }
 
 async function loadProfilSiswa() {
-  idSiswa = cariIdSiswa();
-
-  const fotoLocal = idSiswa
-    ? localStorage.getItem(`foto_profil_${idSiswa}`)
-    : localStorage.getItem(FOTO_KEY);
-
-  setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
-
   try {
-    let url = "./get_profil_siswa.php";
-
-    if (idSiswa) {
-      url += `?id_siswa=${encodeURIComponent(idSiswa)}`;
-    }
-
-    const response = await fetch(url, {
+    const response = await fetch("./get_profil_siswa.php", {
       method: "GET",
       credentials: "same-origin",
       cache: "no-store"
@@ -167,34 +148,36 @@ async function loadProfilSiswa() {
     try {
       result = JSON.parse(text);
     } catch (e) {
-      console.error("RESPON PHP BUKAN JSON:", text);
+      console.error("PHP bukan JSON:", text);
       return;
     }
 
     if (!result.success) {
-      console.error(result.message || "Data siswa tidak ditemukan.");
+      console.error(result.message);
       return;
     }
 
     const siswaData = result.data;
 
-    if (siswaData?.id_siswa) {
-      idSiswa = siswaData.id_siswa;
+    setProfileUI(siswaData);
+
+    if (siswaData.id_siswa) {
       localStorage.setItem("id_siswa", siswaData.id_siswa);
     }
 
-    setProfileUI(siswaData);
-
-    if (siswaData?.foto_profil) {
+    if (siswaData.foto_profil) {
       const fotoUrl = siswaData.foto_profil + "?t=" + Date.now();
       setImage(elFoto, fotoUrl);
       localStorage.setItem(`foto_profil_${siswaData.id_siswa}`, siswaData.foto_profil);
       localStorage.setItem("foto_profil_siswa", siswaData.foto_profil);
     } else {
+      const fotoLocal = localStorage.getItem("foto_profil_siswa");
       setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
     }
   } catch (error) {
     console.error("Gagal load profil siswa:", error);
+
+    const fotoLocal = localStorage.getItem("foto_profil_siswa");
     setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
   }
 }
