@@ -1,11 +1,6 @@
 const idSiswa = localStorage.getItem("id_siswa");
 
-if (!idSiswa) {
-  alert("Silakan login terlebih dahulu.");
-  window.location.href = "../login.html";
-}
-
-const FOTO_KEY = `foto_profil_${idSiswa}`;
+const FOTO_KEY = idSiswa ? `foto_profil_${idSiswa}` : "foto_profil_siswa";
 const DEFAULT_PHOTO = "../img/default-profile.png";
 
 const elNama = document.getElementById("nama");
@@ -39,7 +34,7 @@ function getKelasLabel(idKelas) {
 }
 
 function setText(el, value) {
-  if (el) el.textContent = value || "-";
+  if (el) el.textContent = value && value !== "null" ? value : "-";
 }
 
 function setImage(el, src) {
@@ -70,9 +65,9 @@ function showToast(message, type = "success") {
 }
 
 function setProfileUI(data) {
-  const nama = data?.nama || "-";
+  const nama = data?.nama || data?.nama_lengkap || "-";
   const nisn = data?.nisn || data?.nis || "-";
-  const kelas = data?.kelas || getKelasLabel(data?.id_kelas);
+  const kelas = data?.kelas || data?.nama_kelas || getKelasLabel(data?.id_kelas);
   const email = data?.email || "-";
   const noHp = data?.no_hp || data?.noHp || "-";
   const alamat = data?.alamat || "-";
@@ -99,15 +94,39 @@ function setProfileUI(data) {
   if (kelas && kelas !== "-") {
     localStorage.setItem("kelas_siswa", kelas);
   }
+
+  if (data?.id_siswa) {
+    localStorage.setItem("id_siswa", data.id_siswa);
+  }
 }
 
 async function loadProfilSiswa() {
   try {
-    const response = await fetch(`./get_profil_siswa.php?id_siswa=${encodeURIComponent(idSiswa)}`);
-    const result = await response.json();
+    let url = "./get_profil_siswa.php";
+
+    if (idSiswa) {
+      url += `?id_siswa=${encodeURIComponent(idSiswa)}`;
+    }
+
+    const response = await fetch(url, {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+
+    const text = await response.text();
+    console.log("RESPON get_profil_siswa.php:", text);
+
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      throw new Error("Response PHP bukan JSON. Cek path get_profil_siswa.php");
+    }
 
     if (!result.success) {
       alert(result.message || "Data siswa tidak ditemukan.");
+      window.location.href = "../login.html";
       return;
     }
 
@@ -117,13 +136,13 @@ async function loadProfilSiswa() {
     if (siswaData?.foto_profil) {
       const fotoUrl = siswaData.foto_profil + "?t=" + Date.now();
       setImage(elFoto, fotoUrl);
-      localStorage.setItem(FOTO_KEY, siswaData.foto_profil);
+      localStorage.setItem(`foto_profil_${siswaData.id_siswa}`, siswaData.foto_profil);
     } else {
-      const fotoLocal = localStorage.getItem(FOTO_KEY);
-      setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
+      setImage(elFoto, DEFAULT_PHOTO);
     }
   } catch (error) {
     console.error("Gagal load profil siswa:", error);
+
     const fotoLocal = localStorage.getItem(FOTO_KEY);
     setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
   }
@@ -157,11 +176,15 @@ async function pilihDanUploadFoto(event) {
 
     const formData = new FormData();
     formData.append("foto", file);
-    formData.append("id_siswa", idSiswa);
+
+    if (idSiswa) {
+      formData.append("id_siswa", idSiswa);
+    }
 
     const response = await fetch("upload-foto-profil.php", {
       method: "POST",
-      body: formData
+      body: formData,
+      credentials: "same-origin"
     });
 
     const text = await response.text();
@@ -179,7 +202,12 @@ async function pilihDanUploadFoto(event) {
     }
 
     const fotoBaru = result.foto_url;
-    localStorage.setItem(FOTO_KEY, fotoBaru);
+    const idFinal = result.id_siswa || idSiswa;
+
+    if (idFinal) {
+      localStorage.setItem("id_siswa", idFinal);
+      localStorage.setItem(`foto_profil_${idFinal}`, fotoBaru);
+    }
 
     setImage(elFoto, fotoBaru + "?t=" + Date.now());
     showToast("Foto profil berhasil disimpan.", "success");
@@ -187,11 +215,7 @@ async function pilihDanUploadFoto(event) {
     console.error("Gagal upload:", error);
 
     const fotoLocal = localStorage.getItem(FOTO_KEY);
-    if (fotoLocal) {
-      setImage(elFoto, fotoLocal);
-    } else {
-      setImage(elFoto, DEFAULT_PHOTO);
-    }
+    setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
 
     showToast(
       "Gagal upload: " + (error?.message || "Terjadi kesalahan."),
