@@ -5,7 +5,7 @@ require_once "koneksi.php";
 
 $id_siswa = 0;
 
-if (isset($_GET['id_siswa'])) {
+if (isset($_GET['id_siswa']) && is_numeric($_GET['id_siswa'])) {
     $id_siswa = (int) $_GET['id_siswa'];
 }
 
@@ -16,7 +16,7 @@ if ($id_siswa <= 0 && isset($_SESSION['id_siswa'])) {
 if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
     $id_user = (int) $_SESSION['id_user'];
 
-    $queryUser = "SELECT id_siswa FROM user WHERE id_user = $id_user LIMIT 1";
+    $queryUser = "SELECT id_siswa FROM `user` WHERE id_user = $id_user LIMIT 1";
     $resultUser = mysqli_query($conn, $queryUser);
 
     if ($resultUser && mysqli_num_rows($resultUser) > 0) {
@@ -25,6 +25,14 @@ if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
         if (!empty($userData['id_siswa'])) {
             $id_siswa = (int) $userData['id_siswa'];
         }
+    }
+}
+
+if ($id_siswa <= 0 && isset($_GET['foto_profil'])) {
+    $foto_profil = $_GET['foto_profil'];
+
+    if (preg_match('/siswa_(\d+)_/', $foto_profil, $match)) {
+        $id_siswa = (int) $match[1];
     }
 }
 
@@ -39,18 +47,18 @@ if ($id_siswa <= 0) {
 $query = "
     SELECT 
         s.id_siswa,
-        s.nama,
         s.nis,
         s.nisn,
+        s.nama,
         s.jenis_kelamin,
         s.tanggal_lahir,
         s.alamat,
         s.id_kelas,
         k.nama_kelas AS kelas,
         u.foto_profil
-    FROM siswa s
-    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-    LEFT JOIN user u ON s.id_siswa = u.id_siswa
+    FROM `siswa` s
+    LEFT JOIN `kelas` k ON s.id_kelas = k.id_kelas
+    LEFT JOIN `user` u ON s.id_siswa = u.id_siswa
     WHERE s.id_siswa = $id_siswa
     LIMIT 1
 ";
