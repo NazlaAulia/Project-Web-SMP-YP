@@ -16,14 +16,15 @@ if ($id_siswa <= 0 && isset($_SESSION['id_siswa'])) {
 if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
     $id_user = (int) $_SESSION['id_user'];
 
-    $stmtUser = $conn->prepare("SELECT id_siswa FROM user WHERE id_user = ? LIMIT 1");
-    $stmtUser->bind_param("i", $id_user);
-    $stmtUser->execute();
-    $resultUser = $stmtUser->get_result();
-    $userData = $resultUser->fetch_assoc();
+    $queryUser = "SELECT id_siswa FROM user WHERE id_user = $id_user LIMIT 1";
+    $resultUser = mysqli_query($conn, $queryUser);
 
-    if ($userData && !empty($userData['id_siswa'])) {
-        $id_siswa = (int) $userData['id_siswa'];
+    if ($resultUser && mysqli_num_rows($resultUser) > 0) {
+        $userData = mysqli_fetch_assoc($resultUser);
+
+        if (!empty($userData['id_siswa'])) {
+            $id_siswa = (int) $userData['id_siswa'];
+        }
     }
 }
 
@@ -35,7 +36,7 @@ if ($id_siswa <= 0) {
     exit;
 }
 
-$stmt = $conn->prepare("
+$query = "
     SELECT 
         s.id_siswa,
         s.nama,
@@ -50,31 +51,21 @@ $stmt = $conn->prepare("
     FROM siswa s
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
     LEFT JOIN user u ON s.id_siswa = u.id_siswa
-    WHERE s.id_siswa = ?
+    WHERE s.id_siswa = $id_siswa
     LIMIT 1
-");
+";
 
-if (!$stmt) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Prepare gagal: " . $conn->error
-    ]);
-    exit;
-}
-
-$stmt->bind_param("i", $id_siswa);
-$stmt->execute();
-$result = $stmt->get_result();
+$result = mysqli_query($conn, $query);
 
 if (!$result) {
     echo json_encode([
         "success" => false,
-        "message" => "Query gagal: " . $conn->error
+        "message" => "Query gagal: " . mysqli_error($conn)
     ]);
     exit;
 }
 
-$data = $result->fetch_assoc();
+$data = mysqli_fetch_assoc($result);
 
 if (!$data) {
     echo json_encode([

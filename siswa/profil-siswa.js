@@ -107,11 +107,18 @@ function setProfileUI(data) {
 }
 
 async function loadProfilSiswa() {
+  const idSiswaTerbaru = localStorage.getItem("id_siswa");
+  const fotoLocal = idSiswaTerbaru
+    ? localStorage.getItem(`foto_profil_${idSiswaTerbaru}`)
+    : localStorage.getItem(FOTO_KEY);
+
+  setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
+
   try {
     let url = "./get_profil_siswa.php";
 
-    if (idSiswa) {
-      url += `?id_siswa=${encodeURIComponent(idSiswa)}`;
+    if (idSiswaTerbaru) {
+      url += `?id_siswa=${encodeURIComponent(idSiswaTerbaru)}`;
     }
 
     const response = await fetch(url, {
@@ -123,16 +130,21 @@ async function loadProfilSiswa() {
     const text = await response.text();
     console.log("RESPON get_profil_siswa.php:", text);
 
-    const result = JSON.parse(text);
+    let result;
+
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      console.error("PHP bukan JSON:", text);
+      return;
+    }
 
     if (!result.success) {
-      alert(result.message || "Data siswa tidak ditemukan.");
+      console.error(result.message || "Data siswa tidak ditemukan.");
       return;
     }
 
     const siswaData = result.data;
-
-    console.log("DATA SISWA:", siswaData);
 
     setProfileUI(siswaData);
 
@@ -141,12 +153,11 @@ async function loadProfilSiswa() {
       setImage(elFoto, fotoUrl);
       localStorage.setItem(`foto_profil_${siswaData.id_siswa}`, siswaData.foto_profil);
     } else {
-      const fotoLocal = localStorage.getItem(FOTO_KEY);
       setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
     }
   } catch (error) {
     console.error("Gagal load profil siswa:", error);
-    alert("Gagal ambil data profil. Cek console bagian RESPON get_profil_siswa.php.");
+    setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
   }
 }
 
