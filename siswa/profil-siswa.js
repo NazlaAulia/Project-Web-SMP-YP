@@ -65,14 +65,20 @@ function showToast(message, type = "success") {
 }
 
 function setProfileUI(data) {
-  const nama = data?.nama || data?.nama_lengkap || "-";
-  const nisn = data?.nisn || data?.nis || "-";
-  const kelas = data?.kelas || data?.nama_kelas || getKelasLabel(data?.id_kelas);
-  const email = data?.email || "-";
-  const noHp = data?.no_hp || data?.noHp || "-";
+  const nama = data?.nama || "-";
+  const nisn = data?.nis || data?.nisn
+    ? `${data?.nis || "-"} / ${data?.nisn || "-"}`
+    : "-";
+  const kelas = data?.kelas || getKelasLabel(data?.id_kelas);
+  const email = "-";
+  const noHp = "-";
   const alamat = data?.alamat || "-";
-  const jenisKelamin = data?.jenis_kelamin || data?.gender || "-";
-  const tanggalLahir = data?.tanggal_lahir || data?.tgl_lahir || "-";
+  const jenisKelamin = data?.jenis_kelamin === "L"
+    ? "Laki-laki"
+    : data?.jenis_kelamin === "P"
+      ? "Perempuan"
+      : data?.jenis_kelamin || "-";
+  const tanggalLahir = data?.tanggal_lahir || "-";
 
   setText(elNama, nama);
   setText(elNisn, nisn);
@@ -117,12 +123,7 @@ async function loadProfilSiswa() {
     const text = await response.text();
     console.log("RESPON get_profil_siswa.php:", text);
 
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch (e) {
-      throw new Error("Response get_profil_siswa.php bukan JSON: " + text);
-    }
+    const result = JSON.parse(text);
 
     if (!result.success) {
       alert(result.message || "Data siswa tidak ditemukan.");
@@ -146,9 +147,6 @@ async function loadProfilSiswa() {
   } catch (error) {
     console.error("Gagal load profil siswa:", error);
     alert("Gagal ambil data profil. Cek console bagian RESPON get_profil_siswa.php.");
-
-    const fotoLocal = localStorage.getItem(FOTO_KEY);
-    setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
   }
 }
 
