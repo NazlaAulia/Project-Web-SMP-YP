@@ -20,10 +20,13 @@ if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
     $stmtUser->bind_param("i", $id_user);
     $stmtUser->execute();
     $resultUser = $stmtUser->get_result();
-    $userData = $resultUser->fetch_assoc();
 
-    if ($userData && !empty($userData['id_siswa'])) {
-        $id_siswa = (int) $userData['id_siswa'];
+    if ($resultUser && $resultUser->num_rows > 0) {
+        $userData = $resultUser->fetch_assoc();
+
+        if (!empty($userData['id_siswa'])) {
+            $id_siswa = (int) $userData['id_siswa'];
+        }
     }
 }
 
@@ -46,13 +49,13 @@ $stmt = $conn->prepare("
         s.alamat,
         s.id_kelas,
         k.nama_kelas AS kelas,
-        COALESCE(p.email, u.username) AS email,
+        p.email,
         p.no_hp,
         u.foto_profil
     FROM siswa s
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
     LEFT JOIN pendaftaran p 
-        ON s.id_pendaftaran = p.id_pendaftaran 
+        ON s.id_pendaftaran = p.id_pendaftaran
         OR s.nisn = p.nisn
     LEFT JOIN user u ON s.id_siswa = u.id_siswa
     WHERE s.id_siswa = ?
