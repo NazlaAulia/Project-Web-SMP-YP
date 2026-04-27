@@ -1,40 +1,6 @@
 let idSiswa = localStorage.getItem("id_siswa");
 
-const FOTO_KEY = idSiswa ? `foto_profil_${idSiswa}` : "foto_profil_siswa";
 const DEFAULT_PHOTO = "../img/default-profile.png";
-
-function cariIdSiswa() {
-  let id = localStorage.getItem("id_siswa");
-
-  if (id) return id;
-
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-
-    if (key && key.startsWith("foto_profil_")) {
-      const idDariKey = key.replace("foto_profil_", "");
-
-      if (idDariKey && idDariKey !== "siswa") {
-        localStorage.setItem("id_siswa", idDariKey);
-        return idDariKey;
-      }
-    }
-  }
-
-  const fotoUmum = localStorage.getItem("foto_profil_siswa");
-
-  if (fotoUmum) {
-    const match = fotoUmum.match(/siswa_(\d+)_/);
-
-    if (match && match[1]) {
-      localStorage.setItem("id_siswa", match[1]);
-      localStorage.setItem(`foto_profil_${match[1]}`, fotoUmum);
-      return match[1];
-    }
-  }
-
-  return null;
-}
 
 const elNama = document.getElementById("nama");
 const elNisn = document.getElementById("nisn");
@@ -74,6 +40,28 @@ function setImage(el, src) {
   if (el) el.src = src || DEFAULT_PHOTO;
 }
 
+function getFotoLocal() {
+  const id = localStorage.getItem("id_siswa");
+
+  if (id) {
+    const fotoId = localStorage.getItem(`foto_profil_${id}`);
+    if (fotoId) return fotoId;
+  }
+
+  const fotoUmum = localStorage.getItem("foto_profil_siswa");
+  if (fotoUmum) return fotoUmum;
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+
+    if (key && key.match(/^foto_profil_\d+$/)) {
+      return localStorage.getItem(key);
+    }
+  }
+
+  return "";
+}
+
 function ambilIdentitasLogin() {
   const data = {
     id_siswa: localStorage.getItem("id_siswa") || "",
@@ -81,21 +69,27 @@ function ambilIdentitasLogin() {
     username: localStorage.getItem("username") || ""
   };
 
+  const fotoLocal = getFotoLocal();
+
+  if (!data.id_siswa && fotoLocal) {
+    const match = fotoLocal.match(/siswa_(\d+)_/);
+
+    if (match && match[1]) {
+      data.id_siswa = match[1];
+      localStorage.setItem("id_siswa", match[1]);
+      localStorage.setItem(`foto_profil_${match[1]}`, fotoLocal);
+    }
+  }
+
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     const value = localStorage.getItem(key);
 
-    if (!value) continue;
+    if (!key || !value) continue;
 
-    if (!data.id_siswa && key && key.match(/^foto_profil_\d+$/)) {
+    if (!data.id_siswa && key.match(/^foto_profil_\d+$/)) {
       data.id_siswa = key.replace("foto_profil_", "");
-    }
-
-    if (!data.id_siswa && value.includes("siswa_")) {
-      const match = value.match(/siswa_(\d+)_/);
-      if (match && match[1]) {
-        data.id_siswa = match[1];
-      }
+      localStorage.setItem("id_siswa", data.id_siswa);
     }
 
     try {
@@ -160,28 +154,32 @@ function setProfileUI(data) {
   setText(elNamaKelas, kelas);
   setText(elAvatarPlaceholder, nama !== "-" ? nama.charAt(0).toUpperCase() : "-");
 
-  localStorage.setItem("nama_siswa", nama);
-  localStorage.setItem("kelas_siswa", kelas);
-
-  if (data?.id_siswa) {
-    localStorage.setItem("id_siswa", data.id_siswa);
-  }
+  if (nama !== "-") localStorage.setItem("nama_siswa", nama);
+  if (kelas !== "-") localStorage.setItem("kelas_siswa", kelas);
+  if (data?.id_siswa) localStorage.setItem("id_siswa", data.id_siswa);
+  if (data?.username) localStorage.setItem("username", data.username);
 }
 
 async function loadProfilSiswa() {
+  const fotoLocalAwal = getFotoLocal();
+  setImage(elFoto, fotoLocalAwal || DEFAULT_PHOTO);
+
   try {
     const identitas = ambilIdentitasLogin();
 
-    let url = "./get_profil_siswa.php";
+    let url = "./get-profil-siswa.php";
     const params = new URLSearchParams();
 
-    if (identitas.id_siswa) params.append("id_siswa", identitas.id_siswa);
+    if (identitas.id_siswa) {
+      params.append("id_siswa", identitas.id_siswa);
+    } else {
+      params.append("id_siswa", "1293");
+    }
+
     if (identitas.id_user) params.append("id_user", identitas.id_user);
     if (identitas.username) params.append("username", identitas.username);
 
-    if (params.toString()) {
-      url += "?" + params.toString();
-    }
+    url += "?" + params.toString();
 
     const response = await fetch(url, {
       method: "GET",
@@ -190,7 +188,7 @@ async function loadProfilSiswa() {
     });
 
     const text = await response.text();
-    console.log("RESPON get_profil_siswa.php:", text);
+    console.log("RESPON get-profil-siswa.php:", text);
 
     let result;
 
@@ -203,6 +201,7 @@ async function loadProfilSiswa() {
 
     if (!result.success) {
       console.error(result.message || "Data siswa tidak ditemukan.");
+      setImage(elFoto, fotoLocalAwal || DEFAULT_PHOTO);
       return;
     }
 
@@ -211,9 +210,9 @@ async function loadProfilSiswa() {
     setProfileUI(siswaData);
 
     if (siswaData.id_siswa) {
-  idSiswa = siswaData.id_siswa;
-  localStorage.setItem("id_siswa", siswaData.id_siswa);
-}
+      idSiswa = siswaData.id_siswa;
+      localStorage.setItem("id_siswa", siswaData.id_siswa);
+    }
 
     if (siswaData.username) {
       localStorage.setItem("username", siswaData.username);
@@ -221,15 +220,17 @@ async function loadProfilSiswa() {
 
     if (siswaData.foto_profil) {
       const fotoUrl = siswaData.foto_profil + "?t=" + Date.now();
+
       setImage(elFoto, fotoUrl);
+
       localStorage.setItem(`foto_profil_${siswaData.id_siswa}`, siswaData.foto_profil);
       localStorage.setItem("foto_profil_siswa", siswaData.foto_profil);
     } else {
-      setImage(elFoto, DEFAULT_PHOTO);
+      setImage(elFoto, fotoLocalAwal || DEFAULT_PHOTO);
     }
   } catch (error) {
     console.error("Gagal load profil siswa:", error);
-    setImage(elFoto, DEFAULT_PHOTO);
+    setImage(elFoto, fotoLocalAwal || DEFAULT_PHOTO);
   }
 }
 
@@ -259,14 +260,15 @@ async function pilihDanUploadFoto(event) {
       elBtnPilihFoto.textContent = "Menyimpan...";
     }
 
-const formData = new FormData();
-formData.append("foto", file);
+    const identitas = ambilIdentitasLogin();
+    idSiswa = localStorage.getItem("id_siswa") || identitas.id_siswa || idSiswa;
 
-idSiswa = localStorage.getItem("id_siswa") || idSiswa || cariIdSiswa();
+    const formData = new FormData();
+    formData.append("foto", file);
 
-if (idSiswa) {
-  formData.append("id_siswa", idSiswa);
-}
+    if (idSiswa) {
+      formData.append("id_siswa", idSiswa);
+    }
 
     const response = await fetch("upload-foto-profil.php", {
       method: "POST",
@@ -278,6 +280,7 @@ if (idSiswa) {
     console.log("RESPON upload-foto-profil.php:", text);
 
     let result;
+
     try {
       result = JSON.parse(text);
     } catch (e) {
@@ -289,20 +292,24 @@ if (idSiswa) {
     }
 
     const fotoBaru = result.foto_url;
-    const idFinal = result.id_siswa || idSiswa || cariIdSiswa();
+    const idFinal = result.id_siswa || idSiswa;
 
     if (idFinal) {
+      idSiswa = idFinal;
       localStorage.setItem("id_siswa", idFinal);
       localStorage.setItem(`foto_profil_${idFinal}`, fotoBaru);
-      localStorage.setItem("foto_profil_siswa", fotoBaru);
     }
+
+    localStorage.setItem("foto_profil_siswa", fotoBaru);
 
     setImage(elFoto, fotoBaru + "?t=" + Date.now());
     showToast("Foto profil berhasil disimpan.", "success");
+
+    loadProfilSiswa();
   } catch (error) {
     console.error("Gagal upload:", error);
 
-    const fotoLocal = localStorage.getItem(FOTO_KEY);
+    const fotoLocal = getFotoLocal();
     setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
 
     showToast(

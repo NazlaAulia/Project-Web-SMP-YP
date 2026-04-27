@@ -7,7 +7,7 @@ $id_siswa = 0;
 $id_user = 0;
 $username = "";
 
-/* dari URL / JS */
+/* Ambil dari URL */
 if (isset($_GET['id_siswa']) && is_numeric($_GET['id_siswa'])) {
     $id_siswa = (int) $_GET['id_siswa'];
 }
@@ -20,59 +20,29 @@ if (isset($_GET['username']) && trim($_GET['username']) !== "") {
     $username = trim($_GET['username']);
 }
 
-/* dari session umum */
-$sessionIdSiswaKeys = ['id_siswa', 'siswa_id'];
-$sessionIdUserKeys = ['id_user', 'user_id', 'id'];
-$sessionUsernameKeys = ['username', 'user_username', 'nama_user'];
-
-foreach ($sessionIdSiswaKeys as $key) {
-    if ($id_siswa <= 0 && isset($_SESSION[$key]) && is_numeric($_SESSION[$key])) {
-        $id_siswa = (int) $_SESSION[$key];
-    }
+/* Ambil dari session */
+if ($id_siswa <= 0 && isset($_SESSION['id_siswa'])) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
 }
 
-foreach ($sessionIdUserKeys as $key) {
-    if ($id_user <= 0 && isset($_SESSION[$key]) && is_numeric($_SESSION[$key])) {
-        $id_user = (int) $_SESSION[$key];
-    }
+if ($id_user <= 0 && isset($_SESSION['id_user'])) {
+    $id_user = (int) $_SESSION['id_user'];
 }
 
-foreach ($sessionUsernameKeys as $key) {
-    if ($username === "" && isset($_SESSION[$key]) && trim($_SESSION[$key]) !== "") {
-        $username = trim($_SESSION[$key]);
-    }
+if ($username === "" && isset($_SESSION['username'])) {
+    $username = trim($_SESSION['username']);
 }
 
-/* kalau session bentuk array */
-foreach ($_SESSION as $value) {
-    if (is_array($value)) {
-        if ($id_siswa <= 0 && isset($value['id_siswa']) && is_numeric($value['id_siswa'])) {
-            $id_siswa = (int) $value['id_siswa'];
-        }
-
-        if ($id_user <= 0 && isset($value['id_user']) && is_numeric($value['id_user'])) {
-            $id_user = (int) $value['id_user'];
-        }
-
-        if ($username === "" && isset($value['username']) && trim($value['username']) !== "") {
-            $username = trim($value['username']);
-        }
-    }
-}
-
-/* kalau ada id_user, cari id_siswa */
+/* Kalau ada id_user, cari id_siswa */
 if ($id_siswa <= 0 && $id_user > 0) {
     $stmtUser = $conn->prepare("SELECT id_siswa, username FROM `user` WHERE id_user = ? LIMIT 1");
 
     if ($stmtUser) {
         $stmtUser->bind_param("i", $id_user);
         $stmtUser->execute();
-        $stmtUser->store_result();
+        $stmtUser->bind_result($hasil_id_siswa, $hasil_username);
 
-        if ($stmtUser->num_rows > 0) {
-            $stmtUser->bind_result($hasil_id_siswa, $hasil_username);
-            $stmtUser->fetch();
-
+        if ($stmtUser->fetch()) {
             if (!empty($hasil_id_siswa)) {
                 $id_siswa = (int) $hasil_id_siswa;
             }
@@ -86,19 +56,16 @@ if ($id_siswa <= 0 && $id_user > 0) {
     }
 }
 
-/* kalau ada username, cari id_siswa */
+/* Kalau ada username, cari id_siswa */
 if ($id_siswa <= 0 && $username !== "") {
     $stmtUser = $conn->prepare("SELECT id_siswa FROM `user` WHERE username = ? LIMIT 1");
 
     if ($stmtUser) {
         $stmtUser->bind_param("s", $username);
         $stmtUser->execute();
-        $stmtUser->store_result();
+        $stmtUser->bind_result($hasil_id_siswa);
 
-        if ($stmtUser->num_rows > 0) {
-            $stmtUser->bind_result($hasil_id_siswa);
-            $stmtUser->fetch();
-
+        if ($stmtUser->fetch()) {
             if (!empty($hasil_id_siswa)) {
                 $id_siswa = (int) $hasil_id_siswa;
             }
@@ -111,11 +78,12 @@ if ($id_siswa <= 0 && $username !== "") {
 if ($id_siswa <= 0) {
     echo json_encode([
         "success" => false,
-        "message" => "ID siswa tidak ditemukan. Login tidak mengirim id_siswa/id_user/username ke profil."
+        "message" => "ID siswa tidak ditemukan."
     ]);
     exit;
 }
 
+/* Ambil data profil dari siswa + kelas + pendaftaran + user */
 $sql = "
     SELECT 
         s.id_siswa,
@@ -151,16 +119,6 @@ if (!$stmt) {
 
 $stmt->bind_param("i", $id_siswa);
 $stmt->execute();
-$stmt->store_result();
-
-if ($stmt->num_rows === 0) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Data siswa tidak ditemukan."
-    ]);
-    exit;
-}
-
 $stmt->bind_result(
     $db_id_siswa,
     $nis,
@@ -177,7 +135,14 @@ $stmt->bind_result(
     $foto_profil
 );
 
-$stmt->fetch();
+if (!$stmt->fetch()) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Data siswa tidak ditemukan."
+    ]);
+    exit;
+}
+
 $stmt->close();
 
 $_SESSION['id_siswa'] = $db_id_siswa;
