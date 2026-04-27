@@ -1,13 +1,32 @@
 <?php
+session_start();
 header("Content-Type: application/json");
 require_once "koneksi.php";
 
 $id_siswa = isset($_POST['id_siswa']) ? (int) $_POST['id_siswa'] : 0;
 
+if ($id_siswa <= 0 && isset($_SESSION['id_siswa'])) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
+}
+
+if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
+    $id_user = (int) $_SESSION['id_user'];
+
+    $stmtUser = $conn->prepare("SELECT id_siswa FROM user WHERE id_user = ? LIMIT 1");
+    $stmtUser->bind_param("i", $id_user);
+    $stmtUser->execute();
+    $resultUser = $stmtUser->get_result();
+    $userData = $resultUser->fetch_assoc();
+
+    if ($userData && !empty($userData['id_siswa'])) {
+        $id_siswa = (int) $userData['id_siswa'];
+    }
+}
+
 if ($id_siswa <= 0) {
     echo json_encode([
         "success" => false,
-        "message" => "ID siswa tidak valid."
+        "message" => "ID siswa tidak valid. Silakan login ulang."
     ]);
     exit;
 }
@@ -131,10 +150,13 @@ if (mysqli_query($conn, $queryUpdate)) {
         @unlink($fotoLama);
     }
 
+    $_SESSION['id_siswa'] = $id_siswa;
+
     echo json_encode([
         "success" => true,
         "message" => "Foto profil berhasil disimpan.",
-        "foto_url" => $pathSimpan
+        "foto_url" => $pathSimpan,
+        "id_siswa" => $id_siswa
     ]);
 } else {
     if (file_exists($pathSimpan)) {
