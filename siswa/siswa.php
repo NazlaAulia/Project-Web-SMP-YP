@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -18,12 +19,69 @@ if ($conn->connect_error) {
     exit;
 }
 
-$id_siswa = isset($_GET['id_siswa']) ? (int)$_GET['id_siswa'] : 0;
+$id_siswa = 0;
+
+/*
+  Ambil id_siswa dari URL kalau ada
+*/
+if (isset($_GET['id_siswa'])) {
+    $id_siswa = (int)$_GET['id_siswa'];
+}
+
+/*
+  Kalau URL kosong, ambil dari session id_siswa
+*/
+if ($id_siswa <= 0 && isset($_SESSION['id_siswa'])) {
+    $id_siswa = (int)$_SESSION['id_siswa'];
+}
+
+/*
+  Kalau session id_siswa kosong, ambil dari session id_user
+  lalu cari id_siswa di tabel user
+*/
+if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
+    $id_user = (int)$_SESSION['id_user'];
+
+    $sqlUser = "SELECT id_siswa FROM user WHERE id_user = ? LIMIT 1";
+    $stmtUser = $conn->prepare($sqlUser);
+
+    if (!$stmtUser) {
+        echo json_encode([
+            "status" => "error",
+            "message" => "Prepare user gagal: " . $conn->error
+        ]);
+        exit;
+    }
+
+    $stmtUser->bind_param("i", $id_user);
+
+    if (!$stmtUser->execute()) {
+        echo json_encode([
+            "status" => "error",
+            "message" => "Execute user gagal: " . $stmtUser->error
+        ]);
+        exit;
+    }
+
+    $stmtUser->store_result();
+
+    if ($stmtUser->num_rows > 0) {
+        $stmtUser->bind_result($hasil_id_siswa);
+        $stmtUser->fetch();
+
+        if (!empty($hasil_id_siswa)) {
+            $id_siswa = (int)$hasil_id_siswa;
+            $_SESSION['id_siswa'] = $id_siswa;
+        }
+    }
+
+    $stmtUser->close();
+}
 
 if ($id_siswa <= 0) {
     echo json_encode([
         "status" => "error",
-        "message" => "id_siswa tidak valid"
+        "message" => "id_siswa tidak valid. Session login belum menyimpan id_siswa."
     ]);
     exit;
 }
