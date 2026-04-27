@@ -5,12 +5,12 @@ require_once "koneksi.php";
 
 $id_siswa = 0;
 
-if (isset($_SESSION['id_siswa'])) {
-    $id_siswa = (int) $_SESSION['id_siswa'];
+if (isset($_GET['id_siswa'])) {
+    $id_siswa = (int) $_GET['id_siswa'];
 }
 
-if ($id_siswa <= 0 && isset($_GET['id_siswa'])) {
-    $id_siswa = (int) $_GET['id_siswa'];
+if ($id_siswa <= 0 && isset($_SESSION['id_siswa'])) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
 }
 
 if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
@@ -20,20 +20,17 @@ if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
     $stmtUser->bind_param("i", $id_user);
     $stmtUser->execute();
     $resultUser = $stmtUser->get_result();
+    $userData = $resultUser->fetch_assoc();
 
-    if ($resultUser && $resultUser->num_rows > 0) {
-        $userData = $resultUser->fetch_assoc();
-
-        if (!empty($userData['id_siswa'])) {
-            $id_siswa = (int) $userData['id_siswa'];
-        }
+    if ($userData && !empty($userData['id_siswa'])) {
+        $id_siswa = (int) $userData['id_siswa'];
     }
 }
 
 if ($id_siswa <= 0) {
     echo json_encode([
         "success" => false,
-        "message" => "ID siswa tidak ditemukan. Silakan login ulang."
+        "message" => "ID siswa tidak ditemukan."
     ]);
     exit;
 }
@@ -49,14 +46,9 @@ $stmt = $conn->prepare("
         s.alamat,
         s.id_kelas,
         k.nama_kelas AS kelas,
-        p.email,
-        p.no_hp,
         u.foto_profil
     FROM siswa s
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-    LEFT JOIN pendaftaran p 
-        ON s.id_pendaftaran = p.id_pendaftaran
-        OR s.nisn = p.nisn
     LEFT JOIN user u ON s.id_siswa = u.id_siswa
     WHERE s.id_siswa = ?
     LIMIT 1
@@ -65,14 +57,13 @@ $stmt = $conn->prepare("
 if (!$stmt) {
     echo json_encode([
         "success" => false,
-        "message" => "Prepare query gagal: " . $conn->error
+        "message" => "Prepare gagal: " . $conn->error
     ]);
     exit;
 }
 
 $stmt->bind_param("i", $id_siswa);
 $stmt->execute();
-
 $result = $stmt->get_result();
 
 if (!$result) {
