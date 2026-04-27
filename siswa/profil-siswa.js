@@ -121,16 +121,18 @@ async function loadProfilSiswa() {
     try {
       result = JSON.parse(text);
     } catch (e) {
-      throw new Error("Response PHP bukan JSON. Cek path get_profil_siswa.php");
+      throw new Error("Response get_profil_siswa.php bukan JSON: " + text);
     }
 
     if (!result.success) {
       alert(result.message || "Data siswa tidak ditemukan.");
-      window.location.href = "../login.html";
       return;
     }
 
     const siswaData = result.data;
+
+    console.log("DATA SISWA:", siswaData);
+
     setProfileUI(siswaData);
 
     if (siswaData?.foto_profil) {
@@ -138,10 +140,12 @@ async function loadProfilSiswa() {
       setImage(elFoto, fotoUrl);
       localStorage.setItem(`foto_profil_${siswaData.id_siswa}`, siswaData.foto_profil);
     } else {
-      setImage(elFoto, DEFAULT_PHOTO);
+      const fotoLocal = localStorage.getItem(FOTO_KEY);
+      setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
     }
   } catch (error) {
     console.error("Gagal load profil siswa:", error);
+    alert("Gagal ambil data profil. Cek console bagian RESPON get_profil_siswa.php.");
 
     const fotoLocal = localStorage.getItem(FOTO_KEY);
     setImage(elFoto, fotoLocal || DEFAULT_PHOTO);
