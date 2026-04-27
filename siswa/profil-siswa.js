@@ -134,7 +134,25 @@ function setProfileUI(data) {
 
 async function loadProfilSiswa() {
   try {
-    const response = await fetch("./get_profil_siswa.php", {
+    const idLocal = localStorage.getItem("id_siswa");
+    const usernameLocal = localStorage.getItem("username");
+
+    let url = "./get_profil_siswa.php";
+    const params = new URLSearchParams();
+
+    if (idLocal) {
+      params.append("id_siswa", idLocal);
+    }
+
+    if (usernameLocal) {
+      params.append("username", usernameLocal);
+    }
+
+    if (params.toString()) {
+      url += "?" + params.toString();
+    }
+
+    const response = await fetch(url, {
       method: "GET",
       credentials: "same-origin",
       cache: "no-store"
@@ -153,7 +171,7 @@ async function loadProfilSiswa() {
     }
 
     if (!result.success) {
-      console.error(result.message);
+      console.error(result.message || "Data siswa tidak ditemukan.");
       return;
     }
 
@@ -163,6 +181,18 @@ async function loadProfilSiswa() {
 
     if (siswaData.id_siswa) {
       localStorage.setItem("id_siswa", siswaData.id_siswa);
+    }
+
+    if (siswaData.username) {
+      localStorage.setItem("username", siswaData.username);
+    }
+
+    if (siswaData.nama) {
+      localStorage.setItem("nama_siswa", siswaData.nama);
+    }
+
+    if (siswaData.kelas) {
+      localStorage.setItem("kelas_siswa", siswaData.kelas);
     }
 
     if (siswaData.foto_profil) {
