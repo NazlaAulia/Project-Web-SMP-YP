@@ -837,3 +837,179 @@ button {
         font-size: 20px !important;
     }
 }
+
+/* =========================
+   MODAL EDIT
+========================= */
+.modal-edit-box {
+    max-width: 620px;
+    border-radius: 28px;
+    padding: 28px;
+}
+
+#editSiswaForm .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+#editSiswaForm .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#editSiswaForm .form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+#editSiswaForm .form-group input,
+#editSiswaForm .form-group select {
+    border: 1px solid #d9e3e0;
+    border-radius: 14px;
+    padding: 13px 14px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+}
+
+#editSiswaForm .form-group input:focus,
+#editSiswaForm .form-group select:focus {
+    border-color: #0f5c4d;
+    box-shadow: 0 0 0 3px rgba(15, 92, 77, 0.08);
+}
+
+#editFormMessage {
+    min-height: 22px;
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+#editFormMessage.success {
+    color: #15803d;
+}
+
+#editFormMessage.error {
+    color: #b91c1c;
+}
+
+/* =========================
+   MODAL HAPUS MODERN
+========================= */
+.modern-delete-box {
+    max-width: 630px;
+    border-radius: 34px;
+    padding: 36px 32px 30px;
+    position: relative;
+    text-align: center;
+}
+
+.delete-icon-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.delete-icon-circle {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    background: #fde2e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-icon-circle i {
+    font-size: 42px;
+    color: #e02424;
+}
+
+.delete-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-teal);
+    margin-bottom: 12px;
+}
+
+.center-text {
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #475569;
+    margin-bottom: 22px;
+}
+
+.delete-actions-center {
+    justify-content: center;
+    gap: 16px;
+}
+
+.delete-actions-center .btn-secondary,
+.delete-actions-center .btn-danger {
+    min-width: 160px;
+    padding: 14px 20px;
+    border-radius: 18px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.delete-actions-center .btn-secondary {
+    background: #eef2f4;
+    color: #334155;
+}
+
+.btn-delete-solid {
+    background: #ef2b2b !important;
+    color: #fff !important;
+}
+
+.delete-close-modern {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    font-size: 34px;
+    color: #6b7280;
+    background: transparent;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+    .modal-edit-box,
+    .modern-delete-box {
+        padding: 22px 18px;
+        border-radius: 22px;
+    }
+
+    #editSiswaForm .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .delete-icon-circle {
+        width: 84px;
+        height: 84px;
+    }
+
+    .delete-icon-circle i {
+        font-size: 34px;
+    }
+
+    .delete-title {
+        font-size: 22px;
+    }
+
+    .delete-actions-center {
+        flex-direction: column;
+    }
+
+    .delete-actions-center .btn-secondary,
+    .delete-actions-center .btn-danger {
+        width: 100%;
+        min-width: 100%;
+    }
+}
