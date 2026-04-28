@@ -651,4 +651,13 @@ button {
     }
 }
 
+<div class="action-buttons">
+    <button class="btn-edit btn-icon" onclick="editSiswa(${siswa.id_siswa})" title="Edit">
+        <i class="fas fa-pen"></i>
+    </button>
+
+    <button class="btn-danger btn-icon" onclick="hapusSiswa(${siswa.id_siswa}, '${escapeJs(siswa.nama)}')" title="Hapus">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
 
