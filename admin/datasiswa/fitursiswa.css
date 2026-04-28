@@ -1042,3 +1042,99 @@ button {
     opacity: 0.45;
     cursor: not-allowed;
 }
+
+/* =========================
+   PAGINATION SISWA
+========================= */
+.pagination-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: var(--text-dark);
+    font-weight: 500;
+    text-align: left;
+}
+
+.pagination-btns {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-page {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid #dbe2e8;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 18px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-page:hover:not(:disabled) {
+    border-color: #0b5c57;
+    color: #0b5c57;
+    transform: translateY(-1px);
+}
+
+.btn-page.active {
+    background: #0b5c57;
+    color: #ffffff;
+    border-color: #0b5c57;
+}
+
+.btn-page:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #f8fafc;
+}
+
+.btn-page i {
+    font-size: 18px;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .pagination-container {
+        gap: 10px;
+        margin-top: 14px;
+        padding-top: 14px;
+    }
+
+    .pagination-info {
+        font-size: 13px;
+    }
+
+    .pagination-btns {
+        gap: 8px;
+    }
+
+    .btn-page {
+        min-width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        font-size: 15px;
+    }
+
+    .btn-page i {
+        font-size: 15px;
+    }
+}
