@@ -381,14 +381,7 @@ button {
         padding: 14px 12px;
     }
 
-    .action-buttons {
-        flex-direction: column;
-        align-items: stretch;
-    }
 
-    .action-buttons button {
-        width: 100%;
-    }
 
     .modal-box {
         padding: 18px;
@@ -672,3 +665,100 @@ button {
     pointer-events: none;
 }
 
+.action-buttons {
+    display: flex !important;
+    gap: 6px !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+}
+
+.action-buttons .btn-icon {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.action-buttons .btn-icon i {
+    font-size: 12px !important;
+    line-height: 1 !important;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: row !important;
+        align-items: center !important;
+    }
+
+    .action-buttons .btn-icon {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+    }
+}
+
+.action-buttons {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+}
+
+.action-buttons button,
+.action-buttons .btn-edit,
+.action-buttons .btn-danger,
+.action-buttons .btn-icon {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    padding: 0 !important;
+    border-radius: 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0 !important;
+    line-height: 1 !important;
+}
+
+.action-buttons .btn-edit {
+    background: #dff0fb !important;
+    color: #0b67a3 !important;
+}
+
+.action-buttons .btn-danger {
+    background: #f8dede !important;
+    color: #ef2b2b !important;
+}
+
+.action-buttons button i {
+    font-size: 16px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .action-buttons button,
+    .action-buttons .btn-edit,
+    .action-buttons .btn-danger,
+    .action-buttons .btn-icon {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
+    }
+}
