@@ -408,10 +408,12 @@ button {
         flex-direction: column;
     }
 
-    .modal-actions button {
+      .modal-actions button {
         width: 100%;
     }
-    .modal-approval-box {
+}
+    
+.modal-approval-box {
     max-width: 900px;
 }
 
@@ -1137,4 +1139,79 @@ button {
     .btn-page i {
         font-size: 15px;
     }
+}
+
+.pagination-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+/* FIX FINAL PAGINATION SISWA */
+.table-card .pagination-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    margin-top: 18px !important;
+    padding-top: 18px !important;
+    border-top: 1px solid var(--border) !important;
+}
+
+.table-card .pagination-info {
+    font-size: 14px !important;
+    color: var(--text-dark) !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+}
+
+.table-card .pagination-btns {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+}
+
+.table-card .pagination-btns .btn-page {
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    padding: 0 !important;
+    border: 1px solid #dbe2e8 !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+}
+
+.table-card .pagination-btns .btn-page.active {
+    background: #064e4b !important;
+    border-color: #064e4b !important;
+    color: #ffffff !important;
+}
+
+.table-card .pagination-btns .btn-page:disabled {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+    background: #ffffff !important;
+    color: #94a3b8 !important;
+}
+
+.table-card .pagination-btns .btn-page i {
+    font-size: 18px !important;
+    line-height: 1 !important;
 }
