@@ -650,5 +650,25 @@ button {
         width: 30px;
     }
 }
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
 
+.btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: 0 !important;
+    border-radius: 8px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon i {
+    pointer-events: none;
+}
 
