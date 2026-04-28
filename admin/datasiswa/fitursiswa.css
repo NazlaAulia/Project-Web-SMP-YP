@@ -589,6 +589,66 @@ button {
     font-weight: bold;
 }
 
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.btn-icon {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.btn-icon i {
+    pointer-events: none;
+}
+
+.btn-icon.btn-edit {
+    background: var(--info-soft);
+    color: var(--info-text);
+}
+
+.btn-icon.btn-danger {
+    background: var(--danger-soft);
+    color: var(--danger-text);
+}
+
+.btn-icon:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.97);
+}
+
+.modal-delete-box {
+    max-width: 460px;
+}
+
+.delete-text {
+    font-size: 14px;
+    color: var(--text-dark);
+    line-height: 1.7;
+}
+
+.delete-text strong {
+    color: var(--danger-text);
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .action-buttons button {
+        width: 30px;
+    }
 }
 
 
