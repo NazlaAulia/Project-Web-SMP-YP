@@ -650,14 +650,25 @@ button {
         width: 30px;
     }
 }
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
 
-<div class="action-buttons">
-    <button class="btn-edit btn-icon" onclick="editSiswa(${siswa.id_siswa})" title="Edit">
-        <i class="fas fa-pen"></i>
-    </button>
+.btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: 0 !important;
+    border-radius: 8px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    <button class="btn-danger btn-icon" onclick="hapusSiswa(${siswa.id_siswa}, '${escapeJs(siswa.nama)}')" title="Hapus">
-        <i class="fas fa-trash"></i>
-    </button>
-</div>
+.btn-icon i {
+    pointer-events: none;
+}
 
