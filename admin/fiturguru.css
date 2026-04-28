@@ -823,3 +823,208 @@ button {
         width: 100% !important;
     }
 }
+
+/* FIX RESPONSIVE TABEL GURU */
+@media (max-width: 768px) {
+    .table-wrap {
+        overflow-x: auto !important;
+        width: 100% !important;
+    }
+
+    table {
+        min-width: 850px !important;
+        table-layout: auto !important;
+    }
+
+    thead th,
+    tbody td {
+        white-space: nowrap !important;
+        word-break: normal !important;
+        font-size: 13px !important;
+        padding: 12px 10px !important;
+    }
+
+    tbody td:nth-child(2),
+    tbody td:nth-child(3) {
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+
+    .action-buttons {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .action-buttons button,
+    .icon-only {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        padding: 0 !important;
+    }
+}
+
+/* =========================
+   FIX HP DATA GURU - TABEL BISA DIGESER
+========================= */
+@media (max-width: 768px) {
+    .table-card {
+        overflow: hidden !important;
+    }
+
+    .table-wrap {
+        width: 100% !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .table-wrap table {
+        min-width: 920px !important;
+        width: 920px !important;
+        table-layout: auto !important;
+        border-collapse: collapse !important;
+    }
+
+    .table-wrap thead th,
+    .table-wrap tbody td {
+        white-space: nowrap !important;
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+        padding: 14px 12px !important;
+        font-size: 13px !important;
+        vertical-align: middle !important;
+    }
+
+    .table-wrap tbody td:nth-child(1),
+    .table-wrap tbody td:nth-child(2),
+    .table-wrap tbody td:nth-child(3) {
+        white-space: normal !important;
+        word-break: break-word !important;
+        min-width: 150px !important;
+    }
+
+    .table-wrap thead th:nth-child(1),
+    .table-wrap tbody td:nth-child(1) {
+        min-width: 170px !important;
+    }
+
+    .table-wrap thead th:nth-child(2),
+    .table-wrap tbody td:nth-child(2) {
+        min-width: 220px !important;
+    }
+
+    .table-wrap thead th:nth-child(3),
+    .table-wrap tbody td:nth-child(3) {
+        min-width: 160px !important;
+    }
+
+    .table-wrap thead th:nth-child(4),
+    .table-wrap tbody td:nth-child(4) {
+        min-width: 110px !important;
+    }
+
+    .table-wrap thead th:nth-child(5),
+    .table-wrap tbody td:nth-child(5) {
+        min-width: 130px !important;
+    }
+
+    .table-wrap thead th:nth-child(6),
+    .table-wrap tbody td:nth-child(6) {
+        min-width: 130px !important;
+    }
+
+    .table-wrap thead th:nth-child(7),
+    .table-wrap tbody td:nth-child(7) {
+        min-width: 120px !important;
+    }
+
+    .action-buttons {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .action-buttons .icon-only,
+    .action-buttons button {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        padding: 0 !important;
+        border-radius: 12px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .action-buttons .icon-only i,
+    .action-buttons button i {
+        font-size: 16px !important;
+    }
+}
+
+/* =========================
+   FIX POPUP HP GURU
+========================= */
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding: 16px !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .modal-box {
+        width: 100% !important;
+        max-width: 94vw !important;
+        max-height: 88vh !important;
+        overflow-y: auto !important;
+        border-radius: 22px !important;
+        padding: 20px !important;
+    }
+
+    .modal-header {
+        align-items: center !important;
+        margin-bottom: 16px !important;
+    }
+
+    .modal-header h2 {
+        font-size: 20px !important;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .modal-actions {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    .modal-actions button {
+        width: 100% !important;
+    }
+
+    .custom-popup-overlay {
+        padding: 16px !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .custom-popup-box {
+        max-width: 94vw !important;
+        border-radius: 22px !important;
+    }
+
+    .custom-popup-footer {
+        flex-direction: column !important;
+    }
+
+    .custom-btn-primary,
+    .custom-btn-secondary {
+        width: 100% !important;
+    }
+}
