@@ -204,6 +204,8 @@ function renderPagination(totalPages) {
 
     paginationBtns.innerHTML = "";
 
+    const maxVisiblePages = 5;
+
     const prevBtn = document.createElement("button");
     prevBtn.className = "btn-page";
     prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i>`;
@@ -218,7 +220,15 @@ function renderPagination(totalPages) {
 
     paginationBtns.appendChild(prevBtn);
 
-    for (let i = 1; i <= totalPages; i++) {
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = startPage + maxVisiblePages - 1;
+
+    if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
         const pageBtn = document.createElement("button");
         pageBtn.className = "btn-page";
 
