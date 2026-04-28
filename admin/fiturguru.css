@@ -730,3 +730,96 @@ button {
     }
 }
 
+/* FIX POPUP KONFIRMASI GURU */
+.custom-popup-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.35) !important;
+    display: none;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 99999 !important;
+    padding: 20px !important;
+}
+
+.custom-popup-box {
+    width: 100% !important;
+    max-width: 460px !important;
+    background: #ffffff !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18) !important;
+    overflow: hidden !important;
+}
+
+.custom-popup-header {
+    background: #064e4b !important;
+    color: #ffffff !important;
+    padding: 18px 22px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.custom-popup-header h3 {
+    margin: 0 !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+.custom-popup-close {
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 30px !important;
+    cursor: pointer !important;
+    line-height: 1 !important;
+}
+
+.custom-popup-body {
+    padding: 24px 22px 10px !important;
+    color: #1e293b !important;
+    font-size: 15px !important;
+    line-height: 1.7 !important;
+}
+
+.custom-popup-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    padding: 18px 22px 22px !important;
+}
+
+.custom-btn-primary,
+.custom-btn-secondary {
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 12px 18px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+}
+
+.custom-btn-primary {
+    background: #064e4b !important;
+    color: #ffffff !important;
+}
+
+.custom-btn-secondary {
+    background: #eef2f4 !important;
+    color: #064e4b !important;
+}
+
+@media (max-width: 768px) {
+    .custom-popup-box {
+        max-width: 92vw !important;
+    }
+
+    .custom-popup-footer {
+        flex-direction: column !important;
+    }
+
+    .custom-btn-primary,
+    .custom-btn-secondary {
+        width: 100% !important;
+    }
+}

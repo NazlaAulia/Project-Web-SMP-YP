@@ -6,12 +6,14 @@
     <title>Data Guru - Admin</title>
 
     <link rel="stylesheet" href="components/admin-nav.css">
-<link rel="stylesheet" href="fiturguru.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-       <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="fiturguru.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body data-page="guru">
 
     <div class="container">
@@ -25,7 +27,7 @@
                         <p>Kelola data guru, akun login dibuat otomatis oleh sistem.</p>
                     </div>
 
-                    <button class="btn-primary" id="openModalBtn">
+                    <button class="btn-primary" id="openModalBtn" type="button">
                         <i class="fas fa-plus"></i>
                         Tambah Guru
                     </button>
@@ -38,108 +40,89 @@
                     </div>
                 </section>
 
-               <section class="table-card">
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Nama</th>
-                    <th>Email</th>
-                    <th>Nama Pengguna</th>
-                    <th>NIP</th>
-                    <th>Pelajaran</th>
-                    <th>Wali Kelas</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="guruTableBody">
-                <tr>
-                    <td colspan="7" class="empty-cell">Memuat data guru...</td>
-                </tr>
-            </tbody>
-        </table>
+                <section class="table-card">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Email</th>
+                                    <th>Nama Pengguna</th>
+                                    <th>NIP</th>
+                                    <th>Pelajaran</th>
+                                    <th>Wali Kelas</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="guruTableBody">
+                                <tr>
+                                    <td colspan="7" class="empty-cell">Memuat data guru...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination-container">
+                        <div class="pagination-info" id="paginationInfo">
+                            Menampilkan 0 sampai 0 dari 0 Guru
+                        </div>
+                        <div class="pagination-btns" id="paginationBtns"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
 
-    <div class="pagination-container">
-        <div class="pagination-info" id="paginationInfo">
-            Menampilkan 0 sampai 0 dari 0 Guru
-        </div>
-        <div class="pagination-btns" id="paginationBtns"></div>
-    </div>
-</section>
-
-    <!-- MODAL TAMBAH GURU -->
-   <!-- MODAL TAMBAH GURU -->
-<div class="modal-overlay" id="guruModal">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h2 id="modalTitle">Tambah Guru</h2>
-            <button class="btn-close" id="closeModalBtn">&times;</button>
-        </div>
-
-        <form id="formTambahGuru">
-            <input type="hidden" id="id_guru" name="id_guru">
-            <input type="hidden" id="formMode" name="formMode" value="tambah">
-
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="nip">NIP</label>
-                    <input type="text" id="nip" name="nip" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="nama">Nama Guru</label>
-                    <input type="text" id="nama" name="nama" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_mapel">Pelajaran</label>
-                    <select id="id_mapel" name="id_mapel">
-                        <option value="">-- Pilih Pelajaran --</option>
-                    </select>
-                </div>
+    <!-- MODAL TAMBAH / EDIT GURU -->
+    <div class="modal-overlay" id="guruModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Guru</h2>
+                <button class="btn-close" id="closeModalBtn" type="button">&times;</button>
             </div>
 
-            <div class="info-box">
-                Akun dan Sandi awal akan dibuat otomatis oleh sistem saat guru ditambahkan.
-            </div>
+            <form id="formTambahGuru">
+                <input type="hidden" id="id_guru" name="id_guru">
+                <input type="hidden" id="formMode" name="formMode" value="tambah">
 
-            <div id="formMessage" class="form-message"></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nip">NIP</label>
+                        <input type="text" id="nip" name="nip" required>
+                    </div>
 
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" id="cancelModalBtn">Batal</button>
-                <button type="submit" class="btn-primary" id="submitGuruBtn">Simpan Guru</button>
-            </div>
-        </form>
-    </div>
-</div>
-    <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nama">Nama Guru</label>
+                        <input type="text" id="nama" name="nama" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_mapel">Pelajaran</label>
+                        <select id="id_mapel" name="id_mapel">
+                            <option value="">-- Pilih Pelajaran --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    Akun dan Sandi awal akan dibuat otomatis oleh sistem saat guru ditambahkan.
+                </div>
+
+                <div id="formMessage" class="form-message"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelModalBtn">Batal</button>
+                    <button type="submit" class="btn-primary" id="submitGuruBtn">Simpan Guru</button>
+                </div>
             </form>
         </div>
     </div>
-
-    <div id="confirmModal" class="modal" style="display:none;">
-  <div class="modal-content confirm-modal">
-    <div class="modal-header">
-      <h3>Konfirmasi</h3>
-      <button class="btn-close" onclick="closeConfirmModal()">&times;</button>
-    </div>
-
-    <div class="modal-body">
-      <p id="confirmMessage">Apakah Anda yakin?</p>
-    </div>
-
-    <div class="modal-footer">
-      <button type="button" class="btn-cancel" onclick="closeConfirmModal()">Batal</button>
-      <button type="button" class="btn-submit" id="confirmOkBtn">Ya, Simpan</button>
-    </div>
-  </div>
-</div>
 
     <script src="components/admin-nav.js"></script>
     <script src="fiturguru.js"></script>
