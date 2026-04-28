@@ -1013,3 +1013,32 @@ button {
         min-width: 100%;
     }
 }
+
+.pagination-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.btn-page {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 10px;
+    background: #eef2f4;
+    color: #334155;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-page.active {
+    background: #064e4b;
+    color: #fff;
+}
+
+.btn-page:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
