@@ -4,6 +4,7 @@ let currentPage = 1;
 const rowsPerPage = 10;
 
 let semuaApproval = [];
+let deleteTargetId = null;
 
 const siswaTableBody = document.getElementById("siswaTableBody");
 const searchSiswa = document.getElementById("searchSiswa");
@@ -13,6 +14,12 @@ const openApprovalBtn = document.getElementById("openApprovalBtn");
 const closeApprovalBtn = document.getElementById("closeApprovalBtn");
 const approvalList = document.getElementById("approvalList");
 const pendingApprovalCount = document.getElementById("pendingApprovalCount");
+
+const deleteModal = document.getElementById("deleteModal");
+const deleteSiswaName = document.getElementById("deleteSiswaName");
+const closeDeleteBtn = document.getElementById("closeDeleteBtn");
+const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
 document.addEventListener("DOMContentLoaded", () => {
     loadSiswa();
@@ -117,6 +124,7 @@ function renderSiswa() {
         if (paginationBtns) {
             paginationBtns.innerHTML = "";
         }
+
         return;
     }
 
@@ -144,8 +152,25 @@ function renderSiswa() {
             </td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn-edit" onclick="editSiswa(${siswa.id_siswa})">Edit</button>
-                    <button class="btn-danger" onclick="hapusSiswa(${siswa.id_siswa}, '${escapeJs(siswa.nama)}')">Hapus</button>
+                    <button 
+                        type="button"
+                        class="btn-edit btn-icon" 
+                        onclick="editSiswa(${siswa.id_siswa})" 
+                        title="Edit"
+                        aria-label="Edit"
+                    >
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+
+                    <button 
+                        type="button"
+                        class="btn-danger btn-icon" 
+                        onclick="openDeleteModal(${siswa.id_siswa}, '${escapeJs(siswa.nama || "-")}')" 
+                        title="Hapus"
+                        aria-label="Hapus"
+                    >
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
                 </div>
             </td>
         </tr>
@@ -171,18 +196,24 @@ function renderPagination(totalPages) {
     prevBtn.className = "btn-page";
     prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i>`;
     prevBtn.disabled = currentPage === 1;
+
     prevBtn.addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
             renderSiswa();
         }
     });
+
     paginationBtns.appendChild(prevBtn);
 
     for (let i = 1; i <= totalPages; i++) {
         const pageBtn = document.createElement("button");
         pageBtn.className = "btn-page";
-        if (i === currentPage) pageBtn.classList.add("active");
+
+        if (i === currentPage) {
+            pageBtn.classList.add("active");
+        }
+
         pageBtn.textContent = i;
 
         pageBtn.addEventListener("click", () => {
@@ -197,12 +228,14 @@ function renderPagination(totalPages) {
     nextBtn.className = "btn-page";
     nextBtn.innerHTML = `<i class="fas fa-chevron-right"></i>`;
     nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
     nextBtn.addEventListener("click", () => {
         if (currentPage < totalPages) {
             currentPage++;
             renderSiswa();
         }
     });
+
     paginationBtns.appendChild(nextBtn);
 }
 
@@ -277,38 +310,75 @@ function lihatDetailPendaftaran(idPendaftaran) {
     window.location.href = `/admin/pendaftaran.html?id=${idPendaftaran}`;
 }
 
-async function hapusSiswa(idSiswa, namaSiswa) {
-    const oke = confirm(`Yakin ingin menghapus siswa ${namaSiswa}?`);
-    if (!oke) return;
+function openDeleteModal(idSiswa, namaSiswa) {
+    deleteTargetId = idSiswa;
 
-    try {
-        const formData = new FormData();
-        formData.append("id_siswa", idSiswa);
+    if (deleteSiswaName) {
+        deleteSiswaName.textContent = namaSiswa;
+    }
 
-        const response = await fetch("hapus_siswa.php", {
-            method: "POST",
-            body: formData
-        });
+    if (deleteModal) {
+        deleteModal.classList.add("active");
+    }
+}
 
-        const raw = await response.text();
-        let result;
+function closeDeleteModal() {
+    deleteTargetId = null;
+
+    if (deleteModal) {
+        deleteModal.classList.remove("active");
+    }
+}
+
+if (closeDeleteBtn) {
+    closeDeleteBtn.addEventListener("click", closeDeleteModal);
+}
+
+if (cancelDeleteBtn) {
+    cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+}
+
+if (deleteModal) {
+    deleteModal.addEventListener("click", (e) => {
+        if (e.target === deleteModal) {
+            closeDeleteModal();
+        }
+    });
+}
+
+if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener("click", async () => {
+        if (!deleteTargetId) return;
 
         try {
-            result = JSON.parse(raw);
-        } catch {
-            throw new Error("Response bukan JSON: " + raw);
-        }
+            const formData = new FormData();
+            formData.append("id_siswa", deleteTargetId);
 
-        if (result.status !== "success") {
-            alert(result.message || "Gagal menghapus siswa.");
-            return;
-        }
+            const response = await fetch("hapus_siswa.php", {
+                method: "POST",
+                body: formData
+            });
 
-        alert(result.message);
-        await loadSiswa();
-    } catch (error) {
-        alert(error.message);
-    }
+            const raw = await response.text();
+
+            let result;
+            try {
+                result = JSON.parse(raw);
+            } catch {
+                throw new Error("Response bukan JSON: " + raw);
+            }
+
+            if (result.status !== "success") {
+                alert(result.message || "Gagal menghapus siswa.");
+                return;
+            }
+
+            closeDeleteModal();
+            await loadSiswa();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
 }
 
 function editSiswa(idSiswa) {
