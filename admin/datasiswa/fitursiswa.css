@@ -1215,3 +1215,80 @@ button {
     font-size: 18px !important;
     line-height: 1 !important;
 }
+
+/* FIX FINAL - PAGINATION SISWA KAYAK GURU */
+.table-card .pagination-container {
+    margin-top: 18px !important;
+    padding-top: 15px !important;
+    border-top: 1px solid var(--border) !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 14px !important;
+    flex-wrap: wrap !important;
+}
+
+.table-card .pagination-info {
+    font-size: 14px !important;
+    color: var(--muted) !important;
+    font-weight: 400 !important;
+    text-align: left !important;
+}
+
+.table-card .pagination-btns {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    margin-top: 0 !important;
+    width: auto !important;
+}
+
+.table-card .pagination-btns .btn-page {
+    min-width: 38px !important;
+    width: auto !important;
+    height: 38px !important;
+    padding: 0 12px !important;
+
+    border-radius: 10px !important;
+    border: 1px solid #e5e7eb !important;
+    background: #ffffff !important;
+    color: var(--text-dark) !important;
+
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    cursor: pointer !important;
+    transition: 0.25s ease !important;
+}
+
+.table-card .pagination-btns .btn-page:hover:not(:disabled) {
+    background: var(--primary-teal) !important;
+    color: #ffffff !important;
+    border-color: var(--primary-teal) !important;
+}
+
+.table-card .pagination-btns .btn-page.active {
+    background: var(--primary-teal) !important;
+    color: #ffffff !important;
+    border-color: var(--primary-teal) !important;
+}
+
+.table-card .pagination-btns .btn-page:disabled {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+}
+
+.table-card .pagination-btns .btn-page i {
+    font-size: 14px !important;
+    line-height: 1 !important;
+}
