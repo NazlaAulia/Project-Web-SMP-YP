@@ -21,6 +21,18 @@ const closeDeleteBtn = document.getElementById("closeDeleteBtn");
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
+/* TAMBAHAN UNTUK MODAL EDIT */
+const editModal = document.getElementById("editModal");
+const closeEditBtn = document.getElementById("closeEditBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+const editSiswaForm = document.getElementById("editSiswaForm");
+
+const editIdSiswa = document.getElementById("editIdSiswa");
+const editNisn = document.getElementById("editNisn");
+const editNama = document.getElementById("editNama");
+const editJenisKelamin = document.getElementById("editJenisKelamin");
+const editFormMessage = document.getElementById("editFormMessage");
+
 document.addEventListener("DOMContentLoaded", () => {
     loadSiswa();
     loadPendingApproval();
@@ -381,8 +393,114 @@ if (confirmDeleteBtn) {
     });
 }
 
+/* TAMBAHAN EVENT UNTUK MODAL EDIT */
+if (closeEditBtn) {
+    closeEditBtn.addEventListener("click", closeEditModal);
+}
+
+if (cancelEditBtn) {
+    cancelEditBtn.addEventListener("click", closeEditModal);
+}
+
+if (editModal) {
+    editModal.addEventListener("click", (e) => {
+        if (e.target === editModal) {
+            closeEditModal();
+        }
+    });
+}
+
 function editSiswa(idSiswa) {
-    alert("Fitur edit siswa menyusul.");
+    const siswa = semuaSiswa.find(item => Number(item.id_siswa) === Number(idSiswa));
+
+    if (!siswa) {
+        alert("Data siswa tidak ditemukan.");
+        return;
+    }
+
+    editIdSiswa.value = siswa.id_siswa || "";
+    editNisn.value = siswa.nisn || "";
+    editNama.value = siswa.nama || "";
+    editJenisKelamin.value = siswa.jenis_kelamin || "";
+    editFormMessage.textContent = "";
+    editFormMessage.className = "form-message";
+
+    if (editModal) {
+        editModal.classList.add("active");
+    }
+}
+
+function closeEditModal() {
+    if (editModal) {
+        editModal.classList.remove("active");
+    }
+
+    if (editSiswaForm) {
+        editSiswaForm.reset();
+    }
+
+    if (editFormMessage) {
+        editFormMessage.textContent = "";
+        editFormMessage.className = "form-message";
+    }
+}
+
+if (editSiswaForm) {
+    editSiswaForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        if (editFormMessage) {
+            editFormMessage.textContent = "Menyimpan perubahan...";
+            editFormMessage.className = "form-message";
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append("id_siswa", editIdSiswa.value);
+            formData.append("nisn", editNisn.value.trim());
+            formData.append("nama", editNama.value.trim());
+            formData.append("jenis_kelamin", editJenisKelamin.value);
+
+            const response = await fetch("edit_siswa.php", {
+                method: "POST",
+                body: formData
+            });
+
+            const raw = await response.text();
+
+            let result;
+            try {
+                result = JSON.parse(raw);
+            } catch {
+                throw new Error("Response edit bukan JSON: " + raw);
+            }
+
+            if (result.status !== "success") {
+                if (editFormMessage) {
+                    editFormMessage.textContent = result.message || "Gagal memperbarui data siswa.";
+                    editFormMessage.className = "form-message error";
+                }
+                return;
+            }
+
+            if (editFormMessage) {
+                editFormMessage.textContent = result.message || "Data siswa berhasil diperbarui.";
+                editFormMessage.className = "form-message success";
+            }
+
+            await loadSiswa();
+
+            setTimeout(() => {
+                closeEditModal();
+            }, 800);
+
+        } catch (error) {
+            if (editFormMessage) {
+                editFormMessage.textContent = error.message;
+                editFormMessage.className = "form-message error";
+            }
+        }
+    });
 }
 
 function formatGender(gender) {
