@@ -5,6 +5,9 @@ const rowsPerPage = 10;
 
 let semuaApproval = [];
 
+let idSiswaYangDihapus = null;
+let namaSiswaYangDihapus = "";
+
 const siswaTableBody = document.getElementById("siswaTableBody");
 const searchSiswa = document.getElementById("searchSiswa");
 
@@ -15,6 +18,7 @@ const approvalList = document.getElementById("approvalList");
 const pendingApprovalCount = document.getElementById("pendingApprovalCount");
 
 document.addEventListener("DOMContentLoaded", () => {
+    buatPopupSiswa();
     loadSiswa();
     loadPendingApproval();
 });
@@ -56,6 +60,212 @@ if (searchSiswa) {
         currentPage = 1;
         renderSiswa();
     });
+}
+
+function buatPopupSiswa() {
+    const popupHtml = `
+        <div class="modal-overlay" id="detailSiswaModal">
+            <div class="modal-box modal-detail-siswa">
+                <div class="modal-header">
+                    <h2>Detail Siswa</h2>
+                    <button class="btn-close" id="closeDetailSiswaBtn" type="button">&times;</button>
+                </div>
+
+                <div class="detail-siswa-list">
+                    <div class="detail-row">
+                        <span>Nama</span>
+                        <strong id="detailNamaSiswa">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>NISN</span>
+                        <strong id="detailNisnSiswa">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Nama Pengguna</span>
+                        <strong id="detailUsernameSiswa">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Jenis Kelamin</span>
+                        <strong id="detailGenderSiswa">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Kelas</span>
+                        <strong id="detailKelasSiswa">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Tahun Ajaran</span>
+                        <strong id="detailTahunSiswa">-</strong>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="okDetailSiswaBtn">Tutup</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="hapusSiswaModal">
+            <div class="modal-box modal-hapus-siswa">
+                <div class="modal-header">
+                    <h2>Hapus Siswa</h2>
+                    <button class="btn-close" id="closeHapusSiswaBtn" type="button">&times;</button>
+                </div>
+
+                <p class="hapus-text">
+                    Yakin ingin menghapus siswa <strong id="namaSiswaHapus">-</strong>?
+                </p>
+
+                <div class="form-message" id="hapusSiswaMessage"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelHapusSiswaBtn">Batal</button>
+                    <button type="button" class="btn-danger" id="confirmHapusSiswaBtn">
+                        <i class="fas fa-trash"></i>
+                        Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", popupHtml);
+
+    const style = document.createElement("style");
+    style.textContent = `
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .btn-icon {
+            width: 30px;
+            height: 30px;
+            padding: 0 !important;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .btn-icon i {
+            pointer-events: none;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-1px);
+            filter: brightness(0.97);
+        }
+
+        .modal-detail-siswa,
+        .modal-hapus-siswa {
+            max-width: 480px;
+        }
+
+        .detail-siswa-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: var(--bg-light);
+            font-size: 14px;
+        }
+
+        .detail-row span {
+            color: var(--muted);
+        }
+
+        .detail-row strong {
+            color: var(--text-dark);
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .hapus-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-dark);
+        }
+
+        .hapus-text strong {
+            color: var(--danger-text);
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .action-buttons button {
+                width: 30px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .detail-row strong {
+                text-align: left;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    const detailSiswaModal = document.getElementById("detailSiswaModal");
+    const closeDetailSiswaBtn = document.getElementById("closeDetailSiswaBtn");
+    const okDetailSiswaBtn = document.getElementById("okDetailSiswaBtn");
+
+    const hapusSiswaModal = document.getElementById("hapusSiswaModal");
+    const closeHapusSiswaBtn = document.getElementById("closeHapusSiswaBtn");
+    const cancelHapusSiswaBtn = document.getElementById("cancelHapusSiswaBtn");
+    const confirmHapusSiswaBtn = document.getElementById("confirmHapusSiswaBtn");
+
+    if (closeDetailSiswaBtn) {
+        closeDetailSiswaBtn.addEventListener("click", closeDetailModal);
+    }
+
+    if (okDetailSiswaBtn) {
+        okDetailSiswaBtn.addEventListener("click", closeDetailModal);
+    }
+
+    if (detailSiswaModal) {
+        detailSiswaModal.addEventListener("click", (e) => {
+            if (e.target === detailSiswaModal) {
+                closeDetailModal();
+            }
+        });
+    }
+
+    if (closeHapusSiswaBtn) {
+        closeHapusSiswaBtn.addEventListener("click", closeHapusModal);
+    }
+
+    if (cancelHapusSiswaBtn) {
+        cancelHapusSiswaBtn.addEventListener("click", closeHapusModal);
+    }
+
+    if (hapusSiswaModal) {
+        hapusSiswaModal.addEventListener("click", (e) => {
+            if (e.target === hapusSiswaModal) {
+                closeHapusModal();
+            }
+        });
+    }
+
+    if (confirmHapusSiswaBtn) {
+        confirmHapusSiswaBtn.addEventListener("click", prosesHapusSiswa);
+    }
 }
 
 async function loadSiswa() {
@@ -144,8 +354,19 @@ function renderSiswa() {
             </td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn-edit" onclick="editSiswa(${siswa.id_siswa})">Edit</button>
-                    <button class="btn-danger" onclick="hapusSiswa(${siswa.id_siswa}, '${escapeJs(siswa.nama)}')">Hapus</button>
+                    <button 
+                        class="btn-edit btn-icon" 
+                        title="Edit / Detail"
+                        onclick="editSiswa(${siswa.id_siswa})">
+                        <i class="fas fa-pen"></i>
+                    </button>
+
+                    <button 
+                        class="btn-danger btn-icon" 
+                        title="Hapus"
+                        onclick="hapusSiswa(${siswa.id_siswa}, '${escapeJs(siswa.nama)}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </td>
         </tr>
@@ -277,13 +498,76 @@ function lihatDetailPendaftaran(idPendaftaran) {
     window.location.href = `/admin/pendaftaran.html?id=${idPendaftaran}`;
 }
 
-async function hapusSiswa(idSiswa, namaSiswa) {
-    const oke = confirm(`Yakin ingin menghapus siswa ${namaSiswa}?`);
-    if (!oke) return;
+function editSiswa(idSiswa) {
+    const siswa = semuaSiswa.find(item => Number(item.id_siswa) === Number(idSiswa));
+
+    if (!siswa) {
+        alert("Data siswa tidak ditemukan.");
+        return;
+    }
+
+    document.getElementById("detailNamaSiswa").textContent = siswa.nama || "-";
+    document.getElementById("detailNisnSiswa").textContent = siswa.nisn || "-";
+    document.getElementById("detailUsernameSiswa").textContent = siswa.username || "-";
+    document.getElementById("detailGenderSiswa").textContent = formatGender(siswa.jenis_kelamin || "-");
+    document.getElementById("detailKelasSiswa").textContent = siswa.nama_kelas || "-";
+    document.getElementById("detailTahunSiswa").textContent = siswa.tahun_ajaran || "-";
+
+    document.getElementById("detailSiswaModal").classList.add("active");
+}
+
+function closeDetailModal() {
+    const modal = document.getElementById("detailSiswaModal");
+    if (modal) {
+        modal.classList.remove("active");
+    }
+}
+
+function hapusSiswa(idSiswa, namaSiswa) {
+    idSiswaYangDihapus = idSiswa;
+    namaSiswaYangDihapus = namaSiswa || "-";
+
+    document.getElementById("namaSiswaHapus").textContent = namaSiswaYangDihapus;
+
+    const message = document.getElementById("hapusSiswaMessage");
+    if (message) {
+        message.textContent = "";
+        message.className = "form-message";
+    }
+
+    document.getElementById("hapusSiswaModal").classList.add("active");
+}
+
+function closeHapusModal() {
+    const modal = document.getElementById("hapusSiswaModal");
+    if (modal) {
+        modal.classList.remove("active");
+    }
+
+    idSiswaYangDihapus = null;
+    namaSiswaYangDihapus = "";
+}
+
+async function prosesHapusSiswa() {
+    const message = document.getElementById("hapusSiswaMessage");
+    const confirmBtn = document.getElementById("confirmHapusSiswaBtn");
+
+    if (!idSiswaYangDihapus) {
+        if (message) {
+            message.textContent = "ID siswa tidak valid.";
+            message.className = "form-message error";
+        }
+        return;
+    }
 
     try {
+        if (confirmBtn) {
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menghapus...`;
+        }
+
         const formData = new FormData();
-        formData.append("id_siswa", idSiswa);
+        formData.append("id_siswa", idSiswaYangDihapus);
 
         const response = await fetch("hapus_siswa.php", {
             method: "POST",
@@ -300,19 +584,35 @@ async function hapusSiswa(idSiswa, namaSiswa) {
         }
 
         if (result.status !== "success") {
-            alert(result.message || "Gagal menghapus siswa.");
+            if (message) {
+                message.textContent = result.message || "Gagal menghapus siswa.";
+                message.className = "form-message error";
+            }
             return;
         }
 
-        alert(result.message);
-        await loadSiswa();
-    } catch (error) {
-        alert(error.message);
-    }
-}
+        if (message) {
+            message.textContent = result.message || "Data siswa berhasil dihapus.";
+            message.className = "form-message success";
+        }
 
-function editSiswa(idSiswa) {
-    alert("Fitur edit siswa menyusul.");
+        await loadSiswa();
+
+        setTimeout(() => {
+            closeHapusModal();
+        }, 700);
+
+    } catch (error) {
+        if (message) {
+            message.textContent = error.message;
+            message.className = "form-message error";
+        }
+    } finally {
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = `<i class="fas fa-trash"></i> Hapus`;
+        }
+    }
 }
 
 function formatGender(gender) {
