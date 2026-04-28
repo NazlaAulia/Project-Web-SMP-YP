@@ -1292,3 +1292,53 @@ button {
     font-size: 14px !important;
     line-height: 1 !important;
 }
+
+/* FIX FINAL - ICON AKSI SISWA BIAR KECIL */
+.table-card .action-buttons {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+}
+
+.table-card .action-buttons .btn-icon,
+.table-card .action-buttons button {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: 0 !important;
+    line-height: 1 !important;
+}
+
+.table-card .action-buttons .btn-icon i,
+.table-card .action-buttons button i {
+    font-size: 17px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+}
+
+.table-card .action-buttons .btn-edit {
+    background: #dff0fb !important;
+    color: #0369a1 !important;
+}
+
+.table-card .action-buttons .btn-danger {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+}
+
+.table-card .action-buttons .btn-icon:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.97);
+}
