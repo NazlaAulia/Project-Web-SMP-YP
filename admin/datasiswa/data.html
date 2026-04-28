@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
-<link rel="icon" type="image/x-icon" href="img/admin/datasiswa/images.webp">
+    <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
+
+    <link rel="icon" type="image/x-icon" href="img/admin/datasiswa/images.webp">
     <link rel="stylesheet" href="../components/admin-nav.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +16,6 @@
 
     <link rel="stylesheet" href="fitursiswa.css">
 </head>
-
 
 <body data-page="siswa" data-nav-path="../components/admin-nav.html">
 
@@ -29,10 +30,10 @@
                         <p>Kelola data siswa dan akun login siswa.</p>
                     </div>
 
-                   <button class="btn-primary" id="openApprovalBtn">
-    <i class="fas fa-user-check"></i>
-    Konfirmasi Penerimaan (<span id="pendingApprovalCount">0</span>)
-</button>
+                    <button class="btn-primary" id="openApprovalBtn">
+                        <i class="fas fa-user-check"></i>
+                        Konfirmasi Penerimaan (<span id="pendingApprovalCount">0</span>)
+                    </button>
                 </header>
 
                 <section class="toolbar">
@@ -56,9 +57,10 @@
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
+
                             <tbody id="siswaTableBody">
                                 <tr>
-                                     <td colspan="7" class="empty-cell">Memuat data siswa...</td>
+                                    <td colspan="7" class="empty-cell">Memuat data siswa...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -75,18 +77,42 @@
         </main>
     </div>
 
-<div class="modal-overlay" id="approvalModal">
-    <div class="modal-box modal-approval-box">
-        <div class="modal-header">
-            <h2>Approval Siswa Baru</h2>
-            <button class="btn-close" id="closeApprovalBtn" type="button">&times;</button>
-        </div>
+    <div class="modal-overlay" id="approvalModal">
+        <div class="modal-box modal-approval-box">
+            <div class="modal-header">
+                <h2>Approval Siswa Baru</h2>
+                <button class="btn-close" id="closeApprovalBtn" type="button">&times;</button>
+            </div>
 
-        <div id="approvalList" class="approval-list">
-            <div class="empty-cell">Memuat data pendaftaran...</div>
+            <div id="approvalList" class="approval-list">
+                <div class="empty-cell">Memuat data pendaftaran...</div>
+            </div>
         </div>
     </div>
-</div>
+
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box modal-delete-box">
+            <div class="modal-header">
+                <h2>Hapus Siswa</h2>
+                <button class="btn-close" id="closeDeleteBtn" type="button">&times;</button>
+            </div>
+
+            <p class="delete-text">
+                Yakin ingin menghapus siswa <strong id="deleteSiswaName">-</strong>?
+                <br>
+                Data siswa dan akun loginnya akan dihapus.
+            </p>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="cancelDeleteBtn">
+                    Batal
+                </button>
+                <button type="button" class="btn-danger" id="confirmDeleteBtn">
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script src="../components/admin-nav.js"></script>
     <script src="fitursiswa.js"></script>
