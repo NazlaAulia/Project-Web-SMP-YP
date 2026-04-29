@@ -100,7 +100,7 @@ function renderTable(filteredData = dataNilai) {
   if (filteredData.length === 0) {
     nilaiTableBody.innerHTML = `
       <tr>
-        <td colspan="11" class="empty-state">Belum ada data yang sesuai.</td>
+        <td colspan="12" class="empty-state">Belum ada data yang sesuai.</td>
       </tr>
     `;
     return;
@@ -113,6 +113,7 @@ function renderTable(filteredData = dataNilai) {
           <td>${index + 1}</td>
           <td>${item.id_siswa}</td>
           <td>${item.nama_siswa || "-"}</td>
+          <td>${item.nama_kelas || "-"}</td>
           <td>${item.id_mapel}</td>
           <td>${item.nama_mapel || "-"}</td>
           <td>${item.semester_text || tampilSemester(item.semester)}</td>
