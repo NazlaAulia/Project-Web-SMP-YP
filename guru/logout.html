@@ -37,10 +37,24 @@
 
         <div class="logout-actions">
           <a href="guru.html" class="btn-cancel">Batal</a>
-          <a href="../index.html" class="btn-logout">Logout</a>
+          <a href="../login.html" class="btn-logout" id="btnLogout">Logout</a>
         </div>
       </div>
     </section>
   </main>
+
+  <script>
+    const btnLogout = document.getElementById("btnLogout");
+
+    if (btnLogout) {
+      btnLogout.addEventListener("click", function () {
+        localStorage.removeItem("id_guru");
+        localStorage.removeItem("role_id");
+        localStorage.removeItem("username");
+        localStorage.removeItem("id_siswa");
+        localStorage.removeItem("id_user");
+      });
+    }
+  </script>
 </body>
 </html>
