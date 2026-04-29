@@ -30,9 +30,9 @@
         <p>Import nilai siswa melalui file CSV tanpa input manual satu per satu.</p>
       </div>
 
-      <button id="exportBtn" class="btn btn-primary">
-        <i class="bi bi-download"></i>
-        Ekspor Data CSV
+      <button type="button" class="btn-export" onclick="eksporDataNilaiCsv()">
+          <i class="bi bi-download"></i>
+          Ekspor Data CSV
       </button>
     </header>
 
@@ -76,6 +76,33 @@
 
     <div id="messageBox" class="message-box"></div>
   </section>
+
+  <!-- TARUH DI SINI: filter mode guru mapel / wali kelas -->
+  <section class="card nilai-filter-card" id="filterWaliKelasBox" style="display: none;">
+    <div class="nilai-filter-head">
+      <div>
+        <h3>Filter Data Nilai</h3>
+        <p>Pilih tampilan nilai berdasarkan mapel guru atau kelas wali.</p>
+      </div>
+    </div>
+
+    <div class="nilai-filter-row">
+      <div class="nilai-filter-group">
+        <label for="modeNilai">Tampilkan Data</label>
+        <select id="modeNilai" class="filter-select">
+          <option value="mapel">Mapel Saya</option>
+          <option value="wali">Wali Kelas</option>
+        </select>
+      </div>
+
+      <div class="nilai-filter-group">
+        <label for="filterKelasWali">Kelas Wali</label>
+        <select id="filterKelasWali" class="filter-select" style="display: none;"></select>
+      </div>
+    </div>
+  </section>
+
+  <section class="rekap-grid">
 
       <section class="rekap-grid">
         <div class="rekap-item">

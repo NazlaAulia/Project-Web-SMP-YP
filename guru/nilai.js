@@ -8,6 +8,10 @@ const searchInput = document.getElementById("searchInput");
 const messageBox = document.getElementById("messageBox");
 const nilaiTableBody = document.getElementById("nilaiTableBody");
 
+const modeNilai = document.getElementById("modeNilai");
+const filterKelasWali = document.getElementById("filterKelasWali");
+const filterWaliKelasBox = document.getElementById("filterWaliKelasBox");
+
 const idGuruLogin = localStorage.getItem("id_guru");
 const roleIdLogin = localStorage.getItem("role_id");
 
@@ -32,6 +36,15 @@ function normalisasiSemester(value) {
   if (semesterText === "genap") return 2;
 
   return Number(value);
+}
+
+function tampilSemester(value) {
+  const semester = Number(value);
+
+  if (semester === 1) return "Ganjil";
+  if (semester === 2) return "Genap";
+
+  return value || "-";
 }
 
 function updateRekap() {
@@ -102,7 +115,7 @@ function renderTable(filteredData = dataNilai) {
           <td>${item.nama_siswa || "-"}</td>
           <td>${item.id_mapel}</td>
           <td>${item.nama_mapel || "-"}</td>
-          <td>${item.semester}</td>
+          <td>${item.semester_text || tampilSemester(item.semester)}</td>
           <td>${item.nilai_angka}</td>
           <td>${item.hadir}</td>
           <td>${item.izin}</td>
@@ -205,6 +218,26 @@ function parseCSV(text) {
   return result;
 }
 
+function isiDropdownWaliKelas(waliKelas) {
+  if (!filterKelasWali) return;
+
+  const nilaiSebelumnya = filterKelasWali.value;
+
+  filterKelasWali.innerHTML = "";
+
+  waliKelas.forEach(kelas => {
+    filterKelasWali.innerHTML += `
+      <option value="${kelas.id_kelas}">
+        Kelas ${kelas.nama_kelas}
+      </option>
+    `;
+  });
+
+  if (nilaiSebelumnya) {
+    filterKelasWali.value = nilaiSebelumnya;
+  }
+}
+
 function loadNilaiDatabase() {
   if (!idGuruLogin || roleIdLogin !== "2") {
     alert("Silakan login sebagai guru terlebih dahulu.");
@@ -212,19 +245,40 @@ function loadNilaiDatabase() {
     return;
   }
 
-  fetch(`get_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
+  const mode = modeNilai ? modeNilai.value : "mapel";
+  const idKelas = filterKelasWali ? filterKelasWali.value : "";
+
+  let url = `get_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${mode}`;
+
+  if (mode === "wali" && idKelas) {
+    url += `&id_kelas=${idKelas}`;
+  }
+
+  fetch(url)
     .then(res => res.json())
     .then(result => {
       if (result.status === "success") {
         dataNilai = result.data || [];
+
+        if (result.is_wali_kelas && filterWaliKelasBox) {
+          filterWaliKelasBox.style.display = "block";
+          isiDropdownWaliKelas(result.wali_kelas || []);
+        }
+
+        if (filterKelasWali) {
+          filterKelasWali.style.display = mode === "wali" ? "block" : "none";
+        }
+
         renderTable();
         updateRekap();
       } else {
         console.warn(result.message);
+        showMessage(result.message, "error");
       }
     })
     .catch(err => {
       console.error("Gagal load nilai:", err);
+      showMessage("Gagal memuat data nilai.", "error");
     });
 }
 
@@ -239,6 +293,84 @@ function simpanNilaiKeDatabase() {
     method: "POST",
     body: formData
   }).then(res => res.json());
+}
+
+function filterSearchNilai() {
+  if (!searchInput) return;
+
+  const keyword = searchInput.value.toLowerCase();
+
+  const filtered = dataNilai.filter(item =>
+    String(item.id_siswa).toLowerCase().includes(keyword) ||
+    String(item.nama_siswa || "").toLowerCase().includes(keyword) ||
+    String(item.id_mapel).toLowerCase().includes(keyword) ||
+    String(item.nama_mapel || "").toLowerCase().includes(keyword) ||
+    String(item.nama_kelas || "").toLowerCase().includes(keyword) ||
+    String(item.semester_text || tampilSemester(item.semester)).toLowerCase().includes(keyword)
+  );
+
+  renderTable(filtered);
+}
+
+function amanCsv(value) {
+  const text = String(value ?? "");
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function eksporDataNilaiCsv() {
+  if (dataNilai.length === 0) {
+    showMessage("Belum ada data untuk diexport.", "error");
+    return;
+  }
+
+  const header = [
+    "id_siswa",
+    "nama_siswa",
+    "kelas",
+    "id_mapel",
+    "nama_mapel",
+    "semester",
+    "nilai_angka",
+    "hadir",
+    "izin",
+    "sakit",
+    "alfa"
+  ];
+
+  const rows = dataNilai.map(item => [
+    item.id_siswa,
+    item.nama_siswa || "-",
+    item.nama_kelas || "-",
+    item.id_mapel,
+    item.nama_mapel || "-",
+    item.semester_text || tampilSemester(item.semester),
+    item.nilai_angka,
+    item.hadir,
+    item.izin,
+    item.sakit,
+    item.alfa
+  ]);
+
+  const csvContent = [
+    header.join(","),
+    ...rows.map(row => row.map(amanCsv).join(","))
+  ].join("\n");
+
+  const blob = new Blob(["\uFEFF" + csvContent], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  const mode = modeNilai ? modeNilai.value : "mapel";
+  const tanggal = new Date().toISOString().slice(0, 10);
+
+  link.href = url;
+  link.download = `data_nilai_${mode}_${tanggal}.csv`;
+  link.click();
+
+  URL.revokeObjectURL(url);
 }
 
 if (uploadBtn) {
@@ -311,19 +443,15 @@ if (uploadBtn) {
 }
 
 if (searchInput) {
-  searchInput.addEventListener("input", (e) => {
-    const keyword = e.target.value.toLowerCase();
+  searchInput.addEventListener("input", filterSearchNilai);
+}
 
-    const filtered = dataNilai.filter(item =>
-      String(item.id_siswa).toLowerCase().includes(keyword) ||
-      String(item.nama_siswa || "").toLowerCase().includes(keyword) ||
-      String(item.id_mapel).toLowerCase().includes(keyword) ||
-      String(item.nama_mapel || "").toLowerCase().includes(keyword) ||
-      String(item.semester).toLowerCase().includes(keyword)
-    );
+if (modeNilai) {
+  modeNilai.addEventListener("change", loadNilaiDatabase);
+}
 
-    renderTable(filtered);
-  });
+if (filterKelasWali) {
+  filterKelasWali.addEventListener("change", loadNilaiDatabase);
 }
 
 if (downloadTemplateBtn) {
@@ -345,42 +473,7 @@ if (downloadTemplateBtn) {
 }
 
 if (exportBtn) {
-  exportBtn.addEventListener("click", () => {
-    if (dataNilai.length === 0) {
-      showMessage("Belum ada data untuk diexport.", "error");
-      return;
-    }
-
-    const tahunAjaranEl = document.getElementById("tahunAjaran");
-    const kelasEl = document.getElementById("kelas");
-    const mapelEl = document.getElementById("mapel");
-
-    const tahunAjaran = tahunAjaranEl ? tahunAjaranEl.value : "-";
-    const kelas = kelasEl ? kelasEl.value : "-";
-    const mapel = mapelEl ? mapelEl.value : "-";
-
-    let csvContent = "Tahun Ajaran," + tahunAjaran + "\n";
-    csvContent += "Kelas," + kelas + "\n";
-    csvContent += "Mata Pelajaran," + mapel + "\n\n";
-    csvContent += "No,ID Siswa,Nama Siswa,ID Mapel,Nama Mapel,Semester,Nilai Angka,Hadir,Izin,Sakit,Alfa\n";
-
-    dataNilai.forEach((item, index) => {
-      csvContent += `${index + 1},${item.id_siswa},${item.nama_siswa || "-"},${item.id_mapel},${item.nama_mapel || "-"},${item.semester},${item.nilai_angka},${item.hadir},${item.izin},${item.sakit},${item.alfa}\n`;
-    });
-
-    const blob = new Blob(["\uFEFF" + csvContent], {
-      type: "text/csv;charset=utf-8;"
-    });
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = `nilai_${kelas}_${mapel}.csv`;
-    link.click();
-
-    URL.revokeObjectURL(url);
-  });
+  exportBtn.addEventListener("click", eksporDataNilaiCsv);
 }
 
 loadNilaiDatabase();

@@ -1309,3 +1309,109 @@ td:nth-child(5) {
     }
 }
 }
+.nilai-filter-wrap {
+    margin-top: 18px;
+    margin-bottom: 18px;
+}
+
+.nilai-filter-wrap label {
+    display: block;
+    margin-bottom: 8px;
+    color: #07484a;
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+
+.nilai-filter-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-select {
+    min-width: 210px;
+    height: 48px;
+    border-radius: 14px;
+    border: 1px solid #dfe9e6;
+    background: #ffffff;
+    color: #07484a;
+    font-weight: 700;
+    padding: 0 14px;
+    outline: none;
+    box-shadow: none;
+}
+
+@media (max-width: 600px) {
+    .nilai-filter-row {
+        flex-direction: column;
+    }
+
+    .filter-select {
+        width: 100%;
+        min-width: 0;
+    }
+}
+.nilai-filter-card {
+    margin-bottom: 28px;
+    padding: 24px 28px;
+    border-radius: 24px;
+}
+
+.nilai-filter-head {
+    margin-bottom: 18px;
+}
+
+.nilai-filter-head h3 {
+    margin: 0 0 6px;
+    color: #07484a;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.nilai-filter-head p {
+    margin: 0;
+    color: #6b7a7a;
+    font-size: 0.95rem;
+}
+
+.nilai-filter-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.nilai-filter-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #07484a;
+    font-weight: 800;
+    font-size: 0.92rem;
+}
+
+.filter-select {
+    width: 100%;
+    height: 52px;
+    border-radius: 16px;
+    border: 1px solid #dfe9e6;
+    background: #f8fbfa;
+    color: #07484a;
+    font-weight: 700;
+    padding: 0 16px;
+    outline: none;
+}
+
+@media (max-width: 700px) {
+    .nilai-filter-card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    .nilai-filter-row {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-select {
+        height: 48px;
+        border-radius: 14px;
+    }
+}
