@@ -1,5 +1,6 @@
 let dataNilai = [];
 
+const printBtn = document.getElementById("printBtn");
 const fileInput = document.getElementById("fileInput");
 const uploadBtn = document.getElementById("uploadBtn");
 const exportBtn = document.getElementById("exportBtn");
@@ -473,8 +474,32 @@ if (downloadTemplateBtn) {
   });
 }
 
-if (exportBtn) {
-  exportBtn.addEventListener("click", eksporDataNilaiCsv);
+if (printBtn) {
+  printBtn.addEventListener("click", function () {
+    const mode = modeNilai ? modeNilai.value : "mapel";
+    const idKelas = filterKelasWali ? filterKelasWali.value : "";
+
+    if (!idGuruLogin || roleIdLogin !== "2") {
+      alert("Silakan login sebagai guru terlebih dahulu.");
+      window.location.href = "../login.html";
+      return;
+    }
+
+    if (mode !== "wali") {
+      alert("Cetak semua nilai siswa hanya tersedia untuk mode Wali Kelas.");
+      return;
+    }
+
+    if (!idKelas) {
+      alert("Pilih kelas wali terlebih dahulu.");
+      return;
+    }
+
+    window.open(
+      `cetak_nilai_wali.html?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&id_kelas=${idKelas}`,
+      "_blank"
+    );
+  });
 }
 
 loadNilaiDatabase();

@@ -792,3 +792,44 @@ body {
         padding: 18px;
     }
 }
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-print {
+    border: none;
+    border-radius: 15px;
+    padding: 13px 18px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    text-decoration: none;
+    background: #ffffff;
+    color: #07484a;
+    box-shadow: 0 10px 28px rgba(255, 255, 255, 0.12);
+}
+
+.btn-print:hover {
+    background: #f8fbfb;
+}
+
+@media (max-width: 900px) {
+    .header-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-print,
+    .btn-export {
+        width: 100%;
+    }
+}
