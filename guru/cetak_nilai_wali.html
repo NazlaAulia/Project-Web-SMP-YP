@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Cetak Nilai Wali Kelas</title>
+
+  <link rel="stylesheet" href="cetak_nilai_wali.css?v=1" />
+</head>
+<body>
+  <main class="print-page">
+    <section class="print-header">
+      <div>
+        <h1>Rekap Nilai Siswa</h1>
+        <p>Kelas: <strong id="namaKelas">-</strong></p>
+        <p>Wali Kelas: <strong id="namaWali">-</strong></p>
+        <p>Tanggal Cetak: <span id="tanggalCetak">-</span></p>
+      </div>
+
+      <button type="button" id="btnPrint" class="btn-print">
+        Cetak
+      </button>
+    </section>
+
+    <section id="printContent" class="print-content">
+      <div class="empty-state">Memuat data nilai</div>
+    </section>
+  </main>
+
+  <script src="cetak_nilai_wali.js?v=1"></script>
+</body>
+</html>
