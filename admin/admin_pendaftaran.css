@@ -34,12 +34,24 @@ body {
 }
 
 /* HEADER */
+/* HEADER */
 .admin-header {
-    display: flex;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: flex-start;
     margin-bottom: 28px;
     gap: 20px;
+}
+
+.admin-header > div:first-child {
+    grid-column: 1;
+}
+
+.header-filter-actions {
+    grid-column: 2;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .admin-header h1 {
