@@ -464,9 +464,18 @@ if (downloadTemplateBtn) {
       return;
     }
 
+    const mode = modeNilai ? modeNilai.value : "mapel";
+    const idKelas = filterKelasWali ? filterKelasWali.value : "";
+
+    let templateUrl = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${mode}`;
+
+    if (mode === "wali" && idKelas) {
+      templateUrl += `&id_kelas=${idKelas}`;
+    }
+
     const link = document.createElement("a");
 
-    link.href = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`;
+    link.href = templateUrl;
     link.download = "template_import_nilai_siswa.csv";
     document.body.appendChild(link);
     link.click();

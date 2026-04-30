@@ -158,7 +158,270 @@ tr:nth-child(even) td {
   table {
     min-width: 760px;
   }
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
+* {
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 32px;
+  color: #102a2a;
+  background: #f4f7f6;
+}
+
+.print-page {
+  max-width: 1050px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(7, 72, 74, 0.08);
+}
+
+/* KOP RAPOR */
+.kop-rapor {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 3px double #07484a;
+}
+
+.kop-logo {
+  width: 92px;
+  height: 92px;
+  min-width: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kop-logo img {
+  width: 86px;
+  height: 86px;
+  object-fit: contain;
+}
+
+.kop-text {
+  flex: 1;
+  text-align: center;
+}
+
+.kop-text h2 {
+  margin: 0 0 4px;
+  color: #07484a;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.kop-text h1 {
+  margin: 0 0 6px;
+  color: #07484a;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.kop-text p {
+  margin: 2px 0;
+  color: #4f6263;
+  font-size: 0.9rem;
+}
+
+/* INFO CETAK */
+.print-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.print-info div {
+  background: #f8fbfa;
+  border: 1px solid #e4ece9;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.print-info span {
+  display: block;
+  color: #6b7a7a;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.print-info strong {
+  color: #07484a;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.btn-print {
+  height: 48px;
+  border: none;
+  background: #07484a;
+  color: white;
+  border-radius: 14px;
+  padding: 0 20px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* CARD SISWA */
+.student-card {
+  border: 1px solid #e4ece9;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 22px;
+  break-inside: avoid;
+}
+
+.student-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.student-head h2 {
+  margin: 0;
+  color: #07484a;
+  font-size: 1.15rem;
+}
+
+.student-head span {
+  color: #6b7a7a;
+  font-weight: 700;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+th {
+  background: #07484a;
+  color: white;
+  padding: 11px;
+  font-size: 0.82rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+td {
+  padding: 10px 11px;
+  border-bottom: 1px solid #edf2f2;
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+tr:nth-child(even) td {
+  background: #f8fbfa;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #6b7a7a;
+  font-weight: 700;
+}
+
+/* PRINT */
+@media print {
+  body {
+    background: white;
+    padding: 0;
+  }
+
+  .print-page {
+    box-shadow: none;
+    border-radius: 0;
+    max-width: none;
+    padding: 18px;
+  }
+
+  .btn-print {
+    display: none;
+  }
+
+  .kop-rapor {
+    border-bottom: 3px double #000;
+  }
+
+  .student-card {
+    page-break-inside: avoid;
+  }
+}
+
+/* HP */
+@media (max-width: 700px) {
+  body {
+    padding: 16px;
+  }
+
+  .print-page {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .kop-rapor {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .kop-logo {
+    width: 82px;
+    height: 82px;
+    min-width: 82px;
+  }
+
+  .kop-logo img {
+    width: 78px;
+    height: 78px;
+  }
+
+  .kop-text h2 {
+    font-size: 1.08rem;
+  }
+
+  .kop-text h1 {
+    font-size: 1.28rem;
+  }
+
+  .kop-text p {
+    font-size: 0.84rem;
+  }
+
+  .print-info {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-print {
+    width: 100%;
+  }
+
+  .student-head {
+    flex-direction: column;
+  }
+
+  .student-card {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 760px;
+  }
+}
   .student-card {
     overflow-x: auto;
   }

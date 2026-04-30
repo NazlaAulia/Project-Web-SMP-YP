@@ -6,16 +6,38 @@
 
   <title>Cetak Nilai Wali Kelas</title>
 
-  <link rel="stylesheet" href="cetak_nilai_wali.css?v=1" />
+  <link rel="stylesheet" href="cetak_nilai_wali.css?v=2" />
 </head>
 <body>
   <main class="print-page">
-    <section class="print-header">
+
+    <section class="kop-rapor">
+      <div class="kop-logo">
+        <img src="../img/logo.webp" alt="Logo Sekolah">
+      </div>
+
+      <div class="kop-text">
+        <h2>SMP YP 17 Surabaya</h2>
+        <h1>REKAP NILAI SISWA</h1>
+        <p>Sistem Informasi Akademik</p>
+        <p>Jl. Randu No. 17, Surabaya</p>
+      </div>
+    </section>
+
+    <section class="print-info">
       <div>
-        <h1>Rekap Nilai Siswa</h1>
-        <p>Kelas: <strong id="namaKelas">-</strong></p>
-        <p>Wali Kelas: <strong id="namaWali">-</strong></p>
-        <p>Tanggal Cetak: <span id="tanggalCetak">-</span></p>
+        <span>Kelas</span>
+        <strong id="namaKelas">-</strong>
+      </div>
+
+      <div>
+        <span>Wali Kelas</span>
+        <strong id="namaWali">-</strong>
+      </div>
+
+      <div>
+        <span>Tanggal Cetak</span>
+        <strong id="tanggalCetak">-</strong>
       </div>
 
       <button type="button" id="btnPrint" class="btn-print">
@@ -24,10 +46,10 @@
     </section>
 
     <section id="printContent" class="print-content">
-      <div class="empty-state">Memuat data nilai</div>
+      <div class="empty-state">Memuat data nilai...</div>
     </section>
   </main>
 
-  <script src="cetak_nilai_wali.js?v=1"></script>
+  <script src="cetak_nilai_wali.js?v=2"></script>
 </body>
 </html>
