@@ -48,7 +48,7 @@
             </div>
             <input type="file" id="fileInput" accept=".csv" />
           </label>
-
+              
           <div class="upload-actions">
             <button id="downloadTemplateBtn" class="btn btn-outline" type="button">
               <i class="bi bi-file-earmark-arrow-down"></i>
@@ -56,18 +56,8 @@
             </button>
 
             <button id="uploadBtn" class="btn btn-primary" type="button">
-              <i class="bi bi-upload"></i>
-              Unggah File
-            </button>
-
-            <button id="printBtn" class="btn btn-outline" type="button">
-              <i class="bi bi-printer"></i>
-              Cetak Nilai
-            </button>
-
-            <button id="exportBtn" class="btn btn-outline" type="button">
-              <i class="bi bi-download"></i>
-              Ekspor Data CSV
+              <i class="bi bi-save"></i>
+              Simpan Nilai
             </button>
           </div>
 
@@ -168,23 +158,29 @@
         </div>
       </section>
 
-      <section class="card table-card">
+              <section class="card table-card">
         <div class="table-header">
           <div>
             <h3>Data Nilai Siswa</h3>
             <p>Preview data nilai dari hasil import CSV.</p>
           </div>
 
-          <div class="search-box">
-            <i class="bi bi-search"></i>
-            <input
-              type="text"
-              id="searchInput"
-              placeholder="Cari nilai siswa"
-            />
+          <div class="table-actions">
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Cari nilai siswa"
+              />
+            </div>
+
+            <button id="printBtn" class="btn btn-outline" type="button">
+              <i class="bi bi-printer"></i>
+              Cetak Nilai
+            </button>
           </div>
         </div>
-
         <div class="table-wrapper">
           <table id="nilaiTable">
             <thead>
