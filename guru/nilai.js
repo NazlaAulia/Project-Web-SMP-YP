@@ -12,9 +12,25 @@ const nilaiTableBody = document.getElementById("nilaiTableBody");
 const modeNilai = document.getElementById("modeNilai");
 const filterKelasWali = document.getElementById("filterKelasWali");
 const filterWaliKelasBox = document.getElementById("filterWaliKelasBox");
+const filterKelasWaliGroup = document.getElementById("filterKelasWaliGroup");
 
 const idGuruLogin = localStorage.getItem("id_guru");
 const roleIdLogin = localStorage.getItem("role_id");
+
+const daftarMapelCsv = [
+  { id_mapel: 1, nama_mapel: "BIN" },
+  { id_mapel: 2, nama_mapel: "B. JAWA" },
+  { id_mapel: 3, nama_mapel: "PKN" },
+  { id_mapel: 4, nama_mapel: "INFOR" },
+  { id_mapel: 5, nama_mapel: "MAT" },
+  { id_mapel: 6, nama_mapel: "BIG" },
+  { id_mapel: 7, nama_mapel: "IPA" },
+  { id_mapel: 8, nama_mapel: "IPS" },
+  { id_mapel: 9, nama_mapel: "BK" },
+  { id_mapel: 10, nama_mapel: "INFO/BK" },
+  { id_mapel: 11, nama_mapel: "PAI/BHQ" },
+  { id_mapel: 12, nama_mapel: "PJOK" }
+];
 
 function showMessage(text, type = "success") {
   if (!messageBox) return;
@@ -129,19 +145,7 @@ function renderTable(filteredData = dataNilai) {
     .join("");
 }
 
-function parseCSV(text) {
-  let lines = text.trim().split(/\r?\n/);
-
-  if (lines.length < 2) {
-    throw new Error("File CSV kosong atau tidak valid.");
-  }
-
-  if (lines[0].trim().toLowerCase() === "sep=,") {
-    lines = lines.slice(1);
-  }
-
-  const headers = lines[0].split(",").map(header => header.trim().toLowerCase());
-
+function parseCSVFormatBiasa(lines, headers) {
   const requiredHeaders = [
     "id_siswa",
     "id_mapel",
@@ -156,9 +160,7 @@ function parseCSV(text) {
   const valid = requiredHeaders.every(header => headers.includes(header));
 
   if (!valid) {
-    throw new Error(
-      "Header CSV harus memuat: id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa"
-    );
+    return null;
   }
 
   const idSiswaIndex = headers.indexOf("id_siswa");
@@ -220,6 +222,110 @@ function parseCSV(text) {
   return result;
 }
 
+function parseCSVFormatWali(lines, headers) {
+  const idSiswaIndex = headers.indexOf("id_siswa");
+  const namaSiswaIndex = headers.indexOf("nama_siswa");
+  const semesterIndex = headers.indexOf("semester");
+  const hadirIndex = headers.indexOf("hadir");
+  const izinIndex = headers.indexOf("izin");
+  const sakitIndex = headers.indexOf("sakit");
+  const alfaIndex = headers.indexOf("alfa");
+
+  if (
+    idSiswaIndex < 0 ||
+    namaSiswaIndex < 0 ||
+    semesterIndex < 0 ||
+    hadirIndex < 0 ||
+    izinIndex < 0 ||
+    sakitIndex < 0 ||
+    alfaIndex < 0
+  ) {
+    return null;
+  }
+
+  const result = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+
+    const row = lines[i].split(",").map(item => item.trim());
+
+    const id_siswa = Number(row[idSiswaIndex]);
+    const nama_siswa = row[namaSiswaIndex] || "";
+    const semester = normalisasiSemester(row[semesterIndex]);
+    const hadir = Number(row[hadirIndex]);
+    const izin = Number(row[izinIndex]);
+    const sakit = Number(row[sakitIndex]);
+    const alfa = Number(row[alfaIndex]);
+
+    if (
+      !id_siswa ||
+      !semester ||
+      isNaN(hadir) ||
+      isNaN(izin) ||
+      isNaN(sakit) ||
+      isNaN(alfa)
+    ) {
+      continue;
+    }
+
+    daftarMapelCsv.forEach(mapel => {
+      const mapelIndex = headers.indexOf(mapel.nama_mapel.toLowerCase());
+
+      if (mapelIndex < 0) return;
+
+      const nilai_angka = Number(row[mapelIndex]);
+
+      if (isNaN(nilai_angka)) return;
+
+      result.push({
+        id_siswa,
+        nama_siswa,
+        id_mapel: mapel.id_mapel,
+        nama_mapel: mapel.nama_mapel,
+        semester,
+        nilai_angka,
+        hadir,
+        izin,
+        sakit,
+        alfa
+      });
+    });
+  }
+
+  return result;
+}
+
+function parseCSV(text) {
+  let lines = text.trim().split(/\r?\n/);
+
+  if (lines.length < 2) {
+    throw new Error("File CSV kosong atau tidak valid.");
+  }
+
+  if (lines[0].trim().toLowerCase() === "sep=,") {
+    lines = lines.slice(1);
+  }
+
+  const headers = lines[0].split(",").map(header => header.trim().toLowerCase());
+
+  const formatBiasa = parseCSVFormatBiasa(lines, headers);
+
+  if (formatBiasa !== null) {
+    return formatBiasa;
+  }
+
+  const formatWali = parseCSVFormatWali(lines, headers);
+
+  if (formatWali !== null) {
+    return formatWali;
+  }
+
+  throw new Error(
+    "Format CSV tidak sesuai. Gunakan template CSV dari tombol Unduh Template CSV."
+  );
+}
+
 function isiDropdownWaliKelas(waliKelas) {
   if (!filterKelasWali) return;
 
@@ -237,6 +343,14 @@ function isiDropdownWaliKelas(waliKelas) {
 
   if (nilaiSebelumnya) {
     filterKelasWali.value = nilaiSebelumnya;
+  }
+}
+
+function aturTampilanMode() {
+  const mode = modeNilai ? modeNilai.value : "mapel";
+
+  if (filterKelasWaliGroup) {
+    filterKelasWaliGroup.style.display = mode === "wali" ? "block" : "none";
   }
 }
 
@@ -267,14 +381,10 @@ function loadNilaiDatabase() {
           isiDropdownWaliKelas(result.wali_kelas || []);
         }
 
-        if (filterKelasWali) {
-          filterKelasWali.style.display = mode === "wali" ? "block" : "none";
-        }
-
+        aturTampilanMode();
         renderTable();
         updateRekap();
       } else {
-        console.warn(result.message);
         showMessage(result.message, "error");
       }
     })
@@ -321,7 +431,7 @@ function amanCsv(value) {
 
 function eksporDataNilaiCsv() {
   if (dataNilai.length === 0) {
-    showMessage("Belum ada data untuk diexport.", "error");
+    showMessage("Belum ada data untuk diekspor.", "error");
     return;
   }
 
@@ -364,13 +474,14 @@ function eksporDataNilaiCsv() {
 
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-
   const mode = modeNilai ? modeNilai.value : "mapel";
   const tanggal = new Date().toISOString().slice(0, 10);
 
   link.href = url;
   link.download = `data_nilai_${mode}_${tanggal}.csv`;
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
 
   URL.revokeObjectURL(url);
 }
@@ -449,7 +560,10 @@ if (searchInput) {
 }
 
 if (modeNilai) {
-  modeNilai.addEventListener("change", loadNilaiDatabase);
+  modeNilai.addEventListener("change", function () {
+    aturTampilanMode();
+    loadNilaiDatabase();
+  });
 }
 
 if (filterKelasWali) {
@@ -481,6 +595,10 @@ if (downloadTemplateBtn) {
     link.click();
     document.body.removeChild(link);
   });
+}
+
+if (exportBtn) {
+  exportBtn.addEventListener("click", eksporDataNilaiCsv);
 }
 
 if (printBtn) {

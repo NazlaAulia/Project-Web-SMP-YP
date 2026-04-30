@@ -3,53 +3,128 @@ require_once "koneksi.php";
 
 $id_guru = isset($_GET["id_guru"]) ? (int) $_GET["id_guru"] : 0;
 $role_id = isset($_GET["role_id"]) ? (int) $_GET["role_id"] : 0;
-$mode = isset($_GET["mode"]) ? $_GET["mode"] : "mapel";
+$mode = isset($_GET["mode"]) ? trim($_GET["mode"]) : "mapel";
 $id_kelas = isset($_GET["id_kelas"]) ? (int) $_GET["id_kelas"] : 0;
 
 if ($role_id !== 2 || $id_guru <= 0) {
     die("Akses tidak valid.");
 }
 
-$filename = "template_import_nilai_siswa.csv";
+/*
+|--------------------------------------------------------------------------
+| MODE 1 = GURU MAPEL BIASA
+| - hanya 1 mapel sesuai guru login
+|--------------------------------------------------------------------------
+*/
+if ($mode === "mapel") {
+    $getGuru = $conn->prepare("
+        SELECT 
+            g.id_mapel,
+            m.nama_mapel
+        FROM guru g
+        LEFT JOIN mapel m ON g.id_mapel = m.id_mapel
+        WHERE g.id_guru = ?
+        LIMIT 1
+    ");
 
-header("Content-Type: text/csv; charset=utf-8");
-header("Content-Disposition: attachment; filename=\"$filename\"");
+    if (!$getGuru) {
+        die("Query guru gagal: " . $conn->error);
+    }
 
-$output = fopen("php://output", "w");
+    $getGuru->bind_param("i", $id_guru);
+    $getGuru->execute();
+    $resultGuru = $getGuru->get_result();
 
-fwrite($output, "\xEF\xBB\xBF");
-fputcsv($output, ["sep=,"]);
+    if ($resultGuru->num_rows === 0) {
+        die("Data guru tidak ditemukan.");
+    }
 
-fputcsv($output, [
-    "id_siswa",
-    "nama_siswa",
-    "id_mapel",
-    "nama_mapel",
-    "semester",
-    "nilai_angka",
-    "hadir",
-    "izin",
-    "sakit",
-    "alfa"
-]);
+    $guru = $resultGuru->fetch_assoc();
 
-/* MODE WALI KELAS: semua siswa kelas wali x semua mapel */
+    $id_mapel = (int) $guru["id_mapel"];
+    $nama_mapel = $guru["nama_mapel"] ?? "-";
+
+    $getSiswa = $conn->prepare("
+        SELECT 
+            s.id_siswa,
+            s.nama AS nama_siswa
+        FROM siswa s
+        ORDER BY s.nama ASC
+    ");
+
+    if (!$getSiswa) {
+        die("Query siswa gagal: " . $conn->error);
+    }
+
+    $getSiswa->execute();
+    $resultSiswa = $getSiswa->get_result();
+
+    $filename = "template_import_nilai_mapel.csv";
+
+    header("Content-Type: text/csv; charset=utf-8");
+    header("Content-Disposition: attachment; filename=\"$filename\"");
+
+    $output = fopen("php://output", "w");
+
+    fwrite($output, "\xEF\xBB\xBF");
+    fputcsv($output, ["sep=,"]);
+
+    fputcsv($output, [
+        "id_siswa",
+        "nama_siswa",
+        "id_mapel",
+        "nama_mapel",
+        "semester",
+        "nilai_angka",
+        "hadir",
+        "izin",
+        "sakit",
+        "alfa"
+    ]);
+
+    while ($siswa = $resultSiswa->fetch_assoc()) {
+        fputcsv($output, [
+            $siswa["id_siswa"],
+            $siswa["nama_siswa"],
+            $id_mapel,
+            $nama_mapel,
+            1,
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]);
+    }
+
+    fclose($output);
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MODE 2 = WALI KELAS
+| - mapel dibuat MENYAMPING
+| - 1 siswa = 1 baris
+| - hanya untuk kelas wali yang sesuai guru login
+|--------------------------------------------------------------------------
+*/
 if ($mode === "wali") {
     if ($id_kelas <= 0) {
-        fclose($output);
-        exit;
+        die("ID kelas tidak valid.");
     }
 
     $cekWali = $conn->prepare("
-        SELECT id_kelas, nama_kelas
-        FROM kelas
-        WHERE id_kelas = ? AND id_wali_kelas = ?
+        SELECT 
+            k.id_kelas,
+            k.nama_kelas
+        FROM kelas k
+        WHERE k.id_kelas = ? AND k.id_wali_kelas = ?
         LIMIT 1
     ");
 
     if (!$cekWali) {
-        fclose($output);
-        exit;
+        die("Query wali kelas gagal: " . $conn->error);
     }
 
     $cekWali->bind_param("ii", $id_kelas, $id_guru);
@@ -57,108 +132,100 @@ if ($mode === "wali") {
     $resultWali = $cekWali->get_result();
 
     if ($resultWali->num_rows === 0) {
-        fclose($output);
-        exit;
+        die("Anda bukan wali kelas untuk kelas ini.");
+    }
+
+    $kelas = $resultWali->fetch_assoc();
+
+    $getMapel = $conn->prepare("
+        SELECT 
+            id_mapel,
+            nama_mapel
+        FROM mapel
+        ORDER BY id_mapel ASC
+    ");
+
+    if (!$getMapel) {
+        die("Query mapel gagal: " . $conn->error);
+    }
+
+    $getMapel->execute();
+    $resultMapel = $getMapel->get_result();
+
+    $daftarMapel = [];
+    while ($mapel = $resultMapel->fetch_assoc()) {
+        $daftarMapel[] = [
+            "id_mapel" => (int) $mapel["id_mapel"],
+            "nama_mapel" => $mapel["nama_mapel"]
+        ];
     }
 
     $getSiswa = $conn->prepare("
-        SELECT id_siswa, nama
-        FROM siswa
-        WHERE id_kelas = ?
-        ORDER BY nama ASC
+        SELECT 
+            s.id_siswa,
+            s.nama AS nama_siswa
+        FROM siswa s
+        WHERE s.id_kelas = ?
+        ORDER BY s.nama ASC
     ");
+
+    if (!$getSiswa) {
+        die("Query siswa kelas gagal: " . $conn->error);
+    }
 
     $getSiswa->bind_param("i", $id_kelas);
     $getSiswa->execute();
     $resultSiswa = $getSiswa->get_result();
 
-    $getMapel = $conn->prepare("
-        SELECT id_mapel, nama_mapel
-        FROM mapel
-        ORDER BY id_mapel ASC
-    ");
+    $filename = "template_import_nilai_wali_" . preg_replace('/[^a-zA-Z0-9]/', '_', $kelas["nama_kelas"]) . ".csv";
 
-    $getMapel->execute();
-    $resultMapel = $getMapel->get_result();
+    header("Content-Type: text/csv; charset=utf-8");
+    header("Content-Disposition: attachment; filename=\"$filename\"");
 
-    $mapelList = [];
+    $output = fopen("php://output", "w");
 
-    while ($mapel = $resultMapel->fetch_assoc()) {
-        $mapelList[] = $mapel;
+    fwrite($output, "\xEF\xBB\xBF");
+    fputcsv($output, ["sep=,"]);
+
+    $header = [
+        "id_siswa",
+        "nama_siswa",
+        "semester"
+    ];
+
+    foreach ($daftarMapel as $mapel) {
+        $header[] = $mapel["nama_mapel"];
     }
+
+    $header[] = "hadir";
+    $header[] = "izin";
+    $header[] = "sakit";
+    $header[] = "alfa";
+
+    fputcsv($output, $header);
 
     while ($siswa = $resultSiswa->fetch_assoc()) {
-        foreach ($mapelList as $mapel) {
-            fputcsv($output, [
-                $siswa["id_siswa"],
-                $siswa["nama"],
-                $mapel["id_mapel"],
-                $mapel["nama_mapel"],
-                1,
-                "",
-                "",
-                "",
-                "",
-                ""
-            ]);
+        $row = [
+            $siswa["id_siswa"],
+            $siswa["nama_siswa"],
+            1
+        ];
+
+        foreach ($daftarMapel as $mapel) {
+            $row[] = "";
         }
+
+        $row[] = "";
+        $row[] = "";
+        $row[] = "";
+        $row[] = "";
+
+        fputcsv($output, $row);
     }
 
     fclose($output);
     exit;
 }
 
-/* MODE GURU MAPEL: hanya mapel guru login */
-$getGuru = $conn->prepare("
-    SELECT 
-        g.id_mapel,
-        m.nama_mapel
-    FROM guru g
-    LEFT JOIN mapel m ON g.id_mapel = m.id_mapel
-    WHERE g.id_guru = ?
-    LIMIT 1
-");
-
-$getGuru->bind_param("i", $id_guru);
-$getGuru->execute();
-$resultGuru = $getGuru->get_result();
-
-if ($resultGuru->num_rows === 0) {
-    fclose($output);
-    exit;
-}
-
-$guru = $resultGuru->fetch_assoc();
-
-$id_mapel = (int) $guru["id_mapel"];
-$nama_mapel = $guru["nama_mapel"] ?? "-";
-
-$getSiswa = $conn->prepare("
-    SELECT 
-        id_siswa,
-        nama
-    FROM siswa
-    ORDER BY nama ASC
-");
-
-$getSiswa->execute();
-$resultSiswa = $getSiswa->get_result();
-
-while ($siswa = $resultSiswa->fetch_assoc()) {
-    fputcsv($output, [
-        $siswa["id_siswa"],
-        $siswa["nama"],
-        $id_mapel,
-        $nama_mapel,
-        1,
-        "",
-        "",
-        "",
-        "",
-        ""
-    ]);
-}
-
-fclose($output);
-exit;
+die("Mode template tidak dikenali.");
 ?>
