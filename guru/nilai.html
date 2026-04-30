@@ -65,108 +65,54 @@
             Format file:
             <strong>CSV</strong>
             dengan kolom:
-            <code>id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa</code>
+            <code>Mapel Saya: id_siswa,id_mapel,semester,nilai_angka,hadir,izin,sakit,alfa</code>
+            <br>
+            <code>Wali Kelas: id_siswa,nama_siswa,semester,BIN,B. JAWA,PKN,...,hadir,izin,sakit,alfa</code>
           </p>
         </div>
 
         <div id="messageBox" class="message-box"></div>
       </section>
 
-      <section class="card filter-card" id="filterWaliKelasBox" style="display: none;">
-        <div class="card-heading">
-          <div>
-            <h3>Filter Data Nilai</h3>
-            <p>Pilih tampilan nilai berdasarkan mapel guru atau kelas wali.</p>
-          </div>
-        </div>
-
-        <div class="filter-grid">
-          <div class="filter-group">
-            <label for="modeNilai">Tampilkan Data</label>
-            <select id="modeNilai">
-              <option value="mapel">Mapel Saya</option>
-              <option value="wali">Wali Kelas</option>
-            </select>
+        <section class="card filter-card nilai-filter-card" id="filterWaliKelasBox" style="display: none;">
+          <div class="filter-header">
+            <div>
+              <h3>Filter Data Nilai</h3>
+              <p>Pilih tampilan nilai berdasarkan mapel guru atau kelas wali.</p>
+            </div>
           </div>
 
-          <div class="filter-group" id="filterKelasWaliGroup">
-            <label for="filterKelasWali">Kelas Wali</label>
-            <select id="filterKelasWali"></select>
-          </div>
-        </div>
-      </section>
+          <div class="filter-grid nilai-filter-grid">
+            <div class="filter-group nilai-filter-group">
+              <label for="modeNilai">Tampilkan Data</label>
+              <div class="select-clean">
+                <select id="modeNilai">
+                  <option value="mapel">Mapel Saya</option>
+                  <option value="wali">Wali Kelas</option>
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
 
-      <section class="rekap-grid">
-        <div class="rekap-item">
-          <div class="rekap-icon siswa">
-            <i class="bi bi-people-fill"></i>
+            <div class="filter-group nilai-filter-group" id="filterKelasWaliGroup">
+              <label for="filterKelasWali">Kelas Wali</label>
+              <div class="select-clean">
+                <select id="filterKelasWali"></select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
           </div>
-          <div>
-            <span>Total Data</span>
-            <strong id="totalSiswa">0</strong>
-          </div>
-        </div>
+        </section>
 
-        <div class="rekap-item">
-          <div class="rekap-icon rata">
-            <i class="bi bi-bar-chart-fill"></i>
-          </div>
-          <div>
-            <span>Rata-rata Nilai</span>
-            <strong id="rataRata">0</strong>
-          </div>
-        </div>
-
-        <div class="rekap-item">
-          <div class="rekap-icon tinggi">
-            <i class="bi bi-arrow-up-circle-fill"></i>
-          </div>
-          <div>
-            <span>Nilai Tertinggi</span>
-            <strong id="nilaiTertinggi">0</strong>
-          </div>
-        </div>
-
-        <div class="rekap-item">
-          <div class="rekap-icon rendah">
-            <i class="bi bi-arrow-down-circle-fill"></i>
-          </div>
-          <div>
-            <span>Nilai Terendah</span>
-            <strong id="nilaiTerendah">0</strong>
-          </div>
-        </div>
-
-        <div class="rekap-item">
-          <div class="rekap-icon hadir">
-            <i class="bi bi-check-circle-fill"></i>
-          </div>
-          <div>
-            <span>Total Hadir</span>
-            <strong id="totalHadir">0</strong>
-          </div>
-        </div>
-
-        <div class="rekap-item">
-          <div class="rekap-icon alfa">
-            <i class="bi bi-x-circle-fill"></i>
-          </div>
-          <div>
-            <span>Total Alfa</span>
-            <strong id="totalAlfa">0</strong>
-          </div>
-        </div>
-      </section>
-
-              <section class="card table-card">
-        <div class="table-header">
-          <div>
+        <section class="card table-card nilai-table-card">
+        <div class="table-header nilai-table-header">
+          <div class="table-title">
             <h3>Data Nilai Siswa</h3>
             <p>Preview data nilai dari hasil import CSV.</p>
           </div>
 
-          <div class="table-actions">
-            <div class="search-box">
+          <div class="table-tools">
+            <div class="search-box nilai-search-box">
               <i class="bi bi-search"></i>
               <input
                 type="text"
@@ -175,13 +121,14 @@
               />
             </div>
 
-            <button id="printBtn" class="btn btn-outline" type="button">
+            <button id="printBtn" class="btn btn-outline btn-print-clean" type="button">
               <i class="bi bi-printer"></i>
               Cetak Nilai
             </button>
           </div>
         </div>
-        <div class="table-wrapper">
+
+        <div class="table-wrapper nilai-table-wrapper">
           <table id="nilaiTable">
             <thead>
               <tr>
@@ -199,10 +146,11 @@
                 <th>Alfa</th>
               </tr>
             </thead>
+
             <tbody id="nilaiTableBody">
               <tr>
                 <td colspan="12" class="empty-state">
-                  Belum ada data nilai yang diupload.
+                  Belum ada data yang sesuai.
                 </td>
               </tr>
             </tbody>
