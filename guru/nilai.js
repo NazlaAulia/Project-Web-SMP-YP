@@ -3,7 +3,6 @@ let dataNilai = [];
 const printBtn = document.getElementById("printBtn");
 const fileInput = document.getElementById("fileInput");
 const uploadBtn = document.getElementById("uploadBtn");
-const exportBtn = document.getElementById("exportBtn");
 const downloadTemplateBtn = document.getElementById("downloadTemplateBtn");
 const searchInput = document.getElementById("searchInput");
 const messageBox = document.getElementById("messageBox");
@@ -429,63 +428,6 @@ function amanCsv(value) {
   return `"${text.replace(/"/g, '""')}"`;
 }
 
-function eksporDataNilaiCsv() {
-  if (dataNilai.length === 0) {
-    showMessage("Belum ada data untuk diekspor.", "error");
-    return;
-  }
-
-  const header = [
-    "id_siswa",
-    "nama_siswa",
-    "kelas",
-    "id_mapel",
-    "nama_mapel",
-    "semester",
-    "nilai_angka",
-    "hadir",
-    "izin",
-    "sakit",
-    "alfa"
-  ];
-
-  const rows = dataNilai.map(item => [
-    item.id_siswa,
-    item.nama_siswa || "-",
-    item.nama_kelas || "-",
-    item.id_mapel,
-    item.nama_mapel || "-",
-    item.semester_text || tampilSemester(item.semester),
-    item.nilai_angka,
-    item.hadir,
-    item.izin,
-    item.sakit,
-    item.alfa
-  ]);
-
-  const csvContent = [
-    header.join(","),
-    ...rows.map(row => row.map(amanCsv).join(","))
-  ].join("\n");
-
-  const blob = new Blob(["\uFEFF" + csvContent], {
-    type: "text/csv;charset=utf-8;"
-  });
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  const mode = modeNilai ? modeNilai.value : "mapel";
-  const tanggal = new Date().toISOString().slice(0, 10);
-
-  link.href = url;
-  link.download = `data_nilai_${mode}_${tanggal}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  URL.revokeObjectURL(url);
-}
-
 if (uploadBtn) {
   uploadBtn.addEventListener("click", () => {
     clearMessage();
@@ -523,8 +465,6 @@ if (uploadBtn) {
         renderTable();
         updateRekap();
 
-        showMessage("Sedang menyimpan data nilai ke database...", "success");
-
         simpanNilaiKeDatabase()
           .then(result => {
             if (result.status === "success") {
@@ -533,7 +473,7 @@ if (uploadBtn) {
               const skipped = result.skipped || 0;
 
               showMessage(
-                `Import berhasil. Data baru: ${inserted}, diperbarui: ${updated}, dilewati: ${skipped}.`,
+                `Simpan nilai berhasil. Data baru: ${inserted}, diperbarui: ${updated}, dilewati: ${skipped}.`,
                 "success"
               );
 
@@ -595,10 +535,6 @@ if (downloadTemplateBtn) {
     link.click();
     document.body.removeChild(link);
   });
-}
-
-if (exportBtn) {
-  exportBtn.addEventListener("click", eksporDataNilaiCsv);
 }
 
 if (printBtn) {
