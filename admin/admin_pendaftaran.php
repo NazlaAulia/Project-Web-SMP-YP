@@ -117,6 +117,9 @@ function buildPageUrl($pageNumber, $search, $filter = '')
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
     <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=102">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Library SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body data-page="pendaftaran" data-nav-path="/admin/components/admin-nav.html">
@@ -234,7 +237,7 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                                         <a 
                                             href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima"
                                             class="btn-accept"
-                                            onclick="return confirm('Terima pendaftaran ini?')"
+                                            onclick="konfirmasiAksi(event, this.href, 'terima')"
                                         >
                                             Terima
                                         </a>
@@ -242,7 +245,7 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                                         <a 
                                             href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak"
                                             class="btn-reject"
-                                            onclick="return confirm('Tolak pendaftaran ini?')"
+                                            onclick="konfirmasiAksi(event, this.href, 'tolak')"
                                         >
                                             Tolak
                                         </a>
@@ -327,6 +330,35 @@ function buildPageUrl($pageNumber, $search, $filter = '')
 </div>
 
 <script src="/admin/components/admin-nav.js?v=999"></script>
+
+<!-- Script SweetAlert2 Modal -->
+<script>
+function konfirmasiAksi(event, url, aksi) {
+    // Mencegah browser pindah halaman secara langsung
+    event.preventDefault(); 
+
+    let judul = aksi === 'terima' ? 'Terima Pendaftaran?' : 'Tolak Pendaftaran?';
+    let teks = aksi === 'terima' ? 'Siswa akan resmi terdaftar di sistem.' : 'Data pendaftaran siswa ini akan ditolak.';
+    let warnaTombol = aksi === 'terima' ? '#16a34a' : '#ef4444'; 
+
+    Swal.fire({
+        title: judul,
+        text: teks,
+        icon: aksi === 'terima' ? 'success' : 'warning',
+        showCancelButton: true,
+        confirmButtonColor: warnaTombol,
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Lanjutkan!',
+        cancelButtonText: 'Batal',
+        borderRadius: '20px'
+    }).then((result) => {
+        // Jika ditekan tombol Ya, lanjut ke URL PHP
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
+}
+</script>
 
 </body>
 </html>
