@@ -24,9 +24,9 @@ body {
 /* KOP */
 .kop-rapor {
   display: grid;
-  grid-template-columns: 90px 1fr;
+  grid-template-columns: 90px 1fr 90px;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
   border-bottom: 3px double #102a2a;
   padding-bottom: 18px;
   margin-bottom: 22px;
@@ -126,7 +126,7 @@ body {
   cursor: pointer;
 }
 
-/* STUDENT CARD */
+/* SISWA */
 .student-card {
   border: 1px solid #dfe9e6;
   border-radius: 18px;
@@ -157,7 +157,7 @@ body {
   font-size: 0.9rem;
 }
 
-.student-head .kelas-badge {
+.kelas-badge {
   background: #e7f4ef;
   color: #0c766c;
   padding: 8px 14px;
@@ -211,7 +211,6 @@ body {
   font-weight: 800;
 }
 
-/* EMPTY */
 .empty-state {
   text-align: center;
   padding: 42px;

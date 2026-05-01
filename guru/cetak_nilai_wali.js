@@ -141,27 +141,48 @@ function loadCetakNilai() {
     return;
   }
 
-  fetch(`get_cetak_nilai_wali.php?id_guru=${idGuru}&role_id=${roleId}&id_kelas=${idKelas}`)
-    .then(res => res.json())
-    .then(result => {
+  const url = `cetak_nilai_wali.php?id_guru=${idGuru}&role_id=${roleId}&id_kelas=${idKelas}`;
+
+  fetch(url)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("File cetak_nilai_wali.php tidak ditemukan atau server error.");
+      }
+
+      return res.text();
+    })
+    .then(text => {
+      let result;
+
+      try {
+        result = JSON.parse(text);
+      } catch (error) {
+        console.error("Respon PHP bukan JSON:", text);
+        throw new Error("PHP cetak mengirim respon tidak valid. Cek file cetak_nilai_wali.php.");
+      }
+
       if (result.status === "success") {
         renderCetak(result);
       } else {
-        printContent.innerHTML = `
-          <div class="empty-state">
-            ${result.message}
-          </div>
-        `;
+        if (printContent) {
+          printContent.innerHTML = `
+            <div class="empty-state">
+              ${result.message}
+            </div>
+          `;
+        }
       }
     })
     .catch(err => {
-      console.error(err);
+      console.error("Error cetak:", err);
 
-      printContent.innerHTML = `
-        <div class="empty-state">
-          Gagal memuat data cetak nilai.
-        </div>
-      `;
+      if (printContent) {
+        printContent.innerHTML = `
+          <div class="empty-state">
+            ${err.message}
+          </div>
+        `;
+      }
     });
 }
 

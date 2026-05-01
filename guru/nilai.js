@@ -109,7 +109,6 @@ function updateRekap() {
   totalHadirEl.textContent = totalHadir;
   totalAlfaEl.textContent = totalAlfa;
 }
-
 function renderTable(filteredData = dataNilai) {
   if (!nilaiTableBody) return;
 
@@ -122,22 +121,59 @@ function renderTable(filteredData = dataNilai) {
     return;
   }
 
-  nilaiTableBody.innerHTML = filteredData
+  const siswaMap = {};
+
+  filteredData.forEach(item => {
+    const key = `${item.id_siswa}-${item.semester}`;
+
+    if (!siswaMap[key]) {
+      siswaMap[key] = {
+        id_siswa: item.id_siswa,
+        nama_siswa: item.nama_siswa || "-",
+        nama_kelas: item.nama_kelas || "-",
+        semester: item.semester,
+        semester_text: item.semester_text || tampilSemester(item.semester),
+        total_nilai: 0,
+        jumlah_mapel: 0,
+        total_hadir: 0,
+        total_izin: 0,
+        total_sakit: 0,
+        total_alfa: 0,
+        mapel: []
+      };
+    }
+
+    siswaMap[key].total_nilai += Number(item.nilai_angka || 0);
+    siswaMap[key].jumlah_mapel += 1;
+    siswaMap[key].total_hadir += Number(item.hadir || 0);
+    siswaMap[key].total_izin += Number(item.izin || 0);
+    siswaMap[key].total_sakit += Number(item.sakit || 0);
+    siswaMap[key].total_alfa += Number(item.alfa || 0);
+    siswaMap[key].mapel.push(item.nama_mapel || "-");
+  });
+
+  const dataRingkas = Object.values(siswaMap);
+
+  nilaiTableBody.innerHTML = dataRingkas
     .map((item, index) => {
+      const rataRata = item.jumlah_mapel > 0
+        ? (item.total_nilai / item.jumlah_mapel).toFixed(2)
+        : 0;
+
       return `
         <tr>
           <td>${index + 1}</td>
           <td>${item.id_siswa}</td>
-          <td>${item.nama_siswa || "-"}</td>
-          <td>${item.nama_kelas || "-"}</td>
-          <td>${item.id_mapel}</td>
-          <td>${item.nama_mapel || "-"}</td>
-          <td>${item.semester_text || tampilSemester(item.semester)}</td>
-          <td>${item.nilai_angka}</td>
-          <td>${item.hadir}</td>
-          <td>${item.izin}</td>
-          <td>${item.sakit}</td>
-          <td>${item.alfa}</td>
+          <td><strong>${item.nama_siswa}</strong></td>
+          <td>${item.nama_kelas}</td>
+          <td>-</td>
+          <td>${item.jumlah_mapel} Mapel</td>
+          <td>${item.semester_text}</td>
+          <td>${rataRata}</td>
+          <td>${item.total_hadir}</td>
+          <td>${item.total_izin}</td>
+          <td>${item.total_sakit}</td>
+          <td>${item.total_alfa}</td>
         </tr>
       `;
     })
