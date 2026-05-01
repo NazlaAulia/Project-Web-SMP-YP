@@ -419,8 +419,16 @@ function isiDropdownWaliKelas(waliKelas) {
 function aturTampilanMode() {
   const mode = modeNilai ? modeNilai.value : "mapel";
 
-  if (filterKelasWaliGroup) {
-    filterKelasWaliGroup.style.display = mode === "wali" ? "block" : "none";
+  if (!filterKelasWaliGroup || !filterKelasWali) return;
+
+  filterKelasWaliGroup.style.display = "flex";
+
+  if (mode === "wali") {
+    filterKelasWali.disabled = false;
+    filterKelasWaliGroup.classList.remove("filter-disabled");
+  } else {
+    filterKelasWali.disabled = true;
+    filterKelasWaliGroup.classList.add("filter-disabled");
   }
 }
 
@@ -633,11 +641,11 @@ if (downloadTemplateBtn) {
 /* =========================
    CETAK NILAI
 ========================= */
-
 if (printBtn) {
   printBtn.addEventListener("click", function () {
     const mode = modeNilai ? modeNilai.value : "mapel";
     const idKelas = filterKelasWali ? filterKelasWali.value : "";
+    const keyword = searchInput ? searchInput.value.trim() : "";
 
     if (!idGuruLogin || roleIdLogin !== "2") {
       alert("Silakan login sebagai guru terlebih dahulu.");
@@ -646,7 +654,7 @@ if (printBtn) {
     }
 
     if (mode !== "wali") {
-      alert("Cetak semua nilai siswa hanya tersedia untuk mode Wali Kelas.");
+      alert("Cetak nilai siswa tersedia pada mode Wali Kelas.");
       return;
     }
 
@@ -655,10 +663,13 @@ if (printBtn) {
       return;
     }
 
-    window.open(
-      `cetak_nilai_wali.html?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&id_kelas=${idKelas}`,
-      "_blank"
-    );
+    let url = `cetak_nilai_wali.html?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&id_kelas=${idKelas}`;
+
+    if (keyword !== "") {
+      url += `&q=${encodeURIComponent(keyword)}`;
+    }
+
+    window.open(url, "_blank");
   });
 }
 

@@ -6,22 +6,26 @@
 
   <title>Cetak Nilai Wali Kelas</title>
 
-  <link rel="stylesheet" href="cetak_nilai_wali.css?v=2" />
+  <link rel="stylesheet" href="cetak_nilai_wali.css?v=10" />
 </head>
 <body>
   <main class="print-page">
-
     <section class="kop-rapor">
       <div class="kop-logo">
         <img src="../img/logo.webp" alt="Logo Sekolah">
       </div>
 
       <div class="kop-text">
-        <h2>SMP YP 17 Surabaya</h2>
-        <h1>REKAP NILAI SISWA</h1>
+        <h2>PEMERINTAH KOTA SURABAYA</h2>
+        <h1>SMP YP 17 SURABAYA</h1>
         <p>Sistem Informasi Akademik</p>
         <p>Jl. Randu No. 17, Surabaya</p>
       </div>
+    </section>
+
+    <section class="judul-rapor">
+      <h2>REKAP NILAI SISWA</h2>
+      <p>Data nilai akademik berdasarkan hasil input guru dan wali kelas.</p>
     </section>
 
     <section class="print-info">
@@ -33,6 +37,11 @@
       <div>
         <span>Wali Kelas</span>
         <strong id="namaWali">-</strong>
+      </div>
+
+      <div>
+        <span>Total Siswa</span>
+        <strong id="totalSiswaCetak">-</strong>
       </div>
 
       <div>
@@ -48,8 +57,21 @@
     <section id="printContent" class="print-content">
       <div class="empty-state">Memuat data nilai...</div>
     </section>
+
+    <section class="ttd-section">
+      <div></div>
+
+      <div class="ttd-box">
+        <p>Surabaya, <span id="tanggalTtd">-</span></p>
+        <p>Wali Kelas</p>
+
+        <div class="ttd-space"></div>
+
+        <strong id="ttdWali">-</strong>
+      </div>
+    </section>
   </main>
 
-  <script src="cetak_nilai_wali.js?v=2"></script>
+  <script src="cetak_nilai_wali.js?v=10"></script>
 </body>
 </html>

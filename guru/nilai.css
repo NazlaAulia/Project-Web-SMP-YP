@@ -1253,3 +1253,19 @@ body {
     min-width: 980px;
   }
 }
+.filter-disabled {
+  opacity: 0.65;
+}
+
+.filter-disabled select {
+  cursor: not-allowed;
+  background: #f2f6f5 !important;
+  color: #7f9293 !important;
+}
+
+.filter-disabled label::after {
+  content: " (aktif saat Wali Kelas)";
+  color: #8a9a9b;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
