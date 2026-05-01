@@ -7,399 +7,264 @@
 
 body {
   margin: 0;
-  padding: 32px;
+  padding: 28px;
+  background: #f3f7f6;
   color: #102a2a;
-  background: #f4f7f6;
 }
 
 .print-page {
-  max-width: 1000px;
+  max-width: 1080px;
   margin: 0 auto;
   background: #ffffff;
-  border-radius: 18px;
-  padding: 32px;
-  box-shadow: 0 10px 30px rgba(7, 72, 74, 0.08);
+  border-radius: 20px;
+  padding: 34px 42px;
+  box-shadow: 0 14px 38px rgba(7, 72, 74, 0.1);
 }
 
-.print-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-  border-bottom: 2px solid #e4ece9;
-  padding-bottom: 18px;
-  margin-bottom: 24px;
-}
-
-.print-header h1 {
-  margin: 0 0 8px;
-  color: #07484a;
-  font-size: 1.7rem;
-}
-
-.print-header p {
-  margin: 3px 0;
-  color: #6b7a7a;
-  font-size: 0.95rem;
-}
-
-.btn-print {
-  border: none;
-  background: #07484a;
-  color: white;
-  border-radius: 12px;
-  padding: 12px 18px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.student-card {
-  border: 1px solid #e4ece9;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 22px;
-  break-inside: avoid;
-}
-
-.student-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-
-.student-head h2 {
-  margin: 0;
-  color: #07484a;
-  font-size: 1.15rem;
-}
-
-.student-head span {
-  color: #6b7a7a;
-  font-weight: 700;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  overflow: hidden;
-  border-radius: 12px;
-}
-
-th {
-  background: #07484a;
-  color: white;
-  padding: 11px;
-  font-size: 0.82rem;
-  text-align: left;
-}
-
-td {
-  padding: 10px 11px;
-  border-bottom: 1px solid #edf2f2;
-  font-size: 0.84rem;
-}
-
-tr:nth-child(even) td {
-  background: #f8fbfa;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #6b7a7a;
-  font-weight: 700;
-}
-
-@media print {
-  body {
-    background: white;
-    padding: 0;
-  }
-
-  .print-page {
-    box-shadow: none;
-    border-radius: 0;
-    max-width: none;
-    padding: 18px;
-  }
-
-  .btn-print {
-    display: none;
-  }
-
-  .student-card {
-    page-break-inside: avoid;
-  }
-}
-
-@media (max-width: 700px) {
-  body {
-    padding: 16px;
-  }
-
-  .print-page {
-    padding: 20px;
-    border-radius: 16px;
-  }
-
-  .print-header {
-    flex-direction: column;
-  }
-
-  .btn-print {
-    width: 100%;
-  }
-
-  .student-head {
-    flex-direction: column;
-  }
-
-  table {
-    min-width: 760px;
-  }
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-* {
-  box-sizing: border-box;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-body {
-  margin: 0;
-  padding: 32px;
-  color: #102a2a;
-  background: #f4f7f6;
-}
-
-.print-page {
-  max-width: 1050px;
-  margin: 0 auto;
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 32px;
-  box-shadow: 0 10px 30px rgba(7, 72, 74, 0.08);
-}
-
-/* KOP RAPOR */
+/* KOP */
 .kop-rapor {
-  display: flex;
+  display: grid;
+  grid-template-columns: 90px 1fr;
   align-items: center;
-  gap: 18px;
+  gap: 22px;
+  border-bottom: 3px double #102a2a;
   padding-bottom: 18px;
-  margin-bottom: 18px;
-  border-bottom: 3px double #07484a;
-}
-
-.kop-logo {
-  width: 92px;
-  height: 92px;
-  min-width: 92px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-bottom: 22px;
 }
 
 .kop-logo img {
-  width: 86px;
-  height: 86px;
+  width: 82px;
+  height: 82px;
   object-fit: contain;
 }
 
 .kop-text {
-  flex: 1;
   text-align: center;
 }
 
 .kop-text h2 {
   margin: 0 0 4px;
-  color: #07484a;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #102a2a;
 }
 
 .kop-text h1 {
   margin: 0 0 6px;
-  color: #07484a;
-  font-size: 1.55rem;
+  font-size: 1.75rem;
   font-weight: 800;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
+  color: #07484a;
 }
 
 .kop-text p {
   margin: 2px 0;
-  color: #4f6263;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  color: #4d6263;
 }
 
-/* INFO CETAK */
-.print-info {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr) auto;
-  gap: 12px;
-  align-items: end;
+/* JUDUL */
+.judul-rapor {
+  text-align: center;
   margin-bottom: 24px;
 }
 
+.judul-rapor h2 {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #07484a;
+  color: #07484a;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.judul-rapor p {
+  margin: 0;
+  color: #657879;
+  font-size: 0.95rem;
+}
+
+/* INFO */
+.print-info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) auto;
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: 26px;
+}
+
 .print-info div {
-  background: #f8fbfa;
-  border: 1px solid #e4ece9;
+  border: 1px solid #dfe9e6;
   border-radius: 14px;
   padding: 12px 14px;
+  background: #fbfdfd;
 }
 
 .print-info span {
   display: block;
-  color: #6b7a7a;
   font-size: 0.8rem;
-  font-weight: 700;
+  color: #6d7f80;
   margin-bottom: 4px;
+  font-weight: 700;
 }
 
 .print-info strong {
   color: #07484a;
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: 0.98rem;
 }
 
 .btn-print {
-  height: 48px;
   border: none;
-  background: #07484a;
-  color: white;
   border-radius: 14px;
-  padding: 0 20px;
+  padding: 0 24px;
+  background: #07484a;
+  color: #ffffff;
   font-weight: 800;
   cursor: pointer;
 }
 
-/* CARD SISWA */
+/* STUDENT CARD */
 .student-card {
-  border: 1px solid #e4ece9;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 22px;
+  border: 1px solid #dfe9e6;
+  border-radius: 18px;
+  padding: 22px 24px;
+  margin-bottom: 24px;
   break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 .student-head {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 14px;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 16px;
 }
 
 .student-head h2 {
-  margin: 0;
+  margin: 0 0 4px;
   color: #07484a;
-  font-size: 1.15rem;
+  font-size: 1.18rem;
+  font-weight: 800;
 }
 
-.student-head span {
+.student-head p {
+  margin: 0;
   color: #6b7a7a;
-  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.student-head .kelas-badge {
+  background: #e7f4ef;
+  color: #0c766c;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 800;
 }
 
 /* TABLE */
-table {
+.table-wrap {
+  overflow-x: auto;
+}
+
+.nilai-print-table {
   width: 100%;
   border-collapse: collapse;
-  overflow: hidden;
-  border-radius: 12px;
+  min-width: 780px;
 }
 
-th {
+.nilai-print-table th {
   background: #07484a;
-  color: white;
-  padding: 11px;
-  font-size: 0.82rem;
+  color: #ffffff;
+  padding: 12px 10px;
+  font-size: 0.85rem;
   text-align: left;
-  white-space: nowrap;
+  font-weight: 800;
 }
 
-td {
-  padding: 10px 11px;
+.nilai-print-table th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.nilai-print-table th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.nilai-print-table td {
+  padding: 11px 10px;
   border-bottom: 1px solid #edf2f2;
-  font-size: 0.84rem;
-  white-space: nowrap;
+  color: #102a2a;
+  font-size: 0.86rem;
 }
 
-tr:nth-child(even) td {
+.nilai-print-table tr:nth-child(even) td {
   background: #f8fbfa;
 }
 
+.rata-row td {
+  background: #eef7f4 !important;
+  color: #07484a;
+  font-weight: 800;
+}
+
+/* EMPTY */
 .empty-state {
   text-align: center;
-  padding: 40px;
+  padding: 42px;
   color: #6b7a7a;
   font-weight: 700;
 }
 
-/* PRINT */
-@media print {
-  body {
-    background: white;
-    padding: 0;
-  }
-
-  .print-page {
-    box-shadow: none;
-    border-radius: 0;
-    max-width: none;
-    padding: 18px;
-  }
-
-  .btn-print {
-    display: none;
-  }
-
-  .kop-rapor {
-    border-bottom: 3px double #000;
-  }
-
-  .student-card {
-    page-break-inside: avoid;
-  }
+/* TTD */
+.ttd-section {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  margin-top: 36px;
 }
 
-/* HP */
-@media (max-width: 700px) {
+.ttd-box {
+  text-align: center;
+  color: #102a2a;
+}
+
+.ttd-box p {
+  margin: 0 0 7px;
+  font-size: 0.95rem;
+}
+
+.ttd-space {
+  height: 72px;
+}
+
+.ttd-box strong {
+  display: inline-block;
+  border-bottom: 1px solid #102a2a;
+  padding: 0 8px 3px;
+  color: #07484a;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
   body {
-    padding: 16px;
+    padding: 14px;
   }
 
   .print-page {
-    padding: 20px;
+    padding: 22px 18px;
     border-radius: 16px;
   }
 
   .kop-rapor {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     text-align: center;
-    gap: 10px;
-  }
-
-  .kop-logo {
-    width: 82px;
-    height: 82px;
-    min-width: 82px;
   }
 
   .kop-logo img {
-    width: 78px;
-    height: 78px;
-  }
-
-  .kop-text h2 {
-    font-size: 1.08rem;
-  }
-
-  .kop-text h1 {
-    font-size: 1.28rem;
-  }
-
-  .kop-text p {
-    font-size: 0.84rem;
+    margin: 0 auto;
   }
 
   .print-info {
@@ -407,22 +272,41 @@ tr:nth-child(even) td {
   }
 
   .btn-print {
-    width: 100%;
+    height: 48px;
   }
 
   .student-head {
     flex-direction: column;
   }
 
-  .student-card {
-    overflow-x: auto;
+  .ttd-section {
+    grid-template-columns: 1fr;
   }
 
-  table {
-    min-width: 760px;
+  .ttd-box {
+    margin-top: 20px;
   }
 }
+
+/* PRINT */
+@media print {
+  body {
+    background: #ffffff;
+    padding: 0;
+  }
+
+  .print-page {
+    max-width: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 14mm;
+  }
+
+  .btn-print {
+    display: none;
+  }
+
   .student-card {
-    overflow-x: auto;
+    page-break-inside: avoid;
   }
 }
