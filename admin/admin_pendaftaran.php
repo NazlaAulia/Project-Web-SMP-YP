@@ -237,7 +237,7 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                                         <a 
                                             href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima"
                                             class="btn-accept"
-                                            onclick="konfirmasiAksi(event, this.href, 'terima')"
+                                            onclick="konfirmasiAksi(event, this.href, 'terima', this)"
                                         >
                                             Terima
                                         </a>
@@ -245,7 +245,7 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                                         <a 
                                             href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak"
                                             class="btn-reject"
-                                            onclick="konfirmasiAksi(event, this.href, 'tolak')"
+                                            onclick="konfirmasiAksi(event, this.href, 'tolak', this)"
                                         >
                                             Tolak
                                         </a>
@@ -331,15 +331,14 @@ function buildPageUrl($pageNumber, $search, $filter = '')
 
 <script src="/admin/components/admin-nav.js?v=999"></script>
 
-<!-- Script SweetAlert2 Modal -->
+<!-- Script SweetAlert2 Modal & AJAX -->
 <script>
-function konfirmasiAksi(event, url, aksi) {
-    // Mencegah browser pindah halaman secara langsung
+function konfirmasiAksi(event, url, aksi, elemenTombol) {
     event.preventDefault(); 
 
     let judul = aksi === 'terima' ? 'Terima Pendaftaran?' : 'Tolak Pendaftaran?';
     let teks = aksi === 'terima' ? 'Siswa akan resmi terdaftar di sistem.' : 'Data pendaftaran siswa ini akan ditolak.';
-    let warnaTombol = aksi === 'terima' ? '#16a34a' : '#ef4444'; 
+    let warnaTombol = aksi === 'terima' ? '#22c55e' : '#ef4444'; 
 
     Swal.fire({
         title: judul,
@@ -347,14 +346,88 @@ function konfirmasiAksi(event, url, aksi) {
         icon: aksi === 'terima' ? 'success' : 'warning',
         showCancelButton: true,
         confirmButtonColor: warnaTombol,
-        cancelButtonColor: '#6b7280',
+        cancelButtonColor: '#eef2f3',
         confirmButtonText: 'Ya, Lanjutkan!',
-        cancelButtonText: 'Batal',
-        borderRadius: '20px'
+        cancelButtonText: '<span style="color: #0f5d5d; font-weight: 600;">Batal</span>',
+        borderRadius: '24px'
     }).then((result) => {
-        // Jika ditekan tombol Ya, lanjut ke URL PHP
         if (result.isConfirmed) {
-            window.location.href = url;
+            
+            // Munculkan loading
+            Swal.fire({
+                title: 'Memproses Data...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Jalankan URL via AJAX
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    
+                    // Update tampilan tabel secara langsung (Tanpa Reload!)
+                    let tr = elemenTombol.closest('tr');
+                    let tdStatus = tr.querySelector('td:nth-child(10)');
+                    let tdAksi = tr.querySelector('.action-cell');
+
+                    if (aksi === 'terima') {
+                        tdStatus.innerHTML = '<span class="badge accepted">Diterima</span>';
+                        tdAksi.innerHTML = '<button type="button" class="btn-disabled accepted-disabled" disabled>Sudah diterima</button>';
+                    } else {
+                        tdStatus.innerHTML = '<span class="badge rejected">Ditolak</span>';
+                        tdAksi.innerHTML = '<button type="button" class="btn-disabled rejected-disabled" disabled>Sudah ditolak</button>';
+                    }
+
+                    // Tampilkan Pop-up Hasil Berdasarkan Status & Nomor WA
+                    let judulHasil = aksi === 'terima' ? 'Pendaftaran Diterima' : 'Pendaftaran Ditolak';
+                    let textHasil = data.link_wa !== '' 
+                        ? `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}. Silakan kirim pemberitahuan ke WhatsApp orang tua / wali.` 
+                        : `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}.\n\nNamun, Nomor WhatsApp tidak ditemukan.`;
+
+                    let swalOptions = {
+                        title: judulHasil,
+                        text: textHasil,
+                        icon: aksi === 'terima' ? 'success' : 'error',
+                        borderRadius: '24px'
+                    };
+
+                    // Jika ada nomor WA, munculkan 2 tombol
+                    if (data.link_wa !== '') {
+                        swalOptions.showCancelButton = true;
+                        swalOptions.confirmButtonColor = '#22c55e';
+                        swalOptions.cancelButtonColor = '#eef2f3';
+                        swalOptions.confirmButtonText = 'Kirim ke WhatsApp';
+                        swalOptions.cancelButtonText = '<span style="color: #0f5d5d; font-weight: 600;">Nanti Saja</span>';
+                        swalOptions.reverseButtons = true; // Tombol WA di kanan
+                    } else {
+                        swalOptions.confirmButtonColor = '#0f5d5d';
+                        swalOptions.confirmButtonText = 'Tutup';
+                    }
+
+                    Swal.fire(swalOptions).then((result2) => {
+                        // Buka link WhatsApp di tab baru jika diklik
+                        if (result2.isConfirmed && data.link_wa !== '') {
+                            window.open(data.link_wa, '_blank');
+                        }
+                    });
+
+                } else {
+                    // Tampilkan error jika gagal
+                    Swal.fire({
+                        title: 'Oops!',
+                        text: data.message,
+                        icon: 'warning',
+                        confirmButtonColor: '#0f5d5d'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire('Error!', 'Terjadi kesalahan pada server.', 'error');
+                console.error(error);
+            });
         }
     });
 }
