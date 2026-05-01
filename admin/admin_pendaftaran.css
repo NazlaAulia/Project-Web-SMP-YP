@@ -35,11 +35,16 @@ body {
 
 /* HEADER */
 .admin-header {
+    width: 100%;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: flex-start;
+    gap: 24px;
     margin-bottom: 28px;
-    gap: 20px;
+}
+
+.admin-header > div:first-child {
+    flex: 1;
 }
 
 .admin-header h1 {
@@ -81,6 +86,63 @@ body {
     width: 100%;
     background: transparent;
     color: var(--text-dark);
+}
+
+.search-clear {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-clear:hover {
+    color: var(--danger-text);
+}
+
+/* FILTER MENUNGGU BUTTON */
+.header-filter-actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.btn-filter-waiting {
+    background: var(--primary-teal);
+    color: var(--white);
+    border: none;
+    padding: 14px 22px;
+    border-radius: 16px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 14px rgba(6, 78, 75, 0.18);
+    transition: 0.25s ease;
+    white-space: nowrap;
+}
+
+.btn-filter-waiting i {
+    color: var(--white);
+    font-size: 17px;
+}
+
+.btn-filter-waiting:hover {
+    background: #053f3d;
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-filter-waiting.active {
+    background: var(--primary-teal);
+    color: var(--white);
+    border: none;
 }
 
 /* STATS */
@@ -363,6 +425,63 @@ td:nth-child(11) {
     font-weight: 500;
 }
 
+/* PAGINATION */
+.pagination-wrapper {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.pagination-info {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-btn {
+    min-width: 42px;
+    height: 42px;
+    padding: 0 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--primary-teal);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.25s ease;
+}
+
+.page-btn:hover {
+    background: var(--soft-teal);
+}
+
+.page-btn.active {
+    background: var(--primary-teal);
+    color: var(--white);
+    border-color: var(--primary-teal);
+}
+
+.page-btn.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #f8fafc;
+    color: var(--muted);
+}
+
 /* RESPONSIVE TABLET */
 @media (max-width: 1100px) {
     .admin-stats-grid {
@@ -407,7 +526,7 @@ td:nth-child(11) {
         flex-direction: column;
         align-items: stretch;
         margin-bottom: 16px;
-        gap: 10px;
+        gap: 12px;
     }
 
     .admin-header h1 {
@@ -424,6 +543,20 @@ td:nth-child(11) {
     .search-container-elegant {
         width: 100%;
         margin-top: 16px;
+    }
+
+    .header-filter-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: center;
+    }
+
+    .btn-filter-waiting {
+        width: 100%;
+        justify-content: center;
+        padding: 13px 18px;
+        font-size: 14px;
+        border-radius: 14px;
     }
 
     .admin-stats-grid {
@@ -615,81 +748,7 @@ td:nth-child(11) {
         font-size: 13px;
         padding: 15px;
     }
-}
 
-/* PAGINATION */
-.pagination-wrapper {
-    margin-top: 22px;
-    padding-top: 18px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    flex-wrap: wrap;
-}
-
-.pagination-info {
-    color: var(--muted);
-    font-size: 14px;
-}
-
-.pagination {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.page-btn {
-    min-width: 42px;
-    height: 42px;
-    padding: 0 12px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--white);
-    color: var(--primary-teal);
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.25s ease;
-}
-
-.page-btn:hover {
-    background: var(--soft-teal);
-}
-
-.page-btn.active {
-    background: var(--primary-teal);
-    color: var(--white);
-    border-color: var(--primary-teal);
-}
-
-.page-btn.disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-    background: #f8fafc;
-    color: var(--muted);
-}
-
-.search-clear {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 14px;
-    margin-left: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.search-clear:hover {
-    color: var(--danger-text);
-}
-
-/* PAGINATION MOBILE */
-@media (max-width: 768px) {
     .pagination-wrapper {
         flex-direction: column;
         align-items: stretch;
@@ -716,46 +775,37 @@ td:nth-child(11) {
     }
 }
 
-/* FILTER MENUNGGU BUTTON - STYLE TEAL */
-.btn-filter-waiting {
-    background: var(--primary-teal);
-    color: var(--white);
+/* BUTTON STATUS NONAKTIF */
+.btn-disabled {
     border: none;
-    padding: 14px 22px;
-    border-radius: 16px;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 800;
+    padding: 8px 10px;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: not-allowed;
+    opacity: 0.9;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 14px rgba(6, 78, 75, 0.18);
-    transition: 0.25s ease;
+    justify-content: center;
+    white-space: nowrap;
 }
 
-.btn-filter-waiting i {
-    color: var(--white);
-    font-size: 17px;
+.accepted-disabled {
+    background: var(--success-soft);
+    color: var(--success-text);
 }
 
-.btn-filter-waiting:hover {
-    background: #053f3d;
-    color: var(--white);
-    transform: translateY(-2px);
-}
-
-.btn-filter-waiting.active {
-    background: var(--primary-teal);
-    color: var(--white);
-    border: none;
+.rejected-disabled {
+    background: var(--danger-soft);
+    color: var(--danger-text);
 }
 
 @media (max-width: 768px) {
-    .btn-filter-waiting {
+    .btn-disabled {
         width: 100%;
         justify-content: center;
-        padding: 13px 18px;
-        font-size: 14px;
-        border-radius: 14px;
+        font-size: 8px;
+        padding: 6px 5px;
+        border-radius: 7px;
     }
 }
