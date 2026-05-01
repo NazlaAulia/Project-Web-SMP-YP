@@ -144,7 +144,72 @@ function renderTable(filteredData = dataNilai) {
     .join("");
 }
 
-function parseCSVFormatBiasa(lines, headers) {
+/* =========================
+   PARSE CSV AMAN
+   Bisa baca:
+   1. Format mapel biasa
+   2. Format wali kelas mapel menyamping
+========================= */
+
+function bersihkanHeader(value) {
+  return String(value || "")
+    .replace(/^\uFEFF/, "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function ambilAngka(value, defaultValue = 0) {
+  const text = String(value ?? "").trim();
+
+  if (text === "") return defaultValue;
+
+  const angka = Number(text.replace(",", "."));
+
+  return isNaN(angka) ? defaultValue : angka;
+}
+
+function deteksiDelimiter(line) {
+  const jumlahKoma = (line.match(/,/g) || []).length;
+  const jumlahTitikKoma = (line.match(/;/g) || []).length;
+
+  return jumlahTitikKoma > jumlahKoma ? ";" : ",";
+}
+
+function parseCSVLine(line, delimiter = ",") {
+  const result = [];
+  let current = "";
+  let insideQuote = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+
+    if (char === '"' && nextChar === '"') {
+      current += '"';
+      i++;
+      continue;
+    }
+
+    if (char === '"') {
+      insideQuote = !insideQuote;
+      continue;
+    }
+
+    if (char === delimiter && !insideQuote) {
+      result.push(current.trim());
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  result.push(current.trim());
+  return result;
+}
+
+function parseCSVFormatBiasa(lines, headers, delimiter) {
   const requiredHeaders = [
     "id_siswa",
     "id_mapel",
@@ -178,28 +243,24 @@ function parseCSVFormatBiasa(lines, headers) {
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
 
-    const row = lines[i].split(",").map(item => item.trim());
+    const row = parseCSVLine(lines[i], delimiter);
 
     const id_siswa = Number(row[idSiswaIndex]);
     const nama_siswa = namaSiswaIndex >= 0 ? row[namaSiswaIndex] : "";
     const id_mapel = Number(row[idMapelIndex]);
     const nama_mapel = namaMapelIndex >= 0 ? row[namaMapelIndex] : "";
     const semester = normalisasiSemester(row[semesterIndex]);
-    const nilai_angka = Number(row[nilaiAngkaIndex]);
-    const hadir = Number(row[hadirIndex]);
-    const izin = Number(row[izinIndex]);
-    const sakit = Number(row[sakitIndex]);
-    const alfa = Number(row[alfaIndex]);
+    const nilai_angka = ambilAngka(row[nilaiAngkaIndex], NaN);
+    const hadir = ambilAngka(row[hadirIndex], 0);
+    const izin = ambilAngka(row[izinIndex], 0);
+    const sakit = ambilAngka(row[sakitIndex], 0);
+    const alfa = ambilAngka(row[alfaIndex], 0);
 
     if (
       !id_siswa ||
       !id_mapel ||
       !semester ||
-      isNaN(nilai_angka) ||
-      isNaN(hadir) ||
-      isNaN(izin) ||
-      isNaN(sakit) ||
-      isNaN(alfa)
+      isNaN(nilai_angka)
     ) {
       continue;
     }
@@ -220,58 +281,8 @@ function parseCSVFormatBiasa(lines, headers) {
 
   return result;
 }
-function bersihkanHeader(value) {
-  return String(value || "")
-    .replace(/^\uFEFF/, "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
-}
 
-function ambilAngka(value, defaultValue = 0) {
-  const text = String(value ?? "").trim();
-
-  if (text === "") return defaultValue;
-
-  const angka = Number(text);
-
-  return isNaN(angka) ? defaultValue : angka;
-}
-
-function parseCSVLine(line) {
-  const result = [];
-  let current = "";
-  let insideQuote = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    const nextChar = line[i + 1];
-
-    if (char === '"' && nextChar === '"') {
-      current += '"';
-      i++;
-      continue;
-    }
-
-    if (char === '"') {
-      insideQuote = !insideQuote;
-      continue;
-    }
-
-    if (char === "," && !insideQuote) {
-      result.push(current.trim());
-      current = "";
-      continue;
-    }
-
-    current += char;
-  }
-
-  result.push(current.trim());
-  return result;
-}
-
-function parseCSVFormatWali(lines, headers) {
+function parseCSVFormatWali(lines, headers, delimiter) {
   const idSiswaIndex = headers.indexOf("id_siswa");
   const namaSiswaIndex = headers.indexOf("nama_siswa");
   const semesterIndex = headers.indexOf("semester");
@@ -297,7 +308,7 @@ function parseCSVFormatWali(lines, headers) {
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
 
-    const row = parseCSVLine(lines[i]);
+    const row = parseCSVLine(lines[i], delimiter);
 
     const id_siswa = Number(row[idSiswaIndex]);
     const nama_siswa = row[namaSiswaIndex] || "";
@@ -322,7 +333,7 @@ function parseCSVFormatWali(lines, headers) {
 
       if (nilaiText === "") return;
 
-      const nilai_angka = Number(nilaiText);
+      const nilai_angka = ambilAngka(nilaiText, NaN);
 
       if (isNaN(nilai_angka)) return;
 
@@ -357,24 +368,33 @@ function parseCSV(text) {
     lines = lines.slice(1);
   }
 
-  const headers = parseCSVLine(lines[0]).map(header => bersihkanHeader(header));
+  if (lines[0].trim().toLowerCase() === "sep=;") {
+    lines = lines.slice(1);
+  }
 
-  const formatBiasa = parseCSVFormatBiasa(lines, headers);
+  const delimiter = deteksiDelimiter(lines[0]);
+  const headers = parseCSVLine(lines[0], delimiter).map(header => bersihkanHeader(header));
+
+  const formatBiasa = parseCSVFormatBiasa(lines, headers, delimiter);
 
   if (formatBiasa !== null && formatBiasa.length > 0) {
     return formatBiasa;
   }
 
-  const formatWali = parseCSVFormatWali(lines, headers);
+  const formatWali = parseCSVFormatWali(lines, headers, delimiter);
 
   if (formatWali !== null && formatWali.length > 0) {
     return formatWali;
   }
 
   throw new Error(
-    "Tidak ada nilai yang bisa disimpan. Pastikan kolom nilai mapel sudah diisi, misalnya BIN, B. JAWA, PKN, MAT, dan lainnya."
+    "Belum ada nilai yang bisa disimpan. Isi dulu kolom nilai mapel di file CSV, lalu simpan ulang sebagai CSV."
   );
 }
+
+/* =========================
+   DROPDOWN WALI KELAS
+========================= */
 
 function isiDropdownWaliKelas(waliKelas) {
   if (!filterKelasWali) return;
@@ -403,6 +423,10 @@ function aturTampilanMode() {
     filterKelasWaliGroup.style.display = mode === "wali" ? "block" : "none";
   }
 }
+
+/* =========================
+   LOAD DATA DATABASE
+========================= */
 
 function loadNilaiDatabase() {
   if (!idGuruLogin || roleIdLogin !== "2") {
@@ -457,6 +481,10 @@ function simpanNilaiKeDatabase() {
   }).then(res => res.json());
 }
 
+/* =========================
+   SEARCH
+========================= */
+
 function filterSearchNilai() {
   if (!searchInput) return;
 
@@ -478,6 +506,10 @@ function amanCsv(value) {
   const text = String(value ?? "");
   return `"${text.replace(/"/g, '""')}"`;
 }
+
+/* =========================
+   UPLOAD / SIMPAN NILAI
+========================= */
 
 if (uploadBtn) {
   uploadBtn.addEventListener("click", () => {
@@ -516,6 +548,8 @@ if (uploadBtn) {
         renderTable();
         updateRekap();
 
+        showMessage("Sedang menyimpan data nilai ke database...", "success");
+
         simpanNilaiKeDatabase()
           .then(result => {
             if (result.status === "success") {
@@ -546,6 +580,10 @@ if (uploadBtn) {
   });
 }
 
+/* =========================
+   EVENT SEARCH + FILTER
+========================= */
+
 if (searchInput) {
   searchInput.addEventListener("input", filterSearchNilai);
 }
@@ -560,6 +598,10 @@ if (modeNilai) {
 if (filterKelasWali) {
   filterKelasWali.addEventListener("change", loadNilaiDatabase);
 }
+
+/* =========================
+   DOWNLOAD TEMPLATE CSV
+========================= */
 
 if (downloadTemplateBtn) {
   downloadTemplateBtn.addEventListener("click", () => {
@@ -587,6 +629,10 @@ if (downloadTemplateBtn) {
     document.body.removeChild(link);
   });
 }
+
+/* =========================
+   CETAK NILAI
+========================= */
 
 if (printBtn) {
   printBtn.addEventListener("click", function () {
