@@ -113,16 +113,11 @@ function buildPageUrl($pageNumber, $search, $filter = '')
 <head>
     <meta charset="UTF-8">
     <title>Data Pendaftaran Siswa</title>
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=100">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-       <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=102">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-
 
 <body data-page="pendaftaran" data-nav-path="/admin/components/admin-nav.html">
 
@@ -235,21 +230,31 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                                 </td>
 
                                 <td class="action-cell">
-                                    <a 
-                                        href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima"
-                                        class="btn-accept"
-                                        onclick="return confirm('Terima pendaftaran ini?')"
-                                    >
-                                        Terima
-                                    </a>
+                                    <?php if ($row['status'] == 'menunggu') { ?>
+                                        <a 
+                                            href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima"
+                                            class="btn-accept"
+                                            onclick="return confirm('Terima pendaftaran ini?')"
+                                        >
+                                            Terima
+                                        </a>
 
-                                    <a 
-                                        href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak"
-                                        class="btn-reject"
-                                        onclick="return confirm('Tolak pendaftaran ini?')"
-                                    >
-                                        Tolak
-                                    </a>
+                                        <a 
+                                            href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak"
+                                            class="btn-reject"
+                                            onclick="return confirm('Tolak pendaftaran ini?')"
+                                        >
+                                            Tolak
+                                        </a>
+                                    <?php } elseif ($row['status'] == 'diterima') { ?>
+                                        <button type="button" class="btn-disabled accepted-disabled" disabled>
+                                            Sudah diterima
+                                        </button>
+                                    <?php } else { ?>
+                                        <button type="button" class="btn-disabled rejected-disabled" disabled>
+                                            Sudah ditolak
+                                        </button>
+                                    <?php } ?>
                                 </td>
                             </tr>
                         <?php
