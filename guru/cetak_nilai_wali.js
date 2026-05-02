@@ -100,14 +100,21 @@ function renderSiswa(siswa) {
 }
 
 function renderCetak(data) {
-  let siswaList = data.siswa || [];
+let siswaList = data.siswa || [];
 
-  if (keywordCetak !== "") {
-    siswaList = siswaList.filter(siswa =>
-      String(siswa.nama_siswa || "").toLowerCase().includes(keywordCetak) ||
-      String(siswa.id_siswa || "").toLowerCase().includes(keywordCetak)
-    );
-  }
+/* PENGAMAN: kalau URL membawa id_siswa, tampilkan siswa itu saja */
+if (idSiswa !== "") {
+  siswaList = siswaList.filter(siswa =>
+    String(siswa.id_siswa) === String(idSiswa)
+  );
+}
+
+if (keywordCetak !== "") {
+  siswaList = siswaList.filter(siswa =>
+    String(siswa.nama_siswa || "").toLowerCase().includes(keywordCetak) ||
+    String(siswa.id_siswa || "").toLowerCase().includes(keywordCetak)
+  );
+}
 
   if (namaKelasEl) namaKelasEl.textContent = data.kelas?.nama_kelas || "-";
   if (namaWaliEl) namaWaliEl.textContent = data.wali?.nama || "-";
