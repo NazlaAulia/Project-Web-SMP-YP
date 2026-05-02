@@ -38,6 +38,15 @@ $jumlah_jp_baru = isset($data["jumlah_jp_baru"]) ? (int)$data["jumlah_jp_baru"] 
 $alasan = trim($data["alasan"] ?? "");
 $pesan_ai = trim($data["pesan_ai"] ?? "");
 
+$tipe_request = trim($data["tipe_request"] ?? "slot_kosong");
+$id_jadwal_tukar = isset($data["id_jadwal_tukar"]) && $data["id_jadwal_tukar"] !== null
+    ? (int)$data["id_jadwal_tukar"]
+    : null;
+
+if (!in_array($tipe_request, ["slot_kosong", "tukar"], true)) {
+    $tipe_request = "slot_kosong";
+}
+
 if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid. Silakan login ulang.");
 }
@@ -60,6 +69,10 @@ if ($alasan === "") {
 
 if ($jp_mulai_baru <= 0 || $jp_selesai_baru <= 0 || $jumlah_jp_baru <= 0) {
     kirim_json("error", "Data JP jadwal baru tidak valid.");
+}
+
+if ($tipe_request === "tukar" && (!$id_jadwal_tukar || $id_jadwal_tukar <= 0)) {
+    kirim_json("error", "Data jadwal tukar tidak valid.");
 }
 
 // Pastikan jadwal lama benar-benar milik guru yang login
@@ -125,42 +138,163 @@ if ($resultCekRequest->num_rows > 0) {
 
 $stmtCekRequest->close();
 
-// Cek bentrok guru / kelas berdasarkan JP
-$stmtBentrok = $conn->prepare("
-    SELECT id_jadwal
-    FROM jadwal
-    WHERE hari = ?
-      AND id_jadwal != ?
-      AND (id_guru = ? OR id_kelas = ?)
-      AND (
-          jp_mulai <= ?
+if ($tipe_request === "slot_kosong") {
+    // Validasi slot kosong: guru atau kelas tidak boleh bentrok
+    $stmtBentrok = $conn->prepare("
+        SELECT id_jadwal
+        FROM jadwal
+        WHERE hari = ?
+          AND id_jadwal != ?
+          AND (id_guru = ? OR id_kelas = ?)
+          AND (
+              jp_mulai <= ?
+              AND jp_selesai >= ?
+          )
+        LIMIT 1
+    ");
+
+    if (!$stmtBentrok) {
+        kirim_json("error", "Query cek bentrok gagal: " . $conn->error);
+    }
+
+    $stmtBentrok->bind_param(
+        "siiiii",
+        $hari_baru,
+        $id_jadwal,
+        $id_guru,
+        $id_kelas,
+        $jp_selesai_baru,
+        $jp_mulai_baru
+    );
+
+    $stmtBentrok->execute();
+    $resultBentrok = $stmtBentrok->get_result();
+
+    if ($resultBentrok->num_rows > 0) {
+        kirim_json("error", "Slot jadwal baru bentrok dengan jadwal guru atau kelas.");
+    }
+
+    $stmtBentrok->close();
+}
+
+if ($tipe_request === "tukar") {
+    // Ambil jadwal yang akan ditukar
+    $stmtTukar = $conn->prepare("
+        SELECT 
+            id_jadwal,
+            id_guru,
+            id_kelas,
+            id_mapel,
+            hari,
+            jam,
+            jp_mulai,
+            jp_selesai,
+            jumlah_jp
+        FROM jadwal
+        WHERE id_jadwal = ?
+          AND id_kelas = ?
+        LIMIT 1
+    ");
+
+    if (!$stmtTukar) {
+        kirim_json("error", "Query cek jadwal tukar gagal: " . $conn->error);
+    }
+
+    $stmtTukar->bind_param("ii", $id_jadwal_tukar, $id_kelas);
+    $stmtTukar->execute();
+    $resultTukar = $stmtTukar->get_result();
+
+    if ($resultTukar->num_rows === 0) {
+        kirim_json("error", "Jadwal tukar tidak ditemukan atau bukan dari kelas yang sama.");
+    }
+
+    $jadwal_tukar = $resultTukar->fetch_assoc();
+    $stmtTukar->close();
+
+    if ((int)$jadwal_tukar["id_jadwal"] === $id_jadwal) {
+        kirim_json("error", "Jadwal tukar tidak boleh sama dengan jadwal lama.");
+    }
+
+    if ((int)$jadwal_tukar["jumlah_jp"] !== $jumlah_jp_lama) {
+        kirim_json("error", "Jadwal tukar harus memiliki jumlah JP yang sama.");
+    }
+
+    if ((int)$jadwal_tukar["id_guru"] === $id_guru) {
+        kirim_json("error", "Jadwal tukar tidak boleh dengan guru yang sama.");
+    }
+
+    $id_guru_tukar = (int)$jadwal_tukar["id_guru"];
+
+    // Guru lama harus kosong di slot jadwal tukar
+    $stmtCekGuruLama = $conn->prepare("
+        SELECT id_jadwal
+        FROM jadwal
+        WHERE hari = ?
+          AND id_guru = ?
+          AND id_jadwal NOT IN (?, ?)
+          AND jp_mulai <= ?
           AND jp_selesai >= ?
-      )
-    LIMIT 1
-");
+        LIMIT 1
+    ");
 
-if (!$stmtBentrok) {
-    kirim_json("error", "Query cek bentrok gagal: " . $conn->error);
+    if (!$stmtCekGuruLama) {
+        kirim_json("error", "Query cek guru lama gagal: " . $conn->error);
+    }
+
+    $stmtCekGuruLama->bind_param(
+        "siiiii",
+        $jadwal_tukar["hari"],
+        $id_guru,
+        $id_jadwal,
+        $id_jadwal_tukar,
+        $jadwal_tukar["jp_selesai"],
+        $jadwal_tukar["jp_mulai"]
+    );
+
+    $stmtCekGuruLama->execute();
+    $resultCekGuruLama = $stmtCekGuruLama->get_result();
+
+    if ($resultCekGuruLama->num_rows > 0) {
+        kirim_json("error", "Guru pemohon bentrok pada slot jadwal tukar.");
+    }
+
+    $stmtCekGuruLama->close();
+
+    // Guru tukar harus kosong di slot jadwal lama
+    $stmtCekGuruTukar = $conn->prepare("
+        SELECT id_jadwal
+        FROM jadwal
+        WHERE hari = ?
+          AND id_guru = ?
+          AND id_jadwal NOT IN (?, ?)
+          AND jp_mulai <= ?
+          AND jp_selesai >= ?
+        LIMIT 1
+    ");
+
+    if (!$stmtCekGuruTukar) {
+        kirim_json("error", "Query cek guru tukar gagal: " . $conn->error);
+    }
+
+    $stmtCekGuruTukar->bind_param(
+        "siiiii",
+        $jadwal_lama["hari"],
+        $id_guru_tukar,
+        $id_jadwal,
+        $id_jadwal_tukar,
+        $jadwal_lama["jp_selesai"],
+        $jadwal_lama["jp_mulai"]
+    );
+
+    $stmtCekGuruTukar->execute();
+    $resultCekGuruTukar = $stmtCekGuruTukar->get_result();
+
+    if ($resultCekGuruTukar->num_rows > 0) {
+        kirim_json("error", "Guru pada jadwal tukar bentrok pada slot jadwal lama.");
+    }
+
+    $stmtCekGuruTukar->close();
 }
-
-$stmtBentrok->bind_param(
-    "siiiii",
-    $hari_baru,
-    $id_jadwal,
-    $id_guru,
-    $id_kelas,
-    $jp_selesai_baru,
-    $jp_mulai_baru
-);
-
-$stmtBentrok->execute();
-$resultBentrok = $stmtBentrok->get_result();
-
-if ($resultBentrok->num_rows > 0) {
-    kirim_json("error", "Slot jadwal baru bentrok dengan jadwal guru atau kelas.");
-}
-
-$stmtBentrok->close();
 
 // Simpan request
 $stmtInsert = $conn->prepare("
@@ -176,11 +310,13 @@ $stmtInsert = $conn->prepare("
         jumlah_jp_baru,
         alasan,
         pesan_ai,
+        tipe_request,
+        id_jadwal_tukar,
         status,
         tanggal_request
     )
     VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'menunggu', NOW())
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'menunggu', NOW())
 ");
 
 if (!$stmtInsert) {
@@ -188,7 +324,7 @@ if (!$stmtInsert) {
 }
 
 $stmtInsert->bind_param(
-    "iiissiiiss",
+    "iiissiiisssi",
     $id_guru,
     $id_kelas,
     $id_jadwal,
@@ -198,7 +334,9 @@ $stmtInsert->bind_param(
     $jp_selesai_baru,
     $jumlah_jp_baru,
     $alasan,
-    $pesan_ai
+    $pesan_ai,
+    $tipe_request,
+    $id_jadwal_tukar
 );
 
 if (!$stmtInsert->execute()) {
@@ -210,6 +348,7 @@ $stmtInsert->close();
 $conn->close();
 
 kirim_json("success", "Pengajuan ganti jadwal berhasil dikirim ke admin.", [
-    "id_request" => $id_request
+    "id_request" => $id_request,
+    "tipe_request" => $tipe_request
 ]);
 ?>

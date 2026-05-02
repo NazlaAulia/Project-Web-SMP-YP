@@ -20,6 +20,84 @@ function formatJam($jam) {
     return substr($jam, 0, 5);
 }
 
+function isBentrokGuru($conn, $id_guru, $hari, $jp_mulai, $jp_selesai, $exclude_ids = []) {
+    $exclude_sql = "";
+    $types = "siii";
+    $params = [$hari, $id_guru, $jp_selesai, $jp_mulai];
+
+    if (!empty($exclude_ids)) {
+        $placeholders = implode(",", array_fill(0, count($exclude_ids), "?"));
+        $exclude_sql = " AND id_jadwal NOT IN ($placeholders)";
+        $types .= str_repeat("i", count($exclude_ids));
+        foreach ($exclude_ids as $id) {
+            $params[] = (int)$id;
+        }
+    }
+
+    $sql = "
+        SELECT id_jadwal
+        FROM jadwal
+        WHERE hari = ?
+          AND id_guru = ?
+          AND jp_mulai <= ?
+          AND jp_selesai >= ?
+          $exclude_sql
+        LIMIT 1
+    ";
+
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        return true;
+    }
+
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $bentrok = $result->num_rows > 0;
+    $stmt->close();
+
+    return $bentrok;
+}
+
+function isBentrokGuruAtauKelas($conn, $id_guru, $id_kelas, $hari, $jp_mulai, $jp_selesai, $exclude_ids = []) {
+    $exclude_sql = "";
+    $types = "siiii";
+    $params = [$hari, $id_guru, $id_kelas, $jp_selesai, $jp_mulai];
+
+    if (!empty($exclude_ids)) {
+        $placeholders = implode(",", array_fill(0, count($exclude_ids), "?"));
+        $exclude_sql = " AND id_jadwal NOT IN ($placeholders)";
+        $types .= str_repeat("i", count($exclude_ids));
+        foreach ($exclude_ids as $id) {
+            $params[] = (int)$id;
+        }
+    }
+
+    $sql = "
+        SELECT id_jadwal
+        FROM jadwal
+        WHERE hari = ?
+          AND (id_guru = ? OR id_kelas = ?)
+          AND jp_mulai <= ?
+          AND jp_selesai >= ?
+          $exclude_sql
+        LIMIT 1
+    ";
+
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        return true;
+    }
+
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $bentrok = $result->num_rows > 0;
+    $stmt->close();
+
+    return $bentrok;
+}
+
 function ambilBlockJP($jp_per_hari, $hari, $jumlah_jp) {
     $hasil = [];
 
@@ -57,8 +135,8 @@ function ambilBlockJP($jp_per_hari, $hari, $jumlah_jp) {
     return $hasil;
 }
 
-function fallbackRekomendasi($slot_kosong) {
-    usort($slot_kosong, function ($a, $b) {
+function urutkanRekomendasi($list) {
+    usort($list, function ($a, $b) {
         $hariOrder = [
             "Senin" => 1,
             "Selasa" => 2,
@@ -73,16 +151,10 @@ function fallbackRekomendasi($slot_kosong) {
 
         if ($ha !== $hb) return $ha <=> $hb;
 
-        return $a["jp_mulai"] <=> $b["jp_mulai"];
+        return ((int)$a["jp_mulai"]) <=> ((int)$b["jp_mulai"]);
     });
 
-    $ambil = array_slice($slot_kosong, 0, 3);
-
-    foreach ($ambil as &$slot) {
-        $slot["pesan_ai"] = "Slot ini direkomendasikan karena kosong, tidak bentrok, dan durasi JP sesuai dengan jadwal lama.";
-    }
-
-    return $ambil;
+    return $list;
 }
 
 if ($conn->connect_error) {
@@ -182,6 +254,12 @@ if (empty($jp_per_hari)) {
     kirim_json("error", "Data jam pelajaran masih kosong.");
 }
 
+/*
+|--------------------------------------------------------------------------
+| 1. Cari slot kosong dulu
+|--------------------------------------------------------------------------
+*/
+
 $slot_kosong = [];
 
 foreach ($jp_per_hari as $hari => $listJP) {
@@ -200,147 +278,169 @@ foreach ($jp_per_hari as $hari => $listJP) {
             continue;
         }
 
-        $stmtBentrok = $conn->prepare("
-            SELECT id_jadwal
-            FROM jadwal
-            WHERE hari = ?
-              AND id_jadwal != ?
-              AND (id_guru = ? OR id_kelas = ?)
-              AND (
-                  jp_mulai <= ?
-                  AND jp_selesai >= ?
-              )
-            LIMIT 1
-        ");
-
-        if (!$stmtBentrok) {
-            kirim_json("error", "Query cek bentrok gagal: " . $conn->error);
-        }
-
-        $stmtBentrok->bind_param(
-            "siiiii",
-            $hari,
-            $id_jadwal,
+        $bentrok = isBentrokGuruAtauKelas(
+            $conn,
             $id_guru,
             $id_kelas,
+            $hari,
+            $jp_mulai,
             $jp_selesai,
-            $jp_mulai
+            [$id_jadwal]
         );
-
-        $stmtBentrok->execute();
-        $resultBentrok = $stmtBentrok->get_result();
-        $bentrok = $resultBentrok->num_rows > 0;
-        $stmtBentrok->close();
 
         if (!$bentrok) {
             $slot_kosong[] = [
+                "tipe_request" => "slot_kosong",
+                "id_jadwal_tukar" => null,
                 "hari" => $hari,
                 "jam" => $jam,
                 "jp_mulai" => $jp_mulai,
                 "jp_selesai" => $jp_selesai,
-                "jumlah_jp" => $jumlah_jp
+                "jumlah_jp" => $jumlah_jp,
+                "pesan_ai" => "Slot ini kosong, tidak bentrok, dan durasi JP sesuai dengan jadwal lama."
             ];
         }
     }
 }
 
-if (empty($slot_kosong)) {
+$rekomendasi = [];
+
+if (!empty($slot_kosong)) {
+    $slot_kosong = urutkanRekomendasi($slot_kosong);
+    $rekomendasi = array_slice($slot_kosong, 0, 3);
+
     $conn->close();
-    kirim_json("error", "Tidak ada slot kosong yang cocok untuk jadwal ini.");
+
+    kirim_json("success", "Rekomendasi slot kosong berhasil dibuat.", [
+        "mode" => "slot_kosong",
+        "jadwal_lama" => [
+            "id_jadwal" => (int)$jadwal_lama["id_jadwal"],
+            "id_guru" => (int)$jadwal_lama["id_guru"],
+            "id_kelas" => (int)$jadwal_lama["id_kelas"],
+            "id_mapel" => (int)$jadwal_lama["id_mapel"],
+            "guru" => $jadwal_lama["nama_guru"] ?? "-",
+            "kelas" => $jadwal_lama["nama_kelas"] ?? "-",
+            "mapel" => $jadwal_lama["nama_mapel"] ?? "-",
+            "hari" => $jadwal_lama["hari"],
+            "jam" => $jadwal_lama["jam"],
+            "jp_mulai" => $jadwal_lama["jp_mulai"],
+            "jp_selesai" => $jadwal_lama["jp_selesai"],
+            "jumlah_jp" => $jumlah_jp
+        ],
+        "data" => $rekomendasi
+    ]);
 }
 
-$rekomendasi = fallbackRekomendasi($slot_kosong);
+/*
+|--------------------------------------------------------------------------
+| 2. Kalau slot kosong tidak ada, cari opsi tukar jadwal
+|--------------------------------------------------------------------------
+| Logika tukar:
+| - Cari jadwal lain di kelas yang sama
+| - Durasi JP harus sama
+| - Guru lama harus bisa mengisi slot jadwal tukar
+| - Guru jadwal tukar harus bisa mengisi slot jadwal lama
+|--------------------------------------------------------------------------
+*/
 
-if (defined("GEMINI_API_KEY") && trim(GEMINI_API_KEY) !== "") {
-    $slots_untuk_ai = [];
+$opsi_tukar = [];
 
-    foreach ($slot_kosong as $index => $slot) {
-        $slots_untuk_ai[] = [
-            "idx" => $index,
-            "hari" => $slot["hari"],
-            "jam" => $slot["jam"],
-            "jp_mulai" => $slot["jp_mulai"],
-            "jp_selesai" => $slot["jp_selesai"],
-            "jumlah_jp" => $slot["jumlah_jp"]
-        ];
+$stmtTukar = $conn->prepare("
+    SELECT 
+        j.id_jadwal,
+        j.id_guru,
+        j.id_kelas,
+        j.id_mapel,
+        j.hari,
+        j.jam,
+        j.jp_mulai,
+        j.jp_selesai,
+        j.jumlah_jp,
+        g.nama AS nama_guru,
+        m.nama_mapel
+    FROM jadwal j
+    LEFT JOIN guru g ON j.id_guru = g.id_guru
+    LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
+    WHERE j.id_kelas = ?
+      AND j.id_jadwal != ?
+      AND j.jumlah_jp = ?
+      AND j.id_guru != ?
+    ORDER BY 
+        FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'),
+        COALESCE(j.jp_mulai, 0),
+        j.jam ASC
+");
+
+if (!$stmtTukar) {
+    kirim_json("error", "Query opsi tukar gagal: " . $conn->error);
+}
+
+$stmtTukar->bind_param("iiii", $id_kelas, $id_jadwal, $jumlah_jp, $id_guru);
+$stmtTukar->execute();
+$resultTukar = $stmtTukar->get_result();
+
+while ($tukar = $resultTukar->fetch_assoc()) {
+    $id_jadwal_tukar = (int)$tukar["id_jadwal"];
+    $id_guru_tukar = (int)$tukar["id_guru"];
+
+    $guru_lama_bentrok_di_slot_tukar = isBentrokGuru(
+        $conn,
+        $id_guru,
+        $tukar["hari"],
+        (int)$tukar["jp_mulai"],
+        (int)$tukar["jp_selesai"],
+        [$id_jadwal, $id_jadwal_tukar]
+    );
+
+    if ($guru_lama_bentrok_di_slot_tukar) {
+        continue;
     }
 
-    $prompt = "Kamu adalah asisten penjadwalan SMP YP 17 Surabaya.
-Jadwal lama:
-- Guru: " . ($jadwal_lama["nama_guru"] ?? "-") . "
-- Mapel: " . ($jadwal_lama["nama_mapel"] ?? "-") . "
-- Kelas: " . ($jadwal_lama["nama_kelas"] ?? "-") . "
-- Hari/Jam: " . $jadwal_lama["hari"] . " " . $jadwal_lama["jam"] . "
-- Jumlah JP: " . $jumlah_jp . "
+    $guru_tukar_bentrok_di_slot_lama = isBentrokGuru(
+        $conn,
+        $id_guru_tukar,
+        $jadwal_lama["hari"],
+        (int)$jadwal_lama["jp_mulai"],
+        (int)$jadwal_lama["jp_selesai"],
+        [$id_jadwal, $id_jadwal_tukar]
+    );
 
-Berikut slot kosong yang sudah divalidasi sistem dan tidak bentrok:
-" . json_encode($slots_untuk_ai, JSON_UNESCAPED_UNICODE) . "
+    if ($guru_tukar_bentrok_di_slot_lama) {
+        continue;
+    }
 
-Pilih maksimal 3 slot terbaik. Jawab WAJIB hanya array JSON tanpa markdown.
-Format:
-[
-  {\"idx\": 0, \"pesan_ai\": \"alasan singkat maksimal 1 kalimat\"}
-]";
+    $opsi_tukar[] = [
+        "tipe_request" => "tukar",
+        "id_jadwal_tukar" => $id_jadwal_tukar,
 
-    $api_key = trim(GEMINI_API_KEY);
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . urlencode($api_key);
+        "hari" => $tukar["hari"],
+        "jam" => $tukar["jam"],
+        "jp_mulai" => (int)$tukar["jp_mulai"],
+        "jp_selesai" => (int)$tukar["jp_selesai"],
+        "jumlah_jp" => $jumlah_jp,
 
-    $payload = [
-        "contents" => [
-            [
-                "parts" => [
-                    ["text" => $prompt]
-                ]
-            ]
-        ]
+        "mapel_tukar" => $tukar["nama_mapel"] ?? "-",
+        "guru_tukar" => $tukar["nama_guru"] ?? "-",
+
+        "pesan_ai" => "Tidak ada slot kosong. Opsi ini menukar jadwal dengan " . ($tukar["nama_mapel"] ?? "-") . " agar durasi JP tetap sama dan tidak bentrok dengan guru terkait."
     ];
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload, JSON_UNESCAPED_UNICODE));
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($http_code === 200 && $response) {
-        $gemini_data = json_decode($response, true);
-        $text_response = $gemini_data["candidates"][0]["content"]["parts"][0]["text"] ?? "";
-        $text_response = str_replace(["```json", "```"], "", $text_response);
-
-        $ai_result = json_decode(trim($text_response), true);
-
-        if (is_array($ai_result) && !empty($ai_result)) {
-            $hasil_ai = [];
-
-            foreach ($ai_result as $item) {
-                $idx = isset($item["idx"]) ? (int)$item["idx"] : -1;
-
-                if (isset($slot_kosong[$idx])) {
-                    $slot = $slot_kosong[$idx];
-                    $slot["pesan_ai"] = $item["pesan_ai"] ?? "Slot ini direkomendasikan karena aman dan tidak bentrok.";
-                    $hasil_ai[] = $slot;
-                }
-
-                if (count($hasil_ai) >= 3) {
-                    break;
-                }
-            }
-
-            if (!empty($hasil_ai)) {
-                $rekomendasi = $hasil_ai;
-            }
-        }
-    }
 }
+
+$stmtTukar->close();
+
+if (empty($opsi_tukar)) {
+    $conn->close();
+
+    kirim_json("error", "Tidak ada slot kosong maupun opsi tukar jadwal yang aman untuk jadwal ini.");
+}
+
+$opsi_tukar = urutkanRekomendasi($opsi_tukar);
+$rekomendasi = array_slice($opsi_tukar, 0, 3);
 
 $conn->close();
 
-kirim_json("success", "Rekomendasi jadwal berhasil dibuat.", [
+kirim_json("success", "Tidak ada slot kosong. Sistem membuat rekomendasi tukar jadwal.", [
+    "mode" => "tukar",
     "jadwal_lama" => [
         "id_jadwal" => (int)$jadwal_lama["id_jadwal"],
         "id_guru" => (int)$jadwal_lama["id_guru"],
