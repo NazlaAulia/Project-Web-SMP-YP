@@ -86,8 +86,20 @@ function renderProfil(siswa) {
 
   const semesterSelect = document.getElementById("semesterSelect");
   if (semesterSelect) {
-    semesterSelect.innerHTML =
-      `<option>${siswa.tahun_ajaran || "-"} - ${siswa.semester || "-"}</option>`;
+    if (siswa.tahun_ajaran_list && siswa.tahun_ajaran_list.length > 0) {
+      semesterSelect.innerHTML = siswa.tahun_ajaran_list.map((ta) => {
+        const selected = ta.tahun_ajaran === siswa.tahun_ajaran ? "selected" : "";
+
+        return `
+          <option value="${ta.id_tahun_ajaran}" ${selected}>
+            ${ta.tahun_ajaran} - ${siswa.semester || "-"}
+          </option>
+        `;
+      }).join("");
+    } else {
+      semesterSelect.innerHTML =
+        `<option>${siswa.tahun_ajaran || "-"} - ${siswa.semester || "-"}</option>`;
+    }
   }
 
   document.getElementById("judulTabel").textContent =

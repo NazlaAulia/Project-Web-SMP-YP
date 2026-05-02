@@ -53,7 +53,25 @@ if (!$dataSiswa) {
 $namaSiswa = $dataSiswa['nama'];
 $namaKelas = $dataSiswa['nama_kelas'] ?? '-';
 $tahunAjaran = $dataSiswa['tahun_ajaran'] ?? '-';
-$inisial = strtoupper(substr($namaSiswa, 0, 1));
+$inisial   = strtoupper(substr($namaSiswa, 0, 1));
+
+$queryTahunAjaran = mysqli_query($conn, "
+    SELECT id_tahun_ajaran, tahun_ajaran, status
+    FROM tahun_ajaran
+    ORDER BY id_tahun_ajaran ASC
+");
+
+$tahunAjaranList = [];
+
+if ($queryTahunAjaran) {
+    while ($rowTA = mysqli_fetch_assoc($queryTahunAjaran)) {
+        $tahunAjaranList[] = [
+            "id_tahun_ajaran" => $rowTA['id_tahun_ajaran'],
+            "tahun_ajaran" => $rowTA['tahun_ajaran'],
+            "status" => $rowTA['status']
+        ];
+    }
+}
 
 $hariIndonesia = [
     'Sunday' => 'Minggu',
@@ -194,7 +212,8 @@ echo json_encode([
         "kelas" => $namaKelas,
         "inisial" => $inisial,
         "tahun_ajaran" => $tahunAjaran,
-        "semester" => "Genap"
+        "semester" => "Genap",
+        "tahun_ajaran_list" => $tahunAjaranList
     ],
     "ringkasan" => [
         "hari_ini" => $hariIniText,
