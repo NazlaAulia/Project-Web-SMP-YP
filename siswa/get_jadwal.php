@@ -24,9 +24,11 @@ $querySiswa = mysqli_query($conn, "
     SELECT 
         s.id_siswa,
         s.nama,
-        k.nama_kelas
+        k.nama_kelas,
+        ta.tahun_ajaran
     FROM siswa s
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
+    LEFT JOIN tahun_ajaran ta ON s.id_tahun_ajaran = ta.id_tahun_ajaran
     WHERE s.id_siswa = $id_siswa
 ");
 
@@ -50,7 +52,8 @@ if (!$dataSiswa) {
 
 $namaSiswa = $dataSiswa['nama'];
 $namaKelas = $dataSiswa['nama_kelas'] ?? '-';
-$inisial   = strtoupper(substr($namaSiswa, 0, 1));
+$tahunAjaran = $dataSiswa['tahun_ajaran'] ?? '-';
+$inisial = strtoupper(substr($namaSiswa, 0, 1));
 
 $hariIndonesia = [
     'Sunday' => 'Minggu',
@@ -172,9 +175,6 @@ if (!$queryJadwal) {
     exit;
 }
 
-$jamMulai = substr($rowJadwal['jam_mulai'], 0, 5);
-$jamSelesai = substr($rowJadwal['jam_selesai'], 0, 5);
-
 $jadwalMinggu = [];
 
 while ($rowJadwal = mysqli_fetch_assoc($queryJadwal)) {
@@ -207,4 +207,3 @@ echo json_encode([
 
 $conn->close();
 ?>
-
