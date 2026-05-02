@@ -12,6 +12,7 @@ const params = new URLSearchParams(window.location.search);
 const idGuru = params.get("id_guru");
 const roleId = params.get("role_id");
 const idKelas = params.get("id_kelas");
+const idSiswa = params.get("id_siswa") || "";
 const keywordCetak = (params.get("q") || "").toLowerCase().trim();
 
 function formatTanggalIndonesia(date = new Date()) {
@@ -141,7 +142,14 @@ function loadCetakNilai() {
     return;
   }
 
-  const url = `cetak_nilai_wali.php?id_guru=${idGuru}&role_id=${roleId}&id_kelas=${idKelas}`;
+  const url = `cetak_nilai_wali.php?id_guru=${idGuru}&role_id=${roleId}&id_kelas=${idKelas}`;let url =
+  `cetak_nilai_wali.php?id_guru=${idGuru}` +
+  `&role_id=${roleId}` +
+  `&id_kelas=${idKelas}`;
+
+if (idSiswa !== "") {
+  url += `&id_siswa=${encodeURIComponent(idSiswa)}`;
+}
 
   fetch(url)
     .then(res => {

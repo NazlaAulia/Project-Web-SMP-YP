@@ -150,9 +150,10 @@ if ($mode === "wali") {
     }
 
     $stmt->bind_param("i", $id_kelas);
-} else {
+
+    } else {
     $stmt = $conn->prepare("
-        SELECT
+        SELECT DISTINCT
             n.id_siswa,
             s.nama AS nama_siswa,
             s.id_kelas,
@@ -169,11 +170,14 @@ if ($mode === "wali") {
         INNER JOIN siswa s ON n.id_siswa = s.id_siswa
         INNER JOIN kelas k ON s.id_kelas = k.id_kelas
         INNER JOIN mapel m ON n.id_mapel = m.id_mapel
-        INNER JOIN jadwal j 
-            ON j.id_kelas = s.id_kelas
-            AND j.id_mapel = n.id_mapel
-            AND j.id_guru = ?
         WHERE n.id_mapel = ?
+          AND EXISTS (
+              SELECT 1
+              FROM jadwal j
+              WHERE j.id_guru = ?
+                AND j.id_kelas = s.id_kelas
+                AND j.id_mapel = n.id_mapel
+          )
         ORDER BY k.tingkat ASC, k.nama_kelas ASC, s.nama ASC, n.semester ASC
     ");
 
@@ -181,7 +185,7 @@ if ($mode === "wali") {
         kirim_json("error", "Query nilai mapel gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("ii", $id_guru, $id_mapel_guru);
+    $stmt->bind_param("ii", $id_mapel_guru, $id_guru);
 }
 
 $stmt->execute();

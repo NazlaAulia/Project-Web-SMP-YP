@@ -378,3 +378,58 @@ body {
     break-inside: avoid;
   }
 }
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  html,
+  body {
+    width: 210mm;
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-page {
+    width: 100%;
+    max-width: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+
+  .btn-print {
+    display: none !important;
+  }
+
+  .print-info {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  .student-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 12mm;
+  }
+
+  .table-wrap {
+    overflow: visible !important;
+  }
+
+  .nilai-print-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+  }
+
+  .nilai-print-table th,
+  .nilai-print-table td {
+    padding: 6px 5px !important;
+    font-size: 10px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+}

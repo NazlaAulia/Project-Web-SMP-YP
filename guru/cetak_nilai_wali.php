@@ -20,6 +20,17 @@ $id_siswa_list = [];
 if ($id_siswa_param !== "") {
     $id_siswa_list = array_filter(array_map("intval", explode(",", $id_siswa_param)));
 }
+
+if (!empty($id_siswa_list)) {
+    $placeholder = implode(",", array_fill(0, count($id_siswa_list), "?"));
+    $sql .= " AND s.id_siswa IN ($placeholder)";
+
+    foreach ($id_siswa_list as $id_siswa) {
+        $types .= "i";
+        $params[] = $id_siswa;
+    }
+}
+
 if ($role_id !== 2) {
     kirim_json("error", "Akses ditolak. Akun ini bukan guru.");
 }
@@ -55,8 +66,8 @@ if ($resultWali->num_rows === 0) {
 $wali = $resultWali->fetch_assoc();
 
 /* AMBIL NILAI SISWA DI KELAS WALI
-   Kalau ada id_siswa dari checkbox, yang dicetak hanya siswa terpilih.
-   Kalau tidak ada id_siswa, tetap ambil semua siswa satu kelas.
+   Kalau URL membawa id_siswa, maka hanya siswa itu yang dicetak.
+   Contoh: id_siswa=1834
 */
 $sql = "
     SELECT
