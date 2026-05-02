@@ -31,6 +31,9 @@ $query = "
         j.id_jadwal,
         j.hari,
         j.jam,
+        j.jp_mulai,
+        j.jp_selesai,
+        j.jumlah_jp,
         g.nama AS nama_guru,
         k.nama_kelas,
         m.nama_mapel
@@ -39,12 +42,33 @@ $query = "
     LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
     LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
     ORDER BY 
+        k.nama_kelas ASC,
         FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'),
-        j.jam,
-        k.nama_kelas
+        COALESCE(j.jp_mulai, 0),
+        j.jam ASC
 ";
 
 $result = $conn->query($query);
+
+$jadwal_by_kelas = [];
+$hari_urutan = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $kelas = $row['nama_kelas'] ?? 'Tanpa Kelas';
+        $hari = $row['hari'] ?? '-';
+
+        if (!isset($jadwal_by_kelas[$kelas])) {
+            $jadwal_by_kelas[$kelas] = [];
+        }
+
+        if (!isset($jadwal_by_kelas[$kelas][$hari])) {
+            $jadwal_by_kelas[$kelas][$hari] = [];
+        }
+
+        $jadwal_by_kelas[$kelas][$hari][] = $row;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -70,8 +94,6 @@ $result = $conn->query($query);
             --border: #e5e7eb;
             --danger: #ef4444;
             --success: #22c55e;
-            --success-soft: #dcfce7;
-            --danger-soft: #fee2e2;
             --blue-soft: #eff6ff;
             --blue: #2563eb;
         }
@@ -292,9 +314,15 @@ $result = $conn->query($query);
             font-size: 20px;
         }
 
+        .table-header p {
+            margin: 6px 0 0;
+            color: var(--muted-text);
+            font-size: 14px;
+        }
+
         .search-box {
             position: relative;
-            width: 280px;
+            width: 320px;
             max-width: 100%;
         }
 
@@ -321,64 +349,142 @@ $result = $conn->query($query);
             box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.10);
         }
 
-        .table-wrap {
-            overflow-x: auto;
-            border-radius: 16px;
+        .schedule-wrapper {
+            display: grid;
+            gap: 24px;
+        }
+
+        .class-schedule-card {
+            background: #ffffff;
             border: 1px solid var(--border);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 860px;
-            background: white;
+        .class-schedule-header {
+            padding: 18px 22px;
+            background: linear-gradient(135deg, var(--primary-teal), #115e59);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
         }
 
-        th {
-            background: #f8fafc;
-            color: #475569;
-            font-size: 13px;
+        .class-schedule-header h3 {
+            margin: 0;
+            font-size: 20px;
             font-weight: 700;
-            text-align: left;
-            padding: 14px;
+        }
+
+        .class-schedule-header span {
+            font-size: 13px;
+            opacity: 0.9;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(230px, 1fr));
+            overflow-x: auto;
+        }
+
+        .day-column {
+            min-width: 230px;
+            border-right: 1px solid var(--border);
+            background: #ffffff;
+        }
+
+        .day-column:last-child {
+            border-right: none;
+        }
+
+        .day-title {
+            padding: 14px 16px;
+            background: #f8fafc;
+            color: var(--primary-teal);
+            font-weight: 700;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .day-title small {
+            color: #64748b;
+            font-weight: 600;
+            background: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 999px;
             white-space: nowrap;
         }
 
-        td {
-            padding: 14px;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-            color: #334155;
-            vertical-align: middle;
+        .lesson-list {
+            padding: 12px;
+            display: grid;
+            gap: 10px;
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        .lesson-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 12px;
+            background: #ffffff;
+            transition: 0.2s ease;
         }
 
-        tr:hover td {
-            background: #f9fafb;
+        .lesson-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
         }
 
-        .badge-day {
-            display: inline-flex;
+        .lesson-time {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 700;
+            display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 6px 11px;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .lesson-mapel {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 5px;
+        }
+
+        .lesson-guru {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .lesson-jp {
+            margin-top: 8px;
+            display: inline-flex;
+            padding: 4px 8px;
             border-radius: 999px;
             background: var(--soft-teal);
             color: var(--primary-teal);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
         }
 
-        .time-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 600;
-            color: #475569;
+        .empty-day {
+            padding: 20px 14px;
+            color: #94a3b8;
+            font-size: 13px;
+            text-align: center;
         }
 
         .empty-state {
@@ -510,15 +616,6 @@ $result = $conn->query($query);
             background: #dbe3e8;
         }
 
-        .modal-btn.danger {
-            background: #ef4444;
-            color: white;
-        }
-
-        .modal-btn.danger:hover {
-            background: #dc2626;
-        }
-
         .hidden {
             display: none !important;
         }
@@ -531,6 +628,12 @@ $result = $conn->query($query);
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .day-grid {
+                grid-template-columns: repeat(5, 250px);
             }
         }
 
@@ -596,7 +699,7 @@ $result = $conn->query($query);
                         <h1>Jadwal Mengajar</h1>
                         <p>
                             Halaman ini digunakan admin untuk generate dan memantau jadwal mengajar sebelum semester dimulai.
-                            Jadwal yang sudah dibuat akan menjadi acuan untuk guru dan kelas.
+                            Jadwal ditampilkan per kelas dan per hari agar lebih mudah dibaca.
                         </p>
                     </div>
 
@@ -653,7 +756,8 @@ $result = $conn->query($query);
                 <div class="action-text">
                     <h2>Generate Jadwal Otomatis</h2>
                     <p>
-                        Klik tombol generate untuk menjalankan proses pembuatan jadwal
+                        Klik tombol generate untuk menjalankan proses pembuatan jadwal dari file
+                        <strong>generate_master.php</strong>.
                     </p>
                     <div id="statusBox" class="status-box"></div>
                 </div>
@@ -673,76 +777,94 @@ $result = $conn->query($query);
 
             <section class="table-card">
                 <div class="table-header">
-                    <h2>Daftar Jadwal Saat Ini</h2>
+                    <div>
+                        <h2>Jadwal Mengajar Per Kelas</h2>
+                        <p>Tampilan jadwal dirapikan berdasarkan kelas dan hari.</p>
+                    </div>
 
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" placeholder="Cari guru, kelas, mapel, hari...">
+                        <input type="text" id="searchInput" placeholder="Cari kelas, guru, mapel, hari...">
                     </div>
                 </div>
 
-                <div class="table-wrap">
-                    <table id="jadwalTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Hari</th>
-                                <th>Jam</th>
-                                <th>Kelas</th>
-                                <th>Mata Pelajaran</th>
-                                <th>Guru</th>
-                            </tr>
-                        </thead>
+                <?php if (!empty($jadwal_by_kelas)): ?>
+                    <div class="schedule-wrapper" id="jadwalTable">
+                        <?php foreach ($jadwal_by_kelas as $nama_kelas => $jadwal_harian): ?>
+                            <div class="class-schedule-card">
+                                <div class="class-schedule-header">
+                                    <h3>Kelas <?php echo htmlspecialchars($nama_kelas); ?></h3>
+                                    <span>
+                                        <i class="fas fa-calendar-days"></i>
+                                        Jadwal Mingguan
+                                    </span>
+                                </div>
 
-                        <tbody>
-                            <?php if ($result && $result->num_rows > 0): ?>
-                                <?php $no = 1; ?>
-                                <?php while ($row = $result->fetch_assoc()): ?>
-                                    <tr>
-                                        <td><?php echo $no++; ?></td>
+                                <div class="day-grid">
+                                    <?php foreach ($hari_urutan as $hari): ?>
+                                        <?php
+                                            $list_jadwal = $jadwal_harian[$hari] ?? [];
+                                            $total_jp_hari = 0;
 
-                                        <td>
-                                            <span class="badge-day">
-                                                <?php echo htmlspecialchars($row['hari'] ?? '-'); ?>
-                                            </span>
-                                        </td>
+                                            foreach ($list_jadwal as $item) {
+                                                $total_jp_hari += (int)($item['jumlah_jp'] ?? 1);
+                                            }
+                                        ?>
 
-                                        <td>
-                                            <span class="time-pill">
-                                                <i class="fas fa-clock"></i>
-                                                <?php echo htmlspecialchars($row['jam'] ?? '-'); ?>
-                                            </span>
-                                        </td>
+                                        <div class="day-column">
+                                            <div class="day-title">
+                                                <span><?php echo htmlspecialchars($hari); ?></span>
+                                                <small><?php echo $total_jp_hari; ?> JP</small>
+                                            </div>
 
-                                        <td><?php echo htmlspecialchars($row['nama_kelas'] ?? '-'); ?></td>
+                                            <?php if (!empty($list_jadwal)): ?>
+                                                <div class="lesson-list">
+                                                    <?php foreach ($list_jadwal as $item): ?>
+                                                        <div class="lesson-card">
+                                                            <div class="lesson-time">
+                                                                <i class="fas fa-clock"></i>
+                                                                <?php echo htmlspecialchars($item['jam'] ?? '-'); ?>
+                                                            </div>
 
-                                        <td><?php echo htmlspecialchars($row['nama_mapel'] ?? '-'); ?></td>
+                                                            <div class="lesson-mapel">
+                                                                <?php echo htmlspecialchars($item['nama_mapel'] ?? '-'); ?>
+                                                            </div>
 
-                                        <td>
-                                            <?php
-                                                if (!empty($row['nama_guru'])) {
-                                                    echo htmlspecialchars($row['nama_guru']);
-                                                } else {
-                                                    echo '<span style="color:#ef4444;font-weight:600;">Belum ada guru</span>';
-                                                }
-                                            ?>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="6">
-                                        <div class="empty-state">
-                                            <i class="fas fa-calendar-xmark"></i>
-                                            <h3>Belum ada jadwal</h3>
-                                            <p>Klik tombol Generate Jadwal untuk mulai membuat jadwal mengajar.</p>
+                                                            <div class="lesson-guru">
+                                                                <i class="fas fa-chalkboard-user"></i>
+                                                                <span>
+                                                                    <?php echo htmlspecialchars($item['nama_guru'] ?? 'Belum ada guru'); ?>
+                                                                </span>
+                                                            </div>
+
+                                                            <div class="lesson-jp">
+                                                                JP <?php echo htmlspecialchars($item['jp_mulai'] ?? '-'); ?>
+                                                                -
+                                                                <?php echo htmlspecialchars($item['jp_selesai'] ?? '-'); ?>
+                                                                |
+                                                                <?php echo (int)($item['jumlah_jp'] ?? 1); ?> JP
+                                                            </div>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="empty-day">
+                                                    Tidak ada jadwal
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
-                                    </td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-xmark"></i>
+                        <h3>Belum ada jadwal</h3>
+                        <p>Klik tombol Generate Jadwal untuk mulai membuat jadwal mengajar.</p>
+                    </div>
+                <?php endif; ?>
             </section>
         </main>
     </div>
@@ -756,7 +878,7 @@ $result = $conn->query($query);
             <h3>Generate Jadwal?</h3>
             <p>
                 Jadwal lama akan diperbarui dan sistem akan menjalankan proses generate jadwal otomatis.
-                Pastikan data guru, kelas, dan mata pelajaran sudah benar.
+                Pastikan data guru, kelas, mata pelajaran, aturan mapel, dan jam pelajaran sudah benar.
             </p>
 
             <div class="custom-modal-actions">
@@ -766,7 +888,7 @@ $result = $conn->query($query);
         </div>
     </div>
 
-    <!-- MODAL HASIL / INFO -->
+    <!-- MODAL HASIL -->
     <div class="custom-modal-overlay" id="resultModal">
         <div class="custom-modal-box">
             <div class="custom-modal-icon" id="resultModalIcon">
@@ -848,6 +970,7 @@ $result = $conn->query($query);
 
         function runGenerateJadwal() {
             closeGenerateModal();
+
             setStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Sedang generate jadwal...');
             showResultModal('loading', 'Sedang Diproses', 'Mohon tunggu, sistem sedang membuat jadwal otomatis.');
 
@@ -885,19 +1008,28 @@ $result = $conn->query($query);
             });
         }
 
-        document.getElementById('confirmGenerateBtn').addEventListener('click', runGenerateJadwal);
+        const confirmGenerateBtn = document.getElementById('confirmGenerateBtn');
+        if (confirmGenerateBtn) {
+            confirmGenerateBtn.addEventListener('click', runGenerateJadwal);
+        }
 
-        document.getElementById('generateModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeGenerateModal();
-            }
-        });
+        const generateModal = document.getElementById('generateModal');
+        if (generateModal) {
+            generateModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeGenerateModal();
+                }
+            });
+        }
 
-        document.getElementById('resultModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeResultModal();
-            }
-        });
+        const resultModal = document.getElementById('resultModal');
+        if (resultModal) {
+            resultModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeResultModal();
+                }
+            });
+        }
 
         const searchInput = document.getElementById('searchInput');
         const jadwalTable = document.getElementById('jadwalTable');
@@ -905,11 +1037,11 @@ $result = $conn->query($query);
         if (searchInput && jadwalTable) {
             searchInput.addEventListener('keyup', function () {
                 const keyword = this.value.toLowerCase();
-                const rows = jadwalTable.querySelectorAll('tbody tr');
+                const cards = jadwalTable.querySelectorAll('.class-schedule-card');
 
-                rows.forEach(row => {
-                    const text = row.innerText.toLowerCase();
-                    row.style.display = text.includes(keyword) ? '' : 'none';
+                cards.forEach(card => {
+                    const text = card.innerText.toLowerCase();
+                    card.style.display = text.includes(keyword) ? '' : 'none';
                 });
             });
         }
