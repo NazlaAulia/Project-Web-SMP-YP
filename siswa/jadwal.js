@@ -86,9 +86,9 @@ function renderProfil(siswa) {
 
   const semesterSelect = document.getElementById("semesterSelect");
   if (semesterSelect) {
-    semesterSelect.innerHTML = result.semester_list.map(item =>
-  `<option value="${item.id}">${item.tahun} - ${item.semester}</option>`
-).join("");
+    semesterSelect.innerHTML =
+      `<option>${siswa.tahun_ajaran || "-"} - ${siswa.semester || "-"}</option>`;
+  }
 
   document.getElementById("judulTabel").textContent =
     `Jadwal Pelajaran Kelas ${siswa.kelas} (Minggu Ini)`;
