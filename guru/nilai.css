@@ -1269,3 +1269,14 @@ body {
   font-weight: 600;
   font-size: 0.85rem;
 }
+.check-cetak-siswa {
+  width: 18px;
+  height: 18px;
+  accent-color: #07484a;
+  cursor: pointer;
+}
+
+.nilai-table-wrapper th:last-child,
+.nilai-table-wrapper td:last-child {
+  text-align: center;
+}

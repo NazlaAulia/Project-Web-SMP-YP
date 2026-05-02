@@ -115,7 +115,7 @@ function renderTable(filteredData = dataNilai) {
   if (filteredData.length === 0) {
     nilaiTableBody.innerHTML = `
       <tr>
-        <td colspan="12" class="empty-state">Belum ada data yang sesuai.</td>
+        <td colspan="13" class="empty-state">Belum ada data yang sesuai.</td>
       </tr>
     `;
     return;
@@ -174,6 +174,14 @@ function renderTable(filteredData = dataNilai) {
           <td>${item.total_izin}</td>
           <td>${item.total_sakit}</td>
           <td>${item.total_alfa}</td>
+          <td>
+            <input
+              type="checkbox"
+              class="check-cetak-siswa"
+              value="${item.id_siswa}"
+              data-nama="${item.nama_siswa}"
+            />
+          </td>
         </tr>
       `;
     })
@@ -681,7 +689,6 @@ if (printBtn) {
   printBtn.addEventListener("click", function () {
     const mode = modeNilai ? modeNilai.value : "mapel";
     const idKelas = filterKelasWali ? filterKelasWali.value : "";
-    const keyword = searchInput ? searchInput.value.trim() : "";
 
     if (!idGuruLogin || roleIdLogin !== "2") {
       alert("Silakan login sebagai guru terlebih dahulu.");
@@ -690,7 +697,7 @@ if (printBtn) {
     }
 
     if (mode !== "wali") {
-      alert("Cetak nilai siswa tersedia pada mode Wali Kelas.");
+      alert("Cetak nilai siswa hanya tersedia pada mode Wali Kelas.");
       return;
     }
 
@@ -699,11 +706,23 @@ if (printBtn) {
       return;
     }
 
-    let url = `cetak_nilai_wali.html?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&id_kelas=${idKelas}`;
+    const checked = document.querySelectorAll(".check-cetak-siswa:checked");
 
-    if (keyword !== "") {
-      url += `&q=${encodeURIComponent(keyword)}`;
+    if (checked.length === 0) {
+      alert("Centang minimal satu siswa yang ingin dicetak.");
+      return;
     }
+
+    const idSiswaList = Array.from(checked)
+      .map(item => item.value)
+      .filter(Boolean)
+      .join(",");
+
+    const url =
+      `cetak_nilai_wali.html?id_guru=${idGuruLogin}` +
+      `&role_id=${roleIdLogin}` +
+      `&id_kelas=${idKelas}` +
+      `&id_siswa=${encodeURIComponent(idSiswaList)}`;
 
     window.open(url, "_blank");
   });
