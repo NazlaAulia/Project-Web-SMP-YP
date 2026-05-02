@@ -14,7 +14,12 @@ function kirim_json($status, $message, $extra = []) {
 $id_guru = isset($_GET["id_guru"]) ? (int) $_GET["id_guru"] : 0;
 $role_id = isset($_GET["role_id"]) ? (int) $_GET["role_id"] : 0;
 $id_kelas = isset($_GET["id_kelas"]) ? (int) $_GET["id_kelas"] : 0;
+$id_siswa_param = isset($_GET["id_siswa"]) ? trim($_GET["id_siswa"]) : "";
+$id_siswa_list = [];
 
+if ($id_siswa_param !== "") {
+    $id_siswa_list = array_filter(array_map("intval", explode(",", $id_siswa_param)));
+}
 if ($role_id !== 2) {
     kirim_json("error", "Akses ditolak. Akun ini bukan guru.");
 }
@@ -49,8 +54,11 @@ if ($resultWali->num_rows === 0) {
 
 $wali = $resultWali->fetch_assoc();
 
-/* AMBIL NILAI SEMUA SISWA DI KELAS WALI */
-$stmt = $conn->prepare("
+/* AMBIL NILAI SISWA DI KELAS WALI
+   Kalau ada id_siswa dari checkbox, yang dicetak hanya siswa terpilih.
+   Kalau tidak ada id_siswa, tetap ambil semua siswa satu kelas.
+*/
+$sql = "
     SELECT
         s.id_siswa,
         s.nama AS nama_siswa,
@@ -67,14 +75,30 @@ $stmt = $conn->prepare("
     INNER JOIN kelas k ON s.id_kelas = k.id_kelas
     INNER JOIN mapel m ON n.id_mapel = m.id_mapel
     WHERE s.id_kelas = ?
-    ORDER BY s.nama ASC, n.semester ASC, m.nama_mapel ASC
-");
+";
+
+$types = "i";
+$params = [$id_kelas];
+
+if (!empty($id_siswa_list)) {
+    $placeholder = implode(",", array_fill(0, count($id_siswa_list), "?"));
+    $sql .= " AND s.id_siswa IN ($placeholder)";
+
+    foreach ($id_siswa_list as $id_siswa) {
+        $types .= "i";
+        $params[] = $id_siswa;
+    }
+}
+
+$sql .= " ORDER BY s.nama ASC, n.semester ASC, m.nama_mapel ASC";
+
+$stmt = $conn->prepare($sql);
 
 if (!$stmt) {
     kirim_json("error", "Query nilai gagal: " . $conn->error);
 }
 
-$stmt->bind_param("i", $id_kelas);
+$stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -103,6 +127,9 @@ while ($row = $result->fetch_assoc()) {
     ];
 }
 
+$nama_kepala_sekolah = "Nama Kepala Sekolah";
+$nip_kepala_sekolah = "-";
+
 kirim_json("success", "Data cetak nilai berhasil dimuat.", [
     "kelas" => [
         "id_kelas" => (int) $wali["id_kelas"],
@@ -111,6 +138,10 @@ kirim_json("success", "Data cetak nilai berhasil dimuat.", [
     "wali" => [
         "id_guru" => $id_guru,
         "nama" => $wali["nama_wali"]
+    ],
+    "kepala_sekolah" => [
+        "nama" => $nama_kepala_sekolah,
+        "nip" => $nip_kepala_sekolah
     ],
     "siswa" => array_values($siswaMap)
 ]);

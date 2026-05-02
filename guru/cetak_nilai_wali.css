@@ -170,11 +170,11 @@ body {
 .table-wrap {
   overflow-x: auto;
 }
-
 .nilai-print-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 780px;
+  min-width: 0;
+  table-layout: fixed;
 }
 
 .nilai-print-table th {
@@ -221,8 +221,9 @@ body {
 /* TTD */
 .ttd-section {
   display: grid;
-  grid-template-columns: 1fr 260px;
-  margin-top: 36px;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin-top: 42px;
 }
 
 .ttd-box {
@@ -307,5 +308,42 @@ body {
 
   .student-card {
     page-break-inside: avoid;
+  }
+}
+.ttd-box small {
+  display: block;
+  margin-top: 5px;
+  color: #102a2a;
+  font-size: 0.85rem;
+}
+.nilai-print-table th,
+.nilai-print-table td {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  .table-wrap {
+    overflow: visible;
+  }
+
+  .nilai-print-table {
+    font-size: 10px;
+  }
+
+  .nilai-print-table th,
+  .nilai-print-table td {
+    padding: 7px 6px;
+  }
+
+  .student-card {
+    border: none;
+    padding: 0;
+    margin-bottom: 18px;
   }
 }
