@@ -62,21 +62,10 @@ $stmt->bind_param("i", $id_kelas);
 $stmt->execute();
 $result = $stmt->get_result();
 
-$hari_urutan = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-$jadwal_harian = [];
-
-foreach ($hari_urutan as $hari) {
-    $jadwal_harian[$hari] = [];
-}
+$jadwal_list = [];
 
 while ($row = $result->fetch_assoc()) {
-    $hari = $row['hari'];
-
-    if (!isset($jadwal_harian[$hari])) {
-        $jadwal_harian[$hari] = [];
-    }
-
-    $jadwal_harian[$hari][] = $row;
+    $jadwal_list[] = $row;
 }
 
 $stmt->close();
@@ -105,7 +94,7 @@ $tanggal_cetak = date('d-m-Y');
         }
 
         .print-toolbar {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 14px auto;
             display: flex;
             justify-content: flex-end;
@@ -136,30 +125,30 @@ $tanggal_cetak = date('d-m-Y');
         }
 
         .page {
-            width: 297mm;
-            height: 210mm;
+            width: 210mm;
+            height: 297mm;
             margin: 0 auto 14px;
             background: white;
-            padding: 5mm;
+            padding: 9mm;
             overflow: hidden;
         }
 
         .kop {
             text-align: center;
-            border-bottom: 1.5px solid #111827;
-            padding-bottom: 4px;
-            margin-bottom: 5px;
+            border-bottom: 2px solid #111827;
+            padding-bottom: 6px;
+            margin-bottom: 7px;
         }
 
         .kop h1 {
             margin: 0;
-            font-size: 15px;
+            font-size: 16px;
             letter-spacing: 0.3px;
         }
 
         .kop h2 {
-            margin: 2px 0 0;
-            font-size: 11px;
+            margin: 3px 0 0;
+            font-size: 12px;
             font-weight: normal;
         }
 
@@ -167,13 +156,13 @@ $tanggal_cetak = date('d-m-Y');
             display: flex;
             justify-content: space-between;
             gap: 12px;
-            margin-bottom: 5px;
-            font-size: 8.5px;
+            margin-bottom: 7px;
+            font-size: 9.5px;
         }
 
         .info-row strong {
             display: inline-block;
-            min-width: 64px;
+            min-width: 72px;
         }
 
         .schedule-table {
@@ -181,117 +170,121 @@ $tanggal_cetak = date('d-m-Y');
             border-collapse: collapse;
             table-layout: fixed;
             border: 1px solid #111827;
+            font-size: 8.5px;
         }
 
         .schedule-table th {
             background: #0f766e;
             color: white;
             border: 1px solid #111827;
-            padding: 3px 2px;
-            font-size: 9px;
-            text-align: center;
+            padding: 4px 3px;
+            text-align: left;
+            font-size: 8.5px;
         }
 
         .schedule-table td {
-            border: 1px solid #94a3b8;
+            border: 1px solid #cbd5e1;
+            padding: 3px 4px;
             vertical-align: top;
-            padding: 2px;
-            height: 156mm;
+            line-height: 1.18;
         }
 
-        .lesson {
-            border-bottom: 1px solid #e5e7eb;
-            padding: 1.8px 1px 2px;
-            page-break-inside: avoid;
-            break-inside: avoid;
+        .col-no {
+            width: 22px;
+            text-align: center;
         }
 
-        .lesson:last-child {
-            border-bottom: none;
-        }
-
-        .lesson-time {
-            font-size: 7px;
+        .col-hari {
+            width: 58px;
             font-weight: bold;
-            color: #334155;
-            margin-bottom: 0.5px;
-            line-height: 1.05;
+            color: #0f766e;
         }
 
-        .lesson-mapel {
-            font-size: 7.5px;
+        .col-jam {
+            width: 78px;
             font-weight: bold;
-            color: #111827;
-            margin-bottom: 0.5px;
-            line-height: 1.05;
         }
 
-        .lesson-guru {
-            font-size: 6.4px;
-            color: #475569;
-            line-height: 1.08;
+        .col-mapel {
+            width: 80px;
+            font-weight: bold;
         }
 
-        .lesson-jp {
-            margin-top: 0.5px;
-            font-size: 6.3px;
+        .col-jp {
+            width: 52px;
+            text-align: center;
             color: #0f766e;
             font-weight: bold;
-            line-height: 1.05;
         }
 
-        .empty {
+        .guru-text {
             font-size: 8px;
-            color: #94a3b8;
+            color: #334155;
+        }
+
+        .day-separator td {
+            background: #f1f5f9;
+            color: #0f766e;
+            font-weight: bold;
             text-align: center;
-            padding-top: 10px;
+            padding: 4px;
+            font-size: 8.5px;
         }
 
         .footer-area {
-            margin-top: 4px;
+            margin-top: 7px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            font-size: 8.5px;
+            font-size: 9px;
         }
 
         .note {
             color: #475569;
-            line-height: 1.25;
+            line-height: 1.35;
             max-width: 360px;
         }
 
         .signature-box {
-            width: 180px;
+            width: 190px;
             text-align: center;
-            font-size: 8.5px;
+            font-size: 9px;
         }
 
         .signature-space {
-            height: 20px;
+            height: 28px;
+        }
+
+        .empty-state {
+            border: 1px solid #cbd5e1;
+            padding: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
         }
 
         @page {
-            size: A4 landscape;
-            margin: 4mm;
+            size: A4 portrait;
+            margin: 6mm;
         }
 
         @media print {
             html,
             body {
                 background: white;
-                width: 297mm;
-                height: 210mm;
-                overflow: hidden;
+                width: auto;
+                height: auto;
+                overflow: visible;
             }
 
             .print-toolbar {
-                display: none;
+                display: none !important;
             }
 
             .page {
-                width: 100%;
-                height: 100%;
+                width: auto;
+                height: auto;
+                min-height: 0;
                 margin: 0;
                 padding: 0;
                 box-shadow: none;
@@ -334,48 +327,51 @@ $tanggal_cetak = date('d-m-Y');
         </div>
     </div>
 
-    <table class="schedule-table">
-        <thead>
-            <tr>
-                <?php foreach ($hari_urutan as $hari): ?>
-                    <th><?php echo e($hari); ?></th>
+    <?php if (!empty($jadwal_list)): ?>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th class="col-no">No</th>
+                    <th class="col-hari">Hari</th>
+                    <th class="col-jam">Jam</th>
+                    <th class="col-mapel">Mapel</th>
+                    <th>Guru</th>
+                    <th class="col-jp">JP</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <?php 
+                    $no = 1;
+                    $hari_sebelumnya = '';
+                ?>
+
+                <?php foreach ($jadwal_list as $item): ?>
+                    <?php if ($hari_sebelumnya !== $item['hari']): ?>
+                        <tr class="day-separator">
+                            <td colspan="6"><?php echo e($item['hari']); ?></td>
+                        </tr>
+                        <?php $hari_sebelumnya = $item['hari']; ?>
+                    <?php endif; ?>
+
+                    <tr>
+                        <td class="col-no"><?php echo $no++; ?></td>
+                        <td class="col-hari"><?php echo e($item['hari'] ?? '-'); ?></td>
+                        <td class="col-jam"><?php echo e($item['jam'] ?? '-'); ?></td>
+                        <td class="col-mapel"><?php echo e($item['nama_mapel'] ?? '-'); ?></td>
+                        <td class="guru-text"><?php echo e($item['nama_guru'] ?? 'Belum ada guru'); ?></td>
+                        <td class="col-jp">
+                            <?php echo e($item['jp_mulai'] ?? '-'); ?>-<?php echo e($item['jp_selesai'] ?? '-'); ?>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr>
-                <?php foreach ($hari_urutan as $hari): ?>
-                    <td>
-                        <?php if (!empty($jadwal_harian[$hari])): ?>
-                            <?php foreach ($jadwal_harian[$hari] as $item): ?>
-                                <div class="lesson">
-                                    <div class="lesson-time">
-                                        <?php echo e($item['jam'] ?? '-'); ?>
-                                    </div>
-
-                                    <div class="lesson-mapel">
-                                        <?php echo e($item['nama_mapel'] ?? '-'); ?>
-                                    </div>
-
-                                    <div class="lesson-guru">
-                                        <?php echo e($item['nama_guru'] ?? 'Belum ada guru'); ?>
-                                    </div>
-
-                                    <div class="lesson-jp">
-                                        JP <?php echo e($item['jp_mulai'] ?? '-'); ?>-<?php echo e($item['jp_selesai'] ?? '-'); ?>
-                                        | <?php echo (int)($item['jumlah_jp'] ?? 1); ?> JP
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="empty">Tidak ada jadwal</div>
-                        <?php endif; ?>
-                    </td>
-                <?php endforeach; ?>
-            </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <div class="empty-state">
+            Belum ada jadwal untuk kelas ini.
+        </div>
+    <?php endif; ?>
 
     <div class="footer-area">
         <div class="note">
