@@ -34,6 +34,7 @@ $query = "
         j.jp_mulai,
         j.jp_selesai,
         j.jumlah_jp,
+        k.id_kelas,
         g.nama AS nama_guru,
         k.nama_kelas,
         m.nama_mapel
@@ -385,6 +386,25 @@ if ($result && $result->num_rows > 0) {
             display: inline-flex;
             align-items: center;
             gap: 7px;
+        }
+
+        .print-class-btn {
+            background: white;
+            color: var(--primary-teal);
+            padding: 8px 11px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s ease;
+        }
+
+        .print-class-btn:hover {
+            background: #ecfdf5;
+            transform: translateY(-1px);
         }
 
         .day-grid {
@@ -794,10 +814,35 @@ if ($result && $result->num_rows > 0) {
                             <div class="class-schedule-card">
                                 <div class="class-schedule-header">
                                     <h3>Kelas <?php echo htmlspecialchars($nama_kelas); ?></h3>
-                                    <span>
-                                        <i class="fas fa-calendar-days"></i>
-                                        Jadwal Mingguan
-                                    </span>
+
+                                    <?php
+                                        $id_kelas_cetak = 0;
+
+                                        foreach ($jadwal_harian as $hariItem) {
+                                            if (!empty($hariItem) && !empty($hariItem[0]['id_kelas'])) {
+                                                $id_kelas_cetak = (int)$hariItem[0]['id_kelas'];
+                                                break;
+                                            }
+                                        }
+                                    ?>
+
+                                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                                        <span>
+                                            <i class="fas fa-calendar-days"></i>
+                                            Jadwal Mingguan
+                                        </span>
+
+                                        <?php if ($id_kelas_cetak > 0): ?>
+                                            <a 
+                                                href="/admin/penjadwalan/cetak_jadwal_kelas.php?id_kelas=<?php echo $id_kelas_cetak; ?>" 
+                                                target="_blank"
+                                                class="print-class-btn"
+                                            >
+                                                <i class="fas fa-file-pdf"></i>
+                                                Cetak PDF
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
 
                                 <div class="day-grid">
