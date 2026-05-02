@@ -34,131 +34,6 @@ body,
   min-height: 100vh;
 }
 
-/* ===== SIDEBAR ===== */
-
-.sidebar {
-  background: #064547;
-  width: 320px !important;
-  min-width: 320px !important;
-  max-width: 320px !important;
-  flex: 0 0 320px !important;
-  min-height: 100vh;
-  padding: 18px 26px 24px !important;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar-header {
-  margin-bottom: 18px;
-}
-
-.logo {
-  width: 235px !important;
-  max-width: 100%;
-  display: block;
-  margin: 8px auto 30px !important;
-  object-fit: contain;
-}
-
-.hamburger {
-  display: none;
-}
-
-.sidebar-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  flex-grow: 1;
-}
-
-.sidebar-menu li {
-  margin-bottom: 12px !important;
-}
-
-.sidebar-menu li a {
-  width: 100%;
-  min-height: 56px !important;
-  display: flex;
-  align-items: center;
-  gap: 14px !important;
-  padding: 14px 16px !important;
-  border-radius: 18px !important;
-  background: transparent !important;
-  color: rgba(255, 255, 255, 0.92) !important;
-  text-decoration: none;
-  font-size: 20px !important;
-  font-weight: 500 !important;
-  line-height: 1.25;
-  box-shadow: none !important;
-  transition: all 0.25s ease;
-}
-
-.sidebar-menu li a i {
-  width: 26px !important;
-  min-width: 26px !important;
-  text-align: center;
-  font-size: 20px !important;
-  color: inherit !important;
-  flex-shrink: 0;
-}
-
-.sidebar-menu li a:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
-  color: #ffffff !important;
-}
-
-.sidebar-menu li.active a,
-.sidebar-menu li a.active {
-  background: #f2f2f2 !important;
-  color: #083f45 !important;
-  font-weight: 700 !important;
-  min-height: 64px !important;
-  height: 64px !important;
-  padding: 0 18px !important;
-  border-radius: 22px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-  box-shadow: none !important;
-}
-
-.sidebar-menu li.active a i,
-.sidebar-menu li a.active i {
-  color: #083f45 !important;
-}
-
-.sidebar-footer {
-  margin-top: auto;
-  padding-top: 26px;
-}
-
-.logout-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 14px 16px !important;
-  color: rgba(255, 255, 255, 0.92) !important;
-  text-decoration: none;
-  font-size: 20px !important;
-  font-weight: 500 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.logout-btn i {
-  width: 26px !important;
-  min-width: 26px !important;
-  text-align: center;
-  font-size: 24px !important;
-  margin-right: 0 !important;
-}
-
-.logout-btn:hover {
-  background: transparent !important;
-  color: #ffffff !important;
-}
-
 /* ===== MAIN CONTENT ===== */
 
 .main-content {
@@ -861,112 +736,6 @@ body,
   box-shadow: 0 6px 14px rgba(6, 69, 71, 0.22);
 }
 
-/* ===== POPUP KONFIRMASI KELUAR ===== */
-
-.logout-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  z-index: 99999;
-}
-
-.logout-modal.show {
-  display: flex;
-}
-
-.logout-modal-content {
-  width: 100%;
-  max-width: 540px;
-  background: #ffffff;
-  border-radius: 28px;
-  padding: 32px 24px;
-  text-align: center;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-  animation: popupFade 0.25s ease;
-}
-
-.logout-icon-wrap {
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 20px;
-  border-radius: 50%;
-  background: #f8efe7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logout-icon-wrap i {
-  font-size: 38px;
-  color: #e89b52;
-}
-
-.logout-modal-content h2 {
-  margin: 0 0 12px;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #0d5c5c;
-}
-
-.logout-modal-content p {
-  margin: 0 0 28px;
-  font-size: 1.1rem;
-  color: #555;
-  line-height: 1.5;
-}
-
-.logout-modal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.btn-batal,
-.btn-keluar {
-  border: none;
-  border-radius: 16px;
-  padding: 14px 28px;
-  min-width: 160px;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.btn-batal {
-  background: #e9eef1;
-  color: #0d5c5c;
-}
-
-.btn-batal:hover {
-  background: #dfe6ea;
-}
-
-.btn-keluar {
-  background: #d9534f;
-  color: #fff;
-}
-
-.btn-keluar:hover {
-  background: #c94541;
-}
-
-@keyframes popupFade {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 /* ===== RESPONSIVE TABLET FINAL ===== */
 
 @media (max-width: 1200px) {
@@ -1039,175 +808,6 @@ body,
     width: 100% !important;
     min-height: 100vh !important;
     overflow: visible !important;
-  }
-
-  .sidebar {
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-    height: 74px !important;
-    min-height: 74px !important;
-    max-height: 74px !important;
-    flex: none !important;
-    padding: 10px 18px !important;
-    position: sticky !important;
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 9999 !important;
-    background: #064547 !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-    overflow: visible !important;
-    display: block !important;
-  }
-
-  .sidebar.show-menu {
-    height: 74px !important;
-    min-height: 74px !important;
-    max-height: 74px !important;
-  }
-
-  .sidebar-header {
-    height: 54px !important;
-    margin-bottom: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-  }
-
-  .logo {
-    width: 150px !important;
-    max-width: 150px !important;
-    margin: 0 !important;
-    display: block !important;
-  }
-
-  .hamburger {
-    display: flex !important;
-    width: 44px !important;
-    height: 44px !important;
-    border: none !important;
-    border-radius: 14px !important;
-    background: rgba(255, 255, 255, 0.18) !important;
-    color: #ffffff !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 24px !important;
-    cursor: pointer !important;
-  }
-
-  .sidebar-menu {
-    display: none !important;
-    position: fixed !important;
-    top: 74px !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100vw !important;
-    height: calc(100vh - 74px) !important;
-    background: #064547 !important;
-    padding: 24px 18px 100px !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    z-index: 9998 !important;
-    overflow-y: auto !important;
-    list-style: none !important;
-  }
-
-  .sidebar.show-menu .sidebar-menu {
-    display: block !important;
-  }
-
-  .sidebar-menu li {
-    margin-bottom: 14px !important;
-  }
-
-  .sidebar-menu li a,
-  .sidebar .sidebar-menu li a {
-    width: 100% !important;
-    min-height: auto !important;
-    height: auto !important;
-    font-size: 17px !important;
-    font-weight: 700 !important;
-    padding: 16px 18px !important;
-    border-radius: 16px !important;
-    gap: 14px !important;
-    color: rgba(255, 255, 255, 0.92) !important;
-    background: transparent !important;
-    display: flex !important;
-    align-items: center !important;
-    text-decoration: none !important;
-    line-height: 1.25 !important;
-  }
-
-  .sidebar-menu li a i,
-  .sidebar .sidebar-menu li a i {
-    font-size: 18px !important;
-    width: 22px !important;
-    min-width: 22px !important;
-    color: inherit !important;
-    text-align: center !important;
-  }
-
-  .sidebar-menu li.active a,
-  .sidebar-menu li a.active,
-  .sidebar .sidebar-menu li.active a,
-  .sidebar .sidebar-menu li a.active {
-    min-height: auto !important;
-    height: auto !important;
-    padding: 16px 18px !important;
-    border-radius: 16px !important;
-    background: #f2f2f2 !important;
-    color: #083f45 !important;
-    font-size: 17px !important;
-    font-weight: 700 !important;
-    gap: 14px !important;
-  }
-
-  .sidebar-menu li.active a i,
-  .sidebar-menu li a.active i,
-  .sidebar .sidebar-menu li.active a i,
-  .sidebar .sidebar-menu li a.active i {
-    color: #083f45 !important;
-  }
-
-  .sidebar-footer {
-    display: none !important;
-    position: fixed !important;
-    left: 18px !important;
-    right: 18px !important;
-    bottom: 18px !important;
-    z-index: 9999 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .sidebar.show-menu .sidebar-footer {
-    display: block !important;
-  }
-
-  .logout-btn {
-    width: 100% !important;
-    min-height: auto !important;
-    height: auto !important;
-    font-size: 17px !important;
-    font-weight: 700 !important;
-    padding: 16px 18px !important;
-    border-radius: 16px !important;
-    gap: 14px !important;
-    color: rgba(255, 255, 255, 0.92) !important;
-    background: transparent !important;
-    display: flex !important;
-    align-items: center !important;
-    text-decoration: none !important;
-  }
-
-  .logout-btn i {
-    font-size: 18px !important;
-    width: 22px !important;
-    min-width: 22px !important;
-    margin-right: 0 !important;
-    text-align: center !important;
   }
 
   .main-content {
@@ -1432,81 +1032,9 @@ body,
     min-width: 520px !important;
     overflow: visible !important;
   }
-
-  .logout-modal-content {
-    max-width: 92% !important;
-    padding: 24px 18px !important;
-    border-radius: 22px !important;
-  }
-
-  .logout-icon-wrap {
-    width: 74px !important;
-    height: 74px !important;
-    margin-bottom: 16px !important;
-  }
-
-  .logout-icon-wrap i {
-    font-size: 30px !important;
-  }
-
-  .logout-modal-content h2 {
-    font-size: 1.6rem !important;
-  }
-
-  .logout-modal-content p {
-    font-size: 0.98rem !important;
-    margin-bottom: 22px !important;
-  }
-
-  .logout-modal-actions {
-    flex-direction: column !important;
-    gap: 12px !important;
-  }
-
-  .btn-batal,
-  .btn-keluar {
-    width: 100% !important;
-    min-width: unset !important;
-    padding: 13px 20px !important;
-    font-size: 0.98rem !important;
-  }
 }
 
 @media (max-width: 480px) {
-  .sidebar {
-    height: 70px !important;
-    min-height: 70px !important;
-    max-height: 70px !important;
-    padding: 9px 14px !important;
-  }
-
-  .sidebar.show-menu {
-    height: 70px !important;
-    min-height: 70px !important;
-    max-height: 70px !important;
-  }
-
-  .sidebar-header {
-    height: 52px !important;
-  }
-
-  .sidebar-menu {
-    top: 70px !important;
-    height: calc(100vh - 70px) !important;
-    padding: 22px 14px 90px !important;
-  }
-
-  .logo {
-    width: 135px !important;
-    max-width: 135px !important;
-  }
-
-  .hamburger {
-    width: 42px !important;
-    height: 42px !important;
-    font-size: 22px !important;
-  }
-
   .main-content {
     padding: 12px !important;
   }
@@ -1522,119 +1050,40 @@ body,
   .settings-banner p {
     font-size: 13px !important;
   }
-
-  .logout-modal-content h2 {
-    font-size: 1.4rem !important;
-  }
-
-  .logout-modal-content p {
-    font-size: 0.92rem !important;
-  }
 }
 
+/* ===== FIX NAVBAR UNTUK HALAMAN STYLE.CSS ===== */
 
-/* ===== FIX FINAL SISWA.HTML: NAVBAR GABUNG SAMA ISI HALAMAN ===== */
 @media (min-width: 769px) {
-  body.dashboard-body {
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+  body.dashboard-body #navbar-container {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    flex: 0 0 240px !important;
+    min-height: 100vh !important;
   }
 
-  body.dashboard-body .dashboard-wrapper {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
-    width: 100% !important;
+  body.dashboard-body #navbar-container .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+
+    height: 100vh !important;
     min-height: 100vh !important;
-    overflow: visible !important;
-  }
+    max-height: 100vh !important;
 
-  body.dashboard-body .sidebar {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    bottom: auto !important;
-
-    width: 320px !important;
-    min-width: 320px !important;
-    max-width: 320px !important;
-    flex: 0 0 320px !important;
-
-    height: auto !important;
-    min-height: 100vh !important;
-    max-height: none !important;
-
-    display: flex !important;
-    flex-direction: column !important;
-
-    padding: 18px 26px 24px !important;
-    margin: 0 !important;
+    z-index: 9999 !important;
     background: #064547 !important;
-
-    overflow: visible !important;
-    overflow-y: visible !important;
-    overflow-x: visible !important;
+    overflow: hidden !important;
   }
 
   body.dashboard-body .main-content {
     flex: 1 !important;
-    width: auto !important;
     min-width: 0 !important;
-
-    display: block !important;
-    position: relative !important;
-
-    margin: 0 !important;
-    padding: 30px 40px !important;
-
-    overflow: visible !important;
-    overflow-x: hidden !important;
-  }
-
-  body.dashboard-body .sidebar-header {
-    display: block !important;
-    height: auto !important;
-    margin-bottom: 18px !important;
-  }
-
-  body.dashboard-body .logo {
-    width: 235px !important;
-    max-width: 100% !important;
-    margin: 8px auto 30px !important;
-    display: block !important;
-  }
-
-  body.dashboard-body .hamburger {
-    display: none !important;
-  }
-
-  body.dashboard-body .sidebar-menu {
-    display: block !important;
-    position: static !important;
-
-    width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
-    background: transparent !important;
-    overflow: visible !important;
-  }
-
-  body.dashboard-body .sidebar-footer {
-    display: block !important;
-    position: static !important;
-
-    margin-top: auto !important;
-    padding-top: 26px !important;
-  }
-
-  body.dashboard-body .dashboard-grid {
-    display: grid !important;
-    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr) !important;
-    gap: 28px !important;
-    align-items: start !important;
+    margin-left: 0 !important;
   }
 }

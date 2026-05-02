@@ -1,20 +1,78 @@
 <aside class="sidebar">
   <div class="sidebar-header">
     <img src="../img/logo.webp" alt="Logo" class="logo" />
+
+    <button class="hamburger" id="hamburgerBtn" type="button">
+      <i class="fa-solid fa-bars"></i>
+    </button>
   </div>
 
-  <ul class="sidebar-menu">
-    <li><a href="siswa.html" data-page="siswa"><i class="fa-solid fa-house"></i> Dashboard Siswa</a></li>
-    <li><a href="nilai.html" data-page="nilai"><i class="fa-solid fa-file-lines"></i> Nilai</a></li>
-    <li><a href="jadwal.html" data-page="jadwal"><i class="fa-solid fa-calendar-days"></i> Jadwal</a></li>
-    <li><a href="peringkat.html" data-page="peringkat"><i class="fa-solid fa-trophy"></i> Peringkat</a></li>
-    <li><a href="profil_siswa.html" data-page="profil_siswa"><i class="fa-solid fa-user"></i> Profil Siswa</a></li>
-    <li><a href="settings.html" data-page="settings"><i class="fa-solid fa-gear"></i> Settings</a></li>
-  </ul>
+  <nav class="sidebar-nav">
+    <ul class="sidebar-menu">
+      <li>
+        <a href="siswa.html">
+          <i class="fa-solid fa-house"></i>
+          <span>Beranda Siswa</span>
+        </a>
+      </li>
 
-  <div class="sidebar-footer">
-    <a href="../login.html" class="logout-btn">
-      <i class="fa-solid fa-right-from-bracket"></i> Log Out
-    </a>
-  </div>
+      <li>
+        <a href="nilai.html">
+          <i class="fa-solid fa-file-lines"></i>
+          <span>Nilai</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="jadwal.html">
+          <i class="fa-solid fa-calendar-days"></i>
+          <span>Jadwal</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="peringkat.html">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Peringkat</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="profil-siswa.html">
+          <i class="fa-solid fa-user"></i>
+          <span>Profil Siswa</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="settings.html">
+          <i class="fa-solid fa-gear"></i>
+          <span>Pengaturan</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <a href="#" class="logout-btn" id="logoutBtn">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Keluar</span>
+      </a>
+    </div>
+  </nav>
 </aside>
+
+<div class="logout-modal" id="logoutModal">
+  <div class="logout-modal-content">
+    <div class="logout-icon-wrap">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </div>
+
+    <h2>Konfirmasi Keluar</h2>
+    <p>Apakah Anda yakin ingin keluar dari akun ini?</p>
+
+    <div class="logout-modal-actions">
+      <button type="button" class="btn-batal" id="cancelLogout">Batal</button>
+      <button type="button" class="btn-keluar" id="confirmLogout">Ya, Keluar</button>
+    </div>
+  </div>
+</div>
