@@ -95,7 +95,7 @@ $is_wali_kelas = count($wali_kelas) > 0;
 
 /* =========================
    AMBIL KELAS MAPEL YANG DIAJAR GURU
-   Untuk dropdown Mapel Saya
+   Mapel Saya harus ikut tabel jadwal, bukan semua kelas.
 ========================= */
 $kelas_mapel = [];
 

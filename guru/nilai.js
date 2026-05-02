@@ -130,56 +130,34 @@ function renderTable(filteredData = dataNilai) {
     const key = `${item.id_siswa}-${item.semester}`;
 
     if (!siswaMap[key]) {
-      siswaMap[key] = {
-        id_siswa: item.id_siswa,
-        nama_siswa: item.nama_siswa || "-",
-        nama_kelas: item.nama_kelas || "-",
-        semester: item.semester,
-        semester_text: item.semester_text || tampilSemester(item.semester),
-        total_nilai: 0,
-        jumlah_mapel: 0,
-        total_hadir: 0,
-        total_izin: 0,
-        total_sakit: 0,
-        total_alfa: 0
-      };
+     siswaMap[key] = {
+      id_siswa: item.id_siswa,
+      nama_siswa: item.nama_siswa || "-",
+      nama_kelas: item.nama_kelas || "-",
+      semester: item.semester,
+      semester_text: item.semester_text || tampilSemester(item.semester),
+      total_nilai: 0,
+      jumlah_mapel: 0,
+
+      hadir: Number(item.hadir || 0),
+      izin: Number(item.izin || 0),
+      sakit: Number(item.sakit || 0),
+      alfa: Number(item.alfa || 0)
+    };
     }
 
-    siswaMap[key].total_nilai += Number(item.nilai_angka || 0);
-    siswaMap[key].jumlah_mapel += 1;
-    siswaMap[key].total_hadir += Number(item.hadir || 0);
-    siswaMap[key].total_izin += Number(item.izin || 0);
-    siswaMap[key].total_sakit += Number(item.sakit || 0);
-    siswaMap[key].total_alfa += Number(item.alfa || 0);
+      siswaMap[key].total_nilai += Number(item.nilai_angka || 0);
+      siswaMap[key].jumlah_mapel += 1;
   });
 
   const dataRingkas = Object.values(siswaMap);
 
   nilaiTableBody.innerHTML = dataRingkas
     .map((item, index) => {
-      const rataRata = item.jumlah_mapel > 0
-        ? (item.total_nilai / item.jumlah_mapel).toFixed(2)
-        : "0.00";
-
-      const nilaiTampil = mode === "wali"
-        ? rataRata
-        : rataRata;
-
-      const hadirTampil = mode === "wali"
-        ? item.total_hadir
-        : item.total_hadir;
-
-      const izinTampil = mode === "wali"
-        ? item.total_izin
-        : item.total_izin;
-
-      const sakitTampil = mode === "wali"
-        ? item.total_sakit
-        : item.total_sakit;
-
-      const alfaTampil = mode === "wali"
-        ? item.total_alfa
-        : item.total_alfa;
+      const hadirTampil = item.hadir;
+      const izinTampil = item.izin;
+      const sakitTampil = item.sakit;
+      const alfaTampil = item.alfa;
 
       return `
         <tr>
