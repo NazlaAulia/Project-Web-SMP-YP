@@ -60,7 +60,7 @@ if (empty($slot_kosong)) {
 
 // API Key Gemini kamu
 $api_key = 'AIzaSyDVGFr4u07mKUZ2O3Ahca9ZP142wOtyN_4'; 
-$url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $api_key;
+$url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $api_key;
 
 // Instruksi cerdas untuk AI
 $prompt = "Kamu adalah asisten penjadwalan cerdas untuk SMP YP 17 Surabaya. Berikut adalah daftar slot jadwal yang dipastikan 100% kosong dan tidak bentrok: " . json_encode($slot_kosong) . ". 
