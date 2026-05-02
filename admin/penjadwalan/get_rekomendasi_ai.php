@@ -14,7 +14,6 @@ if ($id_jadwal_lama === 0 || $id_guru === 0 || $id_kelas === 0) {
 }
 
 // 2. Hubungkan dengan file koneksi database-mu
-// Ganti 'koneksi.php' dengan nama file koneksi yang kamu buat tadi
 require_once '../koneksi.php'; 
 
 // Master Waktu (Sesuaikan dengan jam pelajaran sekolah)
@@ -59,7 +58,7 @@ if (empty($slot_kosong)) {
 // 4. INTEGRASI GEMINI AI MELALUI cURL
 // ==========================================
 
-// TODO: Masukkan API Key Gemini kamu di sini
+// API Key Gemini kamu
 $api_key = 'AIzaSyDVGFr4u07mKUZ2O3Ahca9ZP142wOtyN_4'; 
 $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $api_key;
 
@@ -81,9 +80,14 @@ curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
+// Bypass SSL Verification (Solusi ampuh di shared hosting Domainesia/cPanel)
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
 // Eksekusi API
 $response = curl_exec($ch);
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curl_error = curl_error($ch); // Tangkap error asli dari cURL
 curl_close($ch);
 
 // Tutup koneksi database
@@ -91,7 +95,13 @@ $conn->close();
 
 // Cek apakah API merespons dengan baik
 if ($http_code != 200 || !$response) {
-    echo json_encode(['success' => false, 'message' => 'Gagal menghubungi server AI.']);
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Gagal menghubungi server AI.',
+        'http_code' => $http_code,
+        'curl_error' => $curl_error,
+        'gemini_response' => json_decode($response, true)
+    ]);
     exit;
 }
 
