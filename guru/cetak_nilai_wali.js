@@ -142,7 +142,7 @@ function loadCetakNilai() {
     return;
   }
 
-  const url = `cetak_nilai_wali.php?id_guru=${idGuru}&role_id=${roleId}&id_kelas=${idKelas}`;let url =
+let url =
   `cetak_nilai_wali.php?id_guru=${idGuru}` +
   `&role_id=${roleId}` +
   `&id_kelas=${idKelas}`;
