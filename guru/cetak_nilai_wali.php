@@ -91,15 +91,6 @@ $sql = "
 $types = "i";
 $params = [$id_kelas];
 
-if (!empty($id_siswa_list)) {
-    $placeholder = implode(",", array_fill(0, count($id_siswa_list), "?"));
-    $sql .= " AND s.id_siswa IN ($placeholder)";
-
-    foreach ($id_siswa_list as $id_siswa) {
-        $types .= "i";
-        $params[] = $id_siswa;
-    }
-}
 
 $sql .= " ORDER BY s.nama ASC, n.semester ASC, m.nama_mapel ASC";
 
