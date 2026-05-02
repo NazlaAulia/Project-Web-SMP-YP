@@ -29,23 +29,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmtReq = $conn->prepare("
             SELECT 
-                r.id_request,
-                r.id_guru,
-                r.id_kelas,
-                r.id_jadwal,
-                r.hari_baru,
-                r.jam_baru,
-                r.jp_mulai_baru,
-                r.jp_selesai_baru,
-                r.jumlah_jp_baru,
-                r.alasan,
-                r.pesan_ai,
-                r.tipe_request,
-                r.id_jadwal_tukar,
-                r.status,
-                r.tanggal_request
-            FROM request_jadwal r
-            WHERE r.id_request = ?
+                id_request,
+                id_guru,
+                id_kelas,
+                id_jadwal,
+                hari_baru,
+                jam_baru,
+                jp_mulai_baru,
+                jp_selesai_baru,
+                jumlah_jp_baru,
+                alasan,
+                pesan_ai,
+                tipe_request,
+                id_jadwal_tukar,
+                status
+            FROM request_jadwal
+            WHERE id_request = ?
             LIMIT 1
         ");
 
@@ -486,7 +485,7 @@ foreach ($requests as $r) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/admin/components/admin-nav.css">
+    <link rel="stylesheet" href="/admin/components/admin-nav.css?v=500">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -827,17 +826,9 @@ foreach ($requests as $r) {
             color: white;
         }
 
-        .modal-btn.confirm:hover {
-            background: #16a34a;
-        }
-
         .modal-btn.reject {
             background: #ef4444;
             color: white;
-        }
-
-        .modal-btn.reject:hover {
-            background: #dc2626;
         }
 
         .modal-btn.cancel {
@@ -845,8 +836,80 @@ foreach ($requests as $r) {
             color: #244;
         }
 
-        .modal-btn.cancel:hover {
-            background: #dbe3e8;
+        /* ===============================
+           FIX SIDEBAR ADMIN DI HALAMAN REQUEST
+        =============================== */
+
+        .sidebar {
+            background: #0f766e !important;
+            color: #ffffff !important;
+            z-index: 3000 !important;
+        }
+
+        .sidebar .logo strong,
+        .sidebar .logo span,
+        .sidebar .nav-label,
+        .sidebar .nav-item,
+        .sidebar .nav-item span,
+        .sidebar summary,
+        .sidebar summary span,
+        .sidebar .sub-menu a,
+        .sidebar .logout,
+        .sidebar .logout span {
+            color: #ffffff !important;
+        }
+
+        .sidebar .nav-label {
+            color: rgba(255, 255, 255, 0.62) !important;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .sidebar .nav-item {
+            background: transparent !important;
+        }
+
+        .sidebar .nav-item:hover {
+            background: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        .sidebar .sub-menu a {
+            color: rgba(255, 255, 255, 0.88) !important;
+            background: transparent !important;
+        }
+
+        .sidebar .sub-menu a:hover {
+            background: rgba(255, 255, 255, 0.14) !important;
+            color: #ffffff !important;
+        }
+
+        .sidebar .sub-menu a.active-submenu {
+            background: #ffffff !important;
+            color: #0f766e !important;
+            font-weight: 800 !important;
+            border-radius: 999px !important;
+        }
+
+        .sidebar .sub-menu a.active-submenu * {
+            color: #0f766e !important;
+        }
+
+        .sidebar details[open] > summary.nav-item {
+            background: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .sidebar i {
+            color: inherit !important;
+        }
+
+        .mobile-topbar {
+            background: #0f766e !important;
+            color: #ffffff !important;
+            z-index: 3001 !important;
+        }
+
+        .sidebar-overlay {
+            z-index: 2999 !important;
         }
 
         @keyframes modalFadeIn {
@@ -1084,7 +1147,7 @@ foreach ($requests as $r) {
         </div>
     </div>
 
-    <script src="/admin/components/admin-nav.js?v=99"></script>
+    <script src="/admin/components/admin-nav.js?v=500"></script>
 
     <script>
         let selectedActionFormId = null;
