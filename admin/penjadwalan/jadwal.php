@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/koneksi.php';
+require_once __DIR__ . '/../koneksi.php';
 
 $total_jadwal = 0;
 $total_guru = 0;
@@ -57,7 +57,7 @@ $result = $conn->query($query);
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <!-- CSS Navbar kamu -->
+    <!-- CSS Navbar -->
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
 
     <style>
@@ -509,7 +509,7 @@ $result = $conn->query($query);
                     <h2>Generate Jadwal Otomatis</h2>
                     <p>
                         Klik tombol generate untuk menjalankan proses pembuatan jadwal dari file
-                        <strong>penjadwalan/generate_master.php</strong>.
+                        <strong>generate_master.php</strong>.
                     </p>
                     <div id="statusBox" class="status-box"></div>
                 </div>
@@ -520,7 +520,7 @@ $result = $conn->query($query);
                         Generate Jadwal
                     </button>
 
-                    <a href="/admin/jadwal.php" class="btn btn-light">
+                    <a href="/admin/penjadwalan/jadwal.php" class="btn btn-light">
                         <i class="fas fa-rotate-right"></i>
                         Refresh
                     </a>
