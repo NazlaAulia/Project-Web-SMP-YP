@@ -145,7 +145,7 @@ async function generateAIJadwal() {
         btnGenerateAI.disabled = true;
         btnGenerateAI.innerHTML = `<i class="bi bi-hourglass-split"></i> Memproses...`;
 
-        tampilkanHasilAI("AI sedang mencari slot jadwal yang kosong dan tidak bentrok...");
+        tampilkanHasilAI("Sistem sedang mencari slot kosong. Jika penuh, sistem akan mencari opsi tukar jadwal...");
 
         const response = await fetch(
             `get_rekomendasi_ganti_jadwal.php?id_jadwal=${encodeURIComponent(jadwalLamaData.id_jadwal)}&id_guru=${encodeURIComponent(idGuru)}`
@@ -154,7 +154,7 @@ async function generateAIJadwal() {
         const result = await response.json();
 
         if (result.status !== "success") {
-            throw new Error(result.message || "Gagal membuat rekomendasi AI.");
+            throw new Error(result.message || "Gagal membuat rekomendasi.");
         }
 
         rekomendasiAI = result.data || [];
@@ -164,7 +164,7 @@ async function generateAIJadwal() {
             return;
         }
 
-        renderRekomendasiAI(rekomendasiAI);
+        renderRekomendasiAI(rekomendasiAI, result.mode);
 
     } catch (error) {
         console.error(error);
@@ -175,49 +175,71 @@ async function generateAIJadwal() {
     }
 }
 
-function renderRekomendasiAI(list) {
+function renderRekomendasiAI(list, mode) {
     if (!isiHasilAI) return;
 
+    const modeText = mode === "tukar"
+        ? "Tidak ada slot kosong. Berikut opsi tukar jadwal yang aman:"
+        : "Berikut slot kosong yang aman dan tidak bentrok:";
+
     isiHasilAI.innerHTML = `
+        <div style="margin-bottom:12px; font-size:13px; color:#0f766e; font-weight:700;">
+            ${escapeHtml(modeText)}
+        </div>
+
         <div style="display:grid; gap:12px;">
-            ${list.map((item, index) => `
-                <label 
-                    class="ai-option-card"
-                    style="
-                        display:block;
-                        padding:14px;
-                        border:1px solid #d1d5db;
-                        border-radius:16px;
-                        background:#ffffff;
-                        cursor:pointer;
-                        transition:.2s ease;
-                    "
-                >
-                    <div style="display:flex; gap:10px; align-items:flex-start;">
-                        <input 
-                            type="radio" 
-                            name="pilihan_rekomendasi_ai" 
-                            value="${index}"
-                            style="margin-top:4px;"
-                        >
+            ${list.map((item, index) => {
+                const tipe = item.tipe_request || "slot_kosong";
+                const isTukar = tipe === "tukar";
 
-                        <div>
-                            <strong style="display:block; color:#0f766e; margin-bottom:4px;">
-                                ${escapeHtml(item.hari)}, ${escapeHtml(item.jam)}
-                            </strong>
+                return `
+                    <label 
+                        class="ai-option-card"
+                        style="
+                            display:block;
+                            padding:14px;
+                            border:1px solid #d1d5db;
+                            border-radius:16px;
+                            background:#ffffff;
+                            cursor:pointer;
+                            transition:.2s ease;
+                        "
+                    >
+                        <div style="display:flex; gap:10px; align-items:flex-start;">
+                            <input 
+                                type="radio" 
+                                name="pilihan_rekomendasi_ai" 
+                                value="${index}"
+                                style="margin-top:4px;"
+                            >
 
-                            <div style="font-size:13px; color:#374151; margin-bottom:5px;">
-                                JP ${escapeHtml(item.jp_mulai)}-${escapeHtml(item.jp_selesai)}
-                                | ${escapeHtml(item.jumlah_jp)} JP
+                            <div>
+                                <strong style="display:block; color:#0f766e; margin-bottom:4px;">
+                                    ${isTukar ? "Tukar Jadwal" : "Slot Kosong"}: 
+                                    ${escapeHtml(item.hari)}, ${escapeHtml(item.jam)}
+                                </strong>
+
+                                <div style="font-size:13px; color:#374151; margin-bottom:5px;">
+                                    JP ${escapeHtml(item.jp_mulai)}-${escapeHtml(item.jp_selesai)}
+                                    | ${escapeHtml(item.jumlah_jp)} JP
+                                </div>
+
+                                ${isTukar ? `
+                                    <div style="font-size:13px; color:#374151; margin-bottom:5px;">
+                                        Ditukar dengan: 
+                                        <strong>${escapeHtml(item.mapel_tukar || "-")}</strong>
+                                        oleh ${escapeHtml(item.guru_tukar || "-")}
+                                    </div>
+                                ` : ""}
+
+                                <p style="margin:0; font-size:13px; color:#6b7280; line-height:1.5;">
+                                    ${escapeHtml(item.pesan_ai || "Rekomendasi ini aman dan tidak bentrok.")}
+                                </p>
                             </div>
-
-                            <p style="margin:0; font-size:13px; color:#6b7280; line-height:1.5;">
-                                ${escapeHtml(item.pesan_ai || "Slot ini aman dan tidak bentrok.")}
-                            </p>
                         </div>
-                    </div>
-                </label>
-            `).join("")}
+                    </label>
+                `;
+            }).join("")}
         </div>
     `;
 
@@ -245,7 +267,11 @@ function pilihRekomendasi(index) {
     }
 
     if (jamBaru) {
-        jamBaru.innerHTML = `<option value="${escapeHtml(item.jam)}">${escapeHtml(item.jam)}</option>`;
+        const labelJam = item.tipe_request === "tukar"
+            ? `${item.jam} (Tukar jadwal)`
+            : item.jam;
+
+        jamBaru.innerHTML = `<option value="${escapeHtml(item.jam)}">${escapeHtml(labelJam)}</option>`;
         jamBaru.disabled = true;
     }
 }
@@ -261,7 +287,7 @@ async function kirimPengajuan(e) {
     }
 
     if (!rekomendasiDipilih) {
-        alert("Pilih salah satu rekomendasi AI terlebih dahulu.");
+        alert("Pilih salah satu rekomendasi terlebih dahulu.");
         return;
     }
 
@@ -284,7 +310,10 @@ async function kirimPengajuan(e) {
         jumlah_jp_baru: Number(rekomendasiDipilih.jumlah_jp),
 
         alasan: alasan,
-        pesan_ai: rekomendasiDipilih.pesan_ai || ""
+        pesan_ai: rekomendasiDipilih.pesan_ai || "",
+
+        tipe_request: rekomendasiDipilih.tipe_request || "slot_kosong",
+        id_jadwal_tukar: rekomendasiDipilih.id_jadwal_tukar || null
     };
 
     try {
