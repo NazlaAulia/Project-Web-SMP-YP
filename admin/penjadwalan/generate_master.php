@@ -16,16 +16,16 @@ function formatJam($jam)
     return substr($jam, 0, 5);
 }
 
+function buatKey($id, $hari, $nomor_jp)
+{
+    return $id . '|' . $hari . '|' . $nomor_jp;
+}
+
 function bobotKesulitan($tingkat)
 {
     if ($tingkat === 'sulit') return 1;
     if ($tingkat === 'sedang') return 2;
     return 3;
-}
-
-function buatKey($id, $hari, $nomor_jp)
-{
-    return $id . '|' . $hari . '|' . $nomor_jp;
 }
 
 function blockBentrokKelas($kelas_terpakai, $id_kelas, $block)
@@ -42,6 +42,10 @@ function blockBentrokKelas($kelas_terpakai, $id_kelas, $block)
 
 function blockBentrokGuru($guru_terpakai, $id_guru, $block)
 {
+    if ($id_guru === null) {
+        return false;
+    }
+
     foreach ($block as $jp) {
         $key = buatKey($id_guru, $jp['hari'], $jp['nomor_jp']);
         if (isset($guru_terpakai[$key])) {
@@ -62,10 +66,31 @@ function tandaiKelasTerpakai(&$kelas_terpakai, $id_kelas, $block)
 
 function tandaiGuruTerpakai(&$guru_terpakai, $id_guru, $block)
 {
+    if ($id_guru === null) {
+        return;
+    }
+
     foreach ($block as $jp) {
         $key = buatKey($id_guru, $jp['hari'], $jp['nomor_jp']);
         $guru_terpakai[$key] = true;
     }
+}
+
+function cariEarliestFreeJP($jp_per_hari, $kelas_terpakai, $id_kelas, $hari)
+{
+    if (!isset($jp_per_hari[$hari])) {
+        return null;
+    }
+
+    foreach ($jp_per_hari[$hari] as $jp) {
+        $key = buatKey($id_kelas, $hari, $jp['nomor_jp']);
+
+        if (!isset($kelas_terpakai[$key])) {
+            return (int)$jp['nomor_jp'];
+        }
+    }
+
+    return null;
 }
 
 function ambilBlockJP($jp_per_hari, $hari, $jumlah_jp)
@@ -87,13 +112,11 @@ function ambilBlockJP($jp_per_hari, $hari, $jumlah_jp)
             $jp_sekarang = $block[$j];
             $jp_berikutnya = $block[$j + 1];
 
-            // Nomor JP harus berurutan
             if ((int)$jp_berikutnya['nomor_jp'] !== (int)$jp_sekarang['nomor_jp'] + 1) {
                 $valid = false;
                 break;
             }
 
-            // Jam harus nyambung, supaya tidak melompati waktu istirahat
             if ($jp_sekarang['jam_selesai'] !== $jp_berikutnya['jam_mulai']) {
                 $valid = false;
                 break;
@@ -108,29 +131,184 @@ function ambilBlockJP($jp_per_hari, $hari, $jumlah_jp)
     return $hasil;
 }
 
-function urutkanBlockSesuaiMapel($blocks, $tingkat_kesulitan, $prioritas_pagi)
+function hitungJPClassHari($kelas_terpakai, $id_kelas, $hari)
 {
-    usort($blocks, function ($a, $b) use ($tingkat_kesulitan, $prioritas_pagi) {
-        $aMulai = (int)$a[0]['nomor_jp'];
-        $bMulai = (int)$b[0]['nomor_jp'];
+    $total = 0;
+    $prefix = $id_kelas . '|' . $hari . '|';
 
-        // Mapel sulit / prioritas pagi: JP awal lebih dulu
-        if ($prioritas_pagi == 1 || $tingkat_kesulitan === 'sulit') {
-            return $aMulai <=> $bMulai;
+    foreach ($kelas_terpakai as $key => $value) {
+        if (strpos($key, $prefix) === 0) {
+            $total++;
+        }
+    }
+
+    return $total;
+}
+
+function hitungSisaJPTasks($tasks)
+{
+    $total = 0;
+
+    foreach ($tasks as $task) {
+        if (!$task['terpasang']) {
+            $total += (int)$task['jp_per_pertemuan'];
+        }
+    }
+
+    return $total;
+}
+
+function adaTaskUkuran($tasks, $ukuran)
+{
+    foreach ($tasks as $task) {
+        if (!$task['terpasang'] && (int)$task['jp_per_pertemuan'] === (int)$ukuran) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function mapelSudahDiHari($mapel_hari_terpakai, $id_kelas, $id_mapel, $hari)
+{
+    $key = $id_kelas . '|' . $id_mapel . '|' . $hari;
+    return isset($mapel_hari_terpakai[$key]);
+}
+
+function pilihGuruTersedia($guru_tersedia, $guru_terpakai, $beban_guru, $block)
+{
+    if (empty($guru_tersedia)) {
+        return null;
+    }
+
+    usort($guru_tersedia, function ($a, $b) use ($beban_guru) {
+        $bebanA = $beban_guru[$a['id_guru']] ?? 0;
+        $bebanB = $beban_guru[$b['id_guru']] ?? 0;
+
+        if ($bebanA === $bebanB) {
+            return $a['id_guru'] <=> $b['id_guru'];
         }
 
-        // Mapel ringan: jangan terlalu dipaksa pagi, mulai dari tengah
-        if ($tingkat_kesulitan === 'ringan') {
-            $aScore = abs($aMulai - 5);
-            $bScore = abs($bMulai - 5);
-            return $aScore <=> $bScore;
-        }
-
-        // Mapel sedang: normal
-        return $aMulai <=> $bMulai;
+        return $bebanA <=> $bebanB;
     });
 
-    return $blocks;
+    foreach ($guru_tersedia as $guru) {
+        $id_guru = (int)$guru['id_guru'];
+
+        if (!blockBentrokGuru($guru_terpakai, $id_guru, $block)) {
+            return $id_guru;
+        }
+    }
+
+    return false;
+}
+
+function cariKandidatTerbaik($tasks, $jp_per_hari, $kelas_terpakai, $guru_terpakai, $mapel_hari_terpakai, $guru_by_mapel, $beban_guru, $id_kelas, $hari, $target_harian)
+{
+    $earliestFree = cariEarliestFreeJP($jp_per_hari, $kelas_terpakai, $id_kelas, $hari);
+
+    if ($earliestFree === null) {
+        return null;
+    }
+
+    $jp_terisi_hari_ini = hitungJPClassHari($kelas_terpakai, $id_kelas, $hari);
+    $sisa_target = $target_harian - $jp_terisi_hari_ini;
+
+    if ($sisa_target <= 0) {
+        return null;
+    }
+
+    $kandidat = [];
+
+    foreach ($tasks as $taskIndex => $task) {
+        if ($task['terpasang']) {
+            continue;
+        }
+
+        $jumlah_jp = (int)$task['jp_per_pertemuan'];
+
+        if ($jumlah_jp > $sisa_target) {
+            continue;
+        }
+
+        $blocks = ambilBlockJP($jp_per_hari, $hari, $jumlah_jp);
+
+        foreach ($blocks as $block) {
+            $jp_mulai = (int)$block[0]['nomor_jp'];
+
+            if (blockBentrokKelas($kelas_terpakai, $id_kelas, $block)) {
+                continue;
+            }
+
+            $guru_tersedia = $guru_by_mapel[$task['id_mapel']] ?? [];
+            $id_guru = pilihGuruTersedia($guru_tersedia, $guru_terpakai, $beban_guru, $block);
+
+            if ($id_guru === false) {
+                continue;
+            }
+
+            $duplikat_hari = mapelSudahDiHari(
+                $mapel_hari_terpakai,
+                $id_kelas,
+                $task['id_mapel'],
+                $hari
+            );
+
+            $score = 0;
+
+            // Paling penting: isi dari JP paling awal yang masih kosong
+            $score += abs($jp_mulai - $earliestFree) * 1000;
+
+            // Jangan terlalu sering mapel sama di hari sama, tapi boleh kalau terpaksa
+            if ($duplikat_hari) {
+                $score += 600;
+            }
+
+            // Mapel sulit/prioritas pagi tetap didorong lebih pagi
+            if ($task['prioritas_pagi'] == 1 || $task['tingkat_kesulitan'] === 'sulit') {
+                $score += $jp_mulai * 10;
+            } elseif ($task['tingkat_kesulitan'] === 'ringan') {
+                $score += abs($jp_mulai - 6) * 8;
+            } else {
+                $score += $jp_mulai * 5;
+            }
+
+            // Kalau sisa target tinggal 1, utamakan task 1 JP
+            if ($sisa_target === 1 && $jumlah_jp !== 1) {
+                $score += 10000;
+            }
+
+            // Kalau setelah dipasang sisa 1 JP tapi tidak ada task 1 JP, hindari
+            if (($sisa_target - $jumlah_jp) === 1 && !adaTaskUkuran($tasks, 1)) {
+                $score += 2500;
+            }
+
+            // Urutkan mapel sulit dulu secara umum
+            $score += bobotKesulitan($task['tingkat_kesulitan']) * 20;
+
+            $kandidat[] = [
+                'score' => $score,
+                'task_index' => $taskIndex,
+                'task' => $task,
+                'block' => $block,
+                'id_guru' => $id_guru
+            ];
+        }
+    }
+
+    if (empty($kandidat)) {
+        return null;
+    }
+
+    usort($kandidat, function ($a, $b) {
+        if ($a['score'] === $b['score']) {
+            return $a['task']['id_mapel'] <=> $b['task']['id_mapel'];
+        }
+
+        return $a['score'] <=> $b['score'];
+    });
+
+    return $kandidat[0];
 }
 
 try {
@@ -199,6 +377,14 @@ try {
         throw new Exception('Data jam_pelajaran masih kosong.');
     }
 
+    // Target harian otomatis dari tabel jam_pelajaran
+    // Kalau Senin-Kamis 11 JP dan Jumat 8 JP, targetnya ikut itu.
+    $target_harian = [];
+
+    foreach ($jp_per_hari as $hari => $list_jp) {
+        $target_harian[$hari] = count($list_jp);
+    }
+
     // ===============================
     // AMBIL DATA MAPEL + ATURAN MAPEL
     // ===============================
@@ -221,15 +407,15 @@ try {
     ");
 
     if (!$qMapel) {
-        throw new Exception('Gagal mengambil data mapel dan aturan mapel: ' . $conn->error);
+        throw new Exception('Gagal mengambil data mapel dan aturan_mapel: ' . $conn->error);
     }
 
     while ($row = $qMapel->fetch_assoc()) {
         $mapel[] = [
             'id_mapel' => (int)$row['id_mapel'],
             'nama_mapel' => $row['nama_mapel'],
-            'pertemuan_per_minggu' => (int)$row['pertemuan_per_minggu'],
-            'jp_per_pertemuan' => (int)$row['jp_per_pertemuan'],
+            'pertemuan_per_minggu' => max(1, (int)$row['pertemuan_per_minggu']),
+            'jp_per_pertemuan' => max(1, (int)$row['jp_per_pertemuan']),
             'tingkat_kesulitan' => $row['tingkat_kesulitan'],
             'prioritas_pagi' => (int)$row['prioritas_pagi']
         ];
@@ -308,7 +494,7 @@ try {
     }
 
     // ===============================
-    // PENANDA BENTROK
+    // PENANDA BENTROK GLOBAL
     // ===============================
     $kelas_terpakai = [];
     $guru_terpakai = [];
@@ -318,156 +504,134 @@ try {
     $gagal = [];
 
     // ===============================
-    // PROSES GENERATE JADWAL JP
+    // PROSES GENERATE FULL HARIAN
     // ===============================
     foreach ($kelas as $index_kelas => $data_kelas) {
         $id_kelas = (int)$data_kelas['id_kelas'];
         $nama_kelas = $data_kelas['nama_kelas'];
 
-        foreach ($mapel as $index_mapel => $data_mapel) {
-            $id_mapel = (int)$data_mapel['id_mapel'];
-            $nama_mapel = $data_mapel['nama_mapel'];
-            $pertemuan_per_minggu = max(1, (int)$data_mapel['pertemuan_per_minggu']);
-            $jp_per_pertemuan = max(1, (int)$data_mapel['jp_per_pertemuan']);
-            $tingkat_kesulitan = $data_mapel['tingkat_kesulitan'];
-            $prioritas_pagi = (int)$data_mapel['prioritas_pagi'];
+        // Buat daftar kebutuhan mapel untuk kelas ini
+        $tasks = [];
 
-            for ($pertemuan = 1; $pertemuan <= $pertemuan_per_minggu; $pertemuan++) {
-                $berhasil_dipasang = false;
+        foreach ($mapel as $data_mapel) {
+            for ($p = 1; $p <= $data_mapel['pertemuan_per_minggu']; $p++) {
+                $tasks[] = [
+                    'id_mapel' => (int)$data_mapel['id_mapel'],
+                    'nama_mapel' => $data_mapel['nama_mapel'],
+                    'pertemuan_ke' => $p,
+                    'jp_per_pertemuan' => (int)$data_mapel['jp_per_pertemuan'],
+                    'tingkat_kesulitan' => $data_mapel['tingkat_kesulitan'],
+                    'prioritas_pagi' => (int)$data_mapel['prioritas_pagi'],
+                    'terpasang' => false
+                ];
+            }
+        }
 
-                $hari_urut = $hari_list;
+        // Urutkan task: mapel sulit dan prioritas pagi lebih dulu
+        usort($tasks, function ($a, $b) {
+            if ($a['prioritas_pagi'] !== $b['prioritas_pagi']) {
+                return $b['prioritas_pagi'] <=> $a['prioritas_pagi'];
+            }
 
-                // Rotasi hari agar tidak semua kelas mulai dari Senin
-                $hari_count = count($hari_urut);
-                $start_hari = ($index_kelas + $index_mapel + $pertemuan) % $hari_count;
+            $bobotA = bobotKesulitan($a['tingkat_kesulitan']);
+            $bobotB = bobotKesulitan($b['tingkat_kesulitan']);
 
-                $hari_rotasi = [];
-                for ($h = 0; $h < $hari_count; $h++) {
-                    $hari_rotasi[] = $hari_urut[($start_hari + $h) % $hari_count];
+            if ($bobotA !== $bobotB) {
+                return $bobotA <=> $bobotB;
+            }
+
+            return $a['id_mapel'] <=> $b['id_mapel'];
+        });
+
+        foreach ($hari_list as $hari) {
+            $target = $target_harian[$hari] ?? 0;
+
+            if ($target <= 0) {
+                continue;
+            }
+
+            $pengaman_loop = 0;
+
+            while (hitungJPClassHari($kelas_terpakai, $id_kelas, $hari) < $target) {
+                $pengaman_loop++;
+
+                if ($pengaman_loop > 200) {
+                    break;
                 }
 
-                // Kalau mapel prioritas pagi/sulit, tetap boleh semua hari,
-                // yang diprioritaskan adalah JP awalnya.
-                foreach ($hari_rotasi as $hari) {
-                    $key_mapel_hari = $id_kelas . '|' . $id_mapel . '|' . $hari;
-
-                    // Usahakan mapel yang sama tidak muncul 2 kali di hari yang sama
-                    if (isset($mapel_hari_terpakai[$key_mapel_hari])) {
-                        continue;
-                    }
-
-                    $blocks = ambilBlockJP($jp_per_hari, $hari, $jp_per_pertemuan);
-
-                    if (empty($blocks)) {
-                        continue;
-                    }
-
-                    $blocks = urutkanBlockSesuaiMapel($blocks, $tingkat_kesulitan, $prioritas_pagi);
-
-                    foreach ($blocks as $block) {
-                        if (blockBentrokKelas($kelas_terpakai, $id_kelas, $block)) {
-                            continue;
-                        }
-
-                        $guru_tersedia = $guru_by_mapel[$id_mapel] ?? [];
-
-                        // Kalau belum ada guru untuk mapel ini, tetap buat jadwal dengan guru NULL
-                        if (empty($guru_tersedia)) {
-                            $id_guru_insert = null;
-
-                            $hari_insert = $hari;
-                            $jam_insert = formatJam($block[0]['jam_mulai']) . '-' . formatJam($block[count($block) - 1]['jam_selesai']);
-                            $jp_mulai = (int)$block[0]['nomor_jp'];
-                            $jp_selesai = (int)$block[count($block) - 1]['nomor_jp'];
-                            $jumlah_jp = $jp_per_pertemuan;
-
-                            $stmtInsert->bind_param(
-                                "iiissiii",
-                                $id_guru_insert,
-                                $id_kelas,
-                                $id_mapel,
-                                $hari_insert,
-                                $jam_insert,
-                                $jp_mulai,
-                                $jp_selesai,
-                                $jumlah_jp
-                            );
-
-                            if (!$stmtInsert->execute()) {
-                                throw new Exception('Gagal insert jadwal tanpa guru: ' . $stmtInsert->error);
-                            }
-
-                            tandaiKelasTerpakai($kelas_terpakai, $id_kelas, $block);
-                            $mapel_hari_terpakai[$key_mapel_hari] = true;
-
-                            $jumlah_berhasil++;
-                            $berhasil_dipasang = true;
-                            break 2;
-                        }
-
-                        // Urutkan guru berdasarkan beban paling sedikit
-                        usort($guru_tersedia, function ($a, $b) use ($beban_guru) {
-                            $bebanA = $beban_guru[$a['id_guru']] ?? 0;
-                            $bebanB = $beban_guru[$b['id_guru']] ?? 0;
-
-                            if ($bebanA === $bebanB) {
-                                return $a['id_guru'] <=> $b['id_guru'];
-                            }
-
-                            return $bebanA <=> $bebanB;
-                        });
-
-                        foreach ($guru_tersedia as $guru) {
-                            $id_guru_insert = (int)$guru['id_guru'];
-
-                            if (blockBentrokGuru($guru_terpakai, $id_guru_insert, $block)) {
-                                continue;
-                            }
-
-                            $hari_insert = $hari;
-                            $jam_insert = formatJam($block[0]['jam_mulai']) . '-' . formatJam($block[count($block) - 1]['jam_selesai']);
-                            $jp_mulai = (int)$block[0]['nomor_jp'];
-                            $jp_selesai = (int)$block[count($block) - 1]['nomor_jp'];
-                            $jumlah_jp = $jp_per_pertemuan;
-
-                            $stmtInsert->bind_param(
-                                "iiissiii",
-                                $id_guru_insert,
-                                $id_kelas,
-                                $id_mapel,
-                                $hari_insert,
-                                $jam_insert,
-                                $jp_mulai,
-                                $jp_selesai,
-                                $jumlah_jp
-                            );
-
-                            if (!$stmtInsert->execute()) {
-                                throw new Exception('Gagal insert jadwal: ' . $stmtInsert->error);
-                            }
-
-                            tandaiKelasTerpakai($kelas_terpakai, $id_kelas, $block);
-                            tandaiGuruTerpakai($guru_terpakai, $id_guru_insert, $block);
-
-                            $mapel_hari_terpakai[$key_mapel_hari] = true;
-                            $beban_guru[$id_guru_insert] = ($beban_guru[$id_guru_insert] ?? 0) + $jumlah_jp;
-
-                            $jumlah_berhasil++;
-                            $berhasil_dipasang = true;
-
-                            break 3;
-                        }
-                    }
+                if (hitungSisaJPTasks($tasks) <= 0) {
+                    break;
                 }
 
-                if (!$berhasil_dipasang) {
-                    $gagal[] = [
-                        'kelas' => $nama_kelas,
-                        'mapel' => $nama_mapel,
-                        'pertemuan_ke' => $pertemuan,
-                        'butuh_jp' => $jp_per_pertemuan
-                    ];
+                $kandidat = cariKandidatTerbaik(
+                    $tasks,
+                    $jp_per_hari,
+                    $kelas_terpakai,
+                    $guru_terpakai,
+                    $mapel_hari_terpakai,
+                    $guru_by_mapel,
+                    $beban_guru,
+                    $id_kelas,
+                    $hari,
+                    $target
+                );
+
+                if ($kandidat === null) {
+                    break;
                 }
+
+                $taskIndex = $kandidat['task_index'];
+                $task = $kandidat['task'];
+                $block = $kandidat['block'];
+                $id_guru_insert = $kandidat['id_guru'];
+
+                $hari_insert = $hari;
+                $jam_insert = formatJam($block[0]['jam_mulai']) . '-' . formatJam($block[count($block) - 1]['jam_selesai']);
+                $jp_mulai = (int)$block[0]['nomor_jp'];
+                $jp_selesai = (int)$block[count($block) - 1]['nomor_jp'];
+                $jumlah_jp = (int)$task['jp_per_pertemuan'];
+                $id_mapel_insert = (int)$task['id_mapel'];
+
+                $stmtInsert->bind_param(
+                    "iiissiii",
+                    $id_guru_insert,
+                    $id_kelas,
+                    $id_mapel_insert,
+                    $hari_insert,
+                    $jam_insert,
+                    $jp_mulai,
+                    $jp_selesai,
+                    $jumlah_jp
+                );
+
+                if (!$stmtInsert->execute()) {
+                    throw new Exception('Gagal insert jadwal: ' . $stmtInsert->error);
+                }
+
+                tandaiKelasTerpakai($kelas_terpakai, $id_kelas, $block);
+                tandaiGuruTerpakai($guru_terpakai, $id_guru_insert, $block);
+
+                $key_mapel_hari = $id_kelas . '|' . $id_mapel_insert . '|' . $hari;
+                $mapel_hari_terpakai[$key_mapel_hari] = true;
+
+                if ($id_guru_insert !== null) {
+                    $beban_guru[$id_guru_insert] = ($beban_guru[$id_guru_insert] ?? 0) + $jumlah_jp;
+                }
+
+                $tasks[$taskIndex]['terpasang'] = true;
+                $jumlah_berhasil++;
+            }
+        }
+
+        // Catat task yang belum terpasang
+        foreach ($tasks as $task) {
+            if (!$task['terpasang']) {
+                $gagal[] = [
+                    'kelas' => $nama_kelas,
+                    'mapel' => $task['nama_mapel'],
+                    'pertemuan_ke' => $task['pertemuan_ke'],
+                    'butuh_jp' => $task['jp_per_pertemuan']
+                ];
             }
         }
     }
@@ -476,7 +640,7 @@ try {
 
     $conn->commit();
 
-    $message = 'Generate jadwal berhasil. ' . $jumlah_berhasil . ' jadwal dibuat dengan sistem JP.';
+    $message = 'Generate jadwal berhasil. ' . $jumlah_berhasil . ' jadwal dibuat dengan sistem JP full harian.';
 
     if ($jumlah_request_lama > 0) {
         $message .= ' ' . $jumlah_request_lama . ' request jadwal lama dibersihkan.';
