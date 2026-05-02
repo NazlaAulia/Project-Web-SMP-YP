@@ -742,6 +742,124 @@ foreach ($requests as $r) {
             border: 1px solid #e5e7eb;
         }
 
+        .custom-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            padding: 20px;
+        }
+
+        .custom-modal-overlay.active {
+            display: flex;
+        }
+
+        .custom-modal-box {
+            width: 100%;
+            max-width: 540px;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 34px 28px 26px;
+            text-align: center;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+            animation: modalFadeIn 0.25s ease;
+        }
+
+        .custom-modal-icon {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            border: 4px solid #d9f0d2;
+            color: #8bc34a;
+            background: #f7fff3;
+        }
+
+        .custom-modal-icon.reject {
+            color: #ef4444;
+            border-color: #fecaca;
+            background: #fff5f5;
+        }
+
+        .custom-modal-box h3 {
+            margin: 0 0 8px;
+            font-size: 25px;
+            color: #444;
+            font-weight: 700;
+        }
+
+        .custom-modal-box p {
+            margin: 0;
+            font-size: 15px;
+            color: #666;
+            line-height: 1.7;
+        }
+
+        .custom-modal-actions {
+            margin-top: 26px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            min-width: 138px;
+            height: 46px;
+            padding: 0 18px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s ease;
+        }
+
+        .modal-btn.confirm {
+            background: #22c55e;
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            background: #16a34a;
+        }
+
+        .modal-btn.reject {
+            background: #ef4444;
+            color: white;
+        }
+
+        .modal-btn.reject:hover {
+            background: #dc2626;
+        }
+
+        .modal-btn.cancel {
+            background: #e9eef1;
+            color: #244;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #dbe3e8;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         @media (max-width: 900px) {
             .stats-grid,
             .grid-detail {
@@ -751,7 +869,7 @@ foreach ($requests as $r) {
     </style>
 </head>
 
-<body data-page="jadwal">
+<body data-page="request_jadwal">
     <div id="admin-nav-root"></div>
 
     <div class="container">
@@ -908,19 +1026,27 @@ foreach ($requests as $r) {
 
                             <?php if ($r['status'] === 'menunggu'): ?>
                                 <div class="actions">
-                                    <form method="POST" onsubmit="return confirm('Tolak request jadwal ini?');">
+                                    <form method="POST" id="form-tolak-<?php echo (int)$r['id_request']; ?>">
                                         <input type="hidden" name="id_request" value="<?php echo (int)$r['id_request']; ?>">
                                         <input type="hidden" name="action" value="tolak">
-                                        <button type="submit" class="btn btn-reject">
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-reject"
+                                            onclick="openActionModal('tolak', 'form-tolak-<?php echo (int)$r['id_request']; ?>')"
+                                        >
                                             <i class="fas fa-xmark"></i>
                                             Tolak
                                         </button>
                                     </form>
 
-                                    <form method="POST" onsubmit="return confirm('Terima request ini dan update jadwal?');">
+                                    <form method="POST" id="form-terima-<?php echo (int)$r['id_request']; ?>">
                                         <input type="hidden" name="id_request" value="<?php echo (int)$r['id_request']; ?>">
                                         <input type="hidden" name="action" value="terima">
-                                        <button type="submit" class="btn btn-accept">
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-accept"
+                                            onclick="openActionModal('terima', 'form-terima-<?php echo (int)$r['id_request']; ?>')"
+                                        >
                                             <i class="fas fa-check"></i>
                                             Terima
                                         </button>
@@ -938,7 +1064,82 @@ foreach ($requests as $r) {
         </main>
     </div>
 
-    <script src="/admin/components/admin-nav.js"></script>
+    <div class="custom-modal-overlay" id="actionModal">
+        <div class="custom-modal-box">
+            <div class="custom-modal-icon" id="actionModalIcon">
+                <i class="fas fa-check"></i>
+            </div>
+
+            <h3 id="actionModalTitle">Konfirmasi</h3>
+            <p id="actionModalText">Apakah Anda yakin ingin memproses request ini?</p>
+
+            <div class="custom-modal-actions">
+                <button type="button" class="modal-btn confirm" id="actionModalConfirm">
+                    Ya, Lanjutkan!
+                </button>
+                <button type="button" class="modal-btn cancel" onclick="closeActionModal()">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin/components/admin-nav.js?v=99"></script>
+
+    <script>
+        let selectedActionFormId = null;
+
+        function openActionModal(type, formId) {
+            selectedActionFormId = formId;
+
+            const modal = document.getElementById('actionModal');
+            const icon = document.getElementById('actionModalIcon');
+            const title = document.getElementById('actionModalTitle');
+            const text = document.getElementById('actionModalText');
+            const confirmBtn = document.getElementById('actionModalConfirm');
+
+            icon.className = 'custom-modal-icon';
+            confirmBtn.className = 'modal-btn confirm';
+
+            if (type === 'tolak') {
+                icon.classList.add('reject');
+                icon.innerHTML = '<i class="fas fa-xmark"></i>';
+                title.textContent = 'Tolak Request?';
+                text.textContent = 'Request jadwal ini akan ditolak dan statusnya berubah menjadi ditolak.';
+                confirmBtn.textContent = 'Ya, Tolak!';
+                confirmBtn.className = 'modal-btn reject';
+            } else {
+                icon.innerHTML = '<i class="fas fa-check"></i>';
+                title.textContent = 'Terima Request?';
+                text.textContent = 'Jadwal akan diperbarui otomatis sesuai request yang diajukan.';
+                confirmBtn.textContent = 'Ya, Terima!';
+                confirmBtn.className = 'modal-btn confirm';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeActionModal() {
+            const modal = document.getElementById('actionModal');
+            modal.classList.remove('active');
+            selectedActionFormId = null;
+        }
+
+        document.getElementById('actionModalConfirm').addEventListener('click', function () {
+            if (!selectedActionFormId) return;
+
+            const form = document.getElementById(selectedActionFormId);
+            if (form) {
+                form.submit();
+            }
+        });
+
+        document.getElementById('actionModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeActionModal();
+            }
+        });
+    </script>
 </body>
 </html>
 
