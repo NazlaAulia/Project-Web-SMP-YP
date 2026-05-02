@@ -62,7 +62,7 @@ if (empty($slot_kosong)) {
 // Mengambil API Key dari file config.php
 $api_key = GEMINI_API_KEY; 
 // Gunakan jalur v1 (Stable) dan model 1.5 Flash
-$url = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=' . trim($api_key);
+$url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . trim($api_key);
 // Instruksi untuk AI
 $prompt = "Kamu adalah asisten penjadwalan cerdas untuk SMP YP 17 Surabaya. Berikut adalah daftar slot jadwal yang dipastikan 100% kosong dan tidak bentrok: " . json_encode($slot_kosong) . ". 
 Tugasmu: Pilih maksimal 3 slot jadwal yang paling masuk akal dan nyaman untuk guru.
