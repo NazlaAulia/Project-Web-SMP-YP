@@ -68,9 +68,11 @@ $result = $conn->query($query);
             --muted-text: #6b7280;
             --white: #ffffff;
             --border: #e5e7eb;
-            --warning: #f59e0b;
             --danger: #ef4444;
-            --success: #16a34a;
+            --success: #22c55e;
+            --success-soft: #dcfce7;
+            --danger-soft: #fee2e2;
+            --blue-soft: #eff6ff;
             --blue: #2563eb;
         }
 
@@ -252,7 +254,7 @@ $result = $conn->query($query);
 
         .status-loading {
             display: block;
-            background: #eff6ff;
+            background: var(--blue-soft);
             color: #1d4ed8;
         }
 
@@ -401,6 +403,137 @@ $result = $conn->query($query);
             font-size: 14px;
         }
 
+        /* MODAL */
+        .custom-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+
+        .custom-modal-overlay.active {
+            display: flex;
+        }
+
+        .custom-modal-box {
+            width: 100%;
+            max-width: 550px;
+            background: #fff;
+            border-radius: 22px;
+            padding: 34px 28px 26px;
+            text-align: center;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+            animation: modalFadeIn 0.25s ease;
+        }
+
+        .custom-modal-icon {
+            width: 94px;
+            height: 94px;
+            border-radius: 50%;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            border: 4px solid #d9f0d2;
+            color: #8bc34a;
+            background: #f7fff3;
+        }
+
+        .custom-modal-icon.loading {
+            color: #2563eb;
+            border-color: #bfdbfe;
+            background: #eff6ff;
+        }
+
+        .custom-modal-icon.error {
+            color: #ef4444;
+            border-color: #fecaca;
+            background: #fff5f5;
+        }
+
+        .custom-modal-box h3 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            color: #444;
+            font-weight: 700;
+        }
+
+        .custom-modal-box p {
+            margin: 0;
+            font-size: 15px;
+            color: #666;
+            line-height: 1.7;
+        }
+
+        .custom-modal-actions {
+            margin-top: 26px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            min-width: 138px;
+            height: 46px;
+            padding: 0 18px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s ease;
+        }
+
+        .modal-btn.confirm {
+            background: #22c55e;
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            background: #16a34a;
+        }
+
+        .modal-btn.cancel,
+        .modal-btn.secondary {
+            background: #e9eef1;
+            color: #244;
+        }
+
+        .modal-btn.cancel:hover,
+        .modal-btn.secondary:hover {
+            background: #dbe3e8;
+        }
+
+        .modal-btn.danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .modal-btn.danger:hover {
+            background: #dc2626;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         @media (max-width: 992px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -434,6 +567,18 @@ $result = $conn->query($query);
             }
 
             .search-box {
+                width: 100%;
+            }
+
+            .custom-modal-box {
+                padding: 28px 20px 22px;
+            }
+
+            .custom-modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-btn {
                 width: 100%;
             }
         }
@@ -508,14 +653,13 @@ $result = $conn->query($query);
                 <div class="action-text">
                     <h2>Generate Jadwal Otomatis</h2>
                     <p>
-                        Klik tombol generate untuk menjalankan proses pembuatan jadwal dari file
-                        <strong>generate_master.php</strong>.
+                        Klik tombol generate untuk menjalankan proses pembuatan jadwal
                     </p>
                     <div id="statusBox" class="status-box"></div>
                 </div>
 
                 <div class="action-buttons">
-                    <button type="button" class="btn btn-primary" onclick="generateJadwal()">
+                    <button type="button" class="btn btn-primary" onclick="openGenerateModal()">
                         <i class="fas fa-wand-magic-sparkles"></i>
                         Generate Jadwal
                     </button>
@@ -603,6 +747,40 @@ $result = $conn->query($query);
         </main>
     </div>
 
+    <!-- MODAL KONFIRMASI -->
+    <div class="custom-modal-overlay" id="generateModal">
+        <div class="custom-modal-box">
+            <div class="custom-modal-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Generate Jadwal?</h3>
+            <p>
+                Jadwal lama akan diperbarui dan sistem akan menjalankan proses generate jadwal otomatis.
+                Pastikan data guru, kelas, dan mata pelajaran sudah benar.
+            </p>
+
+            <div class="custom-modal-actions">
+                <button type="button" class="modal-btn confirm" id="confirmGenerateBtn">Ya, Lanjutkan!</button>
+                <button type="button" class="modal-btn cancel" onclick="closeGenerateModal()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HASIL / INFO -->
+    <div class="custom-modal-overlay" id="resultModal">
+        <div class="custom-modal-box">
+            <div class="custom-modal-icon" id="resultModalIcon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 id="resultModalTitle">Berhasil</h3>
+            <p id="resultModalText">Proses berhasil dijalankan.</p>
+
+            <div class="custom-modal-actions">
+                <button type="button" class="modal-btn secondary" id="resultModalBtn" onclick="closeResultModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/admin/components/admin-nav.js"></script>
 
     <script>
@@ -622,12 +800,56 @@ $result = $conn->query($query);
             statusBox.innerHTML = message;
         }
 
-        function generateJadwal() {
-            if (!confirm('Generate jadwal sekarang? Proses ini akan menjalankan generate_master.php.')) {
-                return;
+        function openGenerateModal() {
+            document.getElementById('generateModal').classList.add('active');
+        }
+
+        function closeGenerateModal() {
+            document.getElementById('generateModal').classList.remove('active');
+        }
+
+        function closeResultModal() {
+            document.getElementById('resultModal').classList.remove('active');
+        }
+
+        function showResultModal(type, title, text, reloadAfter = false) {
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('resultModalIcon');
+            const titleEl = document.getElementById('resultModalTitle');
+            const textEl = document.getElementById('resultModalText');
+            const btn = document.getElementById('resultModalBtn');
+
+            icon.className = 'custom-modal-icon';
+            btn.textContent = 'Tutup';
+
+            if (type === 'loading') {
+                icon.classList.add('loading');
+                icon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.classList.add('hidden');
+            } else if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check"></i>';
+                btn.classList.remove('hidden');
+            } else {
+                icon.classList.add('error');
+                icon.innerHTML = '<i class="fas fa-xmark"></i>';
+                btn.classList.remove('hidden');
             }
 
+            titleEl.textContent = title;
+            textEl.textContent = text;
+            modal.classList.add('active');
+
+            if (reloadAfter) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1400);
+            }
+        }
+
+        function runGenerateJadwal() {
+            closeGenerateModal();
             setStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Sedang generate jadwal...');
+            showResultModal('loading', 'Sedang Diproses', 'Mohon tunggu, sistem sedang membuat jadwal otomatis.');
 
             fetch('/admin/penjadwalan/generate_master.php', {
                 method: 'POST'
@@ -655,15 +877,27 @@ $result = $conn->query($query);
                     : 'Generate jadwal berhasil dijalankan.';
 
                 setStatus('success', '<i class="fas fa-check-circle"></i> ' + msg);
-
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1200);
+                showResultModal('success', 'Generate Berhasil!', msg, true);
             })
             .catch(error => {
                 setStatus('error', '<i class="fas fa-circle-exclamation"></i> Gagal generate jadwal: ' + error.message);
+                showResultModal('error', 'Generate Gagal', error.message);
             });
         }
+
+        document.getElementById('confirmGenerateBtn').addEventListener('click', runGenerateJadwal);
+
+        document.getElementById('generateModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeGenerateModal();
+            }
+        });
+
+        document.getElementById('resultModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeResultModal();
+            }
+        });
 
         const searchInput = document.getElementById('searchInput');
         const jadwalTable = document.getElementById('jadwalTable');
