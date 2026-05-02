@@ -3,72 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
-<link rel="icon" type="image/x-icon" href="img/images.webp">
-<!-- ppppapaa gggg -->
+
+  <link rel="icon" type="image/x-icon" href="../img/images.webp">
+
+  <link rel="stylesheet" href="jadwal.css?v=999">
+  <link rel="stylesheet" href="navbar.css">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <link rel="stylesheet" href="jadwal.css?v=999" />
 </head>
+
 <body>
   <div class="container">
-   <aside class="sidebar">
-  <div class="sidebar-header">
-    <img src="../img/logo.webp" alt="Logo" class="logo" />
 
-    <button class="hamburger" id="hamburgerBtn" type="button">
-      <i class="fa-solid fa-bars"></i>
-    </button>
-  </div>
-
-  <nav>
-
-    <ul class="sidebar-menu">
-      <li>
-        <a href="siswa.html" class="nav-link">
-          <i class="fa-solid fa-house"></i>
-          <span>Beranda Siswa</span>
-        </a>
-      </li>
-      <li>
-        <a href="nilai.html" class="nav-link">
-          <i class="fa-solid fa-file-lines"></i>
-          <span>Nilai</span>
-        </a>
-      </li>
-      <li>
-        <a href="jadwal.html" class="nav-link active">
-          <i class="fa-solid fa-calendar-days"></i>
-          <span>Jadwal</span>
-        </a>
-      </li>
-      <li>
-        <a href="peringkat.html" class="nav-link">
-          <i class="fa-solid fa-trophy"></i>
-          <span>Peringkat</span>
-        </a>
-      </li>
-      <li>
-        <a href="profil-siswa.html" class="nav-link">
-          <i class="fa-solid fa-user"></i>
-          <span>Profil Siswa</span>
-        </a>
-      </li>
-      <li>
-        <a href="settings.html" class="nav-link">
-          <i class="fa-solid fa-gear"></i>
-          <span>Pengaturan</span>
-        </a>
-      </li>
-    </ul>
-
-   <div class="sidebar-footer">
-  <a href="#" class="logout-btn" id="logoutBtn">
-    <i class="fa-solid fa-right-from-bracket"></i>
-    <span>Keluar</span>
-  </a>
-</div>
-  </nav>
-</aside>
+    <div id="navbar-container"></div>
 
     <main class="main-content">
       <header class="header fade-up">
@@ -85,16 +34,15 @@
         </div>
       </header>
 
-      <!-- vvvvvv -->
-       <!-- hhhhhh -->
       <section class="jadwal-card fade-up delay-1">
         <div class="jadwal-banner">
           <div class="jadwal-banner-left">
             <h2>Rangkuman Jadwal Siswa</h2>
             <p>Pantau jadwal pelajaranmu secara detail.</p>
           </div>
+
           <div class="nilai-banner-img">
-            <img src="../img/siswa.webp" alt="Ilustrasi Nilai Siswa">
+            <img src="../img/siswa.webp" alt="Ilustrasi Jadwal Siswa">
           </div>
         </div>
 
@@ -115,104 +63,50 @@
           </div>
         </div>
 
-<div class="jadwal-filter-wrap">
-  <div class="update-box">
-    <h4>Update Terbaru Jadwal</h4>
-    <div id="updateJadwal">
-      <p>- Memuat data jadwal...</p>
-    </div>
-  </div>
+        <div class="jadwal-filter-wrap">
+          <div class="update-box">
+            <h4>Update Terbaru Jadwal</h4>
+            <div id="updateJadwal">
+              <p>- Memuat data jadwal...</p>
+            </div>
+          </div>
 
-  <div class="filter-group">
-    <label>Tahun Ajaran/Semester</label>
-    <select id="semesterSelect">
-      <option>Memuat...</option>
-    </select>
-  </div>
-</div>
+          <div class="filter-group">
+            <label>Tahun Ajaran/Semester</label>
+            <select id="semesterSelect">
+              <option>Memuat...</option>
+            </select>
+          </div>
+        </div>
 
         <section class="jadwal-section">
           <h3 id="judulTabel">Jadwal Pelajaran</h3>
 
           <div class="table-wrap">
             <table>
-             <thead>
-  <tr>
-    <th>Hari/Jam</th>
-    <th>Mata Pelajaran</th>
-    <th>Guru Pengajar</th>
-    <th>Status</th>
-  </tr>
-</thead>
-<tbody id="jadwalTableBody">
-  <tr>
-    <td colspan="4" class="empty-state">Memuat jadwal...</td>
-  </tr>
-</tbody>
+              <thead>
+                <tr>
+                  <th>Hari/Jam</th>
+                  <th>Mata Pelajaran</th>
+                  <th>Guru Pengajar</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody id="jadwalTableBody">
+                <tr>
+                  <td colspan="4" class="empty-state">Memuat jadwal...</td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </section>
       </section>
     </main>
+
   </div>
 
-<!-- Popup Konfirmasi Keluar -->
-<div class="logout-modal" id="logoutModal">
-  <div class="logout-modal-content">
-    <div class="logout-icon-wrap">
-      <i class="fa-solid fa-right-from-bracket"></i>
-    </div>
-
-    <h2>Konfirmasi Keluar</h2>
-    <p>Apakah Anda yakin ingin keluar dari akun ini?</p>
-
-    <div class="logout-modal-actions">
-      <button type="button" class="btn-batal" id="cancelLogout">Batal</button>
-      <button type="button" class="btn-keluar" id="confirmLogout">Ya, Keluar</button>
-    </div>
-  </div>
-</div>
-
-<script src="jadwal.js?v=999"></script>
-  <script>
-  const logoutBtn = document.getElementById("logoutBtn");
-  const logoutModal = document.getElementById("logoutModal");
-  const cancelLogout = document.getElementById("cancelLogout");
-  const confirmLogout = document.getElementById("confirmLogout");
-
-  logoutBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-    logoutModal.classList.add("show");
-  });
-
-  cancelLogout.addEventListener("click", function () {
-    logoutModal.classList.remove("show");
-  });
-
-  confirmLogout.addEventListener("click", function () {
-    window.location.href = "keluar.php";
-  });
-
-  logoutModal.addEventListener("click", function (e) {
-    if (e.target === logoutModal) {
-      logoutModal.classList.remove("show");
-    }
-  });
-</script>
-
-<script>
-  const jadwalHamburgerBtn = document.getElementById("hamburgerBtn");
-  const jadwalSidebar = document.querySelector(".sidebar");
-
-  if (jadwalHamburgerBtn && jadwalSidebar) {
-    jadwalHamburgerBtn.addEventListener("click", function () {
-      jadwalSidebar.classList.toggle("show-menu");
-
-      const icon = jadwalHamburgerBtn.querySelector("i");
-      icon.classList.toggle("fa-bars");
-      icon.classList.toggle("fa-xmark");
-    });
-  }
-</script>
+  <script src="navbar.js"></script>
+  <script src="jadwal.js?v=999"></script>
 </body>
 </html>

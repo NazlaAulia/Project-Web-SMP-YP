@@ -3,46 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Sistem Informasi Akademik - SMP YP 17 Surabaya</title>
-  <link rel="icon" type="image/x-icon" href="img/images.webp">
+
+  <link rel="icon" type="image/x-icon" href="../img/images.webp">
+
   <link rel="stylesheet" href="peringkat.css">
+  <link rel="stylesheet" href="navbar.css">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
+
 <body>
 
 <div class="container">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <img src="../img/logo.webp" alt="Logo" class="logo" />
+  <div id="navbar-container"></div>
 
-      <button class="hamburger" id="hamburgerBtn" type="button">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </div>
-
-    <nav>
-      <ul class="sidebar-menu">
-        <li><a href="siswa.html"><i class="fa-solid fa-house"></i> Beranda Siswa</a></li>
-        <li><a href="nilai.html"><i class="fa-solid fa-file-lines"></i> Nilai</a></li>
-        <li><a href="jadwal.html"><i class="fa-solid fa-calendar-days"></i> Jadwal</a></li>
-        <li><a href="peringkat.html" class="active"><i class="fa-solid fa-trophy"></i> Peringkat</a></li>
-        <li><a href="profil-siswa.html"><i class="fa-solid fa-user"></i> Profil Siswa</a></li>
-        <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Pengaturan</a></li>
-      </ul>
-
-      <div class="spacer"></div>
-
-      <div class="sidebar-footer">
-        <a href="#" class="logout-btn" id="logoutBtn">
-          <i class="fa-solid fa-right-from-bracket"></i> Keluar
-        </a>
-      </div>
-    </nav>
-  </aside>
-
-  <!-- CONTENT -->
   <main class="main-content">
     <div class="header">
       <input type="text" placeholder="Cari info akademik, tugas, atau jadwal...">
@@ -83,7 +60,6 @@
       </div>
 
       <div class="peringkat-filter-wrap">
-
         <div class="filter-group">
           <label for="semester">Tahun Ajaran/Semester</label>
           <select id="semester">
@@ -106,6 +82,7 @@
               <th>Status</th>
             </tr>
           </thead>
+
           <tbody id="tableBody"></tbody>
         </table>
       </div>
@@ -115,56 +92,8 @@
 
 </div>
 
-<!-- Popup Konfirmasi Keluar -->
-<div class="logout-modal" id="logoutModal">
-  <div class="logout-modal-content">
-    <div class="logout-icon-wrap">
-      <i class="fa-solid fa-right-from-bracket"></i>
-    </div>
-
-    <h2>Konfirmasi Keluar</h2>
-    <p>Apakah Anda yakin ingin keluar dari akun ini?</p>
-
-    <div class="logout-modal-actions">
-      <button type="button" class="btn-batal" id="cancelLogout">Batal</button>
-      <button type="button" class="btn-keluar" id="confirmLogout">Ya, Keluar</button>
-    </div>
-  </div>
-</div>
-
+<script src="navbar.js"></script>
 <script src="peringkat.js"></script>
 
-<script>
-  const hamburgerBtn = document.getElementById("hamburgerBtn");
-  const sidebar = document.querySelector(".sidebar");
-
-  hamburgerBtn.addEventListener("click", function () {
-    sidebar.classList.toggle("show-menu");
-  });
-
-  const logoutBtn = document.getElementById("logoutBtn");
-  const logoutModal = document.getElementById("logoutModal");
-  const cancelLogout = document.getElementById("cancelLogout");
-  const confirmLogout = document.getElementById("confirmLogout");
-
-  logoutBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-    logoutModal.classList.add("show");
-  });
-
-  cancelLogout.addEventListener("click", function () {
-    logoutModal.classList.remove("show");
-  });
-
-  confirmLogout.addEventListener("click", function () {
-    window.location.href = "keluar.php";
-  });
-
-  logoutModal.addEventListener("click", function (e) {
-    if (e.target === logoutModal) {
-      logoutModal.classList.remove("show");
-    }
-  });
-</script>
 </body>
 </html>
