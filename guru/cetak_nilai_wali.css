@@ -347,3 +347,34 @@ body {
     margin-bottom: 18px;
   }
 }
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body {
+    background: #ffffff;
+    padding: 0;
+  }
+
+  .print-page {
+    max-width: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .btn-print {
+    display: none;
+  }
+
+  .table-wrap {
+    overflow: visible;
+  }
+
+  .student-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}
