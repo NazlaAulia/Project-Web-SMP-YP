@@ -193,7 +193,7 @@ echo json_encode([
         "nama" => $namaSiswa,
         "kelas" => $namaKelas,
         "inisial" => $inisial,
-        "tahun_ajaran" => "2025/2026",
+        "tahun_ajaran" => $tahunAjaran,
         "semester" => "Genap"
     ],
     "ringkasan" => [
