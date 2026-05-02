@@ -94,6 +94,40 @@ while ($row = $resultWali->fetch_assoc()) {
 $is_wali_kelas = count($wali_kelas) > 0;
 
 /* =========================
+   AMBIL KELAS MAPEL YANG DIAJAR GURU
+   Untuk dropdown Mapel Saya
+========================= */
+$kelas_mapel = [];
+
+$getKelasMapel = $conn->prepare("
+    SELECT DISTINCT
+        k.id_kelas,
+        k.nama_kelas,
+        k.tingkat
+    FROM jadwal j
+    INNER JOIN kelas k ON j.id_kelas = k.id_kelas
+    WHERE j.id_guru = ?
+      AND j.id_mapel = ?
+    ORDER BY k.tingkat ASC, k.nama_kelas ASC
+");
+
+if (!$getKelasMapel) {
+    kirim_json("error", "Query kelas mapel gagal: " . $conn->error);
+}
+
+$getKelasMapel->bind_param("ii", $id_guru, $id_mapel_guru);
+$getKelasMapel->execute();
+$resultKelasMapel = $getKelasMapel->get_result();
+
+while ($row = $resultKelasMapel->fetch_assoc()) {
+    $kelas_mapel[] = [
+        "id_kelas" => (int) $row["id_kelas"],
+        "nama_kelas" => $row["nama_kelas"],
+        "tingkat" => (int) $row["tingkat"]
+    ];
+}
+
+/* =========================
    VALIDASI MODE WALI
 ========================= */
 if ($mode === "wali") {
@@ -150,9 +184,8 @@ if ($mode === "wali") {
     }
 
     $stmt->bind_param("i", $id_kelas);
-
-    } else {
-    $stmt = $conn->prepare("
+} else {
+    $sql = "
         SELECT DISTINCT
             n.id_siswa,
             s.nama AS nama_siswa,
@@ -178,14 +211,26 @@ if ($mode === "wali") {
                 AND j.id_kelas = s.id_kelas
                 AND j.id_mapel = n.id_mapel
           )
-        ORDER BY k.tingkat ASC, k.nama_kelas ASC, s.nama ASC, n.semester ASC
-    ");
+    ";
+
+    $types = "ii";
+    $params = [$id_mapel_guru, $id_guru];
+
+    if ($id_kelas > 0) {
+        $sql .= " AND s.id_kelas = ?";
+        $types .= "i";
+        $params[] = $id_kelas;
+    }
+
+    $sql .= " ORDER BY k.tingkat ASC, k.nama_kelas ASC, s.nama ASC, n.semester ASC";
+
+    $stmt = $conn->prepare($sql);
 
     if (!$stmt) {
         kirim_json("error", "Query nilai mapel gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("ii", $id_mapel_guru, $id_guru);
+    $stmt->bind_param($types, ...$params);
 }
 
 $stmt->execute();
@@ -221,8 +266,9 @@ kirim_json("success", "Data nilai berhasil dimuat.", [
         "id_mapel" => $id_mapel_guru,
         "nama_mapel" => $guru["nama_mapel"] ?? "-"
     ],
-    "is_wali_kelas" => $is_wali_kelas,
-    "wali_kelas" => $wali_kelas,
-    "data" => $data
+        "is_wali_kelas" => $is_wali_kelas,
+        "wali_kelas" => $wali_kelas,
+        "kelas_mapel" => $kelas_mapel,
+        "data" => $data
 ]);
 ?>

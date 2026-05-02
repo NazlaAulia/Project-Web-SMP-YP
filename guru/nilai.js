@@ -1,5 +1,6 @@
 let dataNilai = [];
 
+const filterKelasWaliLabel = document.querySelector('label[for="filterKelasWali"]');
 const printBtn = document.getElementById("printBtn");
 const fileInput = document.getElementById("fileInput");
 const uploadBtn = document.getElementById("uploadBtn");
@@ -508,19 +509,43 @@ function isiDropdownWaliKelas(waliKelas) {
   }
 }
 
+function isiDropdownKelasMapel(kelasMapel) {
+  if (!filterKelasWali) return;
+
+  const nilaiSebelumnya = filterKelasWali.value;
+
+  filterKelasWali.innerHTML = `
+    <option value="">Semua Kelas Mapel Saya</option>
+  `;
+
+  kelasMapel.forEach(kelas => {
+    filterKelasWali.innerHTML += `
+      <option value="${kelas.id_kelas}">
+        Kelas ${kelas.nama_kelas}
+      </option>
+    `;
+  });
+
+  if (nilaiSebelumnya) {
+    filterKelasWali.value = nilaiSebelumnya;
+  }
+}
+
 function aturTampilanMode() {
   const mode = modeNilai ? modeNilai.value : "mapel";
 
   if (!filterKelasWaliGroup || !filterKelasWali) return;
 
   filterKelasWaliGroup.style.display = "flex";
+  filterKelasWali.disabled = false;
+  filterKelasWaliGroup.classList.remove("filter-disabled");
 
-  if (mode === "wali") {
-    filterKelasWali.disabled = false;
-    filterKelasWaliGroup.classList.remove("filter-disabled");
-  } else {
-    filterKelasWali.disabled = true;
-    filterKelasWaliGroup.classList.add("filter-disabled");
+  if (filterKelasWaliLabel) {
+    if (mode === "wali") {
+      filterKelasWaliLabel.textContent = "Kelas Wali";
+    } else {
+      filterKelasWaliLabel.textContent = "Kelas Mapel Saya";
+    }
   }
 }
 
@@ -540,7 +565,7 @@ function loadNilaiDatabase() {
 
   let url = `get_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${mode}`;
 
-  if (mode === "wali" && idKelas) {
+  if (idKelas) {
     url += `&id_kelas=${idKelas}`;
   }
 
@@ -550,9 +575,14 @@ function loadNilaiDatabase() {
       if (result.status === "success") {
         dataNilai = result.data || [];
 
-        if (result.is_wali_kelas && filterWaliKelasBox) {
+        if (filterWaliKelasBox) {
           filterWaliKelasBox.style.display = "block";
-          isiDropdownWaliKelas(result.wali_kelas || []);
+
+          if (mode === "wali") {
+            isiDropdownWaliKelas(result.wali_kelas || []);
+          } else {
+            isiDropdownKelasMapel(result.kelas_mapel || []);
+          }
         }
 
         aturTampilanMode();
