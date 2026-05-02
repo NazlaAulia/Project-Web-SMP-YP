@@ -166,18 +166,22 @@ if ($mode === "wali") {
             n.sakit,
             n.alfa
         FROM nilai n
-        LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
-        LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-        LEFT JOIN mapel m ON n.id_mapel = m.id_mapel
+        INNER JOIN siswa s ON n.id_siswa = s.id_siswa
+        INNER JOIN kelas k ON s.id_kelas = k.id_kelas
+        INNER JOIN mapel m ON n.id_mapel = m.id_mapel
+        INNER JOIN jadwal j 
+            ON j.id_kelas = s.id_kelas
+            AND j.id_mapel = n.id_mapel
+            AND j.id_guru = ?
         WHERE n.id_mapel = ?
-        ORDER BY s.nama ASC, n.semester ASC
+        ORDER BY k.tingkat ASC, k.nama_kelas ASC, s.nama ASC, n.semester ASC
     ");
 
     if (!$stmt) {
         kirim_json("error", "Query nilai mapel gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("i", $id_mapel_guru);
+    $stmt->bind_param("ii", $id_guru, $id_mapel_guru);
 }
 
 $stmt->execute();

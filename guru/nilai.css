@@ -1280,3 +1280,31 @@ body {
 .nilai-table-wrapper td:last-child {
   text-align: center;
 }
+.btn-cetak-row {
+  border: 1.8px solid #07484a;
+  background: #ffffff;
+  color: #07484a;
+  border-radius: 12px;
+  padding: 9px 13px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.btn-cetak-row:hover {
+  background: #07484a;
+  color: #ffffff;
+}
+
+.nilai-table-wrapper table {
+  min-width: 980px;
+}
+
+.nilai-table-wrapper th:last-child,
+.nilai-table-wrapper td:last-child {
+  text-align: center;
+}

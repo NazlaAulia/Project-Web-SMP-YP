@@ -109,18 +109,20 @@ function updateRekap() {
   totalHadirEl.textContent = totalHadir;
   totalAlfaEl.textContent = totalAlfa;
 }
+
 function renderTable(filteredData = dataNilai) {
   if (!nilaiTableBody) return;
 
   if (filteredData.length === 0) {
     nilaiTableBody.innerHTML = `
       <tr>
-        <td colspan="13" class="empty-state">Belum ada data yang sesuai.</td>
+        <td colspan="11" class="empty-state">Belum ada data yang sesuai.</td>
       </tr>
     `;
     return;
   }
 
+  const mode = modeNilai ? modeNilai.value : "mapel";
   const siswaMap = {};
 
   filteredData.forEach(item => {
@@ -138,8 +140,7 @@ function renderTable(filteredData = dataNilai) {
         total_hadir: 0,
         total_izin: 0,
         total_sakit: 0,
-        total_alfa: 0,
-        mapel: []
+        total_alfa: 0
       };
     }
 
@@ -149,7 +150,6 @@ function renderTable(filteredData = dataNilai) {
     siswaMap[key].total_izin += Number(item.izin || 0);
     siswaMap[key].total_sakit += Number(item.sakit || 0);
     siswaMap[key].total_alfa += Number(item.alfa || 0);
-    siswaMap[key].mapel.push(item.nama_mapel || "-");
   });
 
   const dataRingkas = Object.values(siswaMap);
@@ -158,7 +158,27 @@ function renderTable(filteredData = dataNilai) {
     .map((item, index) => {
       const rataRata = item.jumlah_mapel > 0
         ? (item.total_nilai / item.jumlah_mapel).toFixed(2)
-        : 0;
+        : "0.00";
+
+      const nilaiTampil = mode === "wali"
+        ? rataRata
+        : rataRata;
+
+      const hadirTampil = mode === "wali"
+        ? item.total_hadir
+        : item.total_hadir;
+
+      const izinTampil = mode === "wali"
+        ? item.total_izin
+        : item.total_izin;
+
+      const sakitTampil = mode === "wali"
+        ? item.total_sakit
+        : item.total_sakit;
+
+      const alfaTampil = mode === "wali"
+        ? item.total_alfa
+        : item.total_alfa;
 
       return `
         <tr>
@@ -166,21 +186,21 @@ function renderTable(filteredData = dataNilai) {
           <td>${item.id_siswa}</td>
           <td><strong>${item.nama_siswa}</strong></td>
           <td>${item.nama_kelas}</td>
-          <td>-</td>
-          <td>${item.jumlah_mapel} Mapel</td>
           <td>${item.semester_text}</td>
-          <td>${rataRata}</td>
-          <td>${item.total_hadir}</td>
-          <td>${item.total_izin}</td>
-          <td>${item.total_sakit}</td>
-          <td>${item.total_alfa}</td>
+          <td>${nilaiTampil}</td>
+          <td>${hadirTampil}</td>
+          <td>${izinTampil}</td>
+          <td>${sakitTampil}</td>
+          <td>${alfaTampil}</td>
           <td>
-            <input
-              type="checkbox"
-              class="check-cetak-siswa"
-              value="${item.id_siswa}"
-              data-nama="${item.nama_siswa}"
-            />
+            <button
+              type="button"
+              class="btn-cetak-row"
+              onclick="cetakNilaiSiswa(${item.id_siswa})"
+            >
+              <i class="bi bi-printer"></i>
+              Cetak Nilai
+            </button>
           </td>
         </tr>
       `;
@@ -188,6 +208,34 @@ function renderTable(filteredData = dataNilai) {
     .join("");
 }
 
+function cetakNilaiSiswa(idSiswa) {
+  const mode = modeNilai ? modeNilai.value : "mapel";
+  const idKelas = filterKelasWali ? filterKelasWali.value : "";
+
+  if (!idGuruLogin || roleIdLogin !== "2") {
+    alert("Silakan login sebagai guru terlebih dahulu.");
+    window.location.href = "../login.html";
+    return;
+  }
+
+  if (mode !== "wali") {
+    alert("Cetak rekap nilai siswa hanya tersedia pada mode Wali Kelas.");
+    return;
+  }
+
+  if (!idKelas) {
+    alert("Pilih kelas wali terlebih dahulu.");
+    return;
+  }
+
+  const url =
+    `cetak_nilai_wali.html?id_guru=${idGuruLogin}` +
+    `&role_id=${roleIdLogin}` +
+    `&id_kelas=${idKelas}` +
+    `&id_siswa=${encodeURIComponent(idSiswa)}`;
+
+  window.open(url, "_blank");
+}
 /* =========================
    PARSE CSV AMAN
    Bisa baca:
@@ -687,45 +735,7 @@ if (downloadTemplateBtn) {
 ========================= */
 if (printBtn) {
   printBtn.addEventListener("click", function () {
-    const mode = modeNilai ? modeNilai.value : "mapel";
-    const idKelas = filterKelasWali ? filterKelasWali.value : "";
-
-    if (!idGuruLogin || roleIdLogin !== "2") {
-      alert("Silakan login sebagai guru terlebih dahulu.");
-      window.location.href = "../login.html";
-      return;
-    }
-
-    if (mode !== "wali") {
-      alert("Cetak nilai siswa hanya tersedia pada mode Wali Kelas.");
-      return;
-    }
-
-    if (!idKelas) {
-      alert("Pilih kelas wali terlebih dahulu.");
-      return;
-    }
-
-    const checked = document.querySelectorAll(".check-cetak-siswa:checked");
-
-    if (checked.length === 0) {
-      alert("Centang minimal satu siswa yang ingin dicetak.");
-      return;
-    }
-
-    const idSiswaList = Array.from(checked)
-      .map(item => item.value)
-      .filter(Boolean)
-      .join(",");
-
-    const url =
-      `cetak_nilai_wali.html?id_guru=${idGuruLogin}` +
-      `&role_id=${roleIdLogin}` +
-      `&id_kelas=${idKelas}` +
-      `&id_siswa=${encodeURIComponent(idSiswaList)}`;
-
-    window.open(url, "_blank");
+    alert("Gunakan tombol Cetak Nilai pada baris siswa yang ingin dicetak.");
   });
 }
-
 loadNilaiDatabase();
