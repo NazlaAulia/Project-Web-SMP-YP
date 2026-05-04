@@ -42,12 +42,20 @@
     </nav>
   </div>
 
-  <div class="sidebar-bottom">
-    <a href="/login.html" class="nav-link logout" data-page="/login.html">
-      <i class="bi bi-box-arrow-right"></i>
-      <span>Keluar</span>
-    </a>
-  </div>
 
+<div class="logout-modal-overlay" id="logoutModal">
+    <div class="logout-modal-box">
+        <div class="logout-icon">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
 
+        <h3>Konfirmasi Keluar</h3>
+        <p>Apakah Anda yakin ingin keluar dari akun ini?</p>
+
+        <div class="logout-actions">
+            <button type="button" class="btn-cancel" id="cancelLogout">Batal</button>
+            <a href="/login.html" class="btn-confirm">Ya, Keluar</a>
+        </div>
+    </div>
+</div>
 </aside>
