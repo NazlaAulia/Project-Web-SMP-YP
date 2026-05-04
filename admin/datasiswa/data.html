@@ -131,29 +131,29 @@
     </div>
 </div>
 
-    <div class="modal-overlay" id="deleteModal">
-        <div class="modal-box modal-delete-box">
-            <div class="modal-header">
-                <h2>Hapus Siswa</h2>
-                <button class="btn-close" id="closeDeleteBtn" type="button">&times;</button>
-            </div>
-
-            <p class="delete-text">
-                Yakin ingin menghapus siswa <strong id="deleteSiswaName">-</strong>?
-                <br>
-                Data siswa dan akun loginnya akan dihapus.
-            </p>
-
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" id="cancelDeleteBtn">
-                    Batal
-                </button>
-                <button type="button" class="btn-danger" id="confirmDeleteBtn">
-                    Hapus
-                </button>
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box modal-delete-box modern-delete-box">
+        <div class="delete-icon-wrap">
+            <div class="delete-icon-circle">
+                <i class="fa-solid fa-trash"></i>
             </div>
         </div>
+
+        <h2 class="delete-title">Hapus Siswa?</h2>
+
+        <p class="delete-text center-text">
+            Yakin ingin menghapus siswa <strong id="deleteSiswaName">-</strong>?<br>
+            Data siswa dan akun loginnya akan dihapus permanen.
+        </p>
+
+        <div class="modal-actions delete-actions-center">
+            <button type="button" class="btn-secondary" id="cancelDeleteBtn">Batal</button>
+            <button type="button" class="btn-danger btn-delete-solid" id="confirmDeleteBtn">Ya, Hapus</button>
+        </div>
+
+        <button class="btn-close delete-close-modern" id="closeDeleteBtn" type="button">&times;</button>
     </div>
+</div>
 
     <script src="../components/admin-nav.js"></script>
     <script src="fitursiswa.js"></script>

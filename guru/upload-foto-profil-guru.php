@@ -152,5 +152,5 @@ if (mysqli_query($conn, $queryUpdate)) {
         "success" => false,
         "message" => "Gagal update database: " . mysqli_error($conn)
     ]);
-}*/
+}
 ?>
