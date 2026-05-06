@@ -137,7 +137,7 @@ async function generateAIJadwal() {
     const idGuru = localStorage.getItem("id_guru");
 
     if (!jadwalLamaData || !jadwalLamaData.id_jadwal) {
-        alert("Jadwal lama belum dimuat.");
+        tampilkanPopupRequest("warning", "Jadwal Belum Siap", "Jadwal lama belum dimuat.");
         return;
     }
 
@@ -276,25 +276,70 @@ function pilihRekomendasi(index) {
     }
 }
 
+let popupRedirectUrl = null;
+
+function tampilkanPopupRequest(type, title, message, redirectUrl = null) {
+    const popup = document.getElementById("requestAlertPopup");
+    const icon = document.getElementById("requestAlertIcon");
+    const popupTitle = document.getElementById("requestAlertTitle");
+    const popupMessage = document.getElementById("requestAlertMessage");
+    const popupButton = document.getElementById("requestAlertButton");
+
+    if (!popup || !icon || !popupTitle || !popupMessage || !popupButton) {
+        alert(message);
+
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        }
+
+        return;
+    }
+
+    popupRedirectUrl = redirectUrl;
+
+    icon.className = `request-alert-icon ${type}`;
+    icon.innerHTML = type === "success"
+        ? `<i class="bi bi-check-lg"></i>`
+        : `<i class="bi bi-exclamation-lg"></i>`;
+
+    popupTitle.textContent = title;
+    popupMessage.textContent = message;
+    popup.classList.add("show");
+}
+
+function tutupPopupRequest() {
+    const popup = document.getElementById("requestAlertPopup");
+
+    if (popup) {
+        popup.classList.remove("show");
+    }
+
+    if (popupRedirectUrl) {
+        window.location.href = popupRedirectUrl;
+    }
+}
+
+
 async function kirimPengajuan(e) {
     e.preventDefault();
 
     const idGuru = localStorage.getItem("id_guru");
 
     if (!jadwalLamaData) {
-        alert("Jadwal lama belum dimuat.");
+        tampilkanPopupRequest("warning", "Jadwal Belum Siap", "Jadwal lama belum dimuat.");
         return;
     }
 
+
     if (!rekomendasiDipilih) {
-        alert("Pilih salah satu rekomendasi terlebih dahulu.");
+        tampilkanPopupRequest("warning", "Pilih Rekomendasi", "Pilih salah satu rekomendasi terlebih dahulu.");
         return;
     }
 
     const alasan = alasanGanti ? alasanGanti.value.trim() : "";
 
     if (alasan === "") {
-        alert("Alasan ganti jadwal wajib diisi.");
+        tampilkanPopupRequest("warning", "Alasan Belum Diisi", "Isi dulu alasan pengajuan ganti jadwal sebelum mengirim.");
         return;
     }
 
@@ -334,12 +379,21 @@ async function kirimPengajuan(e) {
             throw new Error(result.message || "Pengajuan gagal dikirim.");
         }
 
-        alert("Pengajuan ganti jadwal berhasil dikirim ke admin.");
-        window.location.href = "jadwalmengajar.html";
+        tampilkanPopupRequest(
+        "success",
+        "Pengajuan Berhasil Dikirim",
+        "Pengajuan ganti jadwal berhasil dikirim ke admin.",
+        "jadwalmengajar.html"
+);
 
     } catch (error) {
         console.error(error);
-        alert(error.message || "Terjadi kesalahan saat mengirim pengajuan.");
+        tampilkanPopupRequest(
+        "warning",
+        "Pengajuan Gagal",
+        error.message || "Terjadi kesalahan saat mengirim pengajuan."
+);
+
     } finally {
         btnKirimRequest.disabled = false;
         btnKirimRequest.innerHTML = `<i class="bi bi-send"></i> Kirim Pengajuan`;
@@ -388,4 +442,9 @@ if (btnResetForm) {
 
 if (formGantiJadwal) {
     formGantiJadwal.addEventListener("submit", kirimPengajuan);
+}
+const requestAlertButton = document.getElementById("requestAlertButton");
+
+if (requestAlertButton) {
+    requestAlertButton.addEventListener("click", tutupPopupRequest);
 }

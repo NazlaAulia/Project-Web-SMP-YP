@@ -52,6 +52,55 @@
         </div>
     </div>
 
+    <div class="request-popup-overlay" id="requestPopup">
+    <div class="request-popup-card">
+        <button type="button" class="request-popup-close" onclick="tutupPopupPengajuan()">
+            <i class="bi bi-x"></i>
+        </button>
+
+        <div class="request-popup-icon">
+            <i class="bi bi-calendar2-week"></i>
+        </div>
+
+        <h3>Pengajuan Ganti Jadwal</h3>
+        <p>Tulis alasan pengajuan ganti jadwal terlebih dahulu.</p>
+
+        <div class="request-popup-field">
+            <label for="alasanPengajuan">Alasan Pengajuan</label>
+            <textarea
+                id="alasanPengajuan"
+                placeholder="Contoh: Bentrok dengan kegiatan sekolah..."
+            ></textarea>
+            <small id="alasanError"></small>
+        </div>
+
+        <div class="request-popup-actions">
+            <button type="button" class="btn-popup-cancel" onclick="tutupPopupPengajuan()">
+                Batal
+            </button>
+            <button type="button" class="btn-popup-submit" onclick="kirimPengajuanJadwal()">
+                <i class="bi bi-send"></i>
+                Kirim Pengajuan
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="success-popup-overlay" id="successPopup">
+    <div class="success-popup-card">
+        <div class="success-check">
+            <i class="bi bi-check-lg"></i>
+        </div>
+
+        <h3>Pengajuan Berhasil Dikirim</h3>
+        <p>Pengajuan ganti jadwal kamu sudah tercatat.</p>
+
+        <button type="button" onclick="tutupPopupBerhasil()">
+            Oke
+        </button>
+    </div>
+</div>
+
     <script src="components/sidebar-guru.js"></script>
     <script src="jadwalmengajar.js"></script>
 </body>
