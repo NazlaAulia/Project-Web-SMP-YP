@@ -721,3 +721,32 @@ body {
 .btn-back-request {
     display: none !important;
 }
+.btn-back-request {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: fit-content;
+    height: 46px;
+    padding: 0 18px;
+    border-radius: 14px;
+    background: #ffffff;
+    color: var(--primary);
+    border: 1px solid rgba(7, 72, 74, 0.14);
+    box-shadow: 0 10px 26px rgba(7, 72, 74, 0.08);
+    text-decoration: none !important;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.btn-back-request:hover {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.request-hero {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 24px !important;
+}
