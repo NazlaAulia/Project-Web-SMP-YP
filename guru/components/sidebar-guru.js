@@ -14,7 +14,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     sidebarContainer.innerHTML = sidebarHTML;
 
     setActiveMenu();
-    setupMobileSidebar();
+
+    if (typeof setupMobileSidebar === "function") {
+      setupMobileSidebar();
+    }
+
     setupSmoothMenuMove();
     setupLogoutPopup();
   } catch (error) {
@@ -50,16 +54,28 @@ function setupSmoothMenuMove() {
 
 function setupLogoutPopup() {
   const logoutLink = document.querySelector(".sidebar .logout");
+  const logoutPopup = document.getElementById("logoutPopup");
+  const cancelLogout = document.getElementById("cancelLogout");
+  const confirmLogout = document.getElementById("confirmLogout");
 
-  if (!logoutLink) return;
+  if (!logoutLink || !logoutPopup || !cancelLogout || !confirmLogout) return;
 
   logoutLink.addEventListener("click", function (e) {
     e.preventDefault();
+    logoutPopup.classList.add("show");
+  });
 
-    const yakinKeluar = confirm("Apakah Anda yakin ingin keluar?");
+  cancelLogout.addEventListener("click", function () {
+    logoutPopup.classList.remove("show");
+  });
 
-    if (yakinKeluar) {
-      window.location.href = logoutLink.getAttribute("href");
+  confirmLogout.addEventListener("click", function () {
+    window.location.href = logoutLink.getAttribute("href");
+  });
+
+  logoutPopup.addEventListener("click", function (e) {
+    if (e.target === logoutPopup) {
+      logoutPopup.classList.remove("show");
     }
   });
 }
