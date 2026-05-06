@@ -1,3 +1,18 @@
+const alertAsli = window.alert;
+
+window.alert = function (message) {
+    if (typeof tampilkanPopupRequest === "function") {
+        tampilkanPopupRequest(
+            "warning",
+            "Pengajuan Belum Bisa Dikirim",
+            String(message)
+        );
+        return;
+    }
+
+    alertAsli(message);
+};
+
 const titleRectangle = document.getElementById("titleRectangle");
 const requestChip = document.getElementById("requestChip");
 const requestFormCard = document.getElementById("requestFormCard");
@@ -329,8 +344,6 @@ async function kirimPengajuan(e) {
         tampilkanPopupRequest("warning", "Jadwal Belum Siap", "Jadwal lama belum dimuat.");
         return;
     }
-
-
 
     if (!rekomendasiDipilih) {
         tampilkanPopupRequest("warning", "Pilih Rekomendasi", "Pilih salah satu rekomendasi terlebih dahulu.");
