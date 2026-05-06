@@ -312,6 +312,14 @@ function tampilkanPopupRequest(type, title, message, redirectUrl = null) {
 
     popupRedirectUrl = redirectUrl;
 
+    const pesan = String(message);
+
+    if (pesan.includes("menunggu persetujuan admin")) {
+        type = "success";
+        title = "Pengajuan Sudah Terkirim";
+        message = "Pengajuan ganti jadwal sudah tercatat dan sedang menunggu persetujuan admin.";
+    }
+
     icon.className = `request-alert-icon ${type}`;
     icon.innerHTML = type === "success"
         ? `<i class="bi bi-check-lg"></i>`
@@ -320,6 +328,7 @@ function tampilkanPopupRequest(type, title, message, redirectUrl = null) {
     popupTitle.textContent = title;
     popupMessage.textContent = message;
     popup.classList.add("show");
+
 }
 
 function tutupPopupRequest() {
