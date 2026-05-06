@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setActiveMenu();
     setupMobileSidebar();
     setupSmoothMenuMove();
+    setupLogoutPopup();
   } catch (error) {
     console.error("Gagal memuat sidebar:", error);
   }
@@ -44,5 +45,21 @@ function setupSmoothMenuMove() {
       navLinks.forEach((item) => item.classList.remove("active"));
       this.classList.add("active");
     });
+  });
+}
+
+function setupLogoutPopup() {
+  const logoutLink = document.querySelector(".sidebar .logout");
+
+  if (!logoutLink) return;
+
+  logoutLink.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    const yakinKeluar = confirm("Apakah Anda yakin ingin keluar?");
+
+    if (yakinKeluar) {
+      window.location.href = logoutLink.getAttribute("href");
+    }
   });
 }
