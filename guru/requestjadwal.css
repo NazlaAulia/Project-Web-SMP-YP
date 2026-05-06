@@ -679,3 +679,45 @@ body {
     background: #e4f7ed;
     color: #16a34a;
 }
+.request-hero {
+    display: block !important;
+    min-height: 0 !important;
+    padding: 32px 42px 28px !important;
+    margin-bottom: 24px !important;
+}
+
+.request-hero-left {
+    width: 100% !important;
+}
+
+.request-title-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 22px !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+.request-title-icon {
+    flex: 0 0 auto !important;
+}
+
+.request-title-content {
+    flex: 1 !important;
+    text-align: left !important;
+}
+
+.request-title-content h1 {
+    margin: 0 0 8px !important;
+}
+
+.request-title-content p {
+    margin: 0 !important;
+    max-width: 900px !important;
+}
+
+.request-chip,
+.btn-back-request {
+    display: none !important;
+}
