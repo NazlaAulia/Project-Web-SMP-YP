@@ -675,3 +675,7 @@ body {
     font-weight: 800;
     cursor: pointer;
 }
+.request-alert-icon.success {
+    background: #e4f7ed;
+    color: #16a34a;
+}
