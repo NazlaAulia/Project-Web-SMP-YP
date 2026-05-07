@@ -22,7 +22,7 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
-/* Ambil kelas sesuai jadwal guru login */
+/* Ambil kelas yang benar-benar diajar guru login */
 $getKelas = $conn->prepare("
     SELECT DISTINCT k.nama_kelas
     FROM jadwal j
@@ -45,7 +45,9 @@ while ($kelas = $resultKelas->fetch_assoc()) {
     $kelasOptions[] = $kelas["nama_kelas"];
 }
 
-/* Ambil mapel sesuai jadwal guru login */
+$getKelas->close();
+
+/* Ambil mapel yang benar-benar diajar guru login */
 $getMapel = $conn->prepare("
     SELECT DISTINCT m.nama_mapel
     FROM jadwal j
@@ -68,9 +70,11 @@ while ($mapel = $resultMapel->fetch_assoc()) {
     $mapelOptions[] = $mapel["nama_mapel"];
 }
 
-/* Ambil data kehadiran hanya sesuai kelas dan mapel yang diajar guru login */
+$getMapel->close();
+
+/* Ambil data kehadiran sesuai jadwal guru login */
 $stmt = $conn->prepare("
-    SELECT
+    SELECT DISTINCT
         s.nama AS nama_siswa,
         k.nama_kelas,
         m.nama_mapel,
@@ -79,17 +83,13 @@ $stmt = $conn->prepare("
         n.izin,
         n.sakit,
         n.alfa
-    FROM nilai n
-    INNER JOIN siswa s ON n.id_siswa = s.id_siswa
-    INNER JOIN kelas k ON s.id_kelas = k.id_kelas
-    INNER JOIN mapel m ON n.id_mapel = m.id_mapel
-    WHERE EXISTS (
-        SELECT 1
-        FROM jadwal j
-        WHERE j.id_guru = ?
-          AND j.id_mapel = n.id_mapel
-          AND j.id_kelas = s.id_kelas
-    )
+    FROM jadwal j
+    INNER JOIN kelas k ON j.id_kelas = k.id_kelas
+    INNER JOIN mapel m ON j.id_mapel = m.id_mapel
+    INNER JOIN siswa s ON s.id_kelas = j.id_kelas
+    INNER JOIN nilai n ON n.id_siswa = s.id_siswa
+                 AND n.id_mapel = j.id_mapel
+    WHERE j.id_guru = ?
     ORDER BY k.nama_kelas ASC, m.nama_mapel ASC, s.nama ASC, n.semester ASC
 ");
 
@@ -125,6 +125,8 @@ while ($row = $result->fetch_assoc()) {
         "alfa" => (int) $row["alfa"]
     ];
 }
+
+$stmt->close();
 
 kirim_json("success", "Data kehadiran berhasil dimuat.", [
     "data" => $data,
