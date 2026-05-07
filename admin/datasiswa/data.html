@@ -91,78 +91,108 @@
     </div>
 
     <div class="modal-overlay" id="editModal">
-    <div class="modal-box modal-edit-box">
-        <div class="modal-header">
-            <h2>Edit Siswa</h2>
-            <button class="btn-close" id="closeEditBtn" type="button">&times;</button>
-        </div>
-
-        <form id="editSiswaForm">
-            <input type="hidden" id="editIdSiswa" name="id_siswa">
-
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="editNisn">NISN</label>
-                    <input type="text" id="editNisn" name="nisn" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="editNama">Nama Siswa</label>
-                    <input type="text" id="editNama" name="nama" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="editJenisKelamin">Jenis Kelamin</label>
-                    <select id="editJenisKelamin" name="jenis_kelamin" required>
-                        <option value="">Pilih Jenis Kelamin</option>
-                        <option value="L">Laki-laki</option>
-                        <option value="P">Perempuan</option>
-                    </select>
-                </div>
-                
-                 <div class="form-group">
-        <label for="editKelas">Kelas</label>
-        <select id="editKelas" name="id_kelas" required>
-            <option value="">Pilih Kelas</option>
-        </select>
-    </div>
-</div>
-
+        <div class="modal-box modal-edit-box">
+            <div class="modal-header">
+                <h2>Edit Siswa</h2>
+                <button class="btn-close" id="closeEditBtn" type="button">&times;</button>
             </div>
 
-            <div class="form-message" id="editFormMessage"></div>
+            <form id="editSiswaForm">
+                <input type="hidden" id="editIdSiswa" name="id_siswa">
 
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" id="cancelEditBtn">Batal</button>
-                <button type="submit" class="btn-primary">Simpan Perubahan</button>
-            </div>
-        </form>
-    </div>
-</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editNisn">NISN</label>
+                        <input type="text" id="editNisn" name="nisn" required>
+                    </div>
 
-  <div class="modal-overlay" id="deleteModal">
-    <div class="modal-box modal-delete-box modern-delete-box">
-        <div class="delete-icon-wrap">
-            <div class="delete-icon-circle">
-                <i class="fa-solid fa-trash"></i>
-            </div>
+                    <div class="form-group">
+                        <label for="editNama">Nama Siswa</label>
+                        <input type="text" id="editNama" name="nama" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editJenisKelamin">Jenis Kelamin</label>
+                        <select id="editJenisKelamin" name="jenis_kelamin" required>
+                            <option value="">Pilih Jenis Kelamin</option>
+                            <option value="L">Laki-laki</option>
+                            <option value="P">Perempuan</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editKelas">Kelas</label>
+                        <select id="editKelas" name="id_kelas" required>
+                            <option value="">Pilih Kelas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-message" id="editFormMessage"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelEditBtn">Batal</button>
+                    <button type="submit" class="btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
         </div>
-
-        <h2 class="delete-title">Hapus Siswa?</h2>
-
-        <p class="delete-text center-text">
-            Yakin ingin menghapus siswa <strong id="deleteSiswaName">-</strong>?<br>
-            Data siswa dan akun loginnya akan dihapus permanen.
-        </p>
-
-        <div class="modal-actions delete-actions-center">
-            <button type="button" class="btn-secondary" id="cancelDeleteBtn">Batal</button>
-            <button type="button" class="btn-danger btn-delete-solid" id="confirmDeleteBtn">Ya, Hapus</button>
-        </div>
-
-        <button class="btn-close delete-close-modern" id="closeDeleteBtn" type="button">&times;</button>
     </div>
-</div>
+
+    <div class="modal-overlay" id="passwordModal">
+        <div class="modal-box modal-edit-box">
+            <div class="modal-header">
+                <h2>Ganti Sandi Siswa</h2>
+                <button class="btn-close" id="closePasswordBtn" type="button">&times;</button>
+            </div>
+
+            <form id="passwordForm">
+                <input type="hidden" id="passwordIdSiswa" name="id_siswa">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="newPassword">Sandi Baru</label>
+                        <input type="password" id="newPassword" name="password" minlength="6" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Ulangi Sandi Baru</label>
+                        <input type="password" id="confirmPassword" name="confirm_password" minlength="6" required>
+                    </div>
+                </div>
+
+                <div class="form-message" id="passwordFormMessage"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelPasswordBtn">Batal</button>
+                    <button type="submit" class="btn-primary">Simpan Sandi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box modal-delete-box modern-delete-box">
+            <div class="delete-icon-wrap">
+                <div class="delete-icon-circle">
+                    <i class="fa-solid fa-user-slash"></i>
+                </div>
+            </div>
+
+            <h2 class="delete-title">Keluarkan Siswa?</h2>
+
+            <p class="delete-text center-text">
+                Yakin ingin mengubah status siswa <strong id="deleteSiswaName">-</strong> menjadi keluar?<br>
+                Data siswa tetap tersimpan dan tidak dihapus permanen.
+            </p>
+
+            <div class="modal-actions delete-actions-center">
+                <button type="button" class="btn-secondary" id="cancelDeleteBtn">Batal</button>
+                <button type="button" class="btn-danger btn-delete-solid" id="confirmDeleteBtn">Ya, Keluarkan</button>
+            </div>
+
+            <button class="btn-close delete-close-modern" id="closeDeleteBtn" type="button">&times;</button>
+        </div>
+    </div>
 
     <script src="../components/admin-nav.js"></script>
     <script src="fitursiswa.js"></script>
