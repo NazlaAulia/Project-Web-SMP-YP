@@ -2,6 +2,7 @@ let dataKehadiran = [];
 let kelasOptions = [];
 let mapelOptions = [];
 
+const filterMapelGroup = filterMapel ? filterMapel.closest(".filter-group") : null;
 const filterSemester = document.getElementById("filterSemester");
 const filterKelas = document.getElementById("filterKelas");
 const filterMapel = document.getElementById("filterMapel");
@@ -207,11 +208,31 @@ function isiFilterDariDatabase() {
   }
 
   if (filterMapel) {
-    filterMapel.innerHTML = `<option value="Semua">Semua Mapel</option>`;
+    if (mapelOptions.length === 1) {
+      const mapelGuru = mapelOptions[0];
 
-    mapelOptions.forEach(mapel => {
-      filterMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
-    });
+      filterMapel.innerHTML = `<option value="${mapelGuru}" selected>${mapelGuru}</option>`;
+      filterMapel.value = mapelGuru;
+      filterMapel.disabled = true;
+      filterMapel.classList.add("readonly-mapel");
+
+      if (filterMapelGroup) {
+        const label = filterMapelGroup.querySelector("label");
+
+        if (label) {
+          label.innerHTML = `<i class="bi bi-journal-bookmark"></i> Mapel Diampu`;
+        }
+      }
+    } else {
+      filterMapel.innerHTML = `<option value="Semua">Semua Mapel</option>`;
+
+      mapelOptions.forEach(mapel => {
+        filterMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
+      });
+
+      filterMapel.disabled = false;
+      filterMapel.classList.remove("readonly-mapel");
+    }
   }
 }
 
