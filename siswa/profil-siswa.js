@@ -43,22 +43,14 @@ function setImage(el, src) {
 function getFotoLocal() {
   const id = localStorage.getItem("id_siswa");
 
-  if (id) {
-    const fotoId = localStorage.getItem(`foto_profil_${id}`);
-    if (fotoId) return fotoId;
-  }
+  if (!id) return "";
 
-  const fotoUmum = localStorage.getItem("foto_profil_siswa");
-  if (fotoUmum) return fotoUmum;
+  // ambil foto khusus siswa ini saja
+  const fotoId = localStorage.getItem(`foto_profil_${id}`);
 
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
+  if (fotoId) return fotoId;
 
-    if (key && key.match(/^foto_profil_\d+$/)) {
-      return localStorage.getItem(key);
-    }
-  }
-
+  // JANGAN ambil foto umum atau siswa lain
   return "";
 }
 
@@ -224,7 +216,7 @@ async function loadProfilSiswa() {
       setImage(elFoto, fotoUrl);
 
       localStorage.setItem(`foto_profil_${siswaData.id_siswa}`, siswaData.foto_profil);
-      localStorage.setItem("foto_profil_siswa", siswaData.foto_profil);
+      // localStorage.setItem("foto_profil_siswa", siswaData.foto_profil);
     } else {
       setImage(elFoto, fotoLocalAwal || DEFAULT_PHOTO);
     }
@@ -300,7 +292,7 @@ async function pilihDanUploadFoto(event) {
       localStorage.setItem(`foto_profil_${idFinal}`, fotoBaru);
     }
 
-    localStorage.setItem("foto_profil_siswa", fotoBaru);
+    // localStorage.setItem("foto_profil_siswa", fotoBaru);
 
     setImage(elFoto, fotoBaru + "?t=" + Date.now());
     showToast("Foto profil berhasil disimpan.", "success");
