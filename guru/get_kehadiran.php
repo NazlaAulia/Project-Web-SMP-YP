@@ -1,6 +1,5 @@
 <?php
 header("Content-Type: application/json; charset=utf-8");
-
 require_once "koneksi.php";
 
 function kirim_json($status, $message, $extra = []) {
@@ -22,11 +21,9 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
-/* AMBIL MAPEL SESUAI GURU LOGIN */
+/* MAPEL GURU LOGIN SAJA */
 $getMapel = $conn->prepare("
-    SELECT DISTINCT
-        m.id_mapel,
-        m.nama_mapel
+    SELECT DISTINCT m.id_mapel, m.nama_mapel
     FROM guru g
     JOIN mapel m ON g.id_mapel = m.id_mapel
     WHERE g.id_guru = ?
@@ -41,22 +38,20 @@ $getMapel->execute();
 $resultMapel = $getMapel->get_result();
 
 $mapelOptions = [];
-$idMapelList = [];
 
 while ($mapel = $resultMapel->fetch_assoc()) {
     $mapelOptions[] = $mapel["nama_mapel"];
-    $idMapelList[] = (int) $mapel["id_mapel"];
 }
 
-if (empty($idMapelList)) {
-    kirim_json("success", "Tidak ada mapel.", [
+if (empty($mapelOptions)) {
+    kirim_json("success", "Guru ini belum punya mapel.", [
         "data" => [],
         "kelas_options" => [],
         "mapel_options" => []
     ]);
 }
 
-/* AMBIL DATA KEHADIRAN SESUAI GURU, MAPEL, DAN KELAS YANG DIAJAR */
+/* DATA KEHADIRAN SESUAI GURU LOGIN + KELAS DI JADWAL + MAPEL GURU */
 $stmt = $conn->prepare("
     SELECT DISTINCT
         s.nama AS nama_siswa,
@@ -67,19 +62,16 @@ $stmt = $conn->prepare("
         n.izin,
         n.sakit,
         n.alfa
-    FROM nilai n
-    JOIN siswa s ON n.id_siswa = s.id_siswa
+    FROM jadwal j
+    JOIN guru g ON j.id_guru = g.id_guru
+    JOIN mapel m ON j.id_mapel = m.id_mapel
+    JOIN siswa s ON j.id_kelas = s.id_kelas
     JOIN kelas k ON s.id_kelas = k.id_kelas
-    JOIN mapel m ON n.id_mapel = m.id_mapel
-    JOIN jadwal j 
-        ON j.id_guru = ?
-        AND j.id_kelas = s.id_kelas
-        AND j.id_mapel = n.id_mapel
-    WHERE n.id_mapel IN (
-        SELECT g.id_mapel
-        FROM guru g
-        WHERE g.id_guru = ?
-    )
+    JOIN nilai n ON n.id_siswa = s.id_siswa
+                AND n.id_mapel = j.id_mapel
+    WHERE j.id_guru = ?
+      AND g.id_guru = ?
+      AND g.id_mapel = j.id_mapel
     ORDER BY k.nama_kelas ASC, s.nama ASC, n.semester ASC
 ");
 
@@ -119,7 +111,6 @@ while ($row = $result->fetch_assoc()) {
     ];
 }
 
-/* UNIKKAN KELAS */
 $kelasOptions = array_values(array_unique($kelasOptions));
 
 kirim_json("success", "Data kehadiran berhasil dimuat.", [
