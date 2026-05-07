@@ -1,5 +1,6 @@
 <?php
 header("Content-Type: application/json; charset=utf-8");
+
 require_once "koneksi.php";
 
 function kirim_json($status, $message, $extra = []) {
@@ -21,9 +22,11 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
-/* MAPEL GURU LOGIN SAJA */
+/* AMBIL MAPEL SESUAI GURU LOGIN */
 $getMapel = $conn->prepare("
-    SELECT DISTINCT m.id_mapel, m.nama_mapel
+    SELECT DISTINCT
+        m.id_mapel,
+        m.nama_mapel
     FROM guru g
     JOIN mapel m ON g.id_mapel = m.id_mapel
     WHERE g.id_guru = ?
@@ -51,7 +54,7 @@ if (empty($mapelOptions)) {
     ]);
 }
 
-/* DATA KEHADIRAN SESUAI GURU LOGIN + KELAS DI JADWAL + MAPEL GURU */
+/* AMBIL DATA KEHADIRAN SESUAI GURU LOGIN, MAPEL GURU, DAN KELAS YANG DIAJAR */
 $stmt = $conn->prepare("
     SELECT DISTINCT
         s.nama AS nama_siswa,
