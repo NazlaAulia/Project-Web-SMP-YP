@@ -67,11 +67,13 @@ $sql = "
     INNER JOIN siswa s ON n.id_siswa = s.id_siswa
     INNER JOIN kelas k ON s.id_kelas = k.id_kelas
     INNER JOIN mapel m ON n.id_mapel = m.id_mapel
+    INNER JOIN guru g ON g.id_guru = ?
     WHERE s.id_kelas = ?
+      AND n.id_mapel = g.id_mapel
 ";
 
-$types = "i";
-$params = [$id_kelas];
+$types = "ii";
+$params = [$id_guru, $id_kelas];
 
 if ($id_siswa > 0) {
     $sql .= " AND s.id_siswa = ?";

@@ -14,11 +14,6 @@ function kirim_json($status, $message, $extra = []) {
 $id_guru = isset($_GET["id_guru"]) ? (int) $_GET["id_guru"] : 0;
 $role_id = isset($_GET["role_id"]) ? (int) $_GET["role_id"] : 0;
 
-/*
-    mode:
-    - mapel = data sesuai mapel guru
-    - wali  = data semua mapel berdasarkan kelas wali
-*/
 $mode = $_GET["mode"] ?? "mapel";
 $id_kelas = isset($_GET["id_kelas"]) ? (int) $_GET["id_kelas"] : 0;
 
@@ -30,9 +25,7 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
-/* =========================
-   AMBIL DATA GURU
-========================= */
+/* AMBIL DATA GURU */
 $getGuru = $conn->prepare("
     SELECT 
         g.id_guru,
@@ -60,9 +53,7 @@ if ($resultGuru->num_rows === 0) {
 $guru = $resultGuru->fetch_assoc();
 $id_mapel_guru = (int) $guru["id_mapel"];
 
-/* =========================
-   CEK APAKAH GURU WALI KELAS
-========================= */
+/* AMBIL KELAS WALI */
 $getWali = $conn->prepare("
     SELECT 
         id_kelas,
@@ -93,10 +84,7 @@ while ($row = $resultWali->fetch_assoc()) {
 
 $is_wali_kelas = count($wali_kelas) > 0;
 
-/* =========================
-   AMBIL KELAS MAPEL YANG DIAJAR GURU
-   Mapel Saya harus ikut tabel jadwal, bukan semua kelas.
-========================= */
+/* AMBIL KELAS MAPEL YANG DIAJAR GURU */
 $kelas_mapel = [];
 
 $getKelasMapel = $conn->prepare("
@@ -106,8 +94,9 @@ $getKelasMapel = $conn->prepare("
         k.tingkat
     FROM jadwal j
     INNER JOIN kelas k ON j.id_kelas = k.id_kelas
+    INNER JOIN guru g ON j.id_guru = g.id_guru
     WHERE j.id_guru = ?
-      AND j.id_mapel = ?
+      AND j.id_mapel = g.id_mapel
     ORDER BY k.tingkat ASC, k.nama_kelas ASC
 ");
 
@@ -115,7 +104,7 @@ if (!$getKelasMapel) {
     kirim_json("error", "Query kelas mapel gagal: " . $conn->error);
 }
 
-$getKelasMapel->bind_param("ii", $id_guru, $id_mapel_guru);
+$getKelasMapel->bind_param("i", $id_guru);
 $getKelasMapel->execute();
 $resultKelasMapel = $getKelasMapel->get_result();
 
@@ -127,9 +116,7 @@ while ($row = $resultKelasMapel->fetch_assoc()) {
     ];
 }
 
-/* =========================
-   VALIDASI MODE WALI
-========================= */
+/* VALIDASI MODE WALI */
 if ($mode === "wali") {
     if (!$is_wali_kelas) {
         kirim_json("error", "Guru ini bukan wali kelas.");
@@ -153,9 +140,7 @@ if ($mode === "wali") {
     }
 }
 
-/* =========================
-   QUERY DATA NILAI
-========================= */
+/* QUERY DATA NILAI */
 if ($mode === "wali") {
     $stmt = $conn->prepare("
         SELECT
@@ -203,7 +188,8 @@ if ($mode === "wali") {
         INNER JOIN siswa s ON n.id_siswa = s.id_siswa
         INNER JOIN kelas k ON s.id_kelas = k.id_kelas
         INNER JOIN mapel m ON n.id_mapel = m.id_mapel
-        WHERE n.id_mapel = ?
+        INNER JOIN guru g ON g.id_guru = ?
+        WHERE n.id_mapel = g.id_mapel
           AND EXISTS (
               SELECT 1
               FROM jadwal j
@@ -214,7 +200,7 @@ if ($mode === "wali") {
     ";
 
     $types = "ii";
-    $params = [$id_mapel_guru, $id_guru];
+    $params = [$id_guru, $id_guru];
 
     if ($id_kelas > 0) {
         $sql .= " AND s.id_kelas = ?";
@@ -266,9 +252,9 @@ kirim_json("success", "Data nilai berhasil dimuat.", [
         "id_mapel" => $id_mapel_guru,
         "nama_mapel" => $guru["nama_mapel"] ?? "-"
     ],
-        "is_wali_kelas" => $is_wali_kelas,
-        "wali_kelas" => $wali_kelas,
-        "kelas_mapel" => $kelas_mapel,
-        "data" => $data
+    "is_wali_kelas" => $is_wali_kelas,
+    "wali_kelas" => $wali_kelas,
+    "kelas_mapel" => $kelas_mapel,
+    "data" => $data
 ]);
 ?>
