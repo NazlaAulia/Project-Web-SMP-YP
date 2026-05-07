@@ -14,6 +14,13 @@ const confirmProcessBtn = document.getElementById("confirmProcessBtn");
 const confirmText = document.getElementById("confirmText");
 const confirmMessage = document.getElementById("confirmMessage");
 
+const buatTahunBtn = document.getElementById("buatTahunBtn");
+const tahunAjaranPopup = document.getElementById("tahunAjaranPopup");
+const closeTahunAjaranPopup = document.getElementById("closeTahunAjaranPopup");
+const cancelTahunAjaranBtn = document.getElementById("cancelTahunAjaranBtn");
+const confirmTahunAjaranBtn = document.getElementById("confirmTahunAjaranBtn");
+const tahunAjaranMessage = document.getElementById("tahunAjaranMessage");
+
 let pendingFormData = null;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -45,14 +52,41 @@ function renderSummary(summary) {
 }
 
 function renderTahunAjaran(data) {
-    tahunSelect.innerHTML = `<option value="">-- Pilih Tahun Ajaran --</option>`;
+    tahunSelect.innerHTML = `<option value="">-- Pilih Tahun Ajaran Baru --</option>`;
 
-    data.forEach((item) => {
+    const tahunAktif = data.find((item) => item.status === "aktif");
+    const awalTahunAktif = tahunAktif ? getAwalTahunAjaran(tahunAktif.tahun_ajaran) : 0;
+
+    const calonTahunBaru = data.filter((item) => {
+        const awalTahun = getAwalTahunAjaran(item.tahun_ajaran);
+        return item.status !== "aktif" && awalTahun > awalTahunAktif;
+    });
+
+    if (!calonTahunBaru.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Belum ada tahun ajaran berikutnya";
+        option.disabled = true;
+        tahunSelect.appendChild(option);
+        return;
+    }
+
+    calonTahunBaru.forEach((item) => {
         const option = document.createElement("option");
         option.value = item.id_tahun_ajaran;
-        option.textContent = item.tahun_ajaran + (item.status === "aktif" ? " - Aktif sekarang" : "");
+        option.textContent = item.tahun_ajaran;
         tahunSelect.appendChild(option);
     });
+}
+
+function getAwalTahunAjaran(tahunAjaran) {
+    const match = String(tahunAjaran || "").match(/^(\d{4})[/-](\d{4})$/);
+
+    if (!match) {
+        return 0;
+    }
+
+    return Number(match[1]);
 }
 
 function renderWaliKelas(kelas, guru) {
@@ -185,4 +219,88 @@ function showConfirmMessage(message) {
     } else {
         showMessage(message, "error");
     }
+}
+
+function openTahunAjaranPopup() {
+    if (tahunAjaranMessage) {
+        tahunAjaranMessage.textContent = "";
+        tahunAjaranMessage.className = "confirm-message";
+    }
+
+    if (tahunAjaranPopup) {
+        tahunAjaranPopup.classList.add("active");
+    }
+}
+
+function closeTahunAjaranModal() {
+    if (tahunAjaranPopup) {
+        tahunAjaranPopup.classList.remove("active");
+    }
+}
+
+if (buatTahunBtn) {
+    buatTahunBtn.addEventListener("click", openTahunAjaranPopup);
+}
+
+if (closeTahunAjaranPopup) {
+    closeTahunAjaranPopup.addEventListener("click", closeTahunAjaranModal);
+}
+
+if (cancelTahunAjaranBtn) {
+    cancelTahunAjaranBtn.addEventListener("click", closeTahunAjaranModal);
+}
+
+if (tahunAjaranPopup) {
+    tahunAjaranPopup.addEventListener("click", (event) => {
+        if (event.target === tahunAjaranPopup) {
+            closeTahunAjaranModal();
+        }
+    });
+}
+
+if (confirmTahunAjaranBtn) {
+    confirmTahunAjaranBtn.addEventListener("click", async () => {
+        try {
+            confirmTahunAjaranBtn.disabled = true;
+            confirmTahunAjaranBtn.textContent = "Membuat...";
+
+            if (tahunAjaranMessage) {
+                tahunAjaranMessage.textContent = "Sedang membuat tahun ajaran berikutnya...";
+                tahunAjaranMessage.className = "confirm-message";
+            }
+
+            const response = await fetch("buat_tahun_ajaran.php", {
+                method: "POST"
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                if (tahunAjaranMessage) {
+                    tahunAjaranMessage.textContent = result.message || "Gagal membuat tahun ajaran.";
+                    tahunAjaranMessage.className = "confirm-message error";
+                }
+                return;
+            }
+
+            if (tahunAjaranMessage) {
+                tahunAjaranMessage.textContent = result.message || "Tahun ajaran berhasil dibuat.";
+                tahunAjaranMessage.className = "confirm-message success";
+            }
+
+            await loadNaikKelasData();
+
+            setTimeout(() => {
+                closeTahunAjaranModal();
+            }, 800);
+        } catch (error) {
+            if (tahunAjaranMessage) {
+                tahunAjaranMessage.textContent = "Gagal membuat tahun ajaran: " + error.message;
+                tahunAjaranMessage.className = "confirm-message error";
+            }
+        } finally {
+            confirmTahunAjaranBtn.disabled = false;
+            confirmTahunAjaranBtn.textContent = "Ya, Buat";
+        }
+    });
 }
