@@ -199,12 +199,18 @@ function renderTable(data) {
 }
 
 function isiFilterDariDatabase() {
+  if (filterSemester) {
+    filterSemester.value = "Semua";
+  }
+
   if (filterKelas) {
-    filterKelas.innerHTML = `<option value="Semua">Semua Kelas</option>`;
+    filterKelas.innerHTML = `<option value="Semua" selected>Semua Kelas</option>`;
 
     kelasOptions.forEach(kelas => {
       filterKelas.innerHTML += `<option value="${kelas}">Kelas ${kelas}</option>`;
     });
+
+    filterKelas.value = "Semua";
   }
 
   if (filterMapel) {
@@ -215,21 +221,14 @@ function isiFilterDariDatabase() {
       filterMapel.value = mapelGuru;
       filterMapel.disabled = true;
       filterMapel.classList.add("readonly-mapel");
-
-      if (filterMapelGroup) {
-        const label = filterMapelGroup.querySelector("label");
-
-        if (label) {
-          label.innerHTML = `<i class="bi bi-journal-bookmark"></i> Mapel Diampu`;
-        }
-      }
     } else {
-      filterMapel.innerHTML = `<option value="Semua">Semua Mapel</option>`;
+      filterMapel.innerHTML = `<option value="Semua" selected>Semua Mapel</option>`;
 
       mapelOptions.forEach(mapel => {
         filterMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
       });
 
+      filterMapel.value = "Semua";
       filterMapel.disabled = false;
       filterMapel.classList.remove("readonly-mapel");
     }
