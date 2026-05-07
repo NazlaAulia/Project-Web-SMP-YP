@@ -11,6 +11,21 @@ if (!isset($conn) || !$conn) {
     exit;
 }
 
+// ========== TAMBAHAN: CEK TAHUN AJARAN AKTIF DAN LOCK ==========
+$queryTahun = "SELECT id_tahun_ajaran, tahun_ajaran, status, jadwal_locked FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1";
+$resultTahun = $conn->query($queryTahun);
+if (!$resultTahun || $resultTahun->num_rows === 0) {
+    echo json_encode(['success' => false, 'message' => 'Tidak ada tahun ajaran yang aktif.']);
+    exit;
+}
+$tahunAktif = $resultTahun->fetch_assoc();
+if ($tahunAktif['jadwal_locked'] == 1) {
+    echo json_encode(['success' => false, 'message' => 'Jadwal untuk tahun ajaran ' . $tahunAktif['tahun_ajaran'] . ' sudah dikunci. Tidak bisa generate ulang.']);
+    exit;
+}
+$id_tahun_aktif = (int)$tahunAktif['id_tahun_ajaran'];
+// ===============================================================
+
 function formatJam($jam)
 {
     return substr($jam, 0, 5);
@@ -396,7 +411,8 @@ function cariKandidatGanjilUntukHari($tasks, $jp_per_hari, $kelas_terpakai, $gur
     return $kandidat[0];
 }
 
-function pasangKandidat(&$stmtInsert, &$tasks, $kandidat, $id_kelas, $hari, &$kelas_terpakai, &$guru_terpakai, &$mapel_hari_terpakai, &$beban_guru, &$jumlah_berhasil)
+// ========== TAMBAHAN: MODIFIKASI FUNGSI PASANGKANDIDAT DENGAN ID_TAHUN_AJARAN ==========
+function pasangKandidat(&$stmtInsert, &$tasks, $kandidat, $id_kelas, $hari, &$kelas_terpakai, &$guru_terpakai, &$mapel_hari_terpakai, &$beban_guru, &$jumlah_berhasil, $id_tahun_ajaran)
 {
     $taskIndex = $kandidat['task_index'];
     $task = $kandidat['task'];
@@ -410,8 +426,9 @@ function pasangKandidat(&$stmtInsert, &$tasks, $kandidat, $id_kelas, $hari, &$ke
     $jumlah_jp = (int)$task['jp_per_pertemuan'];
     $id_mapel_insert = (int)$task['id_mapel'];
 
+    // BIND 9 PARAMETER (tambah id_tahun_ajaran)
     $stmtInsert->bind_param(
-        "iiissiii",
+        "iiissiiii",
         $id_guru_insert,
         $id_kelas,
         $id_mapel_insert,
@@ -419,7 +436,8 @@ function pasangKandidat(&$stmtInsert, &$tasks, $kandidat, $id_kelas, $hari, &$ke
         $jam_insert,
         $jp_mulai,
         $jp_selesai,
-        $jumlah_jp
+        $jumlah_jp,
+        $id_tahun_ajaran
     );
 
     if (!$stmtInsert->execute()) {
@@ -441,6 +459,7 @@ function pasangKandidat(&$stmtInsert, &$tasks, $kandidat, $id_kelas, $hari, &$ke
 
     $jumlah_berhasil++;
 }
+// =======================================================================
 
 try {
     $conn->begin_transaction();
@@ -605,19 +624,21 @@ try {
         throw new Exception('Gagal menghapus request jadwal lama: ' . $conn->error);
     }
 
-    if (!$conn->query("DELETE FROM jadwal")) {
-        throw new Exception('Gagal menghapus jadwal lama: ' . $conn->error);
+    // Hanya hapus jadwal untuk tahun ajaran yang aktif (biar tahun lain tidak terganggu)
+    $stmtDelete = $conn->prepare("DELETE FROM jadwal WHERE id_tahun_ajaran = ?");
+    $stmtDelete->bind_param("i", $id_tahun_aktif);
+    if (!$stmtDelete->execute()) {
+        throw new Exception('Gagal menghapus jadwal lama untuk tahun ini: ' . $conn->error);
     }
-
-    $conn->query("ALTER TABLE jadwal AUTO_INCREMENT = 1");
+    $stmtDelete->close();
 
     // ===============================
-    // PREPARE INSERT JADWAL
+    // PREPARE INSERT JADWAL (DENGAN ID_TAHUN_AJARAN)
     // ===============================
     $stmtInsert = $conn->prepare("
         INSERT INTO jadwal
-        (id_guru, id_kelas, id_mapel, hari, jam, jp_mulai, jp_selesai, jumlah_jp)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        (id_guru, id_kelas, id_mapel, hari, jam, jp_mulai, jp_selesai, jumlah_jp, id_tahun_ajaran)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
     if (!$stmtInsert) {
@@ -677,8 +698,6 @@ try {
 
         // ===============================
         // 1. SEBAR TASK GANJIL DULU
-        // Hari dengan target 11 JP butuh minimal 1 task ganjil
-        // Supaya Senin-Kamis bisa penuh sampai JP 11
         // ===============================
         foreach ($hari_list as $hari) {
             $target = $target_harian[$hari] ?? 0;
@@ -715,7 +734,8 @@ try {
                     $guru_terpakai,
                     $mapel_hari_terpakai,
                     $beban_guru,
-                    $jumlah_berhasil
+                    $jumlah_berhasil,
+                    $id_tahun_aktif   // TAMBAHAN: kirim id_tahun_aktif
                 );
             }
         }
@@ -770,7 +790,8 @@ try {
                     $guru_terpakai,
                     $mapel_hari_terpakai,
                     $beban_guru,
-                    $jumlah_berhasil
+                    $jumlah_berhasil,
+                    $id_tahun_aktif   // TAMBAHAN: kirim id_tahun_aktif
                 );
             }
         }
