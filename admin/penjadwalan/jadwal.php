@@ -87,7 +87,7 @@ if ($result && $result->num_rows > 0) {
 
     <style>
         :root {
-            --primary-teal: #0f766e;
+            --primary-teal: #064e4b;
             --soft-teal: #ecfdf5;
             --dark-text: #1f2937;
             --muted-text: #6b7280;
@@ -708,11 +708,12 @@ if ($result && $result->num_rows > 0) {
     </style>
 </head>
 
-<body data-page="jadwal">
-    <div id="admin-nav-root"></div>
-
+<body data-page="jadwal" data-nav-path="/admin/components/admin-nav.html">
     <div class="container">
+        <div id="admin-nav-root"></div>
+
         <main class="main-content">
+
             <section class="page-header">
                 <div class="page-header-top">
                     <div class="page-title">
