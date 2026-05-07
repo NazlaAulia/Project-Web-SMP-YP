@@ -5,6 +5,7 @@ const rowsPerPage = 10;
 
 let semuaApproval = [];
 let deleteTargetId = null;
+let passwordTargetId = null;
 
 const siswaTableBody = document.getElementById("siswaTableBody");
 const searchSiswa = document.getElementById("searchSiswa");
@@ -21,7 +22,6 @@ const closeDeleteBtn = document.getElementById("closeDeleteBtn");
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
-/* TAMBAHAN UNTUK MODAL EDIT */
 const editModal = document.getElementById("editModal");
 const closeEditBtn = document.getElementById("closeEditBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
@@ -31,9 +31,21 @@ const editIdSiswa = document.getElementById("editIdSiswa");
 const editNisn = document.getElementById("editNisn");
 const editNama = document.getElementById("editNama");
 const editJenisKelamin = document.getElementById("editJenisKelamin");
+const editKelas = document.getElementById("editKelas");
 const editFormMessage = document.getElementById("editFormMessage");
 
-document.addEventListener("DOMContentLoaded", () => {
+const passwordModal = document.getElementById("passwordModal");
+const closePasswordBtn = document.getElementById("closePasswordBtn");
+const cancelPasswordBtn = document.getElementById("cancelPasswordBtn");
+const passwordForm = document.getElementById("passwordForm");
+const passwordIdSiswa = document.getElementById("passwordIdSiswa");
+const passwordSiswaName = document.getElementById("passwordSiswaName");
+const newPassword = document.getElementById("newPassword");
+const confirmPassword = document.getElementById("confirmPassword");
+const passwordFormMessage = document.getElementById("passwordFormMessage");
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadKelas();
     loadSiswa();
     loadPendingApproval();
 });
@@ -75,6 +87,37 @@ if (searchSiswa) {
         currentPage = 1;
         renderSiswa();
     });
+}
+
+async function loadKelas() {
+    if (!editKelas) return;
+
+    try {
+        const response = await fetch("siswa_data.php?mode=kelas");
+        const raw = await response.text();
+
+        let result;
+        try {
+            result = JSON.parse(raw);
+        } catch {
+            throw new Error("Response kelas bukan JSON: " + raw);
+        }
+
+        if (result.status !== "success") {
+            throw new Error(result.message || "Gagal memuat data kelas.");
+        }
+
+        const kelasList = result.data || [];
+
+        editKelas.innerHTML = `
+            <option value="">Pilih Kelas</option>
+            ${kelasList.map(kelas => `
+                <option value="${escapeHtml(kelas.id_kelas)}">${escapeHtml(kelas.nama_kelas)}</option>
+            `).join("")}
+        `;
+    } catch (error) {
+        editKelas.innerHTML = `<option value="">Gagal memuat kelas</option>`;
+    }
 }
 
 async function loadSiswa() {
@@ -172,6 +215,16 @@ function renderSiswa() {
                         aria-label="Edit"
                     >
                         <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+
+                    <button 
+                        type="button"
+                        class="btn-password btn-icon" 
+                        onclick="openPasswordModal(${siswa.id_siswa}, '${escapeJs(siswa.nama || "-")}')" 
+                        title="Ganti Sandi"
+                        aria-label="Ganti Sandi"
+                    >
+                        <i class="fa-solid fa-key"></i>
                     </button>
 
                     <button 
@@ -403,7 +456,6 @@ if (confirmDeleteBtn) {
     });
 }
 
-/* TAMBAHAN EVENT UNTUK MODAL EDIT */
 if (closeEditBtn) {
     closeEditBtn.addEventListener("click", closeEditModal);
 }
@@ -432,6 +484,11 @@ function editSiswa(idSiswa) {
     editNisn.value = siswa.nisn || "";
     editNama.value = siswa.nama || "";
     editJenisKelamin.value = siswa.jenis_kelamin || "";
+
+    if (editKelas) {
+        editKelas.value = siswa.id_kelas || "";
+    }
+
     editFormMessage.textContent = "";
     editFormMessage.className = "form-message";
 
@@ -471,6 +528,10 @@ if (editSiswaForm) {
             formData.append("nama", editNama.value.trim());
             formData.append("jenis_kelamin", editJenisKelamin.value);
 
+            if (editKelas) {
+                formData.append("id_kelas", editKelas.value);
+            }
+
             const response = await fetch("edit_siswa.php", {
                 method: "POST",
                 body: formData
@@ -508,6 +569,124 @@ if (editSiswaForm) {
             if (editFormMessage) {
                 editFormMessage.textContent = error.message;
                 editFormMessage.className = "form-message error";
+            }
+        }
+    });
+}
+
+function openPasswordModal(idSiswa, namaSiswa) {
+    passwordTargetId = idSiswa;
+
+    if (passwordIdSiswa) {
+        passwordIdSiswa.value = idSiswa;
+    }
+
+    if (passwordSiswaName) {
+        passwordSiswaName.textContent = namaSiswa;
+    }
+
+    if (newPassword) {
+        newPassword.value = "";
+    }
+
+    if (confirmPassword) {
+        confirmPassword.value = "";
+    }
+
+    if (passwordFormMessage) {
+        passwordFormMessage.textContent = "";
+        passwordFormMessage.className = "form-message";
+    }
+
+    if (passwordModal) {
+        passwordModal.classList.add("active");
+    }
+}
+
+function closePasswordModal() {
+    passwordTargetId = null;
+
+    if (passwordModal) {
+        passwordModal.classList.remove("active");
+    }
+
+    if (passwordForm) {
+        passwordForm.reset();
+    }
+
+    if (passwordFormMessage) {
+        passwordFormMessage.textContent = "";
+        passwordFormMessage.className = "form-message";
+    }
+}
+
+if (closePasswordBtn) {
+    closePasswordBtn.addEventListener("click", closePasswordModal);
+}
+
+if (cancelPasswordBtn) {
+    cancelPasswordBtn.addEventListener("click", closePasswordModal);
+}
+
+if (passwordModal) {
+    passwordModal.addEventListener("click", (e) => {
+        if (e.target === passwordModal) {
+            closePasswordModal();
+        }
+    });
+}
+
+if (passwordForm) {
+    passwordForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        if (!passwordTargetId) return;
+
+        if (passwordFormMessage) {
+            passwordFormMessage.textContent = "Menyimpan sandi baru...";
+            passwordFormMessage.className = "form-message";
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append("id_siswa", passwordTargetId);
+            formData.append("password", newPassword.value);
+            formData.append("confirm_password", confirmPassword.value);
+
+            const response = await fetch("reset_sandi_siswa.php", {
+                method: "POST",
+                body: formData
+            });
+
+            const raw = await response.text();
+
+            let result;
+            try {
+                result = JSON.parse(raw);
+            } catch {
+                throw new Error("Response sandi bukan JSON: " + raw);
+            }
+
+            if (result.status !== "success") {
+                if (passwordFormMessage) {
+                    passwordFormMessage.textContent = result.message || "Gagal mengganti sandi.";
+                    passwordFormMessage.className = "form-message error";
+                }
+                return;
+            }
+
+            if (passwordFormMessage) {
+                passwordFormMessage.textContent = result.message || "Sandi siswa berhasil diganti.";
+                passwordFormMessage.className = "form-message success";
+            }
+
+            setTimeout(() => {
+                closePasswordModal();
+            }, 800);
+        } catch (error) {
+            if (passwordFormMessage) {
+                passwordFormMessage.textContent = error.message;
+                passwordFormMessage.className = "form-message error";
             }
         }
     });

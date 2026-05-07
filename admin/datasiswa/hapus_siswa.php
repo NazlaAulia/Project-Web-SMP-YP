@@ -20,31 +20,24 @@ if ($idSiswa <= 0) {
     respon("error", "ID siswa tidak valid.");
 }
 
-$conn->begin_transaction();
+$stmt = $conn->prepare("
+    UPDATE siswa
+    SET status = 'keluar'
+    WHERE id_siswa = ?
+");
 
-try {
-    $hapusUser = $conn->prepare("DELETE FROM user WHERE id_siswa = ?");
-    $hapusUser->bind_param("i", $idSiswa);
+if (!$stmt) {
+    respon("error", "Prepare update status gagal: " . $conn->error);
+}
 
-    if (!$hapusUser->execute()) {
-        throw new Exception("Gagal menghapus akun user siswa.");
-    }
+$stmt->bind_param("i", $idSiswa);
 
-    $hapusUser->close();
-
-    $hapusSiswa = $conn->prepare("DELETE FROM siswa WHERE id_siswa = ?");
-    $hapusSiswa->bind_param("i", $idSiswa);
-
-    if (!$hapusSiswa->execute()) {
-        throw new Exception("Gagal menghapus data siswa.");
-    }
-
-    $hapusSiswa->close();
-
-    $conn->commit();
-    respon("success", "Data siswa berhasil dihapus.");
-} catch (Exception $e) {
-    $conn->rollback();
-    respon("error", $e->getMessage());
+if ($stmt->execute()) {
+    $stmt->close();
+    respon("success", "Status siswa berhasil diubah menjadi keluar.");
+} else {
+    $err = $stmt->error;
+    $stmt->close();
+    respon("error", "Gagal mengubah status siswa: " . $err);
 }
 ?>

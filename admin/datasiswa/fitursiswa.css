@@ -1342,3 +1342,8 @@ button {
     transform: translateY(-1px);
     filter: brightness(0.97);
 }
+
+.table-card .action-buttons .btn-password {
+    background: #e8f3f2 !important;
+    color: #064e4b !important;
+}

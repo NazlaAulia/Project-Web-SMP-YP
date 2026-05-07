@@ -19,8 +19,9 @@ $id_siswa = (int)($_POST['id_siswa'] ?? 0);
 $nisn = trim($_POST['nisn'] ?? '');
 $nama = trim($_POST['nama'] ?? '');
 $jenis_kelamin = trim($_POST['jenis_kelamin'] ?? '');
+$id_kelas = (int)($_POST['id_kelas'] ?? 0);
 
-if ($id_siswa <= 0 || $nisn === '' || $nama === '' || $jenis_kelamin === '') {
+if ($id_siswa <= 0 || $nisn === '' || $nama === '' || $jenis_kelamin === '' || $id_kelas <= 0) {
     respon("error", "Data tidak lengkap.");
 }
 
@@ -45,7 +46,7 @@ $cek->close();
 
 $stmt = $conn->prepare("
     UPDATE siswa 
-    SET nisn = ?, nama = ?, jenis_kelamin = ?
+    SET nisn = ?, nama = ?, jenis_kelamin = ?, id_kelas = ?
     WHERE id_siswa = ?
 ");
 
@@ -53,7 +54,7 @@ if (!$stmt) {
     respon("error", "Prepare update gagal: " . $conn->error);
 }
 
-$stmt->bind_param("sssi", $nisn, $nama, $jenis_kelamin, $id_siswa);
+$stmt->bind_param("sssii", $nisn, $nama, $jenis_kelamin, $id_kelas, $id_siswa);
 
 if ($stmt->execute()) {
     $stmt->close();
