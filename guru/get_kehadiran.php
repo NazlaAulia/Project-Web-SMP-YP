@@ -22,17 +22,20 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
-/* Ambil semua kelas untuk dropdown */
+/* Ambil kelas sesuai jadwal guru login */
 $getKelas = $conn->prepare("
-    SELECT nama_kelas
-    FROM kelas
-    ORDER BY nama_kelas ASC
+    SELECT DISTINCT k.nama_kelas
+    FROM jadwal j
+    INNER JOIN kelas k ON j.id_kelas = k.id_kelas
+    WHERE j.id_guru = ?
+    ORDER BY k.nama_kelas ASC
 ");
 
 if (!$getKelas) {
     kirim_json("error", "Query kelas gagal: " . $conn->error);
 }
 
+$getKelas->bind_param("i", $id_guru);
 $getKelas->execute();
 $resultKelas = $getKelas->get_result();
 
@@ -42,17 +45,20 @@ while ($kelas = $resultKelas->fetch_assoc()) {
     $kelasOptions[] = $kelas["nama_kelas"];
 }
 
-/* Ambil semua mapel untuk dropdown */
+/* Ambil mapel sesuai jadwal guru login */
 $getMapel = $conn->prepare("
-    SELECT nama_mapel
-    FROM mapel
-    ORDER BY id_mapel ASC
+    SELECT DISTINCT m.nama_mapel
+    FROM jadwal j
+    INNER JOIN mapel m ON j.id_mapel = m.id_mapel
+    WHERE j.id_guru = ?
+    ORDER BY m.id_mapel ASC
 ");
 
 if (!$getMapel) {
     kirim_json("error", "Query mapel gagal: " . $conn->error);
 }
 
+$getMapel->bind_param("i", $id_guru);
 $getMapel->execute();
 $resultMapel = $getMapel->get_result();
 
@@ -62,7 +68,7 @@ while ($mapel = $resultMapel->fetch_assoc()) {
     $mapelOptions[] = $mapel["nama_mapel"];
 }
 
-/* Ambil data kehadiran dari tabel nilai */
+/* Ambil data kehadiran hanya sesuai kelas dan mapel yang diajar guru login */
 $stmt = $conn->prepare("
     SELECT
         s.nama AS nama_siswa,
@@ -74,9 +80,16 @@ $stmt = $conn->prepare("
         n.sakit,
         n.alfa
     FROM nilai n
-    LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
-    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-    LEFT JOIN mapel m ON n.id_mapel = m.id_mapel
+    INNER JOIN siswa s ON n.id_siswa = s.id_siswa
+    INNER JOIN kelas k ON s.id_kelas = k.id_kelas
+    INNER JOIN mapel m ON n.id_mapel = m.id_mapel
+    WHERE EXISTS (
+        SELECT 1
+        FROM jadwal j
+        WHERE j.id_guru = ?
+          AND j.id_mapel = n.id_mapel
+          AND j.id_kelas = s.id_kelas
+    )
     ORDER BY k.nama_kelas ASC, m.nama_mapel ASC, s.nama ASC, n.semester ASC
 ");
 
@@ -84,6 +97,7 @@ if (!$stmt) {
     kirim_json("error", "Query kehadiran gagal: " . $conn->error);
 }
 
+$stmt->bind_param("i", $id_guru);
 $stmt->execute();
 $result = $stmt->get_result();
 
