@@ -89,7 +89,7 @@ if ($id_siswa <= 0) {
 /*
   Ambil data siswa + kelas
 */
-$sql = "SELECT s.id_siswa, s.nama, s.id_kelas, k.nama_kelas
+$sql = "SELECT s.id_siswa, s.nama, s.id_kelas, s.status, k.nama_kelas
         FROM siswa s
         LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
         WHERE s.id_siswa = ?
@@ -125,7 +125,7 @@ if ($stmt->num_rows === 0) {
     exit;
 }
 
-$stmt->bind_result($db_id_siswa, $nama, $id_kelas, $nama_kelas);
+$stmt->bind_result($db_id_siswa, $nama, $id_kelas, $status_siswa, $nama_kelas);
 $stmt->fetch();
 $stmt->close();
 
@@ -245,6 +245,7 @@ echo json_encode([
         "nama" => $nama,
         "id_kelas" => $id_kelas,
         "nama_kelas" => $nama_kelas,
+        "status" => $status_siswa,
         "hari_ini" => $hariIni,
         "jadwal_hari_ini" => $jadwal,
         "nilai_akademik" => $nilai

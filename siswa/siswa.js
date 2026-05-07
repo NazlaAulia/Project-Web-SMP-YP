@@ -10,6 +10,53 @@ const namaSiswaEl = document.getElementById("namaSiswa");
 const welcomeTextEl = document.getElementById("welcomeText");
 const barChartEl = document.getElementById("barChart") || document.querySelector(".chart-card .bar-chart");
 
+const statusModal = document.getElementById("statusModal");
+const statusModalBox = document.getElementById("statusModalBox");
+const statusModalIcon = document.getElementById("statusModalIcon");
+const statusModalTitle = document.getElementById("statusModalTitle");
+const statusModalMessage = document.getElementById("statusModalMessage");
+const statusModalClose = document.getElementById("statusModalClose");
+
+function tampilkanPopupStatus(status, nama) {
+  if (!statusModal) return;
+
+  const statusLower = String(status || "").toLowerCase();
+
+  if (statusLower !== "lulus" && statusLower !== "keluar") return;
+
+  statusModalBox.classList.remove("modal-lulus", "modal-keluar");
+
+  if (statusLower === "lulus") {
+    statusModalBox.classList.add("modal-lulus");
+    statusModalIcon.innerHTML = `<i class="fa-solid fa-graduation-cap"></i>`;
+    statusModalTitle.textContent = "Selamat, Kamu Dinyatakan Lulus!";
+    statusModalMessage.textContent = `Halo ${nama}, kamu telah dinyatakan lulus dari SMP YP 17 Surabaya. Terus semangat meraih cita-cita!`;
+  }
+
+  if (statusLower === "keluar") {
+    statusModalBox.classList.add("modal-keluar");
+    statusModalIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
+    statusModalTitle.textContent = "Status Siswa: Keluar";
+    statusModalMessage.textContent = `Halo ${nama}, status kamu tercatat keluar dari SMP YP 17 Surabaya. Silakan hubungi pihak sekolah jika membutuhkan informasi lebih lanjut.`;
+  }
+
+  statusModal.classList.add("show");
+}
+
+if (statusModalClose) {
+  statusModalClose.addEventListener("click", () => {
+    statusModal.classList.remove("show");
+  });
+}
+
+if (statusModal) {
+  statusModal.addEventListener("click", (e) => {
+    if (e.target === statusModal) {
+      statusModal.classList.remove("show");
+    }
+  });
+}
+
 const nilai = {
   Matematika: 85,
   "Bahasa Indonesia": 64,
@@ -176,6 +223,7 @@ async function loadDashboard() {
     welcomeTextEl.textContent = `Halo, ${nama}!`;
     avatarPlaceholderEl.textContent = hurufAwal;
     namaKelasEl.textContent = s.nama_kelas || "-";
+    tampilkanPopupStatus(s.status, nama);
 
     renderChart(s.nilai_akademik);
     renderJadwalHariIni(s.jadwal_hari_ini);
