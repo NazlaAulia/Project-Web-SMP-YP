@@ -45,6 +45,9 @@ $sql = "
         s.nisn,
         s.nama,
         s.jenis_kelamin,
+        s.id_kelas,
+COALESCE(s.status, 'aktif') AS status,
+
         u.username,
         k.nama_kelas,
         ta.tahun_ajaran AS tahun_ajaran
