@@ -2,10 +2,11 @@ let dataKehadiran = [];
 let kelasOptions = [];
 let mapelOptions = [];
 
-const filterMapelGroup = filterMapel ? filterMapel.closest(".filter-group") : null;
 const filterSemester = document.getElementById("filterSemester");
 const filterKelas = document.getElementById("filterKelas");
 const filterMapel = document.getElementById("filterMapel");
+const filterMapelGroup = filterMapel ? filterMapel.closest(".filter-group") : null;
+
 const kelasContainer = document.getElementById("kelasContainer");
 const detailTableBody = document.getElementById("detailTableBody");
 const searchInput = document.getElementById("searchInput");
@@ -234,7 +235,6 @@ function isiFilterDariDatabase() {
     }
   }
 }
-
 
 function renderSemua() {
   const filteredData = getFilteredData();
