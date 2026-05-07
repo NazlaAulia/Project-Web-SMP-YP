@@ -14,22 +14,7 @@ function kirim_json($status, $message, $extra = []) {
 $id_guru = isset($_GET["id_guru"]) ? (int) $_GET["id_guru"] : 0;
 $role_id = isset($_GET["role_id"]) ? (int) $_GET["role_id"] : 0;
 $id_kelas = isset($_GET["id_kelas"]) ? (int) $_GET["id_kelas"] : 0;
-$id_siswa_param = isset($_GET["id_siswa"]) ? trim($_GET["id_siswa"]) : "";
-$id_siswa_list = [];
-
-if ($id_siswa_param !== "") {
-    $id_siswa_list = array_filter(array_map("intval", explode(",", $id_siswa_param)));
-}
-
-if (!empty($id_siswa_list)) {
-    $placeholder = implode(",", array_fill(0, count($id_siswa_list), "?"));
-    $sql .= " AND s.id_siswa IN ($placeholder)";
-
-    foreach ($id_siswa_list as $id_siswa) {
-        $types .= "i";
-        $params[] = $id_siswa;
-    }
-}
+$id_siswa = isset($_GET["id_siswa"]) ? (int) $_GET["id_siswa"] : 0;
 
 if ($role_id !== 2) {
     kirim_json("error", "Akses ditolak. Akun ini bukan guru.");
@@ -65,10 +50,7 @@ if ($resultWali->num_rows === 0) {
 
 $wali = $resultWali->fetch_assoc();
 
-/* AMBIL NILAI SISWA DI KELAS WALI
-   Kalau URL membawa id_siswa, maka hanya siswa itu yang dicetak.
-   Contoh: id_siswa=1834
-*/
+/* AMBIL NILAI SISWA */
 $sql = "
     SELECT
         s.id_siswa,
@@ -91,8 +73,13 @@ $sql = "
 $types = "i";
 $params = [$id_kelas];
 
+if ($id_siswa > 0) {
+    $sql .= " AND s.id_siswa = ?";
+    $types .= "i";
+    $params[] = $id_siswa;
+}
 
-$sql .= " ORDER BY s.nama ASC, n.semester ASC, m.nama_mapel ASC";
+$sql .= " ORDER BY s.nama ASC, n.semester ASC, m.id_mapel ASC";
 
 $stmt = $conn->prepare($sql);
 
@@ -107,18 +94,18 @@ $result = $stmt->get_result();
 $siswaMap = [];
 
 while ($row = $result->fetch_assoc()) {
-    $id_siswa = (int) $row["id_siswa"];
+    $id = (int) $row["id_siswa"];
 
-    if (!isset($siswaMap[$id_siswa])) {
-        $siswaMap[$id_siswa] = [
-            "id_siswa" => $id_siswa,
+    if (!isset($siswaMap[$id])) {
+        $siswaMap[$id] = [
+            "id_siswa" => $id,
             "nama_siswa" => $row["nama_siswa"],
             "nama_kelas" => $row["nama_kelas"],
             "nilai" => []
         ];
     }
 
-    $siswaMap[$id_siswa]["nilai"][] = [
+    $siswaMap[$id]["nilai"][] = [
         "nama_mapel" => $row["nama_mapel"],
         "semester" => (int) $row["semester"],
         "nilai_angka" => (int) $row["nilai_angka"],
@@ -128,9 +115,6 @@ while ($row = $result->fetch_assoc()) {
         "alfa" => (int) $row["alfa"]
     ];
 }
-
-$nama_kepala_sekolah = "Nama Kepala Sekolah";
-$nip_kepala_sekolah = "-";
 
 kirim_json("success", "Data cetak nilai berhasil dimuat.", [
     "kelas" => [
@@ -142,8 +126,8 @@ kirim_json("success", "Data cetak nilai berhasil dimuat.", [
         "nama" => $wali["nama_wali"]
     ],
     "kepala_sekolah" => [
-        "nama" => $nama_kepala_sekolah,
-        "nip" => $nip_kepala_sekolah
+        "nama" => "Nama Kepala Sekolah",
+        "nip" => "-"
     ],
     "siswa" => array_values($siswaMap)
 ]);

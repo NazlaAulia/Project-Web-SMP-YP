@@ -123,41 +123,38 @@ function renderTable(filteredData = dataNilai) {
     return;
   }
 
-  const mode = modeNilai ? modeNilai.value : "mapel";
   const siswaMap = {};
 
   filteredData.forEach(item => {
     const key = `${item.id_siswa}-${item.semester}`;
 
     if (!siswaMap[key]) {
-     siswaMap[key] = {
-      id_siswa: item.id_siswa,
-      nama_siswa: item.nama_siswa || "-",
-      nama_kelas: item.nama_kelas || "-",
-      semester: item.semester,
-      semester_text: item.semester_text || tampilSemester(item.semester),
-      total_nilai: 0,
-      jumlah_mapel: 0,
-
-      hadir: Number(item.hadir || 0),
-      izin: Number(item.izin || 0),
-      sakit: Number(item.sakit || 0),
-      alfa: Number(item.alfa || 0)
-    };
+      siswaMap[key] = {
+        id_siswa: item.id_siswa,
+        nama_siswa: item.nama_siswa || "-",
+        nama_kelas: item.nama_kelas || "-",
+        semester: item.semester,
+        semester_text: item.semester_text || tampilSemester(item.semester),
+        total_nilai: 0,
+        jumlah_mapel: 0,
+        hadir: Number(item.hadir || 0),
+        izin: Number(item.izin || 0),
+        sakit: Number(item.sakit || 0),
+        alfa: Number(item.alfa || 0)
+      };
     }
 
-      siswaMap[key].total_nilai += Number(item.nilai_angka || 0);
-      siswaMap[key].jumlah_mapel += 1;
+    siswaMap[key].total_nilai += Number(item.nilai_angka || 0);
+    siswaMap[key].jumlah_mapel += 1;
   });
 
   const dataRingkas = Object.values(siswaMap);
 
   nilaiTableBody.innerHTML = dataRingkas
     .map((item, index) => {
-      const hadirTampil = item.hadir;
-      const izinTampil = item.izin;
-      const sakitTampil = item.sakit;
-      const alfaTampil = item.alfa;
+      const nilaiTampil = item.jumlah_mapel > 0
+        ? (item.total_nilai / item.jumlah_mapel).toFixed(2)
+        : "0";
 
       return `
         <tr>
@@ -167,10 +164,10 @@ function renderTable(filteredData = dataNilai) {
           <td>${item.nama_kelas}</td>
           <td>${item.semester_text}</td>
           <td>${nilaiTampil}</td>
-          <td>${hadirTampil}</td>
-          <td>${izinTampil}</td>
-          <td>${sakitTampil}</td>
-          <td>${alfaTampil}</td>
+          <td>${item.hadir}</td>
+          <td>${item.izin}</td>
+          <td>${item.sakit}</td>
+          <td>${item.alfa}</td>
           <td>
             <button
               type="button"
