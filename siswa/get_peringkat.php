@@ -17,10 +17,11 @@ function konversiSemesterKeAngka($semesterText) {
 
 $id_siswa = 0;
 
-if (isset($_SESSION['id_siswa']) && (int)$_SESSION['id_siswa'] > 0) {
-    $id_siswa = (int) $_SESSION['id_siswa'];
-} elseif (isset($_GET['id_siswa']) && (int)$_GET['id_siswa'] > 0) {
+if (isset($_GET['id_siswa']) && (int)$_GET['id_siswa'] > 0) {
     $id_siswa = (int) $_GET['id_siswa'];
+    $_SESSION['id_siswa'] = $id_siswa;
+} elseif (isset($_SESSION['id_siswa']) && (int)$_SESSION['id_siswa'] > 0) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
 }
 
 if ($id_siswa <= 0) {
@@ -85,7 +86,7 @@ if (!$siswaLogin) {
     exit;
 }
 
-$kelasAktif = !empty($kelasFilter) ? $kelasFilter : $siswaLogin['nama_kelas'];
+$kelasAktif = $siswaLogin['nama_kelas'];
 
 /*
   Ambil rata-rata nilai siswa hanya dalam kelas yang sama.
