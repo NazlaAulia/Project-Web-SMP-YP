@@ -842,3 +842,14 @@ button:hover {
         font-size: 0.95rem !important;
     }
 }
+.readonly-mapel {
+    pointer-events: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: #eef6f4 !important;
+    color: #07484a !important;
+    font-weight: 800 !important;
+    cursor: default !important;
+    opacity: 1 !important;
+}
