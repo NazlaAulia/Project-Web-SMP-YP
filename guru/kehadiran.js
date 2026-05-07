@@ -204,7 +204,7 @@ function isiFilterDariDatabase() {
   }
 
   if (filterKelas) {
-    filterKelas.innerHTML = `<option value="Semua" selected>Semua Kelas</option>`;
+    filterKelas.innerHTML = `<option value="Semua">Semua Kelas</option>`;
 
     kelasOptions.forEach(kelas => {
       filterKelas.innerHTML += `<option value="${kelas}">Kelas ${kelas}</option>`;
@@ -217,12 +217,12 @@ function isiFilterDariDatabase() {
     if (mapelOptions.length === 1) {
       const mapelGuru = mapelOptions[0];
 
-      filterMapel.innerHTML = `<option value="${mapelGuru}" selected>${mapelGuru}</option>`;
+      filterMapel.innerHTML = `<option value="${mapelGuru}">${mapelGuru}</option>`;
       filterMapel.value = mapelGuru;
       filterMapel.disabled = true;
       filterMapel.classList.add("readonly-mapel");
     } else {
-      filterMapel.innerHTML = `<option value="Semua" selected>Semua Mapel</option>`;
+      filterMapel.innerHTML = `<option value="Semua">Semua Mapel</option>`;
 
       mapelOptions.forEach(mapel => {
         filterMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
@@ -234,6 +234,7 @@ function isiFilterDariDatabase() {
     }
   }
 }
+
 
 function renderSemua() {
   const filteredData = getFilteredData();
