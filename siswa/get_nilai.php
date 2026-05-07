@@ -26,10 +26,11 @@ function hitungPredikat($nilai) {
 
 $id_siswa = 0;
 
-if (isset($_SESSION['id_siswa']) && (int)$_SESSION['id_siswa'] > 0) {
-    $id_siswa = (int) $_SESSION['id_siswa'];
-} elseif (isset($_GET['id_siswa']) && (int)$_GET['id_siswa'] > 0) {
+if (isset($_GET['id_siswa']) && (int)$_GET['id_siswa'] > 0) {
     $id_siswa = (int) $_GET['id_siswa'];
+    $_SESSION['id_siswa'] = $id_siswa;
+} elseif (isset($_SESSION['id_siswa']) && (int)$_SESSION['id_siswa'] > 0) {
+    $id_siswa = (int) $_SESSION['id_siswa'];
 }
 
 if ($id_siswa <= 0) {
@@ -169,8 +170,8 @@ $stmtTable = $conn->prepare("
     FROM nilai n
     JOIN siswa s ON s.id_siswa = n.id_siswa
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-    WHERE k.nama_kelas = ?
-      AND n.semester = ?
+    WHERE n.id_siswa = ?
+  AND n.semester = ?
     GROUP BY s.id_siswa, s.nama, k.nama_kelas
     ORDER BY nilai_rata_rata DESC
 ");
@@ -183,7 +184,7 @@ if (!$stmtTable) {
     exit;
 }
 
-$stmtTable->bind_param("si", $kelasAktif, $semester);
+$stmtTable->bind_param("ii", $id_siswa, $semester);
 $stmtTable->execute();
 $resTable = $stmtTable->get_result();
 
