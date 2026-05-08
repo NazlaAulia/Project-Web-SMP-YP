@@ -29,9 +29,11 @@ $cekWali = $conn->prepare("
     SELECT 
         k.id_kelas,
         k.nama_kelas,
-        g.nama AS nama_wali
+        g.nama AS nama_wali,
+        ta.tahun_ajaran
     FROM kelas k
     LEFT JOIN guru g ON k.id_wali_kelas = g.id_guru
+    LEFT JOIN tahun_ajaran ta ON ta.status = 'aktif'
     WHERE k.id_kelas = ? 
       AND k.id_wali_kelas = ?
     LIMIT 1
@@ -120,15 +122,16 @@ while ($row = $result->fetch_assoc()) {
 kirim_json("success", "Data cetak nilai berhasil dimuat.", [
     "kelas" => [
         "id_kelas" => (int) $wali["id_kelas"],
-        "nama_kelas" => $wali["nama_kelas"]
+        "nama_kelas" => $wali["nama_kelas"],
+        "tahun_ajaran" => $wali["tahun_ajaran"] ?? "-"
     ],
     "wali" => [
         "id_guru" => $id_guru,
         "nama" => $wali["nama_wali"]
     ],
     "kepala_sekolah" => [
-        "nama" => "Nama Kepala Sekolah",
-        "nip" => "-"
+        "nama" => "Dra. Slamet Suwarni",
+        "nip" => "196712241994121001"
     ],
     "siswa" => array_values($siswaMap)
 ]);
