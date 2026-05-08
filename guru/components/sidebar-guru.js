@@ -79,3 +79,32 @@ function setupLogoutPopup() {
     }
   });
 }
+
+/* =========================
+   TAMBAHKAN DI BAWAH INI
+========================= */
+function setupMobileSidebar() {
+  const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+  const sidebar = document.querySelector(".sidebar");
+  const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+  if (!mobileMenuBtn || !sidebar || !sidebarOverlay) return;
+
+  mobileMenuBtn.addEventListener("click", function () {
+    sidebar.classList.toggle("show");
+    sidebarOverlay.classList.toggle("show");
+  });
+
+  sidebarOverlay.addEventListener("click", function () {
+    sidebar.classList.remove("show");
+    sidebarOverlay.classList.remove("show");
+  });
+
+  const navLinks = document.querySelectorAll(".sidebar .nav-link");
+  navLinks.forEach((link) => {
+    link.addEventListener("click", function () {
+      sidebar.classList.remove("show");
+      sidebarOverlay.classList.remove("show");
+    });
+  });
+}
