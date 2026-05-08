@@ -1,6 +1,6 @@
 /* =========================
-   FIX FINAL MOBILE SIDEBAR GURU
-   tombol kanan, tidak ikut scroll, sidebar dari kanan
+   FIX GURU MOBILE SIDEBAR
+   samakan seperti sidebar siswa
 ========================= */
 @media (max-width: 900px) {
   html,
@@ -9,8 +9,8 @@
   }
 
   .app-container {
-    position: relative !important;
     width: 100% !important;
+    position: relative !important;
   }
 
   .main-content {
@@ -19,26 +19,23 @@
     padding: 22px 14px 22px !important;
   }
 
-  /* TOMBOL HAMBURGER: KANAN & TIDAK IKUT SCROLL */
   .mobile-menu-btn {
     display: flex !important;
     position: absolute !important;
     top: 18px !important;
     right: 18px !important;
     left: auto !important;
-
-    width: 46px !important;
-    height: 46px !important;
-    min-width: 46px !important;
-    min-height: 46px !important;
-
-    border-radius: 14px !important;
-    z-index: 1500 !important;
+    width: 54px !important;
+    height: 54px !important;
+    min-width: 54px !important;
+    min-height: 54px !important;
+    border-radius: 16px !important;
+    z-index: 3000 !important;
     align-items: center !important;
     justify-content: center !important;
+    pointer-events: auto !important;
   }
 
-  /* OVERLAY */
   .sidebar-overlay {
     position: fixed !important;
     inset: 0 !important;
@@ -50,21 +47,19 @@
     display: block !important;
   }
 
-  /* SIDEBAR SELALU DARI KANAN */
   .sidebar {
     position: fixed !important;
     top: 0 !important;
     right: 0 !important;
     left: auto !important;
-
-    width: 82vw !important;
-    max-width: 360px !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: 100vh !important;
-
+    border-radius: 0 !important;
+    padding: 92px 18px 28px !important;
     transform: translateX(110%) !important;
     transition: transform 0.28s ease !important;
     z-index: 2600 !important;
-
     display: flex !important;
     flex-direction: column !important;
     overflow-y: auto !important;
@@ -75,14 +70,60 @@
     transform: translateX(0) !important;
   }
 
+  .sidebar::after {
+    content: "×";
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    color: #ffffff;
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .logo-container-elegant {
+    display: none !important;
+  }
+
+  .sidebar-top {
+    width: 100% !important;
+    display: block !important;
+  }
+
   .sidebar-menu {
     display: flex !important;
     flex-direction: column !important;
+    gap: 14px !important;
     width: 100% !important;
   }
 
   .nav-link {
     width: 100% !important;
+    min-height: 62px !important;
+    padding: 16px 20px !important;
+    border-radius: 18px !important;
+    font-size: 1.05rem !important;
     justify-content: flex-start !important;
+  }
+
+  .nav-link i {
+    width: 26px !important;
+    min-width: 26px !important;
+  }
+
+  .nav-link.active::before {
+    display: none !important;
+  }
+
+  .sidebar-bottom {
+    width: 100% !important;
+    margin-top: 18px !important;
+    padding-top: 18px !important;
+    display: block !important;
+  }
+
+  .sidebar.show ~ .mobile-menu-btn,
+  body:has(.sidebar.show) .mobile-menu-btn {
+    display: none !important;
   }
 }
