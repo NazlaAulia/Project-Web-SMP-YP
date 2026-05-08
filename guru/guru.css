@@ -1235,3 +1235,10 @@ header {
         padding: 14px;
     }
 }
+/* DESKTOP FIX BIAR GA MEPEET */
+@media (min-width: 901px) {
+  .main-content {
+    margin-left: 260px; /* sesuaikan lebar sidebar kamu */
+    padding: 24px 28px; /* biar lega kanan kiri */
+  }
+}

@@ -196,6 +196,40 @@ function renderRankingDashboard(peringkatList) {
     }).join("");
 }
 
+function renderRequestJadwalDashboard(requestList) {
+    const container = document.getElementById("dashboardRequestJadwal");
+    if (!container) return;
+
+    if (!requestList || requestList.length === 0) {
+        container.innerHTML = `
+            <div class="rank-item">
+                <div class="rank-avatar">-</div>
+                <div class="rank-info">
+                    <span>Belum ada request</span>
+                    <small>Belum ada pengajuan ganti jadwal.</small>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = requestList.map(item => `
+        <div class="rank-item">
+            <div class="rank-avatar">
+                <i class="bi bi-calendar-event"></i>
+            </div>
+            <div class="rank-info">
+                <span>${item.nama_mapel || "-"}</span>
+                <small>
+                    Kelas ${item.nama_kelas || "-"} • ${item.hari || "-"}
+                    ${item.jam_mulai || ""} - ${item.jam_selesai || ""}
+                    <br>Status: ${item.status || "-"}
+                </small>
+            </div>
+        </div>
+    `).join("");
+}
+
 function loadDashboardDatabase() {
     if (!idGuruLogin || roleIdLogin !== "2") return;
 
@@ -210,6 +244,7 @@ function loadDashboardDatabase() {
                 renderMapelDashboard(semuaMapelDashboard);
                 renderKehadiranDashboard(result.kehadiran);
                 renderRankingDashboard(result.peringkat);
+                renderRequestJadwalDashboard(result.request_jadwal);
                 setupSearchDashboard();
             } else {
                 console.warn(result.message);

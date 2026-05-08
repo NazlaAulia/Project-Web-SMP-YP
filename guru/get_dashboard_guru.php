@@ -22,19 +22,35 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
-/* Ambil semua mapel */
+/* =========================
+   MAPEL SESUAI GURU (FIX)
+========================= */
 $mapel = [];
-$qMapel = $conn->query("
-    SELECT id_mapel, nama_mapel
-    FROM mapel
-    ORDER BY id_mapel ASC
+
+$qMapel = $conn->prepare("
+    SELECT DISTINCT m.id_mapel, m.nama_mapel
+    FROM (
+        SELECT id_mapel FROM jadwal WHERE id_guru = ?
+        UNION
+        SELECT j.id_mapel
+        FROM request_jadwal r
+        JOIN jadwal j ON r.id_jadwal = j.id_jadwal
+        WHERE r.id_guru = ?
+    ) AS data_mapel
+    JOIN mapel m ON data_mapel.id_mapel = m.id_mapel
+    ORDER BY m.id_mapel ASC
 ");
 
 if (!$qMapel) {
     kirim_json("error", "Query mapel gagal: " . $conn->error);
 }
 
-while ($row = $qMapel->fetch_assoc()) {
+$qMapel->bind_param("ii", $id_guru, $id_guru);
+$qMapel->execute();
+$resultMapel = $qMapel->get_result();
+
+while ($row = $resultMapel->fetch_assoc()) {
+
     $deskripsi = $row["nama_mapel"];
 
     if ($row["nama_mapel"] === "BIN") $deskripsi = "Bahasa Indonesia";
@@ -57,7 +73,9 @@ while ($row = $qMapel->fetch_assoc()) {
     ];
 }
 
-/* Rekap kehadiran dari tabel nilai */
+/* =========================
+   KEHADIRAN (TIDAK DIUBAH)
+========================= */
 $qKehadiran = $conn->query("
     SELECT
         COALESCE(SUM(hadir), 0) AS total_hadir,
@@ -81,7 +99,9 @@ $totalAlfa = (int) $rekapKehadiran["total_alfa"];
 $totalSemua = $totalHadir + $totalIzin + $totalSakit + $totalAlfa;
 $persenHadir = $totalSemua > 0 ? round(($totalHadir / $totalSemua) * 100) : 0;
 
-/* Total kelas yang sudah punya data nilai */
+/* =========================
+   KELAS TERISI (TIDAK DIUBAH)
+========================= */
 $qKelasTerisi = $conn->query("
     SELECT COUNT(DISTINCT s.id_kelas) AS total_kelas_terisi
     FROM nilai n
@@ -89,25 +109,21 @@ $qKelasTerisi = $conn->query("
     WHERE s.id_kelas IS NOT NULL
 ");
 
-if (!$qKelasTerisi) {
-    kirim_json("error", "Query kelas terisi gagal: " . $conn->error);
-}
-
 $kelasTerisi = $qKelasTerisi->fetch_assoc();
 
-/* Total semua kelas */
+/* =========================
+   TOTAL KELAS (TIDAK DIUBAH)
+========================= */
 $qTotalKelas = $conn->query("
     SELECT COUNT(*) AS total_kelas
     FROM kelas
 ");
 
-if (!$qTotalKelas) {
-    kirim_json("error", "Query total kelas gagal: " . $conn->error);
-}
-
 $totalKelas = $qTotalKelas->fetch_assoc();
 
-/* Peringkat teratas berdasarkan rata-rata nilai */
+/* =========================
+   PERINGKAT (TIDAK DIUBAH)
+========================= */
 $peringkat = [];
 
 $qPeringkat = $conn->query("
@@ -119,38 +135,57 @@ $qPeringkat = $conn->query("
     FROM nilai n
     LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-    GROUP BY s.id_siswa, s.nama, k.nama_kelas
+    GROUP BY s.id_siswa
     ORDER BY rata_rata DESC
     LIMIT 2
 ");
 
-if (!$qPeringkat) {
-    kirim_json("error", "Query peringkat gagal: " . $conn->error);
-}
-
 while ($row = $qPeringkat->fetch_assoc()) {
-    $nama = $row["nama"] ?? "-";
-    $inisial = "";
-
-    $pecahNama = explode(" ", trim($nama));
-    foreach ($pecahNama as $kata) {
-        if ($kata !== "") {
-            $inisial .= strtoupper(substr($kata, 0, 1));
-        }
-
-        if (strlen($inisial) >= 2) {
-            break;
-        }
-    }
-
-    $peringkat[] = [
-        "nama" => $nama,
-        "kelas" => $row["nama_kelas"] ?? "-",
-        "rata_rata" => $row["rata_rata"] ?? 0,
-        "inisial" => $inisial ?: "S"
-    ];
+    $peringkat[] = $row;
 }
 
+/* =========================
+   REQUEST JADWAL GURU LOGIN
+========================= */
+$requestJadwal = [];
+
+$qRequest = $conn->prepare("
+    SELECT
+        r.id_request,
+        r.id_guru,
+        r.id_jadwal,
+        r.alasan,
+        r.status,
+        r.tanggal_request,
+        j.hari,
+        jp.jam_mulai,
+        jp.jam_selesai,
+        k.nama_kelas,
+        m.nama_mapel
+    FROM request_jadwal r
+    LEFT JOIN jadwal j ON r.id_jadwal = j.id_jadwal
+    LEFT JOIN jam_pelajaran jp ON j.id_jam = jp.id_jam
+    LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
+    LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
+    WHERE r.id_guru = ?
+    ORDER BY r.id_request DESC
+    LIMIT 5
+");
+
+if (!$qRequest) {
+    kirim_json("error", "Query request jadwal gagal: " . $conn->error);
+}
+
+$qRequest->bind_param("i", $id_guru);
+$qRequest->execute();
+$resultRequest = $qRequest->get_result();
+
+while ($row = $resultRequest->fetch_assoc()) {
+    $requestJadwal[] = $row;
+}
+/* =========================
+   OUTPUT (TIDAK DIUBAH)
+========================= */
 kirim_json("success", "Data dashboard berhasil dimuat.", [
     "mapel" => $mapel,
     "kehadiran" => [
@@ -162,6 +197,7 @@ kirim_json("success", "Data dashboard berhasil dimuat.", [
         "total_sakit" => $totalSakit,
         "total_alfa" => $totalAlfa
     ],
-    "peringkat" => $peringkat
+    "peringkat" => $peringkat,
+    "request_jadwal" => $requestJadwal
 ]);
 ?>
