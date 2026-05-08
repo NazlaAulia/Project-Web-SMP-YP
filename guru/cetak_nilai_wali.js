@@ -208,11 +208,11 @@ function renderCetak(data) {
   if (totalSiswaCetakEl) totalSiswaCetakEl.textContent = siswaList.length;
 
   if (ttdKepalaSekolahEl) {
-    ttdKepalaSekolahEl.textContent = data.kepala_sekolah?.nama || "-";
+    ttdKepalaSekolahEl.textContent = "Dra. Slamet Suwarni";
   }
 
   if (nipKepalaSekolahEl) {
-    nipKepalaSekolahEl.textContent = `NIP. ${data.kepala_sekolah?.nip || "-"}`;
+    nipKepalaSekolahEl.textContent = "NIP. 196712241994121001";
   }
 
   if (!printContent) return;
