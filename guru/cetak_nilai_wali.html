@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Cetak Nilai Wali Kelas</title>
-
-  <link rel="stylesheet" href="cetak_nilai_wali.css?v=5000" />
+  <link rel="stylesheet" href="cetak_nilai_wali.css?v=9000" />
 </head>
 <body>
   <main class="print-page">
@@ -24,34 +22,7 @@
     </section>
 
     <section class="judul-rapor">
-      <h2>REKAP NILAI SISWA</h2>
-      <p>Data nilai akademik berdasarkan hasil input guru dan wali kelas.</p>
-    </section>
-
-    <section class="print-info">
-      <div>
-        <span>Kelas</span>
-        <strong id="namaKelas">-</strong>
-      </div>
-
-      <div>
-        <span>Wali Kelas</span>
-        <strong id="namaWali">-</strong>
-      </div>
-
-      <div>
-        <span>Total Siswa</span>
-        <strong id="totalSiswaCetak">-</strong>
-      </div>
-
-      <div>
-        <span>Tanggal Cetak</span>
-        <strong id="tanggalCetak">-</strong>
-      </div>
-
-      <button type="button" id="btnPrint" class="btn-print">
-        Cetak
-      </button>
+      <h2>RAPOR NILAI SISWA</h2>
     </section>
 
     <section id="printContent" class="print-content">
@@ -62,9 +33,7 @@
       <div class="ttd-box">
         <p>Mengetahui,</p>
         <p>Kepala Sekolah</p>
-
         <div class="ttd-space"></div>
-
         <strong id="ttdKepalaSekolah">-</strong>
         <small id="nipKepalaSekolah">NIP. -</small>
       </div>
@@ -72,14 +41,19 @@
       <div class="ttd-box">
         <p>Surabaya, <span id="tanggalTtd">-</span></p>
         <p>Wali Kelas</p>
-
         <div class="ttd-space"></div>
-
         <strong id="ttdWali">-</strong>
       </div>
     </section>
+
+    <button type="button" id="btnPrint" class="btn-print">Cetak</button>
+
+    <span id="namaKelas" hidden>-</span>
+    <span id="namaWali" hidden>-</span>
+    <span id="tanggalCetak" hidden>-</span>
+    <span id="totalSiswaCetak" hidden>-</span>
   </main>
 
-  <script src="cetak_nilai_wali.js?v=5000"></script>
+  <script src="cetak_nilai_wali.js?v=9000"></script>
 </body>
 </html>
