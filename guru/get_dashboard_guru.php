@@ -145,6 +145,45 @@ while ($row = $qPeringkat->fetch_assoc()) {
 }
 
 /* =========================
+   REQUEST JADWAL GURU LOGIN
+========================= */
+$requestJadwal = [];
+
+$qRequest = $conn->prepare("
+    SELECT
+        r.id_request,
+        r.id_guru,
+        r.id_jadwal,
+        r.alasan,
+        r.status,
+        r.tanggal_request,
+        j.hari,
+        jp.jam_mulai,
+        jp.jam_selesai,
+        k.nama_kelas,
+        m.nama_mapel
+    FROM request_jadwal r
+    LEFT JOIN jadwal j ON r.id_jadwal = j.id_jadwal
+    LEFT JOIN jam_pelajaran jp ON j.id_jam = jp.id_jam
+    LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
+    LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
+    WHERE r.id_guru = ?
+    ORDER BY r.id_request DESC
+    LIMIT 5
+");
+
+if (!$qRequest) {
+    kirim_json("error", "Query request jadwal gagal: " . $conn->error);
+}
+
+$qRequest->bind_param("i", $id_guru);
+$qRequest->execute();
+$resultRequest = $qRequest->get_result();
+
+while ($row = $resultRequest->fetch_assoc()) {
+    $requestJadwal[] = $row;
+}
+/* =========================
    OUTPUT (TIDAK DIUBAH)
 ========================= */
 kirim_json("success", "Data dashboard berhasil dimuat.", [
@@ -158,6 +197,7 @@ kirim_json("success", "Data dashboard berhasil dimuat.", [
         "total_sakit" => $totalSakit,
         "total_alfa" => $totalAlfa
     ],
-    "peringkat" => $peringkat
+    "peringkat" => $peringkat,
+    "request_jadwal" => $requestJadwal
 ]);
 ?>
