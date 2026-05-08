@@ -401,3 +401,48 @@ body {
     font-size: 9px !important;
   }
 }
+.kop-rapor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-align: center;
+}
+
+.kop-logo {
+  position: absolute;
+  left: 0;
+}
+
+.kop-logo img {
+  width: 70px;
+}
+
+.kop-text {
+  text-align: center;
+}
+
+.kop-text h1,
+.kop-text h2,
+.kop-text p {
+  margin: 2px 0;
+}
+.deskripsi {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.rapor-table th,
+.rapor-table td {
+  border: 1px solid #000;
+  padding: 6px;
+  font-size: 12px;
+}
+
+.rapor-table th {
+  background: #f2f2f2;
+}
+
+.center {
+  text-align: center;
+}
