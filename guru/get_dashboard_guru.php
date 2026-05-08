@@ -22,19 +22,29 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
-/* Ambil semua mapel */
+/* Ambil mapel sesuai guru login */
 $mapel = [];
-$qMapel = $conn->query("
-    SELECT id_mapel, nama_mapel
-    FROM mapel
-    ORDER BY id_mapel ASC
+
+$qMapel = $conn->prepare("
+    SELECT DISTINCT
+        m.id_mapel,
+        m.nama_mapel
+    FROM nilai n
+    INNER JOIN mapel m ON n.id_mapel = m.id_mapel
+    INNER JOIN guru g ON g.id_guru = ?
+    WHERE n.id_mapel = g.id_mapel
+    ORDER BY m.id_mapel ASC
 ");
 
 if (!$qMapel) {
     kirim_json("error", "Query mapel gagal: " . $conn->error);
 }
 
-while ($row = $qMapel->fetch_assoc()) {
+$qMapel->bind_param("i", $id_guru);
+$qMapel->execute();
+$resultMapel = $qMapel->get_result();
+
+while ($row = $resultMapel->fetch_assoc()) {
     $deskripsi = $row["nama_mapel"];
 
     if ($row["nama_mapel"] === "BIN") $deskripsi = "Bahasa Indonesia";
