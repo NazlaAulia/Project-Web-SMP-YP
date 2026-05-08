@@ -1,0 +1,105 @@
+/* =========================
+   FIX MOBILE ALL HALAMAN
+========================= */
+
+@media (max-width: 900px) {
+  html, body {
+    width: 100%;
+    overflow-x: hidden !important;
+  }
+
+  .app-container {
+    display: block !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 90px 14px 20px !important;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    transform: translateX(-100%) !important;
+    transition: 0.3s !important;
+    width: 260px !important;
+    z-index: 1200 !important;
+  }
+
+  .sidebar.show {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+  }
+
+  .sidebar-overlay.show {
+    display: block;
+  }
+
+  /* TOMBOL MENU */
+  .mobile-menu-btn {
+    display: flex !important;
+    position: fixed !important;
+    top: 14px;
+    left: 14px;
+    z-index: 1300;
+    width: 45px;
+    height: 45px;
+    background: #0b5c5c;
+    color: white;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* HEADER */
+  header {
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+  }
+
+  .search-container-elegant {
+    width: 100% !important;
+    margin-left: 55px;
+  }
+
+  .profile-info {
+    display: none !important;
+  }
+
+  .avatar-circle {
+    width: 45px;
+    height: 45px;
+  }
+
+  /* CARD */
+  .card,
+  .table-card,
+  .filter-card,
+  .profile-panel {
+    width: 100% !important;
+    border-radius: 18px;
+  }
+
+  /* GRID */
+  .course-grid,
+  .summary-grid,
+  .rekap-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* TABLE */
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 800px;
+  }
+}
