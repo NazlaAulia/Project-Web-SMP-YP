@@ -1,28 +1,25 @@
-/* =========================
-   FIX MOBILE ALL HALAMAN
-========================= */
-
 @media (max-width: 900px) {
-  html, body {
-    width: 100%;
-    overflow-x: hidden !important;
-  }
-
-  .app-container {
-    display: block !important;
-  }
-
   .main-content {
     margin-left: 0 !important;
     width: 100% !important;
-    padding: 90px 14px 20px !important;
+    padding-top: 82px !important;
   }
 
-  /* SIDEBAR */
+  .mobile-menu-btn {
+    display: flex !important;
+    position: fixed !important;
+    top: 16px !important;
+    left: 16px !important;
+    z-index: 1300 !important;
+  }
+
   .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
     transform: translateX(-100%) !important;
-    transition: 0.3s !important;
-    width: 260px !important;
+    transition: transform 0.28s ease !important;
     z-index: 1200 !important;
   }
 
@@ -31,75 +28,13 @@
   }
 
   .sidebar-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: none;
+    position: fixed !important;
+    inset: 0 !important;
+    display: none !important;
+    z-index: 1100 !important;
   }
 
   .sidebar-overlay.show {
-    display: block;
-  }
-
-  /* TOMBOL MENU */
-  .mobile-menu-btn {
-    display: flex !important;
-    position: fixed !important;
-    top: 14px;
-    left: 14px;
-    z-index: 1300;
-    width: 45px;
-    height: 45px;
-    background: #0b5c5c;
-    color: white;
-    border-radius: 12px;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* HEADER */
-  header {
-    display: grid !important;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-  }
-
-  .search-container-elegant {
-    width: 100% !important;
-    margin-left: 55px;
-  }
-
-  .profile-info {
-    display: none !important;
-  }
-
-  .avatar-circle {
-    width: 45px;
-    height: 45px;
-  }
-
-  /* CARD */
-  .card,
-  .table-card,
-  .filter-card,
-  .profile-panel {
-    width: 100% !important;
-    border-radius: 18px;
-  }
-
-  /* GRID */
-  .course-grid,
-  .summary-grid,
-  .rekap-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* TABLE */
-  .table-wrapper {
-    overflow-x: auto;
-  }
-
-  table {
-    min-width: 800px;
+    display: block !important;
   }
 }
