@@ -446,3 +446,20 @@ body {
 .center {
   text-align: center;
 }
+.kop-logo {
+  display: none !important;
+}
+
+.kop-rapor {
+  display: flex !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.kop-text {
+  text-align: center !important;
+}
+
+.deskripsi {
+  font-weight: 400 !important;
+}

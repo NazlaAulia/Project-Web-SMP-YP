@@ -51,26 +51,26 @@ function renderSiswa(siswa) {
 
   const semesterText = siswa.nilai[0] ? tampilSemester(siswa.nilai[0].semester) : "-";
 
-  const rows = siswa.nilai.map((item, index) => {
-    return `
-      <tr>
-        <td class="center">${index + 1}</td>
-        <td>${item.nama_mapel || "-"}</td>
-        <td class="center">${item.nilai_angka}</td>
-        <td class="center"></td>
-        <td class="center"></td>
-        ${
-          index === 0
-            ? `
-              <td class="deskripsi" rowspan="${siswa.nilai.length + 1}">
-                Kesimpulan dari sikap keseluruhan dalam pembelajaran menunjukkan perkembangan yang baik dan perlu terus ditingkatkan.
-              </td>
-            `
-            : ""
-        }
-      </tr>
-    `;
-  }).join("");
+const rows = siswa.nilai.map((item, index) => {
+  return `
+    <tr>
+      <td class="center">${index + 1}</td>
+      <td>${item.nama_mapel || "-"}</td>
+      <td class="center">${item.nilai_angka}</td>
+      <td class="center">B</td>
+      <td class="center">Baik</td>
+      ${
+        index === 0
+          ? `
+            <td class="deskripsi" rowspan="${siswa.nilai.length + 1}">
+              Siswa menunjukkan sikap yang baik, disiplin, dan aktif dalam mengikuti pembelajaran.
+            </td>
+          `
+          : ""
+      }
+    </tr>
+  `;
+}).join("");
 
   return `
     <article class="rapor-sheet">
@@ -124,33 +124,6 @@ function renderSiswa(siswa) {
           <tr class="rata-row">
             <td colspan="2">Rata-rata Nilai</td>
             <td class="center">${rataRata}</td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table class="ekskul-table">
-        <thead>
-          <tr>
-            <th>Kegiatan Ekstrakurikuler</th>
-            <th>Nilai</th>
-            <th>Keterangan</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1. Pramuka</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>2. UKS</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>3. ............</td>
             <td></td>
             <td></td>
           </tr>
