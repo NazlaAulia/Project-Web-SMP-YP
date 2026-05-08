@@ -42,6 +42,15 @@ function hitungRataRata(nilai) {
   return total / nilai.length;
 }
 
+function getPredikat(nilai) {
+  nilai = Number(nilai);
+
+  if (nilai >= 90) return "A";
+  if (nilai >= 80) return "B";
+  if (nilai >= 70) return "C";
+  return "D";
+}
+
 function renderSiswa(siswa) {
   const rataRata = hitungRataRata(siswa.nilai).toFixed(2);
 
@@ -51,26 +60,26 @@ function renderSiswa(siswa) {
 
   const semesterText = siswa.nilai[0] ? tampilSemester(siswa.nilai[0].semester) : "-";
 
-const rows = siswa.nilai.map((item, index) => {
-  return `
-    <tr>
-      <td class="center">${index + 1}</td>
-      <td>${item.nama_mapel || "-"}</td>
-      <td class="center">${item.nilai_angka}</td>
-      <td class="center">B</td>
-      <td class="center">Baik</td>
-      ${
-        index === 0
-          ? `
-            <td class="deskripsi" rowspan="${siswa.nilai.length + 1}">
-              Siswa menunjukkan sikap yang baik, disiplin, dan aktif dalam mengikuti pembelajaran.
-            </td>
-          `
-          : ""
-      }
-    </tr>
-  `;
-}).join("");
+  const rows = siswa.nilai.map((item, index) => {
+    return `
+      <tr>
+        <td class="center">${index + 1}</td>
+        <td>${item.nama_mapel || "-"}</td>
+        <td class="center">${item.nilai_angka}</td>
+        <td class="center">${getPredikat(item.nilai_angka)}</td>
+        <td class="center">Baik</td>
+        ${
+          index === 0
+            ? `
+              <td class="deskripsi" rowspan="${siswa.nilai.length + 1}">
+                Siswa menunjukkan sikap yang baik, disiplin, dan aktif dalam mengikuti pembelajaran.
+              </td>
+            `
+            : ""
+        }
+      </tr>
+    `;
+  }).join("");
 
   return `
     <article class="rapor-sheet">
@@ -187,7 +196,9 @@ function renderCetak(data) {
   if (nipKepalaSekolahEl) {
     nipKepalaSekolahEl.textContent = "NIP. 196712241994121001";
   }
-window.tahunAjaranCetak = data.kelas?.tahun_ajaran || "-";
+
+  window.tahunAjaranCetak = data.kelas?.tahun_ajaran || "-";
+
   if (!printContent) return;
 
   if (siswaList.length === 0) {
