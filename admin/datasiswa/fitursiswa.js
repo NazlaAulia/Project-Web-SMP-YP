@@ -195,11 +195,16 @@ function renderSiswa() {
             <td>${escapeHtml(siswa.nisn || "-")}</td>
             <td>${escapeHtml(siswa.username || "-")}</td>
             <td>${escapeHtml(formatGender(siswa.jenis_kelamin || "-"))}</td>
-            <td>
-                ${siswa.nama_kelas
-                    ? `<span class="badge">${escapeHtml(siswa.nama_kelas)}</span>`
-                    : `<span class="badge badge-empty">Belum ada</span>`}
-            </td>
+       <td>
+    ${siswa.nama_kelas
+        ? `<span class="badge ${siswa.status === "keluar" ? "badge-keluar" : ""}">
+                ${escapeHtml(siswa.nama_kelas)}${siswa.status === "keluar" ? " - Keluar" : ""}
+           </span>`
+        : `<span class="badge badge-empty">Belum ada</span>`}
+</td>
+
+
+
             <td>
                 ${siswa.tahun_ajaran
                     ? `<span class="badge">${escapeHtml(siswa.tahun_ajaran)}</span>`
