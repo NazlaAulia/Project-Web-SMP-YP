@@ -501,7 +501,7 @@ foreach ($requests as $r) {
         }
 
         .page-header {
-            background: linear-gradient(135deg, #0f766e, #115e59);
+            background: linear-gradient(135deg, #064e4b, #115e59);
             color: white;
             padding: 26px;
             border-radius: 24px;
