@@ -627,3 +627,23 @@ body {
     font-size: 9px !important;
   }
 }
+@media print {
+  .nilai-print-table th,
+  .nilai-print-table td {
+    font-size: 8px !important;
+    padding: 4px 3px !important;
+  }
+
+  .student-card {
+    padding: 8px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .ttd-section {
+    margin-top: 6px !important;
+  }
+
+  .ttd-space {
+    height: 30px !important;
+  }
+}
