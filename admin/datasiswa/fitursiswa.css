@@ -1371,3 +1371,9 @@ button {
     width: auto !important;
     min-width: 150px;
 }
+
+.badge-keluar {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+}
+
