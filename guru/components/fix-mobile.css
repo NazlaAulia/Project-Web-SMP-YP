@@ -1,121 +1,73 @@
-/* =========================
-   FINAL SIDEBAR MOBILE GURU
-   TANPA UBAH LOGIKA
-========================= */
 @media (max-width: 768px) {
   html,
   body {
-    width: 100% !important;
-    overflow-x: hidden !important;
+    width: 100%;
+    overflow-x: hidden;
   }
 
+  .dashboard-wrapper,
   .app-container {
-    width: 100% !important;
-    position: relative !important;
+    width: 100%;
+    min-height: 100dvh;
   }
 
   .main-content {
     margin-left: 0 !important;
     width: 100% !important;
-    padding: 16px !important;
+    padding: 18px !important;
   }
 
-  /* HEADER RAPI */
-  header {
+  .mobile-topbar {
     display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    width: 100% !important;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 106px;
+    padding: 20px 22px;
+    background: #004d49;
+    z-index: 1000;
   }
 
-  .search-container-elegant {
-    flex: 1 !important;
-    min-width: 0 !important;
-  }
-
-  /* TOMBOL HAMBURGER */
   .mobile-menu-btn {
     display: flex !important;
     position: static !important;
-    width: 52px !important;
-    height: 52px !important;
-    min-width: 52px !important;
-    min-height: 52px !important;
-    border-radius: 14px !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 10 !important;
+    width: 62px;
+    height: 62px;
+    border: 0;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.14);
+    color: white;
+    font-size: 34px;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* OVERLAY */
-  .sidebar-overlay {
-    position: fixed !important;
-    inset: 0 !important;
-    display: none !important;
-    z-index: 2000 !important;
-  }
-
-  .sidebar-overlay.show {
-    display: block !important;
-  }
-
-  /* SIDEBAR DARI KANAN */
   .sidebar {
     position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
+    top: 0;
+    right: 0;
     left: auto !important;
-
-    width: 100% !important;
-    height: 100vh !important;
-
-    transform: translateX(110%) !important;
-    transition: transform 0.25s ease !important;
-
-    z-index: 3000 !important;
-
-    display: flex !important;
-    flex-direction: column !important;
-    overflow-y: auto !important;
+    width: min(86vw, 360px) !important;
+    height: 100dvh;
+    transform: translateX(110%);
+    transition: transform 0.25s ease;
+    z-index: 3000;
+    overflow-y: auto;
   }
 
   .sidebar.show {
-    transform: translateX(0) !important;
+    transform: translateX(0);
   }
 
-  /* TOMBOL CLOSE */
-  .sidebar::after {
-    content: "×";
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: bold;
-    color: white;
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 2000;
   }
 
-  /* MENU VERTIKAL */
-  .sidebar-menu {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
-    width: 100% !important;
-  }
-
-  .nav-link {
-    width: 100% !important;
-    min-height: 60px !important;
-    padding: 14px 18px !important;
-    border-radius: 16px !important;
-    justify-content: flex-start !important;
-  }
-
-  .nav-link.active::before {
-    display: none !important;
-  }
-
-  .sidebar-bottom {
-    margin-top: 16px !important;
-    padding-top: 16px !important;
+  .sidebar-overlay.show {
+    display: block;
   }
 }
