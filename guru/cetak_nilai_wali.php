@@ -32,7 +32,8 @@ $cekWali = $conn->prepare("
         g.nama AS nama_wali
     FROM kelas k
     LEFT JOIN guru g ON k.id_wali_kelas = g.id_guru
-    WHERE k.id_kelas = ? AND k.id_wali_kelas = ?
+    WHERE k.id_kelas = ? 
+      AND k.id_wali_kelas = ?
     LIMIT 1
 ");
 
@@ -80,6 +81,8 @@ if ($id_siswa > 0) {
 }
 
 $sql .= " ORDER BY s.nama ASC, n.semester ASC, m.id_mapel ASC";
+
+$stmt = $conn->prepare($sql);
 
 if (!$stmt) {
     kirim_json("error", "Query nilai gagal: " . $conn->error);
