@@ -21,7 +21,6 @@ body {
   box-shadow: 0 14px 38px rgba(7, 72, 74, 0.1);
 }
 
-/* KOP */
 .kop-rapor {
   display: grid;
   grid-template-columns: 90px 1fr 90px;
@@ -64,7 +63,6 @@ body {
   color: #4d6263;
 }
 
-/* JUDUL */
 .judul-rapor {
   text-align: center;
   margin-bottom: 24px;
@@ -87,7 +85,6 @@ body {
   font-size: 0.95rem;
 }
 
-/* INFO */
 .print-info {
   display: grid;
   grid-template-columns: repeat(4, 1fr) auto;
@@ -126,91 +123,6 @@ body {
   cursor: pointer;
 }
 
-/* SISWA */
-.student-card {
-  border: 1px solid #dfe9e6;
-  border-radius: 18px;
-  padding: 22px 24px;
-  margin-bottom: 24px;
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-
-.student-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 18px;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.student-head h2 {
-  margin: 0 0 4px;
-  color: #07484a;
-  font-size: 1.18rem;
-  font-weight: 800;
-}
-
-.student-head p {
-  margin: 0;
-  color: #6b7a7a;
-  font-size: 0.9rem;
-}
-
-.kelas-badge {
-  background: #e7f4ef;
-  color: #0c766c;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  font-weight: 800;
-}
-
-/* TABLE */
-.table-wrap {
-  overflow-x: auto;
-}
-.nilai-print-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 0;
-  table-layout: fixed;
-}
-
-.nilai-print-table th {
-  background: #07484a;
-  color: #ffffff;
-  padding: 12px 10px;
-  font-size: 0.85rem;
-  text-align: left;
-  font-weight: 800;
-}
-
-.nilai-print-table th:first-child {
-  border-top-left-radius: 12px;
-}
-
-.nilai-print-table th:last-child {
-  border-top-right-radius: 12px;
-}
-
-.nilai-print-table td {
-  padding: 11px 10px;
-  border-bottom: 1px solid #edf2f2;
-  color: #102a2a;
-  font-size: 0.86rem;
-}
-
-.nilai-print-table tr:nth-child(even) td {
-  background: #f8fbfa;
-}
-
-.rata-row td {
-  background: #eef7f4 !important;
-  color: #07484a;
-  font-weight: 800;
-}
-
 .empty-state {
   text-align: center;
   padding: 42px;
@@ -218,17 +130,106 @@ body {
   font-weight: 700;
 }
 
-/* TTD */
+/* FORMAT RAPOR KLASIK */
+.rapor-sheet {
+  color: #000;
+  font-size: 12px;
+}
+
+.identitas-rapor {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+}
+
+.identitas-rapor td {
+  padding: 2px 6px;
+  border: none;
+  font-weight: 600;
+  color: #000;
+}
+
+.identitas-rapor td:nth-child(1),
+.identitas-rapor td:nth-child(3) {
+  width: 18%;
+}
+
+.section-title {
+  font-weight: 800;
+  color: #000;
+  margin: 4px 0;
+}
+
+.rapor-table,
+.ekskul-table,
+.absensi-rapor {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+}
+
+.rapor-table th,
+.rapor-table td,
+.ekskul-table th,
+.ekskul-table td,
+.absensi-rapor th,
+.absensi-rapor td {
+  border: 1px solid #000;
+  padding: 4px 6px;
+  color: #000;
+  background: #fff;
+}
+
+.rapor-table th,
+.ekskul-table th,
+.absensi-rapor th {
+  text-align: center;
+  font-weight: 800;
+}
+
+.rapor-table td:first-child {
+  width: 30px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.deskripsi-cell {
+  width: 27%;
+  vertical-align: top;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.rata-row td {
+  font-weight: 800;
+  background: #fff !important;
+  color: #000 !important;
+}
+
+.ekskul-table th:nth-child(1) {
+  width: 50%;
+}
+
+.ekskul-table th:nth-child(2) {
+  width: 14%;
+}
+
+.absensi-rapor {
+  width: 38%;
+}
+
 .ttd-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 80px;
-  margin-top: 42px;
+  margin-top: 34px;
 }
 
 .ttd-box {
   text-align: center;
-  color: #102a2a;
+  color: #000;
 }
 
 .ttd-box p {
@@ -242,12 +243,18 @@ body {
 
 .ttd-box strong {
   display: inline-block;
-  border-bottom: 1px solid #102a2a;
+  border-bottom: 1px solid #000;
   padding: 0 8px 3px;
-  color: #07484a;
+  color: #000;
 }
 
-/* MOBILE */
+.ttd-box small {
+  display: block;
+  margin-top: 5px;
+  color: #000;
+  font-size: 0.85rem;
+}
+
 @media (max-width: 768px) {
   body {
     padding: 14px;
@@ -275,10 +282,6 @@ body {
     height: 48px;
   }
 
-  .student-head {
-    flex-direction: column;
-  }
-
   .ttd-section {
     grid-template-columns: 1fr;
   }
@@ -286,98 +289,13 @@ body {
   .ttd-box {
     margin-top: 20px;
   }
+
+  .absensi-rapor {
+    width: 100%;
+  }
 }
 
-/* PRINT */
-@media print {
-  body {
-    background: #ffffff;
-    padding: 0;
-  }
-
-  .print-page {
-    max-width: none;
-    box-shadow: none;
-    border-radius: 0;
-    padding: 14mm;
-  }
-
-  .btn-print {
-    display: none;
-  }
-
-  .student-card {
-    page-break-inside: avoid;
-  }
-}
-.ttd-box small {
-  display: block;
-  margin-top: 5px;
-  color: #102a2a;
-  font-size: 0.85rem;
-}
-.nilai-print-table th,
-.nilai-print-table td {
-  word-wrap: break-word;
-  white-space: normal;
-}
-
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 12mm;
-  }
-
-  .table-wrap {
-    overflow: visible;
-  }
-
-  .nilai-print-table {
-    font-size: 10px;
-  }
-
-  .nilai-print-table th,
-  .nilai-print-table td {
-    padding: 7px 6px;
-  }
-
-  .student-card {
-    border: none;
-    padding: 0;
-    margin-bottom: 18px;
-  }
-}
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 12mm;
-  }
-
-  body {
-    background: #ffffff;
-    padding: 0;
-  }
-
-  .print-page {
-    max-width: none;
-    box-shadow: none;
-    border-radius: 0;
-    padding: 0;
-  }
-
-  .btn-print {
-    display: none;
-  }
-
-  .table-wrap {
-    overflow: visible;
-  }
-
-  .student-card {
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-}
+/* PRINT RAPOR 1 HALAMAN */
 @media print {
   @page {
     size: A4 portrait;
@@ -386,658 +304,178 @@ body {
 
   html,
   body {
-    width: 210mm;
-    background: #ffffff !important;
-    padding: 0 !important;
+    width: 210mm !important;
     margin: 0 !important;
-  }
-
-  .print-page {
-    width: 100%;
-    max-width: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
     padding: 0 !important;
-    margin: 0 auto !important;
+    background: #ffffff !important;
+    color: #000 !important;
   }
 
-  .btn-print {
-    display: none !important;
-  }
-
-  .print-info {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
-
-  .student-card {
-    page-break-inside: avoid;
-    break-inside: avoid;
-    margin-bottom: 12mm;
-  }
-
-  .table-wrap {
+  body {
     overflow: visible !important;
   }
 
-  .nilai-print-table {
-    width: 100% !important;
-    min-width: 0 !important;
-    table-layout: fixed !important;
-  }
-
-  .nilai-print-table th,
-  .nilai-print-table td {
-    padding: 6px 5px !important;
-    font-size: 10px !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-  }
-}
-/* =========================
-   FIX PRINT BIAR RAPI & TIDAK KEPOTONG
-========================= */
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 8mm;
-  }
-
-  html,
-  body {
-    width: 210mm;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    color: #102a2a !important;
-  }
-
   .print-page {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
+    width: 190mm !important;
+    max-width: 190mm !important;
+    margin: 0 auto !important;
     padding: 0 !important;
-    border-radius: 0 !important;
     box-shadow: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
   }
 
-  .btn-print {
+  .btn-print,
+  .print-info,
+  .judul-rapor p {
     display: none !important;
   }
 
   .kop-rapor {
-    grid-template-columns: 65px 1fr 65px !important;
-    gap: 10px !important;
-    padding-bottom: 8px !important;
-    margin-bottom: 10px !important;
+    display: grid !important;
+    grid-template-columns: 48px 1fr 48px !important;
+    gap: 8px !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 8px !important;
+    border-bottom: 2px double #000 !important;
   }
 
   .kop-logo img {
-    width: 58px !important;
-    height: 58px !important;
-  }
-
-  .kop-text h2 {
-    font-size: 11px !important;
-    margin-bottom: 2px !important;
-  }
-
-  .kop-text h1 {
-    font-size: 20px !important;
-    margin-bottom: 2px !important;
-  }
-
-  .kop-text p {
-    font-size: 10px !important;
-    margin: 1px 0 !important;
-  }
-
-  .judul-rapor {
-    margin-bottom: 10px !important;
-  }
-
-  .judul-rapor h2 {
-    font-size: 16px !important;
-    margin-bottom: 4px !important;
-  }
-
-  .judul-rapor p {
-    font-size: 10px !important;
-  }
-
-  .print-info {
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 8px !important;
-    margin-bottom: 12px !important;
-  }
-
-  .print-info div {
-    padding: 8px 10px !important;
-    border-radius: 8px !important;
-  }
-
-  .print-info span {
-    font-size: 9px !important;
-    margin-bottom: 2px !important;
-  }
-
-  .print-info strong {
-    font-size: 11px !important;
-  }
-
-  .student-card {
-    border-radius: 10px !important;
-    padding: 12px !important;
-    margin-bottom: 12px !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .student-head {
-    margin-bottom: 8px !important;
-  }
-
-  .student-head h2 {
-    font-size: 15px !important;
-  }
-
-  .student-head p {
-    font-size: 10px !important;
-  }
-
-  .kelas-badge {
-    padding: 5px 9px !important;
-    font-size: 10px !important;
-  }
-
-  .table-wrap {
-    overflow: visible !important;
-  }
-
-  .table-wrap::-webkit-scrollbar {
-    display: none !important;
-  }
-
-  .nilai-print-table {
-    width: 100% !important;
-    min-width: 0 !important;
-    table-layout: fixed !important;
-    border-collapse: collapse !important;
-  }
-
-  .nilai-print-table th,
-  .nilai-print-table td {
-    padding: 5px 4px !important;
-    font-size: 9px !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-  }
-
-  .nilai-print-table th:nth-child(1),
-  .nilai-print-table td:nth-child(1) {
-    width: 7% !important;
-  }
-
-  .nilai-print-table th:nth-child(2),
-  .nilai-print-table td:nth-child(2) {
-    width: 25% !important;
-  }
-
-  .nilai-print-table th:nth-child(3),
-  .nilai-print-table td:nth-child(3) {
-    width: 15% !important;
-  }
-
-  .nilai-print-table th:nth-child(4),
-  .nilai-print-table td:nth-child(4),
-  .nilai-print-table th:nth-child(5),
-  .nilai-print-table td:nth-child(5),
-  .nilai-print-table th:nth-child(6),
-  .nilai-print-table td:nth-child(6),
-  .nilai-print-table th:nth-child(7),
-  .nilai-print-table td:nth-child(7),
-  .nilai-print-table th:nth-child(8),
-  .nilai-print-table td:nth-child(8) {
-    width: 9% !important;
-    text-align: center !important;
-  }
-
-  .ttd-section {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 40px !important;
-    margin-top: 10px !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .ttd-box p {
-    font-size: 10px !important;
-    margin-bottom: 4px !important;
-  }
-
-  .ttd-space {
+    width: 42px !important;
     height: 42px !important;
   }
 
-  .ttd-box strong {
-    font-size: 11px !important;
-  }
-
-  .ttd-box small {
-    font-size: 9px !important;
-  }
-}
-@media print {
-  .nilai-print-table th,
-  .nilai-print-table td {
-    font-size: 8px !important;
-    padding: 4px 3px !important;
-  }
-
-  .student-card {
-    padding: 8px !important;
-    margin-bottom: 8px !important;
-  }
-
-  .ttd-section {
-    margin-top: 6px !important;
-  }
-
-  .ttd-space {
-    height: 30px !important;
-  }
-}
-/* =========================
-   FINAL PRINT 1 LEMBAR A4
-========================= */
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 6mm;
-  }
-
-  html,
-  body {
-    width: 210mm !important;
-    height: 297mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    overflow: hidden !important;
-  }
-
-  .print-page {
-    width: 198mm !important;
-    max-width: 198mm !important;
-    min-height: auto !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-  }
-
-  .btn-print {
-    display: none !important;
-  }
-
-  .kop-rapor {
-    display: grid !important;
-    grid-template-columns: 42px 1fr 42px !important;
-    gap: 6px !important;
-    padding-bottom: 5px !important;
-    margin-bottom: 7px !important;
-    border-bottom: 2px double #102a2a !important;
-  }
-
-  .kop-logo img {
-    width: 38px !important;
-    height: 38px !important;
-  }
-
   .kop-text h2 {
-    font-size: 8px !important;
-    margin: 0 !important;
+    font-size: 9px !important;
+    margin: 0 0 1px !important;
     line-height: 1.1 !important;
+    color: #000 !important;
   }
 
   .kop-text h1 {
-    font-size: 13px !important;
+    font-size: 15px !important;
     margin: 1px 0 !important;
     line-height: 1.1 !important;
+    color: #000 !important;
   }
 
   .kop-text p {
-    font-size: 7px !important;
+    font-size: 8px !important;
     margin: 0 !important;
-    line-height: 1.15 !important;
+    line-height: 1.1 !important;
+    color: #000 !important;
   }
 
   .judul-rapor {
-    margin-bottom: 6px !important;
+    margin-bottom: 8px !important;
   }
 
   .judul-rapor h2 {
     font-size: 13px !important;
-    margin: 0 0 2px !important;
+    margin: 0 !important;
     padding-bottom: 2px !important;
+    color: #000 !important;
+    border-bottom: 1px solid #000 !important;
   }
 
-  .judul-rapor p {
-    font-size: 8px !important;
-    margin: 0 !important;
-  }
-
-  .print-info {
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 5px !important;
-    margin-bottom: 7px !important;
-  }
-
-  .print-info div {
-    padding: 5px 7px !important;
-    border-radius: 7px !important;
-  }
-
-  .print-info span {
-    font-size: 7px !important;
-    margin-bottom: 1px !important;
-  }
-
-  .print-info strong {
+  .rapor-sheet {
     font-size: 9px !important;
+    color: #000 !important;
   }
 
-  .student-card {
-    border: 1px solid #dfe9e6 !important;
-    border-radius: 8px !important;
-    padding: 7px !important;
-    margin: 0 !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .student-head {
-    display: flex !important;
-    justify-content: space-between !important;
+  .identitas-rapor {
     margin-bottom: 5px !important;
   }
 
-  .student-head h2 {
-    font-size: 11px !important;
-    margin: 0 !important;
+  .identitas-rapor td {
+    padding: 1.5px 4px !important;
+    font-size: 9px !important;
     line-height: 1.15 !important;
   }
 
-  .student-head p {
-    font-size: 7px !important;
-    margin: 0 !important;
+  .section-title {
+    font-size: 9px !important;
+    margin: 3px 0 !important;
   }
 
-  .kelas-badge {
-    padding: 3px 7px !important;
-    font-size: 8px !important;
+  .rapor-table,
+  .ekskul-table,
+  .absensi-rapor {
+    margin-bottom: 6px !important;
   }
 
-  .table-wrap {
-    overflow: visible !important;
-  }
-
-  .nilai-print-table {
-    width: 100% !important;
-    table-layout: fixed !important;
-    border-collapse: collapse !important;
-  }
-
-  .nilai-print-table th,
-  .nilai-print-table td {
-    padding: 3px 3px !important;
-    font-size: 7.5px !important;
+  .rapor-table th,
+  .rapor-table td,
+  .ekskul-table th,
+  .ekskul-table td,
+  .absensi-rapor th,
+  .absensi-rapor td {
+    padding: 2.5px 4px !important;
+    font-size: 8.2px !important;
     line-height: 1.15 !important;
-    white-space: normal !important;
-    word-break: break-word !important;
+    border: 1px solid #000 !important;
   }
 
-  .nilai-print-table th:nth-child(1),
-  .nilai-print-table td:nth-child(1) {
+  .rapor-table th:nth-child(1),
+  .rapor-table td:nth-child(1) {
     width: 5% !important;
-    text-align: center !important;
   }
 
-  .nilai-print-table th:nth-child(2),
-  .nilai-print-table td:nth-child(2) {
-    width: 24% !important;
+  .rapor-table th:nth-child(2),
+  .rapor-table td:nth-child(2) {
+    width: 34% !important;
   }
 
-  .nilai-print-table th:nth-child(3),
-  .nilai-print-table td:nth-child(3) {
-    width: 13% !important;
+  .rapor-table th:nth-child(3),
+  .rapor-table td:nth-child(3),
+  .rapor-table th:nth-child(4),
+  .rapor-table td:nth-child(4),
+  .rapor-table th:nth-child(5),
+  .rapor-table td:nth-child(5) {
+    width: 10% !important;
   }
 
-  .nilai-print-table th:nth-child(4),
-  .nilai-print-table td:nth-child(4),
-  .nilai-print-table th:nth-child(5),
-  .nilai-print-table td:nth-child(5),
-  .nilai-print-table th:nth-child(6),
-  .nilai-print-table td:nth-child(6),
-  .nilai-print-table th:nth-child(7),
-  .nilai-print-table td:nth-child(7),
-  .nilai-print-table th:nth-child(8),
-  .nilai-print-table td:nth-child(8) {
-    width: 9% !important;
-    text-align: center !important;
-  }
-
-  .rata-row td {
+  .deskripsi-cell {
+    width: 31% !important;
     font-size: 8px !important;
-    padding: 4px 3px !important;
+    line-height: 1.2 !important;
+  }
+
+  .ekskul-table th,
+  .ekskul-table td {
+    height: 16px !important;
+  }
+
+  .absensi-rapor {
+    width: 38% !important;
   }
 
   .ttd-section {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: 30px !important;
-    margin-top: 7px !important;
+    gap: 60px !important;
+    margin-top: 14px !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
   .ttd-box p {
-    font-size: 8px !important;
-    margin: 0 0 2px !important;
-    line-height: 1.2 !important;
+    font-size: 9px !important;
+    margin: 0 0 3px !important;
+    line-height: 1.1 !important;
   }
 
   .ttd-space {
-    height: 26px !important;
+    height: 34px !important;
   }
 
   .ttd-box strong {
-    font-size: 8px !important;
-    padding-bottom: 1px !important;
+    font-size: 9px !important;
+    color: #000 !important;
+    border-bottom: 1px solid #000 !important;
   }
 
   .ttd-box small {
-    font-size: 7px !important;
-    margin-top: 1px !important;
-  }
-}
-/* FINAL MODEL RAPOR */
-.student-identitas {
-  margin-bottom: 12px;
-}
-
-.student-identitas table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-
-.student-identitas td {
-  padding: 4px 8px;
-  border: none;
-}
-
-.student-identitas td:nth-child(1),
-.student-identitas td:nth-child(3) {
-  width: 18%;
-  font-weight: 700;
-}
-
-.rapor-bottom-grid {
-  display: grid;
-  grid-template-columns: 36% 1fr;
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.absensi-table,
-.catatan-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.absensi-table th,
-.absensi-table td,
-.catatan-table th,
-.catatan-table td {
-  border: 1px solid #102a2a;
-  padding: 7px 8px;
-  font-size: 0.82rem;
-}
-
-.absensi-table th,
-.catatan-table th {
-  background: #eef7f4;
-  color: #07484a;
-  font-weight: 800;
-}
-
-.catatan-table td {
-  height: 96px;
-  vertical-align: top;
-}
-
-/* CETAK 1 LEMBAR */
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 8mm;
-  }
-
-  html,
-  body {
-    width: 210mm !important;
-    height: 297mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: white !important;
-  }
-
-  .print-page {
-    width: 194mm !important;
-    max-width: 194mm !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-  }
-
-  .btn-print {
-    display: none !important;
-  }
-
-  .kop-rapor {
-    grid-template-columns: 55px 1fr 55px !important;
-    padding-bottom: 6px !important;
-    margin-bottom: 8px !important;
-  }
-
-  .kop-logo img {
-    width: 48px !important;
-    height: 48px !important;
-  }
-
-  .kop-text h2 {
-    font-size: 10px !important;
-  }
-
-  .kop-text h1 {
-    font-size: 18px !important;
-  }
-
-  .kop-text p {
-    font-size: 9px !important;
-  }
-
-  .judul-rapor {
-    margin-bottom: 10px !important;
-  }
-
-  .judul-rapor h2 {
-    font-size: 16px !important;
-  }
-
-  .judul-rapor p {
-    font-size: 10px !important;
-  }
-
-  .print-info {
-    display: none !important;
-  }
-
-  .student-card {
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .student-identitas table {
-    font-size: 10px !important;
-  }
-
-  .student-identitas td {
-    padding: 3px 5px !important;
-  }
-
-  .nilai-print-table th,
-  .nilai-print-table td {
-    font-size: 10px !important;
-    padding: 5px 6px !important;
-  }
-
-  .rapor-bottom-grid {
-    grid-template-columns: 36% 1fr !important;
-    gap: 10px !important;
-    margin-top: 10px !important;
-  }
-
-  .absensi-table th,
-  .absensi-table td,
-  .catatan-table th,
-  .catatan-table td {
-    font-size: 9px !important;
-    padding: 5px 6px !important;
-  }
-
-  .catatan-table td {
-    height: 64px !important;
-  }
-
-  .ttd-section {
-    margin-top: 16px !important;
-    gap: 45px !important;
-  }
-
-  .ttd-box p {
-    font-size: 10px !important;
-  }
-
-  .ttd-space {
-    height: 42px !important;
-  }
-
-  .ttd-box strong {
-    font-size: 10px !important;
+    font-size: 8px !important;
   }
 }

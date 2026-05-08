@@ -45,125 +45,158 @@ function hitungRataRata(nilai) {
 function renderSiswa(siswa) {
   const rataRata = hitungRataRata(siswa.nilai).toFixed(2);
 
-  const totalHadir = siswa.nilai.reduce((sum, item) => sum + Number(item.hadir || 0), 0);
-  const totalIzin = siswa.nilai.reduce((sum, item) => sum + Number(item.izin || 0), 0);
   const totalSakit = siswa.nilai.reduce((sum, item) => sum + Number(item.sakit || 0), 0);
+  const totalIzin = siswa.nilai.reduce((sum, item) => sum + Number(item.izin || 0), 0);
   const totalAlfa = siswa.nilai.reduce((sum, item) => sum + Number(item.alfa || 0), 0);
 
   const rows = siswa.nilai.map((item, index) => {
     return `
       <tr>
-        <td>${index + 1}</td>
+        <td class="text-center">${index + 1}</td>
         <td>${item.nama_mapel || "-"}</td>
-        <td>${tampilSemester(item.semester)}</td>
-        <td>${item.nilai_angka}</td>
+        <td class="text-center">${item.nilai_angka}</td>
+        <td class="text-center"></td>
+        <td class="text-center"></td>
+        ${
+          index === 0
+            ? `
+              <td rowspan="${siswa.nilai.length + 1}" class="deskripsi-cell">
+                Kesimpulan dari capaian siswa dalam pembelajaran menunjukkan perkembangan yang baik.
+              </td>
+            `
+            : ""
+        }
       </tr>
     `;
   }).join("");
 
   return `
-    <article class="student-card">
-      <div class="student-identitas">
-        <table>
-          <tr>
-            <td>Nama Siswa</td>
-            <td>: ${siswa.nama_siswa}</td>
-            <td>Kelas</td>
-            <td>: ${siswa.nama_kelas}</td>
-          </tr>
-          <tr>
-            <td>ID Siswa</td>
-            <td>: ${siswa.id_siswa}</td>
-            <td>Semester</td>
-            <td>: ${siswa.nilai[0] ? tampilSemester(siswa.nilai[0].semester) : "-"}</td>
-          </tr>
-        </table>
-      </div>
+    <article class="rapor-sheet">
+      <table class="identitas-rapor">
+        <tr>
+          <td>Nama Sekolah</td>
+          <td>: SMP YP 17 Surabaya</td>
+          <td>Kelas</td>
+          <td>: ${siswa.nama_kelas}</td>
+        </tr>
+        <tr>
+          <td>Alamat</td>
+          <td>: Jl. Randu No.17, Surabaya</td>
+          <td>Semester</td>
+          <td>: ${siswa.nilai[0] ? tampilSemester(siswa.nilai[0].semester) : "-"}</td>
+        </tr>
+        <tr>
+          <td>Nama</td>
+          <td>: ${siswa.nama_siswa}</td>
+          <td>Tahun Pelajaran</td>
+          <td>: -</td>
+        </tr>
+        <tr>
+          <td>ID Siswa</td>
+          <td>: ${siswa.id_siswa}</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
 
-      <table class="nilai-print-table">
+      <div class="section-title">CAPAIAN</div>
+
+      <table class="rapor-table">
         <thead>
           <tr>
-            <th>No</th>
-            <th>Mata Pelajaran</th>
-            <th>Semester</th>
+            <th rowspan="2">No</th>
+            <th rowspan="2">Mata Pelajaran</th>
+            <th>Pengetahuan</th>
+            <th>Keterampilan</th>
+            <th>Sikap</th>
+            <th rowspan="2">Deskripsi</th>
+          </tr>
+          <tr>
             <th>Nilai</th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           ${rows}
           <tr class="rata-row">
-            <td colspan="3">Rata-rata Nilai</td>
-            <td>${rataRata}</td>
+            <td colspan="2">Rata-rata Nilai</td>
+            <td class="text-center">${rataRata}</td>
+            <td></td>
+            <td></td>
           </tr>
         </tbody>
       </table>
 
-      <div class="rapor-bottom-grid">
-        <table class="absensi-table">
-          <thead>
-            <tr>
-              <th colspan="2">Ketidakhadiran</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Hadir</td>
-              <td>${totalHadir} Hari</td>
-            </tr>
-            <tr>
-              <td>Izin</td>
-              <td>${totalIzin} Hari</td>
-            </tr>
-            <tr>
-              <td>Sakit</td>
-              <td>${totalSakit} Hari</td>
-            </tr>
-            <tr>
-              <td>Alfa</td>
-              <td>${totalAlfa} Hari</td>
-            </tr>
-          </tbody>
-        </table>
+      <table class="ekskul-table">
+        <thead>
+          <tr>
+            <th>Kegiatan Ekstrakurikuler</th>
+            <th>Nilai</th>
+            <th>Keterangan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1. Pramuka</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>2. UKS</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>3. ............</td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
 
-        <table class="catatan-table">
-          <thead>
-            <tr>
-              <th>Catatan Wali Kelas</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Terus tingkatkan semangat belajar dan kedisiplinan.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table class="absensi-rapor">
+        <tr>
+          <th colspan="2">Ketidakhadiran</th>
+        </tr>
+        <tr>
+          <td>Sakit</td>
+          <td>: ${totalSakit} hari</td>
+        </tr>
+        <tr>
+          <td>Izin</td>
+          <td>: ${totalIzin} hari</td>
+        </tr>
+        <tr>
+          <td>Tanpa Keterangan</td>
+          <td>: ${totalAlfa} hari</td>
+        </tr>
+      </table>
     </article>
   `;
 }
 
 function renderCetak(data) {
-let siswaList = data.siswa || [];
+  let siswaList = data.siswa || [];
 
-/* PENGAMAN: kalau URL membawa id_siswa, tampilkan siswa itu saja */
-if (idSiswa !== "") {
-  siswaList = siswaList.filter(siswa =>
-    String(siswa.id_siswa) === String(idSiswa)
-  );
-}
+  if (idSiswa !== "") {
+    siswaList = siswaList.filter(siswa =>
+      String(siswa.id_siswa) === String(idSiswa)
+    );
+  }
 
-if (keywordCetak !== "") {
-  siswaList = siswaList.filter(siswa =>
-    String(siswa.nama_siswa || "").toLowerCase().includes(keywordCetak) ||
-    String(siswa.id_siswa || "").toLowerCase().includes(keywordCetak)
-  );
-}
+  if (keywordCetak !== "") {
+    siswaList = siswaList.filter(siswa =>
+      String(siswa.nama_siswa || "").toLowerCase().includes(keywordCetak) ||
+      String(siswa.id_siswa || "").toLowerCase().includes(keywordCetak)
+    );
+  }
 
-if (siswaList.length === 1) {
-  document.title = `Rapor_${siswaList[0].nama_siswa}_${siswaList[0].nama_kelas}`;
-} else {
-  document.title = `Rapor_Kelas_${data.kelas?.nama_kelas || "-"}`;
-}
+  if (siswaList.length === 1) {
+    document.title = `Rapor_${siswaList[0].nama_siswa}_${siswaList[0].nama_kelas}`;
+  } else {
+    document.title = `Rapor_Kelas_${data.kelas?.nama_kelas || "-"}`;
+  }
 
   if (namaKelasEl) namaKelasEl.textContent = data.kelas?.nama_kelas || "-";
   if (namaWaliEl) namaWaliEl.textContent = data.wali?.nama || "-";
@@ -198,14 +231,14 @@ function loadCetakNilai() {
     return;
   }
 
-let url =
-  `cetak_nilai_wali.php?id_guru=${idGuru}` +
-  `&role_id=${roleId}` +
-  `&id_kelas=${idKelas}`;
+  let url =
+    `cetak_nilai_wali.php?id_guru=${idGuru}` +
+    `&role_id=${roleId}` +
+    `&id_kelas=${idKelas}`;
 
-if (idSiswa !== "") {
-  url += `&id_siswa=${encodeURIComponent(idSiswa)}`;
-}
+  if (idSiswa !== "") {
+    url += `&id_siswa=${encodeURIComponent(idSiswa)}`;
+  }
 
   fetch(url)
     .then(res => {
