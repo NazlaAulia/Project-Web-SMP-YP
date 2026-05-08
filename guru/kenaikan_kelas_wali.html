@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Kenaikan Kelas - Guru</title>
+
+    <link rel="stylesheet" href="components/sidebar.css">
+    <link rel="stylesheet" href="components/fix-mobile.css">
+    <link rel="stylesheet" href="kenaikan_kelas_wali.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body data-page="kenaikan-kelas">
+    <div class="layout">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div class="page-wrap">
+                <header class="page-header">
+                    <div>
+                        <h1>Status Kenaikan Kelas</h1>
+                        <p>Menampilkan hasil perhitungan siswa yang naik kelas, tidak naik kelas, atau lulus pada kelas wali.</p>
+                    </div>
+                </header>
+
+                <section class="kelas-info-card">
+                    <div class="kelas-icon">
+                        <i class="fas fa-chalkboard-user"></i>
+                    </div>
+                    <div>
+                        <h2 id="kelasWaliText">Memuat kelas wali...</h2>
+                        <p>Data hanya menampilkan siswa dari kelas yang sedang diampu sebagai wali kelas.</p>
+                    </div>
+                </section>
+
+                <section class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-icon success">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div>
+                            <h3 id="jumlahNaik">0</h3>
+                            <p>Naik Kelas</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-icon danger">
+                            <i class="fas fa-circle-xmark"></i>
+                        </div>
+                        <div>
+                            <h3 id="jumlahTidakNaik">0</h3>
+                            <p>Tidak Naik Kelas</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-icon info">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <h3 id="jumlahLulus">0</h3>
+                            <p>Lulus</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h3 id="jumlahTotal">0</h3>
+                            <p>Total Siswa</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="table-card">
+                    <div class="table-header">
+                        <div>
+                            <h2>Daftar Siswa</h2>
+                            <p>Status kenaikan dihitung dari nilai rata-rata, mapel di bawah KKM, izin, sakit, dan alfa.</p>
+                        </div>
+
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchKenaikan" placeholder="Cari nama, kelas, atau status...">
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Kelas Lama</th>
+                                    <th>Kelas Baru</th>
+                                    <th>Rata-rata</th>
+                                    <th>Mapel &lt; KKM</th>
+                                    <th>Izin</th>
+                                    <th>Sakit</th>
+                                    <th>Alfa</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="kenaikanTableBody">
+                                <tr>
+                                    <td colspan="9" class="empty-cell">Memuat data kenaikan kelas...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination-container">
+                        <div class="pagination-info" id="paginationInfo">
+                            Menampilkan 0 sampai 0 dari 0 siswa
+                        </div>
+
+                        <div class="pagination-btns" id="paginationBtns"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="components/sidebar-guru.js"></script>
+    <script src="kenaikan_kelas_wali.js"></script>
+</body>
+</html>

@@ -30,6 +30,19 @@ if (empty($wali_kelas)) {
     exit;
 }
 
+/*
+    Aturan kenaikan kelas:
+    - Rata-rata nilai minimal 75
+    - Mapel di bawah KKM maksimal 2
+    - Alfa maksimal 10
+    - Total izin + sakit maksimal 30
+    - Siswa tidak punya nilai dianggap tidak naik kelas
+*/
+$kkm = 75;
+$maksMapelTidakLulus = 2;
+$maksAlfa = 10;
+$maksIzinSakit = 30;
+
 $conn->begin_transaction();
 
 try {
@@ -40,6 +53,11 @@ try {
         SET status = 'aktif'
         WHERE id_tahun_ajaran = ?
     ");
+
+    if (!$stmt) {
+        throw new Exception($conn->error);
+    }
+
     $stmt->bind_param("i", $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
@@ -49,6 +67,10 @@ try {
         SET id_wali_kelas = ?
         WHERE id_kelas = ?
     ");
+
+    if (!$stmtWali) {
+        throw new Exception($conn->error);
+    }
 
     foreach ($wali_kelas as $id_kelas => $id_guru) {
         $id_kelas = (int) $id_kelas;
@@ -62,21 +84,75 @@ try {
 
     $stmtWali->close();
 
+    /*
+        Buat data sementara siswa yang layak naik.
+        Data ini dipakai supaya proses naik kelas tidak menaikkan semua siswa aktif.
+    */
+    $conn->query("DROP TEMPORARY TABLE IF EXISTS tmp_siswa_layak_naik");
+
+    $createTempQuery = "
+        CREATE TEMPORARY TABLE tmp_siswa_layak_naik AS
+        SELECT 
+            s.id_siswa,
+            k.tingkat,
+            k.nama_kelas,
+            ROUND(AVG(n.nilai_angka), 2) AS rata_rata,
+            SUM(CASE WHEN n.nilai_angka < $kkm THEN 1 ELSE 0 END) AS mapel_tidak_lulus,
+            COALESCE(SUM(n.izin), 0) AS total_izin,
+            COALESCE(SUM(n.sakit), 0) AS total_sakit,
+            COALESCE(SUM(n.alfa), 0) AS total_alfa,
+            COUNT(n.id_siswa) AS jumlah_nilai,
+            CASE
+                WHEN 
+                    COUNT(n.id_siswa) > 0
+                    AND AVG(n.nilai_angka) >= $kkm
+                    AND SUM(CASE WHEN n.nilai_angka < $kkm THEN 1 ELSE 0 END) <= $maksMapelTidakLulus
+                    AND COALESCE(SUM(n.alfa), 0) <= $maksAlfa
+                    AND (COALESCE(SUM(n.izin), 0) + COALESCE(SUM(n.sakit), 0)) <= $maksIzinSakit
+                THEN 1
+                ELSE 0
+            END AS layak_naik
+        FROM siswa s
+        JOIN kelas k ON s.id_kelas = k.id_kelas
+        LEFT JOIN nilai n ON s.id_siswa = n.id_siswa
+        WHERE s.status = 'aktif'
+        GROUP BY s.id_siswa, k.tingkat, k.nama_kelas
+    ";
+
+    if (!$conn->query($createTempQuery)) {
+        throw new Exception($conn->error);
+    }
+
+    /*
+        Kelas 9 yang layak naik akan menjadi lulus.
+        Kelas 9 yang tidak layak tetap aktif dan tetap di kelas lama.
+    */
     $stmt = $conn->prepare("
         UPDATE siswa s
-        JOIN kelas k ON s.id_kelas = k.id_kelas
+        JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
         SET 
             s.status = 'lulus',
             s.id_tahun_ajaran = ?
-        WHERE k.tingkat = 9
+        WHERE t.tingkat = 9
+          AND t.layak_naik = 1
           AND s.status = 'aktif'
     ");
+
+    if (!$stmt) {
+        throw new Exception($conn->error);
+    }
+
     $stmt->bind_param("i", $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
+    /*
+        Kelas 8 yang layak naik akan pindah ke kelas 9 dengan huruf kelas yang sama.
+        Contoh: 8A -> 9A.
+    */
     $stmt = $conn->prepare("
         UPDATE siswa s
+        JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
         JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
         JOIN kelas k_baru
             ON k_baru.tingkat = 9
@@ -84,15 +160,26 @@ try {
         SET 
             s.id_kelas = k_baru.id_kelas,
             s.id_tahun_ajaran = ?
-        WHERE k_lama.tingkat = 8
+        WHERE t.tingkat = 8
+          AND t.layak_naik = 1
           AND s.status = 'aktif'
     ");
+
+    if (!$stmt) {
+        throw new Exception($conn->error);
+    }
+
     $stmt->bind_param("i", $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
+    /*
+        Kelas 7 yang layak naik akan pindah ke kelas 8 dengan huruf kelas yang sama.
+        Contoh: 7A -> 8A.
+    */
     $stmt = $conn->prepare("
         UPDATE siswa s
+        JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
         JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
         JOIN kelas k_baru
             ON k_baru.tingkat = 8
@@ -100,13 +187,43 @@ try {
         SET 
             s.id_kelas = k_baru.id_kelas,
             s.id_tahun_ajaran = ?
-        WHERE k_lama.tingkat = 7
+        WHERE t.tingkat = 7
+          AND t.layak_naik = 1
           AND s.status = 'aktif'
     ");
+
+    if (!$stmt) {
+        throw new Exception($conn->error);
+    }
+
     $stmt->bind_param("i", $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
+    /*
+        Siswa aktif yang tidak layak naik tetap di kelas lama.
+        Tapi tahun ajarannya tetap diganti ke tahun ajaran baru.
+    */
+    $stmt = $conn->prepare("
+        UPDATE siswa s
+        JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
+        SET 
+            s.id_tahun_ajaran = ?
+        WHERE t.layak_naik = 0
+          AND s.status = 'aktif'
+    ");
+
+    if (!$stmt) {
+        throw new Exception($conn->error);
+    }
+
+    $stmt->bind_param("i", $id_tahun_ajaran);
+    $stmt->execute();
+    $stmt->close();
+
+    /*
+        Siswa baru ditempatkan ke kelas 7 secara urut merata.
+    */
     $kelas7 = [];
     $resultKelas7 = $conn->query("
         SELECT id_kelas
@@ -114,6 +231,10 @@ try {
         WHERE tingkat = 7
         ORDER BY nama_kelas ASC
     ");
+
+    if (!$resultKelas7) {
+        throw new Exception($conn->error);
+    }
 
     while ($row = $resultKelas7->fetch_assoc()) {
         $kelas7[] = (int) $row['id_kelas'];
@@ -131,6 +252,10 @@ try {
         ORDER BY nama ASC, id_siswa ASC
     ");
 
+    if (!$resultSiswaBaru) {
+        throw new Exception($conn->error);
+    }
+
     $stmtSiswaBaru = $conn->prepare("
         UPDATE siswa
         SET 
@@ -139,6 +264,10 @@ try {
             status = 'aktif'
         WHERE id_siswa = ?
     ");
+
+    if (!$stmtSiswaBaru) {
+        throw new Exception($conn->error);
+    }
 
     $i = 0;
 
@@ -159,11 +288,13 @@ try {
 
     $stmtSiswaBaru->close();
 
+    $conn->query("DROP TEMPORARY TABLE IF EXISTS tmp_siswa_layak_naik");
+
     $conn->commit();
 
     echo json_encode([
         'success' => true,
-        'message' => 'Proses naik kelas berhasil dijalankan.'
+        'message' => 'Proses naik kelas berhasil dijalankan. Siswa yang memenuhi syarat naik kelas, siswa yang tidak memenuhi syarat tetap di kelas lama.'
     ]);
 } catch (Exception $e) {
     $conn->rollback();
