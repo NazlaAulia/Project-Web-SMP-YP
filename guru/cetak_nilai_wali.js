@@ -4,6 +4,8 @@ const tanggalCetakEl = document.getElementById("tanggalCetak");
 const tanggalTtdEl = document.getElementById("tanggalTtd");
 const totalSiswaCetakEl = document.getElementById("totalSiswaCetak");
 const ttdWaliEl = document.getElementById("ttdWali");
+const ttdKepalaSekolahEl = document.getElementById("ttdKepalaSekolah");
+const nipKepalaSekolahEl = document.getElementById("nipKepalaSekolah");
 const printContent = document.getElementById("printContent");
 const btnPrint = document.getElementById("btnPrint");
 
@@ -25,10 +27,8 @@ function formatTanggalIndonesia(date = new Date()) {
 
 function tampilSemester(value) {
   const semester = Number(value);
-
   if (semester === 1) return "Ganjil";
   if (semester === 2) return "Genap";
-
   return value || "-";
 }
 
@@ -49,19 +49,21 @@ function renderSiswa(siswa) {
   const totalIzin = siswa.nilai.reduce((sum, item) => sum + Number(item.izin || 0), 0);
   const totalAlfa = siswa.nilai.reduce((sum, item) => sum + Number(item.alfa || 0), 0);
 
+  const semesterText = siswa.nilai[0] ? tampilSemester(siswa.nilai[0].semester) : "-";
+
   const rows = siswa.nilai.map((item, index) => {
     return `
       <tr>
-        <td class="text-center">${index + 1}</td>
+        <td class="center">${index + 1}</td>
         <td>${item.nama_mapel || "-"}</td>
-        <td class="text-center">${item.nilai_angka}</td>
-        <td class="text-center"></td>
-        <td class="text-center"></td>
+        <td class="center">${item.nilai_angka}</td>
+        <td class="center"></td>
+        <td class="center"></td>
         ${
           index === 0
             ? `
-              <td rowspan="${siswa.nilai.length + 1}" class="deskripsi-cell">
-                Kesimpulan dari capaian siswa dalam pembelajaran menunjukkan perkembangan yang baik.
+              <td class="deskripsi" rowspan="${siswa.nilai.length + 1}">
+                Kesimpulan dari sikap keseluruhan dalam pembelajaran menunjukkan perkembangan yang baik dan perlu terus ditingkatkan.
               </td>
             `
             : ""
@@ -72,7 +74,7 @@ function renderSiswa(siswa) {
 
   return `
     <article class="rapor-sheet">
-      <table class="identitas-rapor">
+      <table class="identitas-table">
         <tr>
           <td>Nama Sekolah</td>
           <td>: SMP YP 17 Surabaya</td>
@@ -81,9 +83,9 @@ function renderSiswa(siswa) {
         </tr>
         <tr>
           <td>Alamat</td>
-          <td>: Jl. Randu No.17, Surabaya</td>
+          <td>: Jl. Randu No. 17, Surabaya</td>
           <td>Semester</td>
-          <td>: ${siswa.nilai[0] ? tampilSemester(siswa.nilai[0].semester) : "-"}</td>
+          <td>: ${semesterText}</td>
         </tr>
         <tr>
           <td>Nama</td>
@@ -99,12 +101,12 @@ function renderSiswa(siswa) {
         </tr>
       </table>
 
-      <div class="section-title">CAPAIAN</div>
+      <div class="capai-title">CAPAIAN</div>
 
       <table class="rapor-table">
         <thead>
           <tr>
-            <th rowspan="2">No</th>
+            <th rowspan="2" class="no-col">No</th>
             <th rowspan="2">Mata Pelajaran</th>
             <th>Pengetahuan</th>
             <th>Keterampilan</th>
@@ -121,7 +123,7 @@ function renderSiswa(siswa) {
           ${rows}
           <tr class="rata-row">
             <td colspan="2">Rata-rata Nilai</td>
-            <td class="text-center">${rataRata}</td>
+            <td class="center">${rataRata}</td>
             <td></td>
             <td></td>
           </tr>
@@ -155,7 +157,7 @@ function renderSiswa(siswa) {
         </tbody>
       </table>
 
-      <table class="absensi-rapor">
+      <table class="absensi-table">
         <tr>
           <th colspan="2">Ketidakhadiran</th>
         </tr>
@@ -204,6 +206,14 @@ function renderCetak(data) {
   if (tanggalCetakEl) tanggalCetakEl.textContent = formatTanggalIndonesia();
   if (tanggalTtdEl) tanggalTtdEl.textContent = formatTanggalIndonesia();
   if (totalSiswaCetakEl) totalSiswaCetakEl.textContent = siswaList.length;
+
+  if (ttdKepalaSekolahEl) {
+    ttdKepalaSekolahEl.textContent = data.kepala_sekolah?.nama || "-";
+  }
+
+  if (nipKepalaSekolahEl) {
+    nipKepalaSekolahEl.textContent = `NIP. ${data.kepala_sekolah?.nip || "-"}`;
+  }
 
   if (!printContent) return;
 
