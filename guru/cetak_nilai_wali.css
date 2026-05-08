@@ -862,3 +862,182 @@ body {
     margin-top: 1px !important;
   }
 }
+/* FINAL MODEL RAPOR */
+.student-identitas {
+  margin-bottom: 12px;
+}
+
+.student-identitas table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.student-identitas td {
+  padding: 4px 8px;
+  border: none;
+}
+
+.student-identitas td:nth-child(1),
+.student-identitas td:nth-child(3) {
+  width: 18%;
+  font-weight: 700;
+}
+
+.rapor-bottom-grid {
+  display: grid;
+  grid-template-columns: 36% 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.absensi-table,
+.catatan-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.absensi-table th,
+.absensi-table td,
+.catatan-table th,
+.catatan-table td {
+  border: 1px solid #102a2a;
+  padding: 7px 8px;
+  font-size: 0.82rem;
+}
+
+.absensi-table th,
+.catatan-table th {
+  background: #eef7f4;
+  color: #07484a;
+  font-weight: 800;
+}
+
+.catatan-table td {
+  height: 96px;
+  vertical-align: top;
+}
+
+/* CETAK 1 LEMBAR */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+
+  html,
+  body {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  .print-page {
+    width: 194mm !important;
+    max-width: 194mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .btn-print {
+    display: none !important;
+  }
+
+  .kop-rapor {
+    grid-template-columns: 55px 1fr 55px !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .kop-logo img {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .kop-text h2 {
+    font-size: 10px !important;
+  }
+
+  .kop-text h1 {
+    font-size: 18px !important;
+  }
+
+  .kop-text p {
+    font-size: 9px !important;
+  }
+
+  .judul-rapor {
+    margin-bottom: 10px !important;
+  }
+
+  .judul-rapor h2 {
+    font-size: 16px !important;
+  }
+
+  .judul-rapor p {
+    font-size: 10px !important;
+  }
+
+  .print-info {
+    display: none !important;
+  }
+
+  .student-card {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .student-identitas table {
+    font-size: 10px !important;
+  }
+
+  .student-identitas td {
+    padding: 3px 5px !important;
+  }
+
+  .nilai-print-table th,
+  .nilai-print-table td {
+    font-size: 10px !important;
+    padding: 5px 6px !important;
+  }
+
+  .rapor-bottom-grid {
+    grid-template-columns: 36% 1fr !important;
+    gap: 10px !important;
+    margin-top: 10px !important;
+  }
+
+  .absensi-table th,
+  .absensi-table td,
+  .catatan-table th,
+  .catatan-table td {
+    font-size: 9px !important;
+    padding: 5px 6px !important;
+  }
+
+  .catatan-table td {
+    height: 64px !important;
+  }
+
+  .ttd-section {
+    margin-top: 16px !important;
+    gap: 45px !important;
+  }
+
+  .ttd-box p {
+    font-size: 10px !important;
+  }
+
+  .ttd-space {
+    height: 42px !important;
+  }
+
+  .ttd-box strong {
+    font-size: 10px !important;
+  }
+}
