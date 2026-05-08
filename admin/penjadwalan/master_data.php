@@ -328,7 +328,7 @@ $total_mapel = count($mapel_list);
 
     <style>
         :root {
-            --primary-teal: #0f766e;
+            --primary-teal:  #064e4b;
             --soft-teal: #ecfdf5;
             --dark-text: #1f2937;
             --muted-text: #6b7280;
