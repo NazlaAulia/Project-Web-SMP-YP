@@ -49,6 +49,7 @@ if ($resultWali->num_rows === 0) {
 }
 
 $wali = $resultWali->fetch_assoc();
+
 /* AMBIL NILAI SISWA */
 $sql = "
     SELECT
@@ -79,30 +80,6 @@ if ($id_siswa > 0) {
 }
 
 $sql .= " ORDER BY s.nama ASC, n.semester ASC, m.id_mapel ASC";
-
-$types = "i";
-$params = [$id_kelas];
-
-if ($id_siswa > 0) {
-    $sql .= " AND s.id_siswa = ?";
-    $types .= "i";
-    $params[] = $id_siswa;
-}
-
-$sql .= " ORDER BY s.nama ASC, n.semester ASC, m.id_mapel ASC";
-
-$types = "ii";
-$params = [$id_guru, $id_kelas];
-
-if ($id_siswa > 0) {
-    $sql .= " AND s.id_siswa = ?";
-    $types .= "i";
-    $params[] = $id_siswa;
-}
-
-$sql .= " ORDER BY s.nama ASC, n.semester ASC, m.id_mapel ASC";
-
-$stmt = $conn->prepare($sql);
 
 if (!$stmt) {
     kirim_json("error", "Query nilai gagal: " . $conn->error);
