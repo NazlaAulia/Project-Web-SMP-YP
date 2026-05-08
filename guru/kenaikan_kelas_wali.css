@@ -29,6 +29,17 @@ body {
     color: var(--text);
 }
 
+.layout {
+    min-height: 100vh;
+}
+
+.main-content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    min-height: 100vh;
+    background: var(--bg);
+}
+
 .page-wrap {
     padding: 30px;
 }
@@ -321,6 +332,13 @@ tbody tr:hover {
 
     .page-wrap {
         padding: 24px 18px;
+    }
+}
+
+@media (max-width: 900px) {
+    .main-content {
+        margin-left: 0;
+        width: 100%;
     }
 }
 
