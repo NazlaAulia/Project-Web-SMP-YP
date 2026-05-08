@@ -841,7 +841,7 @@ foreach ($requests as $r) {
         =============================== */
 
         .sidebar {
-            background: #0f766e !important;
+            background: #064e4b !important;
             color: #ffffff !important;
             z-index: 3000 !important;
         }
