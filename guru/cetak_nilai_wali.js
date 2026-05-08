@@ -91,7 +91,7 @@ const rows = siswa.nilai.map((item, index) => {
           <td>Nama</td>
           <td>: ${siswa.nama_siswa}</td>
           <td>Tahun Pelajaran</td>
-          <td>: -</td>
+          <td>: ${window.tahunAjaranCetak || "-"}</td>
         </tr>
         <tr>
           <td>ID Siswa</td>
@@ -187,7 +187,7 @@ function renderCetak(data) {
   if (nipKepalaSekolahEl) {
     nipKepalaSekolahEl.textContent = "NIP. 196712241994121001";
   }
-
+window.tahunAjaranCetak = data.kelas?.tahun_ajaran || "-";
   if (!printContent) return;
 
   if (siswaList.length === 0) {
