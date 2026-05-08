@@ -7,6 +7,9 @@ const jumlahSiswaBaru = document.getElementById("jumlahSiswaBaru");
 const jumlahSiswaAktif = document.getElementById("jumlahSiswaAktif");
 const jumlahKelas9 = document.getElementById("jumlahKelas9");
 
+const previewNaikBody = document.getElementById("previewNaikBody");
+const previewSummary = document.getElementById("previewSummary");
+
 const confirmPopup = document.getElementById("confirmPopup");
 const closeConfirmPopup = document.getElementById("closeConfirmPopup");
 const cancelConfirmBtn = document.getElementById("cancelConfirmBtn");
@@ -25,6 +28,7 @@ let pendingFormData = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     loadNaikKelasData();
+    loadPreviewNaikKelas();
 });
 
 async function loadNaikKelasData() {
@@ -43,6 +47,117 @@ async function loadNaikKelasData() {
     } catch (error) {
         showMessage("Terjadi kesalahan saat memuat data.", "error");
     }
+}
+
+async function loadPreviewNaikKelas() {
+    if (!previewNaikBody || !previewSummary) {
+        return;
+    }
+
+    try {
+        const response = await fetch("preview_naik_kelas.php");
+        const result = await response.json();
+
+        if (!result.success) {
+            previewNaikBody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="empty-cell">${result.message || "Gagal memuat preview."}</td>
+                </tr>
+            `;
+
+            previewSummary.textContent = "Preview kenaikan kelas gagal dimuat.";
+            return;
+        }
+
+        renderPreviewNaikKelas(result.data, result.summary);
+    } catch (error) {
+        previewNaikBody.innerHTML = `
+            <tr>
+                <td colspan="9" class="empty-cell">Terjadi kesalahan saat memuat preview.</td>
+            </tr>
+        `;
+
+        previewSummary.textContent = "Preview kenaikan kelas gagal dimuat.";
+    }
+}
+
+function renderPreviewNaikKelas(data, summary) {
+    if (!previewNaikBody || !previewSummary) {
+        return;
+    }
+
+    if (!data.length) {
+        previewNaikBody.innerHTML = `
+            <tr>
+                <td colspan="9" class="empty-cell">Belum ada data siswa untuk diproses.</td>
+            </tr>
+        `;
+
+        previewSummary.textContent = "Belum ada data preview.";
+        return;
+    }
+
+    previewSummary.innerHTML = `
+        <strong>Ringkasan:</strong>
+        Naik Kelas: ${summary.naik_kelas || 0} siswa,
+        Tidak Naik Kelas: ${summary.tidak_naik || 0} siswa,
+        Lulus: ${summary.lulus || 0} siswa,
+        Siswa Baru: ${summary.siswa_baru || 0} siswa.
+    `;
+
+    previewNaikBody.innerHTML = "";
+
+    data.forEach((item) => {
+        const tr = document.createElement("tr");
+        const statusClass = getStatusClass(item.status_kenaikan);
+
+        tr.innerHTML = `
+            <td>${escapeHtml(item.nama)}</td>
+            <td>${escapeHtml(item.kelas_lama)}</td>
+            <td>${escapeHtml(item.kelas_baru)}</td>
+            <td>${escapeHtml(item.rata_rata)}</td>
+            <td>${escapeHtml(item.mapel_tidak_lulus)}</td>
+            <td>${escapeHtml(item.izin)}</td>
+            <td>${escapeHtml(item.sakit)}</td>
+            <td>${escapeHtml(item.alfa)}</td>
+            <td>
+                <span class="status-badge ${statusClass}">
+                    ${escapeHtml(item.status_kenaikan)}
+                </span>
+            </td>
+        `;
+
+        previewNaikBody.appendChild(tr);
+    });
+}
+
+function getStatusClass(status) {
+    if (status === "Naik Kelas") {
+        return "status-naik";
+    }
+
+    if (status === "Tidak Naik Kelas") {
+        return "status-tidak-naik";
+    }
+
+    if (status === "Lulus") {
+        return "status-lulus";
+    }
+
+    if (status === "Siswa Baru") {
+        return "status-baru";
+    }
+
+    return "";
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 function renderSummary(summary) {
@@ -167,6 +282,7 @@ confirmProcessBtn.addEventListener("click", async () => {
             closePopup();
             showMessage(result.message || "Proses naik kelas berhasil.", "success");
             loadNaikKelasData();
+            loadPreviewNaikKelas();
         } else {
             showConfirmMessage(result.message || "Proses naik kelas gagal.");
         }
@@ -289,6 +405,7 @@ if (confirmTahunAjaranBtn) {
             }
 
             await loadNaikKelasData();
+            await loadPreviewNaikKelas();
 
             setTimeout(() => {
                 closeTahunAjaranModal();

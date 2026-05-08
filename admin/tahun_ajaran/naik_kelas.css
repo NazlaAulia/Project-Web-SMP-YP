@@ -337,6 +337,165 @@ button,
     }
 }
 
+.confirm-input-group {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.confirm-input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.confirm-input-group input {
+    border: 1px solid #d9e3e0;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 14px;
+    outline: none;
+}
+
+.confirm-input-group input:focus {
+    border-color: var(--primary-teal);
+    box-shadow: 0 0 0 3px rgba(6, 78, 75, 0.08);
+}
+
+.confirm-message {
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #b91c1c;
+}
+
+.confirm-message.success {
+    color: var(--success-text);
+}
+
+.confirm-message.error {
+    color: #b91c1c;
+}
+
+.tahun-ajaran-row {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    max-width: 760px;
+}
+
+.tahun-ajaran-row select {
+    flex: 1;
+    min-width: 0;
+}
+
+.tahun-ajaran-row .btn-create-year {
+    height: 54px;
+    padding: 0 18px;
+    border-radius: 16px;
+    background: #e8f3f2;
+    color: #064e4b;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tahun-ajaran-row .btn-create-year:hover {
+    background: #dcecea;
+}
+
+/* ===== PREVIEW KENAIKAN KELAS ===== */
+
+.preview-section {
+    margin-top: 24px;
+}
+
+.preview-summary {
+    margin-bottom: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--bg-light);
+    color: var(--text-dark);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.preview-summary strong {
+    color: var(--primary-teal);
+}
+
+.preview-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+}
+
+.preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+    background: var(--white);
+}
+
+.preview-table th,
+.preview-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.preview-table th {
+    background: var(--soft-teal);
+    color: var(--primary-teal);
+    font-weight: 700;
+}
+
+.preview-table td {
+    color: var(--text-dark);
+}
+
+.preview-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status-naik {
+    background: var(--success-soft);
+    color: var(--success-text);
+}
+
+.status-tidak-naik {
+    background: var(--danger-soft);
+    color: var(--danger-text);
+}
+
+.status-lulus {
+    background: var(--info-soft);
+    color: var(--info-text);
+}
+
+.status-baru {
+    background: #fef3c7;
+    color: #b45309;
+}
+
 @media (max-width: 992px) {
     .page-wrap {
         padding: 24px 18px;
@@ -383,101 +542,7 @@ button,
     .custom-popup-footer button {
         width: 100%;
     }
-}
 
-.confirm-input-group {
-    margin-top: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.confirm-input-group label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-dark);
-}
-
-.confirm-input-group input {
-    border: 1px solid #d9e3e0;
-    border-radius: 14px;
-    padding: 12px 14px;
-    font-size: 14px;
-    outline: none;
-}
-
-.confirm-input-group input:focus {
-    border-color: var(--primary-teal);
-    box-shadow: 0 0 0 3px rgba(6, 78, 75, 0.08);
-}
-
-
-.confirm-message {
-    margin-top: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #b91c1c;
-}
-
-.tahun-ajaran-row {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-.tahun-ajaran-row select {
-    flex: 1;
-}
-
-.tahun-ajaran-row .btn-secondary {
-    min-height: 66px;
-    white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-    .tahun-ajaran-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .tahun-ajaran-row .btn-secondary {
-        width: 100%;
-        min-height: 54px;
-    }
-}
-
-.tahun-ajaran-row {
-    display: flex;
-    align-items: stretch;
-    gap: 12px;
-    max-width: 760px;
-}
-
-.tahun-ajaran-row select {
-    flex: 1;
-    min-width: 0;
-}
-
-.tahun-ajaran-row .btn-create-year {
-    height: 54px;
-    padding: 0 18px;
-    border-radius: 16px;
-    background: #e8f3f2;
-    color: #064e4b;
-    font-size: 14px;
-    font-weight: 700;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.tahun-ajaran-row .btn-create-year:hover {
-    background: #dcecea;
-}
-
-@media (max-width: 768px) {
     .tahun-ajaran-row {
         flex-direction: column;
     }
