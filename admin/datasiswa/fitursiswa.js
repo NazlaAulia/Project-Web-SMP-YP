@@ -195,48 +195,56 @@ function renderSiswa() {
             <td>${escapeHtml(siswa.nisn || "-")}</td>
             <td>${escapeHtml(siswa.username || "-")}</td>
             <td>${escapeHtml(formatGender(siswa.jenis_kelamin || "-"))}</td>
+
             <td>
                 ${siswa.nama_kelas
-                    ? `<span class="badge">${escapeHtml(siswa.nama_kelas)}</span>`
+                    ? `<span class="badge ${siswa.status === "keluar" ? "badge-keluar" : ""}">
+                            ${escapeHtml(siswa.nama_kelas)}${siswa.status === "keluar" ? " - Keluar" : ""}
+                       </span>`
                     : `<span class="badge badge-empty">Belum ada</span>`}
             </td>
+
             <td>
                 ${siswa.tahun_ajaran
                     ? `<span class="badge">${escapeHtml(siswa.tahun_ajaran)}</span>`
                     : `<span class="badge badge-empty">Belum ada</span>`}
             </td>
+
             <td>
-                <div class="action-buttons">
-                    <button 
-                        type="button"
-                        class="btn-edit btn-icon" 
-                        onclick="editSiswa(${siswa.id_siswa})" 
-                        title="Edit"
-                        aria-label="Edit"
-                    >
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
+                ${siswa.status === "keluar"
+                    ? `<span class="badge badge-keluar">Nonaktif</span>`
+                    : `<div class="action-buttons">
+                        <button 
+                            type="button"
+                            class="btn-edit btn-icon" 
+                            onclick="editSiswa(${siswa.id_siswa})" 
+                            title="Edit"
+                            aria-label="Edit"
+                        >
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
 
-                    <button 
-                        type="button"
-                        class="btn-password btn-icon" 
-                        onclick="openPasswordModal(${siswa.id_siswa}, '${escapeJs(siswa.nama || "-")}')" 
-                        title="Ganti Sandi"
-                        aria-label="Ganti Sandi"
-                    >
-                        <i class="fa-solid fa-key"></i>
-                    </button>
+                        <button 
+                            type="button"
+                            class="btn-password btn-icon" 
+                            onclick="openPasswordModal(${siswa.id_siswa}, '${escapeJs(siswa.nama || "-")}')" 
+                            title="Ganti Sandi"
+                            aria-label="Ganti Sandi"
+                        >
+                            <i class="fa-solid fa-key"></i>
+                        </button>
 
-                    <button 
-                        type="button"
-                        class="btn-danger btn-icon" 
-                        onclick="openDeleteModal(${siswa.id_siswa}, '${escapeJs(siswa.nama || "-")}')" 
-                        title="Hapus"
-                        aria-label="Hapus"
-                    >
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
+                        <button 
+                            type="button"
+                            class="btn-danger btn-icon" 
+                            onclick="openDeleteModal(${siswa.id_siswa}, '${escapeJs(siswa.nama || "-")}')" 
+                            title="Keluarkan"
+                            aria-label="Keluarkan"
+                        >
+                            <i class="fa-solid fa-user-slash"></i>
+                        </button>
+                    </div>`
+                }
             </td>
         </tr>
     `).join("");

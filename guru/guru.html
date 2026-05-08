@@ -16,17 +16,8 @@
 <body>
     <div class="app-container">
         <div id="sidebar-container"></div>
-        <button class="mobile-menu-btn" id="mobileMenuBtn">
-           <i class="fa-solid fa-bars"></i>
-        </button>
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
         <main class="main-content">
             <header>
-                <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
-                    <i class="bi bi-list"></i>
-                </button>
-
                 <div class="search-container-elegant">
                     <i class="bi bi-search search-icon"></i>
                     <input 
@@ -118,6 +109,22 @@
                         </div>
                     </div>
 
+                    <div class="side-card dashboard-mini-card request-card">
+                    <div class="mini-card-head">
+                        <div class="mini-card-icon rank">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div>
+                            <h3>Request Jadwal</h3>
+                            <p>Pengajuan ganti jadwal saya</p>
+                        </div>
+                    </div>
+
+                    <div id="dashboardRequestJadwal" class="dashboard-ranking-list">
+                        <p>Memuat request jadwal...</p>
+                    </div>
+                </div>
+
                     <div id="dashboardRankingList" class="dashboard-ranking-list"></div>
                 </div>
             </div>
@@ -126,4 +133,4 @@
     <script src="components/sidebar-guru.js"></script>
     <script src="guru.js"></script>
 </body>
-</html>
+</html> nitip
