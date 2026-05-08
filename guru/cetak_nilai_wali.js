@@ -45,6 +45,11 @@ function hitungRataRata(nilai) {
 function renderSiswa(siswa) {
   const rataRata = hitungRataRata(siswa.nilai).toFixed(2);
 
+  const totalHadir = siswa.nilai.reduce((sum, item) => sum + Number(item.hadir || 0), 0);
+  const totalIzin = siswa.nilai.reduce((sum, item) => sum + Number(item.izin || 0), 0);
+  const totalSakit = siswa.nilai.reduce((sum, item) => sum + Number(item.sakit || 0), 0);
+  const totalAlfa = siswa.nilai.reduce((sum, item) => sum + Number(item.alfa || 0), 0);
+
   const rows = siswa.nilai.map((item, index) => {
     return `
       <tr>
@@ -52,45 +57,83 @@ function renderSiswa(siswa) {
         <td>${item.nama_mapel || "-"}</td>
         <td>${tampilSemester(item.semester)}</td>
         <td>${item.nilai_angka}</td>
-        <td>${item.hadir}</td>
-        <td>${item.izin}</td>
-        <td>${item.sakit}</td>
-        <td>${item.alfa}</td>
       </tr>
     `;
   }).join("");
 
   return `
     <article class="student-card">
-      <div class="student-head">
-        <div>
-          <h2>${siswa.nama_siswa}</h2>
-          <p>ID Siswa: ${siswa.id_siswa}</p>
-        </div>
-
-        <div class="kelas-badge">Kelas ${siswa.nama_kelas}</div>
+      <div class="student-identitas">
+        <table>
+          <tr>
+            <td>Nama Siswa</td>
+            <td>: ${siswa.nama_siswa}</td>
+            <td>Kelas</td>
+            <td>: ${siswa.nama_kelas}</td>
+          </tr>
+          <tr>
+            <td>ID Siswa</td>
+            <td>: ${siswa.id_siswa}</td>
+            <td>Semester</td>
+            <td>: ${siswa.nilai[0] ? tampilSemester(siswa.nilai[0].semester) : "-"}</td>
+          </tr>
+        </table>
       </div>
 
-      <div class="table-wrap">
-        <table class="nilai-print-table">
+      <table class="nilai-print-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Mata Pelajaran</th>
+            <th>Semester</th>
+            <th>Nilai</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+          <tr class="rata-row">
+            <td colspan="3">Rata-rata Nilai</td>
+            <td>${rataRata}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="rapor-bottom-grid">
+        <table class="absensi-table">
           <thead>
             <tr>
-              <th>No</th>
-              <th>Mata Pelajaran</th>
-              <th>Semester</th>
-              <th>Nilai</th>
-              <th>Hadir</th>
-              <th>Izin</th>
-              <th>Sakit</th>
-              <th>Alfa</th>
+              <th colspan="2">Ketidakhadiran</th>
             </tr>
           </thead>
-
           <tbody>
-            ${rows}
-            <tr class="rata-row">
-              <td colspan="3">Rata-rata Nilai</td>
-              <td colspan="5">${rataRata}</td>
+            <tr>
+              <td>Hadir</td>
+              <td>${totalHadir} Hari</td>
+            </tr>
+            <tr>
+              <td>Izin</td>
+              <td>${totalIzin} Hari</td>
+            </tr>
+            <tr>
+              <td>Sakit</td>
+              <td>${totalSakit} Hari</td>
+            </tr>
+            <tr>
+              <td>Alfa</td>
+              <td>${totalAlfa} Hari</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="catatan-table">
+          <thead>
+            <tr>
+              <th>Catatan Wali Kelas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Terus tingkatkan semangat belajar dan kedisiplinan.</td>
             </tr>
           </tbody>
         </table>
@@ -114,6 +157,12 @@ if (keywordCetak !== "") {
     String(siswa.nama_siswa || "").toLowerCase().includes(keywordCetak) ||
     String(siswa.id_siswa || "").toLowerCase().includes(keywordCetak)
   );
+}
+
+if (siswaList.length === 1) {
+  document.title = `Rapor_${siswaList[0].nama_siswa}_${siswaList[0].nama_kelas}`;
+} else {
+  document.title = `Rapor_Kelas_${data.kelas?.nama_kelas || "-"}`;
 }
 
   if (namaKelasEl) namaKelasEl.textContent = data.kelas?.nama_kelas || "-";
