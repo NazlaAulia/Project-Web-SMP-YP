@@ -9,6 +9,9 @@ const jumlahKelas9 = document.getElementById("jumlahKelas9");
 
 const previewNaikBody = document.getElementById("previewNaikBody");
 const previewSummary = document.getElementById("previewSummary");
+const searchPreview = document.getElementById("searchPreview");
+const previewPaginationInfo = document.getElementById("previewPaginationInfo");
+const previewPaginationBtns = document.getElementById("previewPaginationBtns");
 
 const confirmPopup = document.getElementById("confirmPopup");
 const closeConfirmPopup = document.getElementById("closeConfirmPopup");
@@ -25,6 +28,11 @@ const confirmTahunAjaranBtn = document.getElementById("confirmTahunAjaranBtn");
 const tahunAjaranMessage = document.getElementById("tahunAjaranMessage");
 
 let pendingFormData = null;
+
+let previewData = [];
+let filteredPreviewData = [];
+let currentPreviewPage = 1;
+const previewRowsPerPage = 10;
 
 document.addEventListener("DOMContentLoaded", () => {
     loadNaikKelasData();
@@ -66,10 +74,17 @@ async function loadPreviewNaikKelas() {
             `;
 
             previewSummary.textContent = "Preview kenaikan kelas gagal dimuat.";
+            updatePreviewPaginationInfo(0, 0, 0);
+            clearPreviewPaginationBtns();
             return;
         }
 
-        renderPreviewNaikKelas(result.data, result.summary);
+        previewData = Array.isArray(result.data) ? result.data : [];
+        filteredPreviewData = [...previewData];
+        currentPreviewPage = 1;
+
+        renderPreviewSummary(result.summary);
+        renderPreviewTable();
     } catch (error) {
         previewNaikBody.innerHTML = `
             <tr>
@@ -78,36 +93,56 @@ async function loadPreviewNaikKelas() {
         `;
 
         previewSummary.textContent = "Preview kenaikan kelas gagal dimuat.";
+        updatePreviewPaginationInfo(0, 0, 0);
+        clearPreviewPaginationBtns();
     }
 }
 
-function renderPreviewNaikKelas(data, summary) {
-    if (!previewNaikBody || !previewSummary) {
-        return;
-    }
-
-    if (!data.length) {
-        previewNaikBody.innerHTML = `
-            <tr>
-                <td colspan="9" class="empty-cell">Belum ada data siswa untuk diproses.</td>
-            </tr>
-        `;
-
-        previewSummary.textContent = "Belum ada data preview.";
+function renderPreviewSummary(summary) {
+    if (!previewSummary) {
         return;
     }
 
     previewSummary.innerHTML = `
         <strong>Ringkasan:</strong>
-        Naik Kelas: ${summary.naik_kelas || 0} siswa,
-        Tidak Naik Kelas: ${summary.tidak_naik || 0} siswa,
-        Lulus: ${summary.lulus || 0} siswa,
-        Siswa Baru: ${summary.siswa_baru || 0} siswa.
+        Naik Kelas: ${summary?.naik_kelas || 0} siswa,
+        Tidak Naik Kelas: ${summary?.tidak_naik || 0} siswa,
+        Lulus: ${summary?.lulus || 0} siswa,
+        Siswa Baru: ${summary?.siswa_baru || 0} siswa.
     `;
+}
+
+function renderPreviewTable() {
+    if (!previewNaikBody) {
+        return;
+    }
+
+    if (!filteredPreviewData.length) {
+        previewNaikBody.innerHTML = `
+            <tr>
+                <td colspan="9" class="empty-cell">Data siswa tidak ditemukan.</td>
+            </tr>
+        `;
+
+        updatePreviewPaginationInfo(0, 0, 0);
+        clearPreviewPaginationBtns();
+        return;
+    }
+
+    const totalData = filteredPreviewData.length;
+    const totalPages = Math.ceil(totalData / previewRowsPerPage);
+
+    if (currentPreviewPage > totalPages) {
+        currentPreviewPage = totalPages;
+    }
+
+    const startIndex = (currentPreviewPage - 1) * previewRowsPerPage;
+    const endIndex = startIndex + previewRowsPerPage;
+    const paginatedData = filteredPreviewData.slice(startIndex, endIndex);
 
     previewNaikBody.innerHTML = "";
 
-    data.forEach((item) => {
+    paginatedData.forEach((item) => {
         const tr = document.createElement("tr");
         const statusClass = getStatusClass(item.status_kenaikan);
 
@@ -128,6 +163,104 @@ function renderPreviewNaikKelas(data, summary) {
         `;
 
         previewNaikBody.appendChild(tr);
+    });
+
+    updatePreviewPaginationInfo(startIndex + 1, Math.min(endIndex, totalData), totalData);
+    renderPreviewPaginationBtns(totalPages);
+}
+
+function updatePreviewPaginationInfo(start, end, total) {
+    if (!previewPaginationInfo) {
+        return;
+    }
+
+    previewPaginationInfo.textContent = `Menampilkan ${start} sampai ${end} dari ${total} siswa`;
+}
+
+function clearPreviewPaginationBtns() {
+    if (previewPaginationBtns) {
+        previewPaginationBtns.innerHTML = "";
+    }
+}
+
+function renderPreviewPaginationBtns(totalPages) {
+    if (!previewPaginationBtns) {
+        return;
+    }
+
+    previewPaginationBtns.innerHTML = "";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.type = "button";
+    prevBtn.className = "preview-page-btn";
+    prevBtn.textContent = "Prev";
+    prevBtn.disabled = currentPreviewPage === 1;
+    prevBtn.addEventListener("click", () => {
+        if (currentPreviewPage > 1) {
+            currentPreviewPage--;
+            renderPreviewTable();
+        }
+    });
+    previewPaginationBtns.appendChild(prevBtn);
+
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPreviewPage - 2);
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let page = startPage; page <= endPage; page++) {
+        const pageBtn = document.createElement("button");
+        pageBtn.type = "button";
+        pageBtn.className = `preview-page-btn ${page === currentPreviewPage ? "active" : ""}`;
+        pageBtn.textContent = page;
+
+        pageBtn.addEventListener("click", () => {
+            currentPreviewPage = page;
+            renderPreviewTable();
+        });
+
+        previewPaginationBtns.appendChild(pageBtn);
+    }
+
+    const nextBtn = document.createElement("button");
+    nextBtn.type = "button";
+    nextBtn.className = "preview-page-btn";
+    nextBtn.textContent = "Next";
+    nextBtn.disabled = currentPreviewPage === totalPages;
+    nextBtn.addEventListener("click", () => {
+        if (currentPreviewPage < totalPages) {
+            currentPreviewPage++;
+            renderPreviewTable();
+        }
+    });
+    previewPaginationBtns.appendChild(nextBtn);
+}
+
+if (searchPreview) {
+    searchPreview.addEventListener("input", () => {
+        const keyword = searchPreview.value.trim().toLowerCase();
+
+        filteredPreviewData = previewData.filter((item) => {
+            const searchableText = [
+                item.nama,
+                item.kelas_lama,
+                item.kelas_baru,
+                item.rata_rata,
+                item.mapel_tidak_lulus,
+                item.izin,
+                item.sakit,
+                item.alfa,
+                item.status_kenaikan
+            ].join(" ").toLowerCase();
+
+            return searchableText.includes(keyword);
+        });
+
+        currentPreviewPage = 1;
+        renderPreviewTable();
     });
 }
 
