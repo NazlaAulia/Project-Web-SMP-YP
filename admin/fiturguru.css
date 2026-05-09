@@ -1176,3 +1176,71 @@ button {
         text-align: center !important;
     }
 }
+
+/* FIX TOOLBAR IMPORT GURU BIAR RAPI */
+.toolbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+}
+
+.toolbar .search-box {
+    width: 100% !important;
+    max-width: 600px !important;
+}
+
+.import-form {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-self: unset !important;
+}
+
+.btn-file,
+.import-form .btn-primary,
+.btn-template {
+    height: 46px !important;
+    white-space: nowrap !important;
+}
+
+.file-name {
+    max-width: 260px !important;
+    min-width: 120px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.template-note {
+    width: 100% !important;
+    margin-top: -6px !important;
+    text-align: left !important;
+    justify-self: unset !important;
+}
+
+@media (max-width: 768px) {
+    .import-form {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .btn-file,
+    .import-form .btn-primary,
+    .btn-template {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .file-name {
+        max-width: 100% !important;
+        text-align: center !important;
+    }
+
+    .template-note {
+        text-align: center !important;
+    }
+}

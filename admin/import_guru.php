@@ -6,35 +6,6 @@ function redirectBack($message, $status = 'success') {
     exit;
 }
 
-function buatUsernameGuru($nama, $nip, $conn) {
-    $namaBersih = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $nama));
-    $suffix = substr($nip, -3);
-    $base = $namaBersih . $suffix;
-
-    if ($base === '') {
-        $base = 'guru' . $suffix;
-    }
-
-    $username = $base;
-    $i = 1;
-
-    while (true) {
-        $stmt = $conn->prepare("SELECT id_user FROM user WHERE username = ? LIMIT 1");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows === 0) {
-            $stmt->close();
-            return $username;
-        }
-
-        $stmt->close();
-        $username = $base . $i;
-        $i++;
-    }
-}
-
 if (!isset($conn) || $conn->connect_error) {
     redirectBack("Koneksi database gagal.", "error");
 }
@@ -86,15 +57,15 @@ $errorRows = [];
 $conn->begin_transaction();
 
 try {
-  while (($row = fgetcsv($handle, 0, ';')) !== false) {
-    $firstCell = trim($row[0] ?? '');
+    while (($row = fgetcsv($handle, 0, ';')) !== false) {
+        $firstCell = trim($row[0] ?? '');
 
-    if ($firstCell === '' || strpos($firstCell, '#') === 0) {
-        continue;
-    }
+        // Lewati baris kosong dan baris panduan yang diawali #
+        if ($firstCell === '' || strpos($firstCell, '#') === 0) {
+            continue;
+        }
 
-    $nip = trim($row[$index['nip']] ?? '');
-
+        $nip = trim($row[$index['nip']] ?? '');
         $nama = trim($row[$index['nama']] ?? '');
         $email = trim($row[$index['email']] ?? '');
         $jenisKelamin = strtoupper(trim($row[$index['jenis_kelamin']] ?? ''));
@@ -118,6 +89,7 @@ try {
             continue;
         }
 
+        // Cek supaya guru tidak masuk dobel berdasarkan NIP atau email
         $cekGuru = $conn->prepare("SELECT id_guru FROM guru WHERE nip = ? OR email = ? LIMIT 1");
         if (!$cekGuru) {
             throw new Exception("Prepare cek guru gagal: " . $conn->error);
@@ -135,6 +107,7 @@ try {
 
         $cekGuru->close();
 
+        // Cari id_mapel berdasarkan nama mapel di file CSV
         $stmtMapel = $conn->prepare("SELECT id_mapel FROM mapel WHERE LOWER(nama_mapel) = LOWER(?) LIMIT 1");
         if (!$stmtMapel) {
             throw new Exception("Prepare cek mapel gagal: " . $conn->error);
@@ -154,6 +127,8 @@ try {
 
         $idMapel = (int)$mapel['id_mapel'];
 
+        // Insert guru saja.
+        // Akun user guru dibuat otomatis oleh sistem/database.
         $stmtGuru = $conn->prepare("
             INSERT INTO guru (nip, nama, email, jenis_kelamin, id_mapel)
             VALUES (?, ?, ?, ?, ?)
@@ -169,29 +144,7 @@ try {
             throw new Exception("Gagal insert guru NIP " . $nip . ": " . $stmtGuru->error);
         }
 
-        $idGuru = $stmtGuru->insert_id;
         $stmtGuru->close();
-
-        $username = buatUsernameGuru($nama, $nip, $conn);
-        $passwordHash = password_hash($nip, PASSWORD_DEFAULT);
-        $roleIdGuru = 2;
-
-        $stmtUser = $conn->prepare("
-            INSERT INTO user (username, password, role_id, id_guru)
-            VALUES (?, ?, ?, ?)
-        ");
-
-        if (!$stmtUser) {
-            throw new Exception("Prepare insert user gagal: " . $conn->error);
-        }
-
-        $stmtUser->bind_param("ssii", $username, $passwordHash, $roleIdGuru, $idGuru);
-
-        if (!$stmtUser->execute()) {
-            throw new Exception("Gagal membuat akun user untuk NIP " . $nip . ": " . $stmtUser->error);
-        }
-
-        $stmtUser->close();
 
         $berhasil++;
     }
@@ -202,11 +155,11 @@ try {
     $message = "Import selesai. Berhasil: {$berhasil}. Dilewati: {$dilewati}.";
 
     if (!empty($errorRows)) {
-       $message .= "\n\nCatatan:\n" . implode("\n", array_slice($errorRows, 0, 8));
-
+        $message .= "\n\nCatatan:\n" . implode("\n", array_slice($errorRows, 0, 8));
     }
 
     redirectBack($message, "success");
+
 } catch (Exception $e) {
     if (is_resource($handle)) {
         fclose($handle);
