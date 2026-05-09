@@ -94,8 +94,15 @@ $errorRows = [];
 $conn->begin_transaction();
 
 try {
-    while (($row = fgetcsv($handle, 0, ';')) !== false) {
-        $nisn = trim($row[$index['nisn']] ?? '');
+  while (($row = fgetcsv($handle, 0, ';')) !== false) {
+    $firstCell = trim($row[0] ?? '');
+
+    // Lewati baris kosong dan baris panduan yang diawali #
+    if ($firstCell === '' || strpos($firstCell, '#') === 0) {
+        continue;
+    }
+
+    $nisn = trim($row[$index['nisn']] ?? '');
         $nama = trim($row[$index['nama']] ?? '');
         $jenisKelamin = strtoupper(trim($row[$index['jenis_kelamin']] ?? ''));
         $tanggalLahir = trim($row[$index['tanggal_lahir']] ?? '');
@@ -227,13 +234,21 @@ try {
     fclose($handle);
     $conn->commit();
 
-    $message = "Import selesai. Berhasil: {$berhasil}. Dilewati: {$dilewati}.";
+   $message = "Import selesai. Berhasil: {$berhasil}. Dilewati: {$dilewati}.";
 
-    if (!empty($errorRows)) {
-        $message .= "\\n\\nCatatan:\\n" . implode("\\n", array_slice($errorRows, 0, 8));
-    }
+if (!empty($errorRows)) {
+    $message .= "\n\nCatatan:\n" . implode("\n", array_slice($errorRows, 0, 8));
+}
 
-    redirectBack($message, "success");
+/*
+    Kalau tidak ada satu pun data yang berhasil masuk,
+    popup harus dianggap gagal/error.
+*/
+if ($berhasil === 0) {
+    redirectBack($message, "error");
+}
+
+redirectBack($message, "success");
 } catch (Exception $e) {
     if (is_resource($handle)) {
         fclose($handle);
