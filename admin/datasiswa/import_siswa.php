@@ -6,6 +6,31 @@ function redirectBack($message, $status = 'success') {
     exit;
 }
 
+function normalisasiTanggalLahir($tanggal) {
+    $tanggal = trim($tanggal);
+
+    if ($tanggal === '') {
+        return false;
+    }
+
+    $formatList = [
+        'd/m/Y', // 10/05/2012
+        'd-m-Y', // 10-05-2012
+        'd.m.Y', // 10.05.2012
+        'Y-m-d'  // 2012-05-10
+    ];
+
+    foreach ($formatList as $format) {
+        $date = DateTime::createFromFormat('!' . $format, $tanggal);
+
+        if ($date && $date->format($format) === $tanggal) {
+            return $date->format('Y-m-d');
+        }
+    }
+
+    return false;
+}
+
 function buatUsername($nama, $nisn, $conn) {
     $namaBersih = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $nama));
     $suffix = substr($nisn, -3);
@@ -94,15 +119,15 @@ $errorRows = [];
 $conn->begin_transaction();
 
 try {
-  while (($row = fgetcsv($handle, 0, ';')) !== false) {
-    $firstCell = trim($row[0] ?? '');
+    while (($row = fgetcsv($handle, 0, ';')) !== false) {
+        $firstCell = trim($row[0] ?? '');
 
-    // Lewati baris kosong dan baris panduan yang diawali #
-    if ($firstCell === '' || strpos($firstCell, '#') === 0) {
-        continue;
-    }
+        // Lewati baris kosong dan baris panduan yang diawali #
+        if ($firstCell === '' || strpos($firstCell, '#') === 0) {
+            continue;
+        }
 
-    $nisn = trim($row[$index['nisn']] ?? '');
+        $nisn = trim($row[$index['nisn']] ?? '');
         $nama = trim($row[$index['nama']] ?? '');
         $jenisKelamin = strtoupper(trim($row[$index['jenis_kelamin']] ?? ''));
         $tanggalLahir = trim($row[$index['tanggal_lahir']] ?? '');
@@ -130,12 +155,15 @@ try {
             continue;
         }
 
-        $tanggalObj = DateTime::createFromFormat('Y-m-d', $tanggalLahir);
-        if (!$tanggalObj || $tanggalObj->format('Y-m-d') !== $tanggalLahir) {
+        $tanggalNormal = normalisasiTanggalLahir($tanggalLahir);
+
+        if ($tanggalNormal === false) {
             $dilewati++;
-            $errorRows[] = "Format tanggal lahir harus YYYY-MM-DD untuk NISN: " . $nisn;
+            $errorRows[] = "Format tanggal lahir tidak valid untuk NISN: " . $nisn . ". Gunakan format DD/MM/YYYY, contoh: 10/05/2012";
             continue;
         }
+
+        $tanggalLahir = $tanggalNormal;
 
         $cek = $conn->prepare("SELECT id_siswa FROM siswa WHERE nisn = ? LIMIT 1");
         if (!$cek) {
@@ -227,28 +255,28 @@ try {
         $idSiswa = $stmtSiswa->insert_id;
         $stmtSiswa->close();
 
-
         $berhasil++;
     }
 
     fclose($handle);
     $conn->commit();
 
-   $message = "Import selesai. Berhasil: {$berhasil}. Dilewati: {$dilewati}.";
+    $message = "Import selesai. Berhasil: {$berhasil}. Dilewati: {$dilewati}.";
 
-if (!empty($errorRows)) {
-    $message .= "\n\nCatatan:\n" . implode("\n", array_slice($errorRows, 0, 8));
-}
+    if (!empty($errorRows)) {
+        $message .= "\n\nCatatan:\n" . implode("\n", array_slice($errorRows, 0, 8));
+    }
 
-/*
-    Kalau tidak ada satu pun data yang berhasil masuk,
-    popup harus dianggap gagal/error.
-*/
-if ($berhasil === 0) {
-    redirectBack($message, "error");
-}
+    /*
+        Kalau tidak ada satu pun data yang berhasil masuk,
+        popup harus dianggap gagal/error.
+    */
+    if ($berhasil === 0) {
+        redirectBack($message, "error");
+    }
 
-redirectBack($message, "success");
+    redirectBack($message, "success");
+
 } catch (Exception $e) {
     if (is_resource($handle)) {
         fclose($handle);
