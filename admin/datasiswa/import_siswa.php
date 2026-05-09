@@ -59,7 +59,8 @@ if (!$handle) {
     redirectBack("File CSV gagal dibaca.");
 }
 
-$header = fgetcsv($handle);
+$header = fgetcsv($handle, 0, ';');
+
 if (!$header) {
     fclose($handle);
     redirectBack("File CSV kosong.");
@@ -87,7 +88,8 @@ $errorRows = [];
 $conn->begin_transaction();
 
 try {
-    while (($row = fgetcsv($handle)) !== false) {
+   while (($row = fgetcsv($handle, 0, ';')) !== false) {
+
         $nisn = trim($row[$index['nisn']] ?? '');
         $nama = trim($row[$index['nama']] ?? '');
         $jenisKelamin = strtoupper(trim($row[$index['jenis_kelamin']] ?? ''));
