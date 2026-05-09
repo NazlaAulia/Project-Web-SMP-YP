@@ -1555,3 +1555,117 @@ button {
         text-align: center !important;
     }
 }
+
+/* =========================
+   FIX IMPORT SISWA BIAR DI BAWAH SEARCH
+========================= */
+
+.toolbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 16px !important;
+    margin-bottom: 22px !important;
+}
+
+.toolbar .search-box {
+    width: 100% !important;
+    max-width: 620px !important;
+}
+
+.import-form {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-self: unset !important;
+}
+
+.btn-file,
+.btn-template,
+.import-form .btn-primary {
+    height: 46px !important;
+    padding: 0 18px !important;
+    border-radius: 14px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.btn-file {
+    background: #e8f3f2 !important;
+    color: #064e4b !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+}
+
+.btn-template {
+    background: transparent !important;
+    color: #1f2937 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-decoration: none !important;
+}
+
+.file-name {
+    display: block !important;
+    max-width: 260px !important;
+    min-width: 120px !important;
+    color: #64748b !important;
+    font-size: 14px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.template-note {
+    width: 100% !important;
+    margin-top: -4px !important;
+    color: #6b7280 !important;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+    text-align: left !important;
+}
+
+/* HP */
+@media (max-width: 768px) {
+    .toolbar {
+        gap: 14px !important;
+    }
+
+    .toolbar .search-box {
+        max-width: 100% !important;
+    }
+
+    .import-form {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+
+    .btn-file,
+    .btn-template,
+    .import-form .btn-primary {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .file-name {
+        max-width: 100% !important;
+        text-align: center !important;
+    }
+
+    .template-note {
+        text-align: center !important;
+    }
+}

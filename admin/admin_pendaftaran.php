@@ -163,15 +163,21 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                     </form>
                 </div>
 
-                <div class="header-filter-actions">
-                    <a 
-                        href="<?= buildPageUrl(1, $search, $isMenungguMode ? '' : 'menunggu'); ?>" 
-                        class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>"
-                    >
-                        <i class="fas fa-clock"></i>
-                        Menunggu
-                    </a>
-                </div>
+              <div class="header-filter-actions">
+    <div class="waiting-filter-wrap">
+        <a 
+            href="<?= buildPageUrl(1, $search, $isMenungguMode ? '' : 'menunggu'); ?>" 
+            class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>"
+        >
+            <i class="fas fa-clock"></i>
+            Menunggu
+        </a>
+
+        <p class="waiting-filter-note">
+            Klik tombol Menunggu untuk menaikkan data pendaftaran yang statusnya belum dikonfirmasi ke urutan paling atas.
+        </p>
+    </div>
+</div>
             </div>
 
             <div class="table-card">
