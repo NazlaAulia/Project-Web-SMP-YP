@@ -65,7 +65,6 @@ animatedCards.forEach((card) => {
 
 /* =========================
    DASHBOARD DATABASE
-   tempelan baru cukup 1 kali
 ========================= */
 
 const courseGrid = document.getElementById("courseGrid");
@@ -75,6 +74,7 @@ const dashboardRankingList = document.getElementById("dashboardRankingList");
 const dashboardSearchInput = document.getElementById("dashboardSearchInput");
 
 let semuaMapelDashboard = [];
+
 const iconMapel = {
     "BIN": "bi-book",
     "B. JAWA": "bi-journal-text",
@@ -131,7 +131,7 @@ function renderMapelDashboard(mapelList) {
                 </div>
                 <div class="course-info">
                     <h4>${mapel.nama_mapel}</h4>
-                    <p>${mapel.deskripsi}</p>
+                    <p>${mapel.deskripsi || "Mata pelajaran yang diampu."}</p>
                 </div>
             </div>
         `;
@@ -146,8 +146,8 @@ function setupSearchDashboard() {
 
         const hasilFilter = semuaMapelDashboard.filter(mapel => {
             return `
-                ${mapel.nama_mapel}
-                ${mapel.deskripsi}
+                ${mapel.nama_mapel || ""}
+                ${mapel.deskripsi || ""}
             `.toLowerCase().includes(keyword);
         });
 
@@ -159,11 +159,11 @@ function renderKehadiranDashboard(kehadiran) {
     if (!kehadiran) return;
 
     if (dashboardPersenHadir) {
-        dashboardPersenHadir.textContent = `${kehadiran.persen_hadir}%`;
+        dashboardPersenHadir.textContent = `${kehadiran.persen_hadir || 0}%`;
     }
 
     if (dashboardKelasTerisi) {
-        dashboardKelasTerisi.textContent = `${kehadiran.kelas_terisi}/${kehadiran.total_kelas} Kelas`;
+        dashboardKelasTerisi.textContent = `${kehadiran.kelas_terisi || 0}/${kehadiran.total_kelas || 0} Kelas`;
     }
 }
 
@@ -186,10 +186,10 @@ function renderRankingDashboard(peringkatList) {
     dashboardRankingList.innerHTML = peringkatList.map(siswa => {
         return `
             <div class="rank-item">
-                <div class="rank-avatar">${siswa.inisial}</div>
+                <div class="rank-avatar">${siswa.inisial || "-"}</div>
                 <div class="rank-info">
-                    <span>${siswa.nama}</span>
-                    <small>Kelas ${siswa.kelas} • Rata-rata: ${siswa.rata_rata}</small>
+                    <span>${siswa.nama || "-"}</span>
+                    <small>Kelas ${siswa.kelas || "-"} • Rata-rata: ${siswa.rata_rata || "-"}</small>
                 </div>
             </div>
         `;
@@ -255,9 +255,9 @@ function loadDashboardDatabase() {
         });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    loadJadwalMengajarHariIni();
-});
+/* =========================
+   JADWAL MENGAJAR HARI INI
+========================= */
 
 function loadJadwalMengajarHariIni() {
     const container = document.getElementById("dashboardJadwalHariIni");
@@ -265,9 +265,16 @@ function loadJadwalMengajarHariIni() {
 
     if (!container) return;
 
-    fetch("get_jadwal_hari_ini.php")
+    if (!idGuruLogin || roleIdLogin !== "2") {
+        container.innerHTML = `<p class="empty-jadwal">ID guru tidak ditemukan. Silakan login ulang.</p>`;
+        return;
+    }
+
+    fetch(`get_jadwal_hari_ini.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
         .then(response => response.json())
         .then(result => {
+            console.log("Data jadwal hari ini:", result);
+
             if (result.status !== "success") {
                 container.innerHTML = `<p class="empty-jadwal">${result.message}</p>`;
                 return;
@@ -313,4 +320,11 @@ function loadJadwalMengajarHariIni() {
         });
 }
 
-loadDashboardDatabase();
+/* =========================
+   JALANKAN SEMUA
+========================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadDashboardDatabase();
+    loadJadwalMengajarHariIni();
+});
