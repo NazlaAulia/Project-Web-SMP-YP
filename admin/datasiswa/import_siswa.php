@@ -220,26 +220,6 @@ try {
         $idSiswa = $stmtSiswa->insert_id;
         $stmtSiswa->close();
 
-        $username = buatUsername($nama, $nisn, $conn);
-        $passwordHash = password_hash($nisn, PASSWORD_DEFAULT);
-        $roleIdSiswa = 3;
-
-        $stmtUser = $conn->prepare("
-            INSERT INTO user (username, password, role_id, id_siswa)
-            VALUES (?, ?, ?, ?)
-        ");
-
-        if (!$stmtUser) {
-            throw new Exception("Prepare insert user gagal: " . $conn->error);
-        }
-
-        $stmtUser->bind_param("ssii", $username, $passwordHash, $roleIdSiswa, $idSiswa);
-
-        if (!$stmtUser->execute()) {
-            throw new Exception("Gagal membuat user untuk NISN " . $nisn . ": " . $stmtUser->error);
-        }
-
-        $stmtUser->close();
 
         $berhasil++;
     }
