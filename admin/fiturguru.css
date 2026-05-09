@@ -1093,3 +1093,86 @@ button {
         text-align: center;
     }
 }
+
+#customAlertMessage {
+    white-space: pre-line !important;
+    text-align: left !important;
+}
+
+/* FIX IMPORT GURU BIAR TETAP RAPI */
+.toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(280px, 600px) 1fr !important;
+    align-items: center !important;
+    gap: 14px !important;
+}
+
+.toolbar .search-box {
+    max-width: 600px !important;
+}
+
+.import-form {
+    justify-self: end !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(120px, 220px) auto auto !important;
+    align-items: center !important;
+    gap: 10px !important;
+    max-width: 760px !important;
+}
+
+.file-name {
+    display: block !important;
+    max-width: 220px !important;
+    min-width: 120px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.template-note {
+    grid-column: 1 / -1 !important;
+    justify-self: end !important;
+    max-width: 760px !important;
+    margin-top: -4px !important;
+    font-size: 13px !important;
+    color: #6b7280 !important;
+}
+
+.btn-file,
+.btn-template,
+.import-form .btn-primary {
+    height: 46px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+@media (max-width: 1100px) {
+    .toolbar {
+        grid-template-columns: 1fr !important;
+    }
+
+    .import-form {
+        justify-self: start !important;
+        max-width: 100% !important;
+    }
+
+    .template-note {
+        justify-self: start !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .import-form {
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+    }
+
+    .file-name {
+        max-width: 100% !important;
+        text-align: center !important;
+    }
+
+    .template-note {
+        text-align: center !important;
+    }
+}

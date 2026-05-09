@@ -86,8 +86,15 @@ $errorRows = [];
 $conn->begin_transaction();
 
 try {
-    while (($row = fgetcsv($handle, 0, ';')) !== false) {
-        $nip = trim($row[$index['nip']] ?? '');
+  while (($row = fgetcsv($handle, 0, ';')) !== false) {
+    $firstCell = trim($row[0] ?? '');
+
+    if ($firstCell === '' || strpos($firstCell, '#') === 0) {
+        continue;
+    }
+
+    $nip = trim($row[$index['nip']] ?? '');
+
         $nama = trim($row[$index['nama']] ?? '');
         $email = trim($row[$index['email']] ?? '');
         $jenisKelamin = strtoupper(trim($row[$index['jenis_kelamin']] ?? ''));
@@ -195,7 +202,8 @@ try {
     $message = "Import selesai. Berhasil: {$berhasil}. Dilewati: {$dilewati}.";
 
     if (!empty($errorRows)) {
-        $message .= "\\n\\nCatatan:\\n" . implode("\\n", array_slice($errorRows, 0, 8));
+       $message .= "\n\nCatatan:\n" . implode("\n", array_slice($errorRows, 0, 8));
+
     }
 
     redirectBack($message, "success");

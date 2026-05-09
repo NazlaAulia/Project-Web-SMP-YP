@@ -938,7 +938,7 @@ foreach ($requests as $r) {
     <div class="container">
         <main class="main-content">
             <section class="page-header">
-                <h1>Approve Request Jadwal</h1>
+                <h1>Terima ganti Jadwal</h1>
                 <p>
                     Halaman ini digunakan admin untuk meninjau, menerima, atau menolak pengajuan ganti jadwal dari guru.
                     Jika request bertipe tukar, sistem akan menukar dua slot jadwal secara otomatis saat diterima.
