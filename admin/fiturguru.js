@@ -633,3 +633,32 @@ window.openConfirmModal = openConfirmModal;
 window.closeConfirmModal = closeConfirmModal;
 window.showAlertModal = showAlertModal;
 window.closeAlertModal = closeAlertModal;
+
+const fileGuru = document.getElementById("fileGuru");
+const fileGuruName = document.getElementById("fileGuruName");
+
+if (fileGuru && fileGuruName) {
+    fileGuru.addEventListener("change", () => {
+        fileGuruName.textContent = fileGuru.files.length
+            ? fileGuru.files[0].name
+            : "Belum ada file";
+    });
+}
+
+function showImportGuruResultFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("import_status");
+    const message = params.get("import_message");
+
+    if (!status || !message) return;
+
+    showAlertModal(message);
+
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    if (typeof loadGuru === "function") {
+        loadGuru();
+    }
+}
+
+document.addEventListener("DOMContentLoaded", showImportGuruResultFromUrl);
