@@ -1032,6 +1032,14 @@ body,
     min-width: 520px !important;
     overflow: visible !important;
   }
+
+    .right-column {
+    order: 1 !important;
+  }
+
+  .chart-card {
+    order: 2 !important;
+  }
 }
 
 @media (max-width: 480px) {
