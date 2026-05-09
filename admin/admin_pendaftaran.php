@@ -115,7 +115,7 @@ function buildPageUrl($pageNumber, $search, $filter = '')
     <title>Data Pendaftaran Siswa</title>
 
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=102">
+ <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=103">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Library SweetAlert2 -->
