@@ -13,42 +13,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="components/fix-mobile.css">
 </head>
-<body>
-    <div class="app-container">
-        <div id="sidebar-container"></div>
-        <main class="main-content">
-            <header>
-                <div class="search-container-elegant">
-                    <i class="bi bi-search search-icon"></i>
-                    <input 
-                        type="text" 
-                        id="dashboardSearchInput"
-                        class="search-input"
-                        placeholder="Cari mata pelajaran..."
-                    >
-
-                </div>
-            
-                <a href="profilguru.html" class="user-profile-link">
-                    <div class="user-profile">
-                        <div class="profile-info">
-                            <span class="user-name" id="namaGuru">Profil Guru</span>
-                        </div>
-                        <div class="avatar-circle"<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Guru</title>
-
-    <link rel="stylesheet" href="guru.css">
-    <link rel="icon" type="image/x-icon" href="img/images.webp">
-    <link rel="stylesheet" href="components/sidebar.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="components/fix-mobile.css">
-</head>
 
 <body>
     <div class="app-container">
@@ -167,7 +131,9 @@
                             </div>
                         </div>
 
-                        <div id="dashboardRankingList" class="dashboard-ranking-list"></div>
+                        <div id="dashboardRankingList" class="dashboard-ranking-list">
+                            <p>Memuat peringkat...</p>
+                        </div>
                     </div>
 
                     <!-- REQUEST JADWAL -->
@@ -195,103 +161,4 @@
     <script src="components/sidebar-guru.js"></script>
     <script src="guru.js"></script>
 </body>
-</html> id="avatarGuru">G</div>
-                    </div>
-                </a>
-            </header>
-
-            <div class="main-banner" id="bannerGuru">
-                <div class="banner-content">
-                    <span class="banner-badge">
-                        <i class="bi bi-stars"></i>
-                        Dashboard Guru
-                    </span>
-
-                    <h1>
-                        Halo, <span id="namaGuruDashboard">Selamat Datang</span>!
-                        <span class="emoji-star">🌟</span>
-                    </h1>
-
-                    <p>
-                        Kelola jadwal mengajar, input nilai, dan pantau kehadiran siswa
-                        dengan lebih mudah melalui dashboard guru yang terintegrasi.
-                    </p>
-                </div>
-
-            <div class="banner-img">
-                <div class="image-glow"></div>
-            <img
-                id="gambarGuruBanner"
-                src="../img/dasbor guru profil.png"
-                alt="Ilustrasi AI Guru"
-            />
-            </div>
-            </div>
-
-            <div class="content-row">
-        <div class="left-column">
-            <div class="section-header">
-                <h3>Mata Pelajaran SMP YP 17 SURABAYA</h3>
-            </div>
-
-            <div class="course-grid" id="courseGrid"></div>
-
-            <div class="right-column">
-                <div class="side-card dashboard-mini-card">
-                    <div class="mini-card-head">
-                        <div class="mini-card-icon hadir">
-                            <i class="bi bi-check-circle"></i>
-                        </div>
-                        <div>
-                            <h3>Kehadiran</h3>
-                            <p>Rekap dari data nilai</p>
-                        </div>
-                    </div>
-
-                    <div class="mini-card-main">
-                        <strong id="dashboardPersenHadir">0%</strong>
-                        <span>Siswa Hadir</span>
-                    </div>
-
-                    <div class="mini-card-footer">
-                        <span>Data terisi</span>
-                        <b id="dashboardKelasTerisi">0/0 Kelas</b>
-                    </div>
-                </div>
-
-                <div class="side-card dashboard-mini-card ranking-card">
-                    <div class="mini-card-head">
-                        <div class="mini-card-icon rank">
-                            <i class="bi bi-trophy"></i>
-                        </div>
-                        <div>
-                            <h3>Peringkat Teratas</h3>
-                            <p>Berdasarkan rata-rata nilai</p>
-                        </div>
-                    </div>
-
-                    <div class="side-card dashboard-mini-card request-card">
-                    <div class="mini-card-head">
-                        <div class="mini-card-icon rank">
-                            <i class="bi bi-calendar-check"></i>
-                        </div>
-                        <div>
-                            <h3>Request Jadwal</h3>
-                            <p>Pengajuan ganti jadwal saya</p>
-                        </div>
-                    </div>
-
-                    <div id="dashboardRequestJadwal" class="dashboard-ranking-list">
-                        <p>Memuat request jadwal...</p>
-                    </div>
-                </div>
-
-                    <div id="dashboardRankingList" class="dashboard-ranking-list"></div>
-                </div>
-            </div>
-        </main>
-    </div>
-    <script src="components/sidebar-guru.js"></script>
-    <script src="guru.js"></script>
-</body>
-</html> nitip
+</html>
