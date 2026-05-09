@@ -130,7 +130,7 @@ function renderMapelDashboard(mapelList) {
                     <i class="bi ${icon}"></i>
                 </div>
                 <div class="course-info">
-                    <h4>${mapel.nama_mapel}</h4>
+                    <h4>${mapel.nama_mapel || "-"}</h4>
                     <p>${mapel.deskripsi || "Mata pelajaran yang diampu."}</p>
                 </div>
             </div>
@@ -156,14 +156,12 @@ function setupSearchDashboard() {
 }
 
 function renderKehadiranDashboard(kehadiran) {
-    if (!kehadiran) return;
-
     if (dashboardPersenHadir) {
-        dashboardPersenHadir.textContent = `${kehadiran.persen_hadir || 0}%`;
+        dashboardPersenHadir.textContent = `${kehadiran?.persen_hadir || 0}%`;
     }
 
     if (dashboardKelasTerisi) {
-        dashboardKelasTerisi.textContent = `${kehadiran.kelas_terisi || 0}/${kehadiran.total_kelas || 0} Kelas`;
+        dashboardKelasTerisi.textContent = `${kehadiran?.kelas_terisi || 0}/${kehadiran?.total_kelas || 0} Kelas`;
     }
 }
 
@@ -176,7 +174,7 @@ function renderRankingDashboard(peringkatList) {
                 <div class="rank-avatar">-</div>
                 <div class="rank-info">
                     <span>Belum ada data</span>
-                    <small>Data nilai belum tersedia</small>
+                    <small>Data nilai belum tersedia.</small>
                 </div>
             </div>
         `;
@@ -231,7 +229,17 @@ function renderRequestJadwalDashboard(requestList) {
 }
 
 function loadDashboardDatabase() {
-    if (!idGuruLogin || roleIdLogin !== "2") return;
+    if (!idGuruLogin || roleIdLogin !== "2") {
+        renderMapelDashboard([]);
+        renderKehadiranDashboard({
+            persen_hadir: 0,
+            kelas_terisi: 0,
+            total_kelas: 0
+        });
+        renderRankingDashboard([]);
+        renderRequestJadwalDashboard([]);
+        return;
+    }
 
     fetch(`get_dashboard_guru.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
         .then(res => res.json())
@@ -242,16 +250,38 @@ function loadDashboardDatabase() {
                 semuaMapelDashboard = result.mapel || [];
 
                 renderMapelDashboard(semuaMapelDashboard);
-                renderKehadiranDashboard(result.kehadiran);
-                renderRankingDashboard(result.peringkat);
-                renderRequestJadwalDashboard(result.request_jadwal);
+                renderKehadiranDashboard(result.kehadiran || {
+                    persen_hadir: 0,
+                    kelas_terisi: 0,
+                    total_kelas: 0
+                });
+                renderRankingDashboard(result.peringkat || []);
+                renderRequestJadwalDashboard(result.request_jadwal || []);
                 setupSearchDashboard();
             } else {
                 console.warn(result.message);
+
+                renderMapelDashboard([]);
+                renderKehadiranDashboard({
+                    persen_hadir: 0,
+                    kelas_terisi: 0,
+                    total_kelas: 0
+                });
+                renderRankingDashboard([]);
+                renderRequestJadwalDashboard([]);
             }
         })
         .catch(err => {
             console.error("Gagal load dashboard database:", err);
+
+            renderMapelDashboard([]);
+            renderKehadiranDashboard({
+                persen_hadir: 0,
+                kelas_terisi: 0,
+                total_kelas: 0
+            });
+            renderRankingDashboard([]);
+            renderRequestJadwalDashboard([]);
         });
 }
 
