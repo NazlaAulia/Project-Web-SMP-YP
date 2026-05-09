@@ -720,3 +720,14 @@ function escapeJs(text) {
         .replaceAll("\\", "\\\\")
         .replaceAll("'", "\\'");
 }
+
+const fileSiswa = document.getElementById("fileSiswa");
+const fileSiswaName = document.getElementById("fileSiswaName");
+
+if (fileSiswa && fileSiswaName) {
+    fileSiswa.addEventListener("change", () => {
+        fileSiswaName.textContent = fileSiswa.files.length
+            ? fileSiswa.files[0].name
+            : "Belum ada file";
+    });
+}
