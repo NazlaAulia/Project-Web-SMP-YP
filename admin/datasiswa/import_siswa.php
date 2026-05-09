@@ -67,10 +67,19 @@ if (!$header) {
 }
 
 $header = array_map(function ($item) {
+    $item = preg_replace('/^\xEF\xBB\xBF/', '', $item);
     return strtolower(trim($item));
 }, $header);
 
-$required = ['nisn', 'nama', 'jenis_kelamin', 'kelas', 'tahun_ajaran'];
+$required = [
+    'nisn',
+    'nama',
+    'jenis_kelamin',
+    'tanggal_lahir',
+    'alamat',
+    'kelas',
+    'tahun_ajaran'
+];
 
 foreach ($required as $kolom) {
     if (!in_array($kolom, $header)) {
@@ -88,15 +97,24 @@ $errorRows = [];
 $conn->begin_transaction();
 
 try {
-   while (($row = fgetcsv($handle, 0, ';')) !== false) {
-
+    while (($row = fgetcsv($handle, 0, ';')) !== false) {
         $nisn = trim($row[$index['nisn']] ?? '');
         $nama = trim($row[$index['nama']] ?? '');
         $jenisKelamin = strtoupper(trim($row[$index['jenis_kelamin']] ?? ''));
+        $tanggalLahir = trim($row[$index['tanggal_lahir']] ?? '');
+        $alamat = trim($row[$index['alamat']] ?? '');
         $namaKelas = strtoupper(trim($row[$index['kelas']] ?? ''));
         $tahunAjaran = trim($row[$index['tahun_ajaran']] ?? '');
 
-        if ($nisn === '' || $nama === '' || $jenisKelamin === '' || $namaKelas === '' || $tahunAjaran === '') {
+        if (
+            $nisn === '' ||
+            $nama === '' ||
+            $jenisKelamin === '' ||
+            $tanggalLahir === '' ||
+            $alamat === '' ||
+            $namaKelas === '' ||
+            $tahunAjaran === ''
+        ) {
             $dilewati++;
             $errorRows[] = "Data tidak lengkap untuk NISN: " . ($nisn ?: "-");
             continue;
@@ -105,6 +123,13 @@ try {
         if (!in_array($jenisKelamin, ['L', 'P'])) {
             $dilewati++;
             $errorRows[] = "Jenis kelamin tidak valid untuk NISN: " . $nisn;
+            continue;
+        }
+
+        $tanggalObj = DateTime::createFromFormat('Y-m-d', $tanggalLahir);
+        if (!$tanggalObj || $tanggalObj->format('Y-m-d') !== $tanggalLahir) {
+            $dilewati++;
+            $errorRows[] = "Format tanggal lahir harus YYYY-MM-DD untuk NISN: " . $nisn;
             continue;
         }
 
@@ -151,11 +176,33 @@ try {
         $idTahun = (int)$tahun['id_tahun_ajaran'];
 
         $stmtSiswa = $conn->prepare("
-            INSERT INTO siswa (nisn, nama, jenis_kelamin, id_kelas, id_tahun_ajaran, status)
-            VALUES (?, ?, ?, ?, ?, 'aktif')
+            INSERT INTO siswa (
+                nisn,
+                nama,
+                jenis_kelamin,
+                tanggal_lahir,
+                alamat,
+                id_kelas,
+                id_tahun_ajaran,
+                status
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'aktif')
         ");
 
-        $stmtSiswa->bind_param("sssii", $nisn, $nama, $jenisKelamin, $idKelas, $idTahun);
+        if (!$stmtSiswa) {
+            throw new Exception("Prepare insert siswa gagal: " . $conn->error);
+        }
+
+        $stmtSiswa->bind_param(
+            "sssssii",
+            $nisn,
+            $nama,
+            $jenisKelamin,
+            $tanggalLahir,
+            $alamat,
+            $idKelas,
+            $idTahun
+        );
 
         if (!$stmtSiswa->execute()) {
             throw new Exception("Gagal insert siswa NISN " . $nisn . ": " . $stmtSiswa->error);
@@ -172,6 +219,10 @@ try {
             INSERT INTO user (username, password, role_id, id_siswa)
             VALUES (?, ?, ?, ?)
         ");
+
+        if (!$stmtUser) {
+            throw new Exception("Prepare insert user gagal: " . $conn->error);
+        }
 
         $stmtUser->bind_param("ssii", $username, $passwordHash, $roleIdSiswa, $idSiswa);
 
