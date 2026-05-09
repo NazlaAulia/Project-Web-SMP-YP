@@ -1028,3 +1028,68 @@ button {
         width: 100% !important;
     }
 }
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.import-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-file,
+.btn-template {
+    height: 46px;
+    padding: 0 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-file {
+    background: #e8f3f2;
+    color: #064e4b;
+    cursor: pointer;
+}
+
+.file-name {
+    max-width: 220px;
+    color: #64748b;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.template-note {
+    width: 100%;
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: -4px;
+}
+
+@media (max-width: 768px) {
+    .import-form,
+    .btn-file,
+    .btn-template,
+    .import-form .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .file-name {
+        max-width: 100%;
+        text-align: center;
+    }
+}
