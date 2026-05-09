@@ -1116,3 +1116,48 @@ body {
         width: 100% !important;
     }
 }
+
+/* =========================
+   FIX PAGINATION PENDAFTARAN
+   LAPTOP KANAN, HP KIRI
+========================= */
+
+/* LAPTOP / DESKTOP */
+@media (min-width: 769px) {
+    .pagination-wrapper {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 18px !important;
+    }
+
+    .pagination-info {
+        width: auto !important;
+        text-align: left !important;
+    }
+
+    .pagination {
+        width: auto !important;
+        margin-left: auto !important;
+        justify-content: flex-end !important;
+    }
+}
+
+/* HP */
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+    }
+
+    .pagination-info {
+        width: 100% !important;
+        text-align: left !important;
+    }
+
+    .pagination {
+        width: 100% !important;
+        margin-left: 0 !important;
+        justify-content: flex-start !important;
+    }
+}
