@@ -701,7 +701,7 @@ $total_mapel = count($mapel_list);
             <section class="page-header">
                 <div class="page-header-top">
                     <div class="page-title">
-                        <h1>Master Jadwal</h1>
+                        <h1>Kelola Jadwal</h1>
                         <p>
                             Halaman ini digunakan admin untuk mengatur jam pelajaran dan aturan mapel
                             sebelum melakukan generate jadwal mengajar.
