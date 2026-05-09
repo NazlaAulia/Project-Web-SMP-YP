@@ -255,4 +255,62 @@ function loadDashboardDatabase() {
         });
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+    loadJadwalMengajarHariIni();
+});
+
+function loadJadwalMengajarHariIni() {
+    const container = document.getElementById("dashboardJadwalHariIni");
+    const teksHari = document.getElementById("teksHariIni");
+
+    if (!container) return;
+
+    fetch("get_jadwal_hari_ini.php")
+        .then(response => response.json())
+        .then(result => {
+            if (result.status !== "success") {
+                container.innerHTML = `<p class="empty-jadwal">${result.message}</p>`;
+                return;
+            }
+
+            const hari = result.data.hari;
+            const jadwal = result.data.jadwal;
+
+            if (teksHari) {
+                teksHari.textContent = `Hari ${hari}`;
+            }
+
+            if (!jadwal || jadwal.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-jadwal-box">
+                        <i class="bi bi-calendar-x"></i>
+                        <p>Tidak ada jadwal mengajar hari ini.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = jadwal.map(item => `
+                <div class="jadwal-hari-item">
+                    <div class="jadwal-time">
+                        <strong>${item.jam || "-"}</strong>
+                        <span>JP ${item.jp_mulai || "-"} - ${item.jp_selesai || "-"}</span>
+                    </div>
+
+                    <div class="jadwal-detail">
+                        <h4>${item.nama_mapel || "Mata Pelajaran"}</h4>
+                        <p>
+                            <i class="bi bi-door-open"></i>
+                            Kelas ${item.nama_kelas || "-"}
+                        </p>
+                    </div>
+                </div>
+            `).join("");
+        })
+        .catch(error => {
+            console.error("Gagal memuat jadwal hari ini:", error);
+            container.innerHTML = `<p class="empty-jadwal">Gagal memuat jadwal mengajar.</p>`;
+        });
+}
+
 loadDashboardDatabase();
