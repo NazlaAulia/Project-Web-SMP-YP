@@ -36,12 +36,30 @@
                     </button>
                 </header>
 
-                <section class="toolbar">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchSiswa" placeholder="Cari nama, NISN, nama pengguna, kelas...">
-                    </div>
-                </section>
+               <section class="toolbar">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchSiswa" placeholder="Cari nama, NISN, nama pengguna, kelas...">
+    </div>
+
+   <form action="import_siswa.php" method="POST" enctype="multipart/form-data" class="import-form">
+    <label for="fileSiswa" class="btn-file">
+        <i class="fas fa-file-excel"></i>
+        Pilih File
+    </label>
+
+    <input type="file" name="file_siswa" id="fileSiswa" accept=".csv" required hidden>
+
+    <span class="file-name" id="fileSiswaName">Belum ada file</span>
+
+    <button type="submit" class="btn-primary">
+        <i class="fas fa-file-import"></i>
+        Import
+    </button>
+</form>
+
+</section>
+
 
                 <section class="table-card">
                     <div class="table-wrap">

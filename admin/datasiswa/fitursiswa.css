@@ -1377,3 +1377,94 @@ button {
     color: #dc2626 !important;
 }
 
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.import-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.import-form input[type="file"] {
+    max-width: 230px;
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .import-form,
+    .import-form .btn-primary {
+        width: 100%;
+    }
+
+    .import-form input[type="file"] {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+.import-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-file {
+    height: 46px;
+    padding: 0 16px;
+    border-radius: 14px;
+    background: #e8f3f2;
+    color: #064e4b;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.btn-file:hover {
+    background: #dcecea;
+}
+
+.file-name {
+    max-width: 220px;
+    color: #64748b;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.import-form .btn-primary {
+    height: 46px;
+    border-radius: 14px;
+    padding: 0 18px;
+}
+
+@media (max-width: 768px) {
+    .import-form {
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .btn-file,
+    .import-form .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .file-name {
+        max-width: 100%;
+        text-align: center;
+    }
+}
