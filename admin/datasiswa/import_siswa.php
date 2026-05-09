@@ -1,11 +1,8 @@
 <?php
 require_once '../koneksi.php';
 
-function redirectBack($message) {
-    echo "<script>
-        alert(" . json_encode($message) . ");
-        window.location.href = 'data.html';
-    </script>";
+function redirectBack($message, $status = 'success') {
+    header("Location: data.html?import_status=" . urlencode($status) . "&import_message=" . urlencode($message));
     exit;
 }
 
@@ -39,11 +36,11 @@ function buatUsername($nama, $nisn, $conn) {
 }
 
 if (!isset($conn) || $conn->connect_error) {
-    redirectBack("Koneksi database gagal.");
+    redirectBack("Koneksi database gagal.", "error");
 }
 
 if (!isset($_FILES['file_siswa']) || $_FILES['file_siswa']['error'] !== UPLOAD_ERR_OK) {
-    redirectBack("File import belum dipilih.");
+    redirectBack("File import belum dipilih.", "error");
 }
 
 $fileTmp = $_FILES['file_siswa']['tmp_name'];
@@ -51,19 +48,19 @@ $fileName = $_FILES['file_siswa']['name'];
 $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
 if ($ext !== 'csv') {
-    redirectBack("Untuk sementara gunakan file CSV dari Excel. Save As Excel ke format CSV.");
+    redirectBack("Untuk sementara gunakan file CSV dari Excel. Save As Excel ke format CSV.", "error");
 }
 
 $handle = fopen($fileTmp, 'r');
 if (!$handle) {
-    redirectBack("File CSV gagal dibaca.");
+    redirectBack("File CSV gagal dibaca.", "error");
 }
 
 $header = fgetcsv($handle, 0, ';');
 
 if (!$header) {
     fclose($handle);
-    redirectBack("File CSV kosong.");
+    redirectBack("File CSV kosong.", "error");
 }
 
 $header = array_map(function ($item) {
@@ -84,7 +81,7 @@ $required = [
 foreach ($required as $kolom) {
     if (!in_array($kolom, $header)) {
         fclose($handle);
-        redirectBack("Kolom wajib tidak ada: " . $kolom);
+        redirectBack("Kolom wajib tidak ada: " . $kolom, "error");
     }
 }
 
@@ -134,6 +131,10 @@ try {
         }
 
         $cek = $conn->prepare("SELECT id_siswa FROM siswa WHERE nisn = ? LIMIT 1");
+        if (!$cek) {
+            throw new Exception("Prepare cek siswa gagal: " . $conn->error);
+        }
+
         $cek->bind_param("s", $nisn);
         $cek->execute();
         $cek->store_result();
@@ -147,6 +148,10 @@ try {
         $cek->close();
 
         $stmtKelas = $conn->prepare("SELECT id_kelas FROM kelas WHERE UPPER(nama_kelas) = ? LIMIT 1");
+        if (!$stmtKelas) {
+            throw new Exception("Prepare cek kelas gagal: " . $conn->error);
+        }
+
         $stmtKelas->bind_param("s", $namaKelas);
         $stmtKelas->execute();
         $resultKelas = $stmtKelas->get_result();
@@ -160,6 +165,10 @@ try {
         }
 
         $stmtTahun = $conn->prepare("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE tahun_ajaran = ? LIMIT 1");
+        if (!$stmtTahun) {
+            throw new Exception("Prepare cek tahun ajaran gagal: " . $conn->error);
+        }
+
         $stmtTahun->bind_param("s", $tahunAjaran);
         $stmtTahun->execute();
         $resultTahun = $stmtTahun->get_result();
@@ -244,10 +253,13 @@ try {
         $message .= "\\n\\nCatatan:\\n" . implode("\\n", array_slice($errorRows, 0, 8));
     }
 
-    redirectBack($message);
+    redirectBack($message, "success");
 } catch (Exception $e) {
-    fclose($handle);
+    if (is_resource($handle)) {
+        fclose($handle);
+    }
+
     $conn->rollback();
-    redirectBack("Import gagal: " . $e->getMessage());
+    redirectBack("Import gagal: " . $e->getMessage(), "error");
 }
 ?>

@@ -1478,3 +1478,20 @@ button {
     gap: 8px;
     text-decoration: none;
 }
+
+.import-result-icon {
+    background: #dcfce7 !important;
+}
+
+.import-result-icon i {
+    color: #16a34a !important;
+}
+
+.import-result-icon.error {
+    background: #fee2e2 !important;
+}
+
+.import-result-icon.error i {
+    color: #dc2626 !important;
+}
+
