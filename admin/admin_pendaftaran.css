@@ -1079,3 +1079,40 @@ body {
         padding: 0 8px !important;
     }
 }
+
+/* =========================
+   FIX PAGINATION PENDAFTARAN KE KIRI
+========================= */
+
+.pagination-wrapper {
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+}
+
+.pagination-info {
+    width: 100% !important;
+    text-align: left !important;
+}
+
+.pagination {
+    justify-content: flex-start !important;
+    width: 100% !important;
+}
+
+/* HP */
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+    }
+
+    .pagination-info {
+        text-align: left !important;
+        width: 100% !important;
+    }
+
+    .pagination {
+        justify-content: flex-start !important;
+        width: 100% !important;
+    }
+}
