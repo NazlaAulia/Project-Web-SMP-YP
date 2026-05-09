@@ -238,6 +238,54 @@ while ($row = $resultNilai->fetch_assoc()) {
 
 $stmtNilai->close();
 
+/*
+  Hitung status kenaikan kelas siswa
+  Logika:
+  - rata-rata nilai >= 75
+  - total alfa <= 10
+  Maka siswa dinyatakan naik kelas
+*/
+
+$sqlKenaikan = "SELECT 
+                  AVG(nilai_angka) AS rata_rata,
+                  SUM(alfa) AS total_alfa
+                FROM nilai
+                WHERE id_siswa = ?";
+
+$stmtKenaikan = $conn->prepare($sqlKenaikan);
+
+if (!$stmtKenaikan) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Prepare kenaikan kelas gagal: " . $conn->error
+    ]);
+    exit;
+}
+
+$stmtKenaikan->bind_param("i", $id_siswa);
+
+if (!$stmtKenaikan->execute()) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Execute kenaikan kelas gagal: " . $stmtKenaikan->error
+    ]);
+    exit;
+}
+
+$resultKenaikan = $stmtKenaikan->get_result();
+$dataKenaikan = $resultKenaikan->fetch_assoc();
+
+$rata_rata = round((float)($dataKenaikan['rata_rata'] ?? 0), 1);
+$total_alfa = (int)($dataKenaikan['total_alfa'] ?? 0);
+
+if ($rata_rata >= 75 && $total_alfa <= 10) {
+    $status_kenaikan = "naik";
+} else {
+    $status_kenaikan = "belum naik";
+}
+
+$stmtKenaikan->close();
+
 echo json_encode([
     "status" => "success",
     "data" => [
@@ -248,7 +296,12 @@ echo json_encode([
         "status" => $status_siswa,
         "hari_ini" => $hariIni,
         "jadwal_hari_ini" => $jadwal,
-        "nilai_akademik" => $nilai
+        "nilai_akademik" => $nilai,
+        "kenaikan_kelas" => [
+            "rata_rata" => $rata_rata,
+            "total_alfa" => $total_alfa,
+            "status_kenaikan" => $status_kenaikan
+        ]
     ]
 ]);
 

@@ -17,27 +17,32 @@ const statusModalTitle = document.getElementById("statusModalTitle");
 const statusModalMessage = document.getElementById("statusModalMessage");
 const statusModalClose = document.getElementById("statusModalClose");
 
-function tampilkanPopupStatus(status, nama) {
+function tampilkanPopupStatus(statusKenaikan, nama, rataRata = 0, totalAlfa = 0) {
   if (!statusModal) return;
 
-  const statusLower = String(status || "").toLowerCase();
+  const statusLower = String(statusKenaikan || "").toLowerCase();
 
-  if (statusLower !== "lulus" && statusLower !== "keluar") return;
+  if (statusLower !== "naik" && statusLower !== "belum naik") return;
 
-  statusModalBox.classList.remove("modal-lulus", "modal-keluar");
+  statusModalBox.classList.remove(
+    "modal-lulus",
+    "modal-keluar",
+    "modal-naik",
+    "modal-belum-naik"
+  );
 
-  if (statusLower === "lulus") {
-    statusModalBox.classList.add("modal-lulus");
-    statusModalIcon.innerHTML = `<i class="fa-solid fa-graduation-cap"></i>`;
-    statusModalTitle.textContent = "Selamat, Kamu Dinyatakan Lulus!";
-    statusModalMessage.textContent = `Halo ${nama}, kamu telah dinyatakan lulus dari SMP YP 17 Surabaya. Terus semangat meraih cita-cita!`;
+  if (statusLower === "naik") {
+    statusModalBox.classList.add("modal-naik");
+    statusModalIcon.innerHTML = `<i class="fa-solid fa-trophy"></i>`;
+    statusModalTitle.textContent = "Selamat, Anda Naik Kelas!";
+    statusModalMessage.textContent = `Halo ${nama}, kamu dinyatakan naik kelas. Rata-rata nilai kamu ${rataRata} dan total alfa ${totalAlfa}. Pertahankan semangat belajarmu ya!`;
   }
 
-  if (statusLower === "keluar") {
-    statusModalBox.classList.add("modal-keluar");
+  if (statusLower === "belum naik") {
+    statusModalBox.classList.add("modal-belum-naik");
     statusModalIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
-    statusModalTitle.textContent = "Status Siswa: Keluar";
-    statusModalMessage.textContent = `Halo ${nama}, status kamu tercatat keluar dari SMP YP 17 Surabaya. Silakan hubungi pihak sekolah jika membutuhkan informasi lebih lanjut.`;
+    statusModalTitle.textContent = "Anda Belum Naik Kelas";
+    statusModalMessage.textContent = `Halo ${nama}, kamu belum memenuhi syarat kenaikan kelas. Rata-rata nilai kamu ${rataRata} dan total alfa ${totalAlfa}. Silakan tingkatkan lagi nilai dan kehadiranmu.`;
   }
 
   statusModal.classList.add("show");
@@ -223,7 +228,14 @@ async function loadDashboard() {
     welcomeTextEl.textContent = `Halo, ${nama}!`;
     avatarPlaceholderEl.textContent = hurufAwal;
     namaKelasEl.textContent = s.nama_kelas || "-";
-    tampilkanPopupStatus(s.status, nama);
+    if (s.kenaikan_kelas) {
+  tampilkanPopupStatus(
+    s.kenaikan_kelas.status_kenaikan,
+    nama,
+    s.kenaikan_kelas.rata_rata,
+    s.kenaikan_kelas.total_alfa
+  );
+}
 
     renderChart(s.nilai_akademik);
     renderJadwalHariIni(s.jadwal_hari_ini);
