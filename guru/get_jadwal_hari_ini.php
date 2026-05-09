@@ -33,21 +33,67 @@ $hariIndonesia = [
 $hariIni = $hariIndonesia[$hariInggris] ?? "";
 
 /*
-  Utama: ambil id_guru dari session.
-  Kalau session kamu beda namanya, sesuaikan bagian ini.
+    Ambil id_guru dari banyak kemungkinan:
+    1. session id_guru
+    2. session guru_id
+    3. GET id_guru dari JavaScript
+    4. username dari session/GET lalu dicari ke tabel user
+    5. nama guru dari GET lalu dicari ke tabel guru
 */
-$id_guru = $_SESSION['id_guru'] ?? null;
 
-/*
-  Cadangan untuk testing:
-  contoh buka: get_jadwal_hari_ini.php?id_guru=4
-*/
-if (!$id_guru && isset($_GET['id_guru'])) {
+$id_guru = null;
+
+if (isset($_SESSION['id_guru'])) {
+    $id_guru = $_SESSION['id_guru'];
+} elseif (isset($_SESSION['guru_id'])) {
+    $id_guru = $_SESSION['guru_id'];
+} elseif (isset($_SESSION['user']['id_guru'])) {
+    $id_guru = $_SESSION['user']['id_guru'];
+} elseif (isset($_GET['id_guru']) && $_GET['id_guru'] !== '') {
     $id_guru = $_GET['id_guru'];
 }
 
+$username = $_GET['username'] ?? ($_SESSION['username'] ?? ($_SESSION['user']['username'] ?? null));
+$namaGuru = $_GET['nama'] ?? null;
+
+/* Kalau id_guru belum ketemu, cari lewat username di tabel user */
+if (!$id_guru && $username) {
+    $sqlUser = "SELECT id_guru FROM user WHERE username = ? AND id_guru IS NOT NULL LIMIT 1";
+    $stmtUser = $conn->prepare($sqlUser);
+
+    if ($stmtUser) {
+        $stmtUser->bind_param("s", $username);
+        $stmtUser->execute();
+        $resultUser = $stmtUser->get_result();
+
+        if ($rowUser = $resultUser->fetch_assoc()) {
+            $id_guru = $rowUser['id_guru'];
+        }
+    }
+}
+
+/* Kalau masih belum ketemu, cari lewat nama guru */
+if (!$id_guru && $namaGuru) {
+    $namaGuru = trim($namaGuru);
+
+    if ($namaGuru !== "" && strtolower($namaGuru) !== "profil guru") {
+        $sqlGuru = "SELECT id_guru FROM guru WHERE nama = ? LIMIT 1";
+        $stmtGuru = $conn->prepare($sqlGuru);
+
+        if ($stmtGuru) {
+            $stmtGuru->bind_param("s", $namaGuru);
+            $stmtGuru->execute();
+            $resultGuru = $stmtGuru->get_result();
+
+            if ($rowGuru = $resultGuru->fetch_assoc()) {
+                $id_guru = $rowGuru['id_guru'];
+            }
+        }
+    }
+}
+
 if (!$id_guru) {
-    respon("error", "ID guru tidak ditemukan. Pastikan guru sudah login.");
+    respon("error", "ID guru tidak ditemukan. Pastikan data login guru membawa id_guru.");
 }
 
 $sql = "
@@ -89,6 +135,7 @@ while ($row = $result->fetch_assoc()) {
 }
 
 respon("success", "Jadwal mengajar hari ini berhasil diambil.", [
+    "id_guru" => $id_guru,
     "hari" => $hariIni,
     "jadwal" => $data
 ]);
