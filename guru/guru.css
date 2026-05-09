@@ -1235,6 +1235,88 @@ header {
         padding: 14px;
     }
 }
+
+.jadwal-hari-card {
+    margin-bottom: 18px;
+}
+
+.mini-card-icon.jadwal {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+}
+
+.dashboard-jadwal-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.jadwal-hari-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+}
+
+.jadwal-time {
+    min-width: 95px;
+    padding: 10px;
+    border-radius: 14px;
+    background: #ffffff;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.jadwal-time strong {
+    display: block;
+    font-size: 13px;
+    color: #111827;
+}
+
+.jadwal-time span {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.jadwal-detail h4 {
+    margin: 0;
+    font-size: 14px;
+    color: #111827;
+}
+
+.jadwal-detail p {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.empty-jadwal,
+.empty-jadwal-box p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.empty-jadwal-box {
+    padding: 16px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    text-align: center;
+}
+
+.empty-jadwal-box i {
+    font-size: 24px;
+    color: #94a3b8;
+    display: block;
+    margin-bottom: 8px;
+}
 /* DESKTOP FIX BIAR GA MEPEET */
 @media (min-width: 901px) {
   .main-content {
