@@ -1468,3 +1468,13 @@ button {
         text-align: center;
     }
 }
+
+.btn-template {
+    height: 46px;
+    border-radius: 14px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
