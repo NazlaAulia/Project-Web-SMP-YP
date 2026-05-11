@@ -1,25 +1,41 @@
 <?php
 include '../koneksi.php';
 
+// ========== 1. TAHUN AJARAN (DROPDOWN & FILTER) ==========
+$query_ta = "SELECT * FROM tahun_ajaran ORDER BY tahun_ajaran DESC";
+$result_ta = mysqli_query($conn, $query_ta);
+
+$id_tahun_terpilih = isset($_GET['id_tahun']) ? (int)$_GET['id_tahun'] : 0;
+if ($id_tahun_terpilih == 0) {
+    $ta_aktif = mysqli_fetch_assoc(mysqli_query($conn, "SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status='aktif'"));
+    $id_tahun_terpilih = $ta_aktif['id_tahun_ajaran'];
+}
+
+$info_ta = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM tahun_ajaran WHERE id_tahun_ajaran = $id_tahun_terpilih"));
+$is_nonaktif = ($info_ta['status'] == 'nonaktif');
+$diterima = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pendaftaran WHERE id_tahun_ajaran = $id_tahun_terpilih AND status='diterima'"))['total'];
+$kuota = $info_ta['kuota'];
+$sisa = $kuota - $diterima;
+
+// ========== 2. PAGINATION & SEARCH (dengan filter tahun) ==========
 $limit = 10;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $page = max($page, 1);
-
 $offset = ($page - 1) * $limit;
 
 $search = isset($_GET['q']) ? trim($_GET['q']) : '';
 $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
-
 $isMenungguMode = ($filter === 'menunggu');
 
 $searchLike = '%' . $search . '%';
 
-$where = "";
+// Query count (dengan id_tahun_terpilih)
+$countSql = "SELECT COUNT(*) AS total FROM pendaftaran WHERE id_tahun_ajaran = $id_tahun_terpilih";
 $params = [];
 $types = "";
 
 if ($search !== '') {
-    $where = "WHERE 
+    $countSql .= " AND ( 
         nama_lengkap LIKE ? OR
         nisn LIKE ? OR
         jenis_kelamin LIKE ? OR
@@ -28,82 +44,74 @@ if ($search !== '') {
         asal_sekolah LIKE ? OR
         nama_wali LIKE ? OR
         pendapatan_ortu LIKE ? OR
-        status LIKE ?";
-
-    $params = [
-        $searchLike,
-        $searchLike,
-        $searchLike,
-        $searchLike,
-        $searchLike,
-        $searchLike,
-        $searchLike,
-        $searchLike,
-        $searchLike
-    ];
-
+        status LIKE ?
+    )";
+    $params = [$searchLike, $searchLike, $searchLike, $searchLike, $searchLike, $searchLike, $searchLike, $searchLike, $searchLike];
     $types = "sssssssss";
 }
 
+$countStmt = mysqli_prepare($conn, $countSql);
+if ($countStmt) {
+    if ($search !== '') {
+        mysqli_stmt_bind_param($countStmt, $types, ...$params);
+    }
+    mysqli_stmt_execute($countStmt);
+    $countResult = mysqli_stmt_get_result($countStmt);
+    $totalData = mysqli_fetch_assoc($countResult)['total'];
+} else {
+    $totalData = 0;
+}
+$totalPages = ceil($totalData / $limit);
+$totalPages = max($totalPages, 1);
+
+// Query data
 $orderBy = $isMenungguMode
     ? "ORDER BY CASE WHEN status = 'menunggu' THEN 0 ELSE 1 END, id_pendaftaran DESC"
     : "ORDER BY id_pendaftaran DESC";
 
-/* HITUNG TOTAL DATA */
-$countSql = "SELECT COUNT(*) AS total FROM pendaftaran $where";
-$countStmt = mysqli_prepare($conn, $countSql);
-
-if (!$countStmt) {
-    die("Query count gagal: " . mysqli_error($conn));
-}
-
+$dataSql = "SELECT * FROM pendaftaran WHERE id_tahun_ajaran = $id_tahun_terpilih";
 if ($search !== '') {
-    mysqli_stmt_bind_param($countStmt, $types, ...$params);
+    $dataSql .= " AND ( 
+        nama_lengkap LIKE ? OR
+        nisn LIKE ? OR
+        jenis_kelamin LIKE ? OR
+        tanggal_lahir LIKE ? OR
+        no_hp LIKE ? OR
+        asal_sekolah LIKE ? OR
+        nama_wali LIKE ? OR
+        pendapatan_ortu LIKE ? OR
+        status LIKE ?
+    )";
 }
+$dataSql .= " $orderBy LIMIT ? OFFSET ?";
 
-mysqli_stmt_execute($countStmt);
-$countResult = mysqli_stmt_get_result($countStmt);
-$totalData = mysqli_fetch_assoc($countResult)['total'];
-
-$totalPages = ceil($totalData / $limit);
-$totalPages = max($totalPages, 1);
-
-/* AMBIL DATA */
-$dataSql = "SELECT * FROM pendaftaran $where $orderBy LIMIT ? OFFSET ?";
 $dataStmt = mysqli_prepare($conn, $dataSql);
-
-if (!$dataStmt) {
-    die("Query data gagal: " . mysqli_error($conn));
-}
-
-if ($search !== '') {
-    $typesData = $types . "ii";
-    $paramsData = array_merge($params, [$limit, $offset]);
-    mysqli_stmt_bind_param($dataStmt, $typesData, ...$paramsData);
+if ($dataStmt) {
+    if ($search !== '') {
+        $paramsData = array_merge($params, [$limit, $offset]);
+        $typesData = $types . "ii";
+        mysqli_stmt_bind_param($dataStmt, $typesData, ...$paramsData);
+    } else {
+        mysqli_stmt_bind_param($dataStmt, "ii", $limit, $offset);
+    }
+    mysqli_stmt_execute($dataStmt);
+    $result = mysqli_stmt_get_result($dataStmt);
 } else {
-    mysqli_stmt_bind_param($dataStmt, "ii", $limit, $offset);
+    $result = false;
 }
-
-mysqli_stmt_execute($dataStmt);
-$result = mysqli_stmt_get_result($dataStmt);
 
 $startData = $totalData > 0 ? $offset + 1 : 0;
 $endData = min($offset + $limit, $totalData);
 
-function buildPageUrl($pageNumber, $search, $filter = '')
+function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
 {
-    $query = [
-        'page' => $pageNumber
-    ];
-
+    $query = ['page' => $pageNumber, 'id_tahun' => $id_tahun];
     if ($search !== '') {
         $query['q'] = $search;
     }
-
     if ($filter !== '') {
         $query['filter'] = $filter;
     }
-
     return '?' . http_build_query($query);
 }
 ?>
@@ -117,8 +125,6 @@ function buildPageUrl($pageNumber, $search, $filter = '')
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
     <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=102">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Library SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -130,50 +136,66 @@ function buildPageUrl($pageNumber, $search, $filter = '')
     <main class="main-content">
         <div class="admin-container">
 
+            <!-- HEADER BIASA -->
             <div class="admin-header">
                 <div>
                     <h1>Data Pendaftaran Siswa</h1>
                     <p>Daftar siswa yang telah mengisi formulir pendaftaran online.</p>
-
-                    <form method="GET" action="" class="search-container-elegant search-below-title">
-                        <span class="search-icon">
-                            <i class="fas fa-search"></i>
-                        </span>
-
-                        <input 
-                            type="text" 
-                            name="q"
-                            class="search-input" 
-                            placeholder="Cari nama, NISN, sekolah..."
-                            value="<?= htmlspecialchars($search); ?>"
-                        >
-
-                        <?php if ($filter !== '') { ?>
-                            <input type="hidden" name="filter" value="<?= htmlspecialchars($filter); ?>">
-                        <?php } ?>
-
-                        <?php if ($search !== '') { ?>
-                            <a 
-                                href="<?= $filter !== '' ? buildPageUrl(1, '', $filter) : '/admin/admin_pendaftaran.php'; ?>" 
-                                class="search-clear"
-                            >
-                                <i class="fas fa-times"></i>
-                            </a>
-                        <?php } ?>
-                    </form>
                 </div>
-
                 <div class="header-filter-actions">
-                    <a 
-                        href="<?= buildPageUrl(1, $search, $isMenungguMode ? '' : 'menunggu'); ?>" 
-                        class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>"
-                    >
-                        <i class="fas fa-clock"></i>
-                        Menunggu
+                    <a href="<?= buildPageUrl(1, $search, $isMenungguMode ? '' : 'menunggu', $id_tahun_terpilih); ?>" 
+                       class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>">
+                        <i class="fas fa-clock"></i> Menunggu
                     </a>
                 </div>
             </div>
 
+            <!-- DROPDOWN TAHUN, KUOTA, CETAK -->
+            <div class="filter-bar" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <form method="GET" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label style="font-weight: bold;">Tahun Ajaran:</label>
+                    <select name="id_tahun" onchange="this.form.submit()" style="padding:6px 12px; border-radius:20px; border:1px solid #ccc;">
+                        <?php 
+                        mysqli_data_seek($result_ta, 0);
+                        while($ta = mysqli_fetch_assoc($result_ta)): ?>
+                            <option value="<?= $ta['id_tahun_ajaran'] ?>" <?= $id_tahun_terpilih == $ta['id_tahun_ajaran'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($ta['tahun_ajaran']) ?> 
+                                <?= $ta['status'] == 'aktif' ? '(Aktif)' : '' ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                    
+                    <?php if($search !== ''): ?>
+                        <input type="hidden" name="q" value="<?= htmlspecialchars($search); ?>">
+                    <?php endif; ?>
+                    <?php if($filter !== ''): ?>
+                        <input type="hidden" name="filter" value="<?= htmlspecialchars($filter); ?>">
+                    <?php endif; ?>
+
+                    <div style="background: #eef2f3; padding: 5px 12px; border-radius: 20px;">
+                        <i class="fas fa-users"></i> Kuota: <?= $diterima ?> / <?= $kuota ?> | Sisa: <?= $sisa ?>
+                    </div>
+
+                    <a href="cetak_kurang_mampu.php?id_tahun=<?= $id_tahun_terpilih ?>" class="btn btn-warning btn-sm" target="_blank" style="background:#ffc107; padding:5px 12px; border-radius:20px; text-decoration:none; color:#000;">
+                        <i class="fas fa-print"></i> Cetak Kurang Mampu
+                    </a>
+                </form>
+
+                <!-- Form pencarian -->
+                <form method="GET" action="" style="display: flex; gap: 5px;">
+                    <input type="hidden" name="id_tahun" value="<?= $id_tahun_terpilih ?>">
+                    <?php if($filter !== ''): ?>
+                        <input type="hidden" name="filter" value="<?= htmlspecialchars($filter); ?>">
+                    <?php endif; ?>
+                    <input type="text" name="q" value="<?= htmlspecialchars($search); ?>" placeholder="Cari nama, NISN..." style="padding:6px 12px; border-radius:20px; border:1px solid #ccc;">
+                    <button type="submit" style="border-radius:20px; padding:6px 12px;"><i class="fas fa-search"></i></button>
+                    <?php if($search !== ''): ?>
+                        <a href="?id_tahun=<?= $id_tahun_terpilih ?><?= $filter ? '&filter='.$filter : '' ?>" style="border-radius:50%; background:#ccc; padding:6px 10px;">✕</a>
+                    <?php endif; ?>
+                </form>
+            </div>
+
+            <!-- TABEL -->
             <div class="table-card">
                 <table id="tablePendaftaran">
                     <thead>
@@ -181,6 +203,7 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                             <th>No</th>
                             <th>Nama Lengkap</th>
                             <th>NISN</th>
+                            <th>Tanggal Daftar</th>
                             <th>JK</th>
                             <th>Tanggal Lahir</th>
                             <th>No HP Wali</th>
@@ -191,151 +214,91 @@ function buildPageUrl($pageNumber, $search, $filter = '')
                             <th>Aksi</th>
                         </tr>
                     </thead>
-
                     <tbody>
                         <?php
                         $no = $offset + 1;
-
-                        if (mysqli_num_rows($result) > 0) {
+                        if ($result && mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
                         ?>
-                            <tr>
-                                <td><?= $no++; ?></td>
-
-                                <td><?= htmlspecialchars($row['nama_lengkap']); ?></td>
-
-                                <td><?= htmlspecialchars($row['nisn']); ?></td>
-
-                                <td>
-                                    <?= $row['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?>
-                                </td>
-
-                                <td><?= htmlspecialchars($row['tanggal_lahir']); ?></td>
-
-                                <td><?= htmlspecialchars($row['no_hp']); ?></td>
-
-                                <td><?= htmlspecialchars($row['asal_sekolah']); ?></td>
-
-                                <td><?= htmlspecialchars($row['nama_wali']); ?></td>
-
-                                <td>
-                                    Rp <?= number_format($row['pendapatan_ortu'], 0, ',', '.'); ?>
-                                </td>
-
-                                <td>
-                                    <?php if ($row['status'] == 'menunggu') { ?>
-                                        <span class="badge waiting">Menunggu</span>
-                                    <?php } elseif ($row['status'] == 'diterima') { ?>
-                                        <span class="badge accepted">Diterima</span>
-                                    <?php } else { ?>
-                                        <span class="badge rejected">Ditolak</span>
-                                    <?php } ?>
-                                </td>
-
-                                <td class="action-cell">
-                                    <?php if ($row['status'] == 'menunggu') { ?>
-                                        <a 
-                                            href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima"
-                                            class="btn-accept"
-                                            onclick="konfirmasiAksi(event, this.href, 'terima', this)"
-                                        >
-                                            Terima
-                                        </a>
-
-                                        <a 
-                                            href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak"
-                                            class="btn-reject"
-                                            onclick="konfirmasiAksi(event, this.href, 'tolak', this)"
-                                        >
-                                            Tolak
-                                        </a>
-                                    <?php } elseif ($row['status'] == 'diterima') { ?>
-                                        <button type="button" class="btn-disabled accepted-disabled" disabled>
-                                            Sudah diterima
-                                        </button>
-                                    <?php } else { ?>
-                                        <button type="button" class="btn-disabled rejected-disabled" disabled>
-                                            Sudah ditolak
-                                        </button>
-                                    <?php } ?>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td><?= $no++; ?></td>
+                            <td><?= htmlspecialchars($row['nama_lengkap']); ?></td>
+                            <td><?= htmlspecialchars($row['nisn']); ?></td>
+                            <td><?= date('d-m-Y H:i:s', strtotime($row['tanggal_daftar'])); ?></td>
+                            <td><?= $row['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?></td>
+                            <td><?= htmlspecialchars($row['tanggal_lahir']); ?></td>
+                            <td><?= htmlspecialchars($row['no_hp']); ?></td>
+                            <td><?= htmlspecialchars($row['asal_sekolah']); ?></td>
+                            <td><?= htmlspecialchars($row['nama_wali']); ?></td>
+                            <td>Rp <?= number_format($row['pendapatan_ortu'], 0, ',', '.'); ?></td>
+                            <td>
+                                <?php if ($row['status'] == 'menunggu') { ?>
+                                    <span class="badge waiting">Menunggu</span>
+                                <?php } elseif ($row['status'] == 'diterima') { ?>
+                                    <span class="badge accepted">Diterima</span>
+                                <?php } else { ?>
+                                    <span class="badge rejected">Ditolak</span>
+                                <?php } ?>
+                             </tr>
+                            <td class="action-cell">
+                                <?php if ($is_nonaktif): ?>
+                                    <span class="badge badge-secondary">Arsip</span>
+                                <?php elseif ($row['status'] == 'menunggu'): ?>
+                                    <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima&id_tahun=<?= $id_tahun_terpilih ?>"
+                                       class="btn-accept" onclick="konfirmasiAksi(event, this.href, 'terima', this)">Terima</a>
+                                    <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak&id_tahun=<?= $id_tahun_terpilih ?>"
+                                       class="btn-reject" onclick="konfirmasiAksi(event, this.href, 'tolak', this)">Tolak</a>
+                                <?php elseif ($row['status'] == 'diterima'): ?>
+                                    <button disabled class="btn-disabled accepted-disabled">Sudah diterima</button>
+                                <?php else: ?>
+                                    <button disabled class="btn-disabled rejected-disabled">Sudah ditolak</button>
+                                <?php endif; ?>
+                             </td>
+                        </tr>
                         <?php
                             }
-                        } else {
-                        ?>
-                            <tr>
-                                <td colspan="11" class="empty-data">
-                                    Data tidak ditemukan.
-                                </td>
-                            </tr>
+                        } else { ?>
+                            <tr><td colspan="12" class="empty-data">Data tidak ditemukan.</td></tr>
                         <?php } ?>
                     </tbody>
                 </table>
 
+                <!-- PAGINATION -->
                 <div class="pagination-wrapper">
-                    <p class="pagination-info">
-                        Menampilkan <?= $startData; ?> sampai <?= $endData; ?> dari <?= $totalData; ?> Pendaftar
-                    </p>
-
+                    <p class="pagination-info">Menampilkan <?= $startData; ?> sampai <?= $endData; ?> dari <?= $totalData; ?> Pendaftar</p>
                     <div class="pagination">
                         <?php if ($page > 1) { ?>
-                            <a href="<?= buildPageUrl($page - 1, $search, $filter); ?>" class="page-btn">
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
+                            <a href="<?= buildPageUrl($page - 1, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><i class="fas fa-chevron-left"></i></a>
                         <?php } else { ?>
-                            <span class="page-btn disabled">
-                                <i class="fas fa-chevron-left"></i>
-                            </span>
-                        <?php } ?>
-
-                        <?php
+                            <span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span>
+                        <?php } 
                         $startPage = max(1, $page - 2);
                         $endPage = min($totalPages, $page + 2);
-
-                        if ($page <= 3) {
-                            $endPage = min($totalPages, 5);
-                        }
-
-                        if ($page > $totalPages - 2) {
-                            $startPage = max(1, $totalPages - 4);
-                        }
-
-                        for ($i = $startPage; $i <= $endPage; $i++) {
-                        ?>
+                        if ($page <= 3) $endPage = min($totalPages, 5);
+                        if ($page > $totalPages - 2) $startPage = max(1, $totalPages - 4);
+                        for ($i = $startPage; $i <= $endPage; $i++) { ?>
                             <?php if ($i == $page) { ?>
                                 <span class="page-btn active"><?= $i; ?></span>
                             <?php } else { ?>
-                                <a href="<?= buildPageUrl($i, $search, $filter); ?>" class="page-btn">
-                                    <?= $i; ?>
-                                </a>
+                                <a href="<?= buildPageUrl($i, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><?= $i; ?></a>
                             <?php } ?>
                         <?php } ?>
-
                         <?php if ($page < $totalPages) { ?>
-                            <a href="<?= buildPageUrl($page + 1, $search, $filter); ?>" class="page-btn">
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
+                            <a href="<?= buildPageUrl($page + 1, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><i class="fas fa-chevron-right"></i></a>
                         <?php } else { ?>
-                            <span class="page-btn disabled">
-                                <i class="fas fa-chevron-right"></i>
-                            </span>
+                            <span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span>
                         <?php } ?>
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
 </div>
 
 <script src="/admin/components/admin-nav.js?v=999"></script>
-
-<!-- Script SweetAlert2 Modal & AJAX -->
 <script>
 function konfirmasiAksi(event, url, aksi, elemenTombol) {
     event.preventDefault(); 
-
     let judul = aksi === 'terima' ? 'Terima Pendaftaran?' : 'Tolak Pendaftaran?';
     let teks = aksi === 'terima' ? 'Siswa akan resmi terdaftar di sistem.' : 'Data pendaftaran siswa ini akan ditolak.';
     let warnaTombol = aksi === 'terima' ? '#22c55e' : '#ef4444'; 
@@ -352,27 +315,14 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
         borderRadius: '24px'
     }).then((result) => {
         if (result.isConfirmed) {
-            
-            // Munculkan loading
-            Swal.fire({
-                title: 'Memproses Data...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Jalankan URL via AJAX
+            Swal.fire({ title: 'Memproses Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             fetch(url)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    
-                    // Update tampilan tabel secara langsung (Tanpa Reload!)
                     let tr = elemenTombol.closest('tr');
-                    let tdStatus = tr.querySelector('td:nth-child(10)');
+                    let tdStatus = tr.querySelector('td:nth-child(11)');
                     let tdAksi = tr.querySelector('.action-cell');
-
                     if (aksi === 'terima') {
                         tdStatus.innerHTML = '<span class="badge accepted">Diterima</span>';
                         tdAksi.innerHTML = '<button type="button" class="btn-disabled accepted-disabled" disabled>Sudah diterima</button>';
@@ -380,58 +330,38 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
                         tdStatus.innerHTML = '<span class="badge rejected">Ditolak</span>';
                         tdAksi.innerHTML = '<button type="button" class="btn-disabled rejected-disabled" disabled>Sudah ditolak</button>';
                     }
-
-                    // Tampilkan Pop-up Hasil Berdasarkan Status & Nomor WA
                     let judulHasil = aksi === 'terima' ? 'Pendaftaran Diterima' : 'Pendaftaran Ditolak';
                     let textHasil = data.link_wa !== '' 
-                        ? `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}. Silakan kirim pemberitahuan ke WhatsApp orang tua / wali.` 
-                        : `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}.\n\nNamun, Nomor WhatsApp tidak ditemukan.`;
-
+                        ? `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}. Kirim pemberitahuan WhatsApp?` 
+                        : `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}.`;
                     let swalOptions = {
                         title: judulHasil,
                         text: textHasil,
                         icon: aksi === 'terima' ? 'success' : 'error',
                         borderRadius: '24px'
                     };
-
-                    // Jika ada nomor WA, munculkan 2 tombol
                     if (data.link_wa !== '') {
                         swalOptions.showCancelButton = true;
                         swalOptions.confirmButtonColor = '#22c55e';
                         swalOptions.cancelButtonColor = '#eef2f3';
                         swalOptions.confirmButtonText = 'Kirim ke WhatsApp';
                         swalOptions.cancelButtonText = '<span style="color: #0f5d5d; font-weight: 600;">Nanti Saja</span>';
-                        swalOptions.reverseButtons = true; // Tombol WA di kanan
+                        swalOptions.reverseButtons = true;
                     } else {
                         swalOptions.confirmButtonColor = '#0f5d5d';
                         swalOptions.confirmButtonText = 'Tutup';
                     }
-
                     Swal.fire(swalOptions).then((result2) => {
-                        // Buka link WhatsApp di tab baru jika diklik
-                        if (result2.isConfirmed && data.link_wa !== '') {
-                            window.open(data.link_wa, '_blank');
-                        }
+                        if (result2.isConfirmed && data.link_wa !== '') window.open(data.link_wa, '_blank');
                     });
-
                 } else {
-                    // Tampilkan error jika gagal
-                    Swal.fire({
-                        title: 'Oops!',
-                        text: data.message,
-                        icon: 'warning',
-                        confirmButtonColor: '#0f5d5d'
-                    });
+                    Swal.fire({ title: 'Oops!', text: data.message, icon: 'warning', confirmButtonColor: '#0f5d5d' });
                 }
             })
-            .catch(error => {
-                Swal.fire('Error!', 'Terjadi kesalahan pada server.', 'error');
-                console.error(error);
-            });
+            .catch(error => { Swal.fire('Error!', 'Terjadi kesalahan pada server.', 'error'); console.error(error); });
         }
     });
 }
 </script>
-
 </body>
 </html>

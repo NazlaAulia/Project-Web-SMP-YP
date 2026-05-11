@@ -1,7 +1,6 @@
 <?php
 include '../koneksi.php';
 
-// Beri tahu browser bahwa ini adalah balasan berupa data JSON
 header('Content-Type: application/json');
 
 function formatNomorWa($nomor)
@@ -20,6 +19,7 @@ if (!isset($_GET['id']) || !isset($_GET['status'])) {
 
 $id_pendaftaran = (int) $_GET['id'];
 $status = trim($_GET['status']);
+$id_tahun = isset($_GET['id_tahun']) ? (int) $_GET['id_tahun'] : 0;
 
 if (!in_array($status, ['diterima', 'ditolak'])) {
     echo json_encode(['success' => false, 'message' => 'Status tidak valid.']);
@@ -43,7 +43,6 @@ $namaSiswa = $data['nama_lengkap'];
 $nomorWa = formatNomorWa($data['no_hp']);
 $statusLama = $data['status'];
 
-// Cek jika status sudah diproses
 if ($statusLama !== 'menunggu') {
     echo json_encode([
         'success' => false, 
@@ -52,9 +51,14 @@ if ($statusLama !== 'menunggu') {
     exit;
 }
 
-// Proses Update
-$stmt = mysqli_prepare($conn, "UPDATE pendaftaran SET status = ? WHERE id_pendaftaran = ?");
-mysqli_stmt_bind_param($stmt, "si", $status, $id_pendaftaran);
+// Proses Update: jika diterima dan ada id_tahun, update juga kolom id_tahun_ajaran
+if ($status === 'diterima' && $id_tahun > 0) {
+    $stmt = mysqli_prepare($conn, "UPDATE pendaftaran SET status = ?, id_tahun_ajaran = ? WHERE id_pendaftaran = ?");
+    mysqli_stmt_bind_param($stmt, "sii", $status, $id_tahun, $id_pendaftaran);
+} else {
+    $stmt = mysqli_prepare($conn, "UPDATE pendaftaran SET status = ? WHERE id_pendaftaran = ?");
+    mysqli_stmt_bind_param($stmt, "si", $status, $id_pendaftaran);
+}
 
 if (!mysqli_stmt_execute($stmt)) {
     echo json_encode(['success' => false, 'message' => 'Gagal mengupdate database.']);
