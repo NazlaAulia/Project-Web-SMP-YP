@@ -33,12 +33,37 @@
                     </button>
                 </header>
 
-                <section class="toolbar">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchGuru" placeholder="Cari nama, email, nama pengguna, NIP...">
-                    </div>
-                </section>
+              <section class="toolbar">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchGuru" placeholder="Cari nama, email, nama pengguna, NIP...">
+    </div>
+
+    <form action="import_guru.php" method="POST" enctype="multipart/form-data" class="import-form">
+        <label for="fileGuru" class="btn-file">
+            <i class="fas fa-file-excel"></i>
+            Pilih File
+        </label>
+
+        <input type="file" name="file_guru" id="fileGuru" accept=".csv" required hidden>
+
+        <span class="file-name" id="fileGuruName">Belum ada file</span>
+
+        <button type="submit" class="btn-primary">
+            <i class="fas fa-file-import"></i>
+            Import
+        </button>
+
+        <a href="template_import_guru.php" class="btn-secondary btn-template">
+            <i class="fas fa-download"></i>
+            Unduh Template
+        </a>
+    </form>
+
+    <p class="template-note">
+        Template digunakan untuk import data guru lama. Isi nama mapel sesuai data pelajaran di sistem.
+    </p>
+</section>
 
                 <section class="table-card">
                     <div class="table-wrap">

@@ -36,12 +36,41 @@
                     </button>
                 </header>
 
-                <section class="toolbar">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchSiswa" placeholder="Cari nama, NISN, nama pengguna, kelas...">
-                    </div>
-                </section>
+              <section class="toolbar">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchSiswa" placeholder="Cari nama, NISN, nama pengguna, kelas...">
+    </div>
+
+    <form action="import_siswa.php" method="POST" enctype="multipart/form-data" class="import-form">
+        <label for="fileSiswa" class="btn-file">
+            <i class="fas fa-file-excel"></i>
+            Pilih File
+        </label>
+
+        <input type="file" name="file_siswa" id="fileSiswa" accept=".csv" required hidden>
+
+        <span class="file-name" id="fileSiswaName">Belum ada file</span>
+
+        <button type="submit" class="btn-primary">
+            <i class="fas fa-file-import"></i>
+            Import
+        </button>
+
+        <a href="template_import_siswa.php" class="btn-secondary btn-template">
+            <i class="fas fa-download"></i>
+            Unduh Template
+        </a>
+    </form>
+
+    <p class="template-note">
+        Template digunakan untuk import data siswa lama. Isi NISN, nama pengguna, kelas, dan tahun ajaran sesuai data di sistem.
+    </p>
+</section>
+
+
+</section>
+
 
                 <section class="table-card">
                     <div class="table-wrap">
@@ -193,6 +222,27 @@
             <button class="btn-close delete-close-modern" id="closeDeleteBtn" type="button">&times;</button>
         </div>
     </div>
+
+    <div class="modal-overlay" id="importResultModal">
+    <div class="modal-box modal-delete-box modern-delete-box">
+        <div class="delete-icon-wrap">
+            <div class="delete-icon-circle import-result-icon" id="importResultIcon">
+                <i class="fa-solid fa-check"></i>
+            </div>
+        </div>
+
+        <h2 class="delete-title" id="importResultTitle">Import Berhasil</h2>
+
+        <p class="delete-text center-text" id="importResultText">
+            Import selesai.
+        </p>
+
+        <div class="modal-actions delete-actions-center">
+            <button type="button" class="btn-primary" id="closeImportResultBtn">Tutup</button>
+        </div>
+    </div>
+</div>
+
 
     <script src="../components/admin-nav.js"></script>
     <script src="fitursiswa.js"></script>

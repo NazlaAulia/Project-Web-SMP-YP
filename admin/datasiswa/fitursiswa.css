@@ -1377,3 +1377,295 @@ button {
     color: #dc2626 !important;
 }
 
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.import-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.import-form input[type="file"] {
+    max-width: 230px;
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .import-form,
+    .import-form .btn-primary {
+        width: 100%;
+    }
+
+    .import-form input[type="file"] {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+.import-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-file {
+    height: 46px;
+    padding: 0 16px;
+    border-radius: 14px;
+    background: #e8f3f2;
+    color: #064e4b;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.btn-file:hover {
+    background: #dcecea;
+}
+
+.file-name {
+    max-width: 220px;
+    color: #64748b;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.import-form .btn-primary {
+    height: 46px;
+    border-radius: 14px;
+    padding: 0 18px;
+}
+
+@media (max-width: 768px) {
+    .import-form {
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .btn-file,
+    .import-form .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .file-name {
+        max-width: 100%;
+        text-align: center;
+    }
+}
+
+.btn-template {
+    height: 46px;
+    border-radius: 14px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.import-result-icon {
+    background: #dcfce7 !important;
+}
+
+.import-result-icon i {
+    color: #16a34a !important;
+}
+
+.import-result-icon.error {
+    background: #fee2e2 !important;
+}
+
+.import-result-icon.error i {
+    color: #dc2626 !important;
+}
+
+/* FIX IMPORT SISWA BIAR TETAP RAPI */
+.toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(280px, 600px) 1fr !important;
+    align-items: center !important;
+    gap: 14px !important;
+}
+
+.toolbar .search-box {
+    max-width: 600px !important;
+}
+
+.import-form {
+    justify-self: end !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(120px, 220px) auto auto !important;
+    align-items: center !important;
+    gap: 10px !important;
+    max-width: 760px !important;
+}
+
+.file-name {
+    display: block !important;
+    max-width: 220px !important;
+    min-width: 120px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.btn-file,
+.btn-template,
+.import-form .btn-primary {
+    height: 46px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+@media (max-width: 1100px) {
+    .toolbar {
+        grid-template-columns: 1fr !important;
+    }
+
+    .import-form {
+        justify-self: start !important;
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .import-form {
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+    }
+
+    .file-name {
+        max-width: 100% !important;
+        text-align: center !important;
+    }
+}
+
+/* =========================
+   FIX IMPORT SISWA BIAR DI BAWAH SEARCH
+========================= */
+
+.toolbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 16px !important;
+    margin-bottom: 22px !important;
+}
+
+.toolbar .search-box {
+    width: 100% !important;
+    max-width: 620px !important;
+}
+
+.import-form {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-self: unset !important;
+}
+
+.btn-file,
+.btn-template,
+.import-form .btn-primary {
+    height: 46px !important;
+    padding: 0 18px !important;
+    border-radius: 14px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.btn-file {
+    background: #e8f3f2 !important;
+    color: #064e4b !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+}
+
+.btn-template {
+    background: transparent !important;
+    color: #1f2937 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-decoration: none !important;
+}
+
+.file-name {
+    display: block !important;
+    max-width: 260px !important;
+    min-width: 120px !important;
+    color: #64748b !important;
+    font-size: 14px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.template-note {
+    width: 100% !important;
+    margin-top: -4px !important;
+    color: #6b7280 !important;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+    text-align: left !important;
+}
+
+/* HP */
+@media (max-width: 768px) {
+    .toolbar {
+        gap: 14px !important;
+    }
+
+    .toolbar .search-box {
+        max-width: 100% !important;
+    }
+
+    .import-form {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+
+    .btn-file,
+    .btn-template,
+    .import-form .btn-primary {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .file-name {
+        max-width: 100% !important;
+        text-align: center !important;
+    }
+
+    .template-note {
+        text-align: center !important;
+    }
+}

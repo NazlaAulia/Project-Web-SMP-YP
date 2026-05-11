@@ -98,10 +98,16 @@ function renderChart(dataNilai = null) {
       nilai_angka: Number(item.nilai_angka) || 0
     }));
   } else {
-    nilaiFinal = Object.entries(nilai).map(([nama_mapel, nilai_angka]) => ({
-      nama_mapel,
-      nilai_angka: Number(nilai_angka) || 0
-    }));
+    // Jika dataNilai kosong atau null, tidak tampilkan grafik
+    if (!dataNilai || dataNilai.length === 0) {
+      if (barChartEl) {
+        barChartEl.innerHTML = `<p class="chart-empty">Tidak ada data nilai.</p>`;
+      }
+      if (document.getElementById("avgValue")) document.getElementById("avgValue").textContent = "-";
+      if (document.getElementById("maxValue")) document.getElementById("maxValue").textContent = "-";
+      if (document.getElementById("minValue")) document.getElementById("minValue").textContent = "-";
+      return;
+    }
   }
 
   if (!barChartEl) return;

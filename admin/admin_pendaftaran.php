@@ -120,10 +120,12 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pendaftaran Siswa</title>
 
+
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=102">
+ <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=103">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -142,12 +144,31 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
                     <h1>Data Pendaftaran Siswa</h1>
                     <p>Daftar siswa yang telah mengisi formulir pendaftaran online.</p>
                 </div>
+<<<<<<< admin
                 <div class="header-filter-actions">
                     <a href="<?= buildPageUrl(1, $search, $isMenungguMode ? '' : 'menunggu', $id_tahun_terpilih); ?>" 
                        class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>">
                         <i class="fas fa-clock"></i> Menunggu
                     </a>
                 </div>
+=======
+
+              <div class="header-filter-actions">
+    <div class="waiting-filter-wrap">
+        <a 
+            href="<?= buildPageUrl(1, $search, $isMenungguMode ? '' : 'menunggu'); ?>" 
+            class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>"
+        >
+            <i class="fas fa-clock"></i>
+            Menunggu
+        </a>
+
+        <p class="waiting-filter-note">
+            Klik tombol Menunggu untuk menaikkan data pendaftaran yang statusnya belum dikonfirmasi ke urutan paling atas.
+        </p>
+    </div>
+</div>
+>>>>>>> main
             </div>
 
             <!-- DROPDOWN TAHUN, KUOTA, CETAK -->

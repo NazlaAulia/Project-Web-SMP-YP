@@ -720,3 +720,61 @@ function escapeJs(text) {
         .replaceAll("\\", "\\\\")
         .replaceAll("'", "\\'");
 }
+
+const fileSiswa = document.getElementById("fileSiswa");
+const fileSiswaName = document.getElementById("fileSiswaName");
+
+if (fileSiswa && fileSiswaName) {
+    fileSiswa.addEventListener("change", () => {
+        fileSiswaName.textContent = fileSiswa.files.length
+            ? fileSiswa.files[0].name
+            : "Belum ada file";
+    });
+}
+
+const importResultModal = document.getElementById("importResultModal");
+const importResultIcon = document.getElementById("importResultIcon");
+const importResultTitle = document.getElementById("importResultTitle");
+const importResultText = document.getElementById("importResultText");
+const closeImportResultBtn = document.getElementById("closeImportResultBtn");
+
+function showImportResultModal() {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("import_status");
+    const message = params.get("import_message");
+
+    if (!status || !message || !importResultModal) return;
+
+    if (status === "error") {
+        importResultTitle.textContent = "Import Gagal";
+        importResultIcon.classList.add("error");
+        importResultIcon.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
+    } else {
+        importResultTitle.textContent = "Import Berhasil";
+        importResultIcon.classList.remove("error");
+        importResultIcon.innerHTML = `<i class="fa-solid fa-check"></i>`;
+    }
+
+    importResultText.textContent = message;
+    importResultModal.classList.add("active");
+
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+}
+
+if (closeImportResultBtn) {
+    closeImportResultBtn.addEventListener("click", () => {
+        importResultModal.classList.remove("active");
+    });
+}
+
+if (importResultModal) {
+    importResultModal.addEventListener("click", (e) => {
+        if (e.target === importResultModal) {
+            importResultModal.classList.remove("active");
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", showImportResultModal);
+
