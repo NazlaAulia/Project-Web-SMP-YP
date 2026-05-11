@@ -90,19 +90,69 @@ function singkatNamaMapel(nama) {
 }
 
 function renderChart(dataNilai = null) {
-  let nilaiFinal = [];
+  const daftarBar = barChartEl;
+  const avgEl = document.getElementById("avgValue");
+  const maxEl = document.getElementById("maxValue");
+  const minEl = document.getElementById("minValue");
 
-  if (dataNilai && dataNilai.length > 0) {
-    nilaiFinal = dataNilai.map((item) => ({
-      nama_mapel: item.nama_mapel,
-      nilai_angka: Number(item.nilai_angka) || 0
-    }));
-  } else {
-    nilaiFinal = Object.entries(nilai).map(([nama_mapel, nilai_angka]) => ({
-      nama_mapel,
-      nilai_angka: Number(nilai_angka) || 0
-    }));
+  // Siapkan data nilai
+  const nilaiFinal = Array.isArray(dataNilai) && dataNilai.length > 0
+    ? dataNilai.map(item => ({
+        nama_mapel: item.nama_mapel,
+        nilai_angka: Number(item.nilai_angka) || 0
+      }))
+    : [];
+
+  // Jika tidak ada data, tampilkan pesan kosong
+  if (!nilaiFinal.length) {
+    if (daftarBar) daftarBar.innerHTML = `<p class="chart-empty">Tidak ada data nilai.</p>`;
+    if (avgEl) avgEl.textContent = "-";
+    if (maxEl) maxEl.textContent = "-";
+    if (minEl) minEl.textContent = "-";
+    return;
   }
+
+  // Set jumlah bar untuk CSS
+  if (daftarBar) daftarBar.style.setProperty("--jumlah-bar", nilaiFinal.length);
+
+  // Render bar chart
+  if (daftarBar) {
+    daftarBar.innerHTML = nilaiFinal.map(item => {
+      const label = singkatNamaMapel(item.nama_mapel);
+      const nilaiAngka = Number(item.nilai_angka);
+      return `
+        <div class="bar-group">
+          <div class="bar-value">${nilaiAngka}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="height: ${nilaiAngka}%;"></div>
+          </div>
+          <span class="bar-label" title="${item.nama_mapel}">${label}</span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // Filter hanya nilai > 0 untuk perhitungan statistik
+  const nilaiValid = nilaiFinal.filter(item => Number(item.nilai_angka) > 0);
+
+  if (!nilaiValid.length) {
+    if (avgEl) avgEl.textContent = "0";
+    if (maxEl) maxEl.textContent = "-";
+    if (minEl) minEl.textContent = "-";
+    return;
+  }
+
+  // Hitung rata-rata, tertinggi, dan terendah
+  const total = nilaiValid.reduce((sum, item) => sum + Number(item.nilai_angka), 0);
+  const rataRata = (total / nilaiValid.length).toFixed(1);
+
+  const tertinggi = nilaiValid.reduce((a, b) => Number(b.nilai_angka) > Number(a.nilai_angka) ? b : a);
+  const terendah = nilaiValid.reduce((a, b) => Number(b.nilai_angka) < Number(a.nilai_angka) ? b : a);
+
+  if (avgEl) avgEl.textContent = rataRata;
+  if (maxEl) maxEl.textContent = `${tertinggi.nama_mapel} (${tertinggi.nilai_angka})`;
+  if (minEl) minEl.textContent = `${terendah.nama_mapel} (${terendah.nilai_angka})`;
+}
 
   if (!barChartEl) return;
 
