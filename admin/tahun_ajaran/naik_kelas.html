@@ -1,3 +1,10 @@
+<?php
+include '../koneksi.php';
+
+// Ambil tahun ajaran aktif (untuk dropdown awal)
+$query_ta = "SELECT * FROM tahun_ajaran ORDER BY tahun_ajaran DESC";
+$result_ta = mysqli_query($conn, $query_ta);
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -16,6 +23,98 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link rel="stylesheet" href="naik_kelas.css">
+    <style>
+        /* Style tambahan untuk tombol Buat Kelas Baru dan modal */
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn-tambah-kelas {
+            background: #064e4b;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-tambah-kelas:hover {
+            background: #0f7a76;
+        }
+        /* Modal tambah kelas */
+        .modal-kelas {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-kelas.active {
+            display: flex;
+        }
+        .modal-kelas .modal-box {
+            background: white;
+            width: 500px;
+            max-width: 90%;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+        .modal-kelas h3 {
+            margin-bottom: 20px;
+            color: #064e4b;
+        }
+        .modal-kelas .form-group {
+            margin-bottom: 16px;
+        }
+        .modal-kelas label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .modal-kelas input, .modal-kelas select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        .modal-kelas .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .modal-kelas .btn-batal {
+            background: #e0e0e0;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .modal-kelas .btn-simpan {
+            background: #064e4b;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body data-page="tahun_ajaran" data-nav-path="../components/admin-nav.html">
 
@@ -68,22 +167,27 @@
                     <form id="naikKelasForm">
                         <div class="form-group full">
                             <label for="id_tahun_ajaran">Tahun Ajaran Baru</label>
-
                             <div class="tahun-ajaran-row">
                                 <select id="id_tahun_ajaran" name="id_tahun_ajaran" required>
                                     <option value="">Memuat tahun ajaran...</option>
+                                    <?php while($ta = mysqli_fetch_assoc($result_ta)): ?>
+                                        <option value="<?= $ta['id_tahun_ajaran'] ?>"><?= htmlspecialchars($ta['tahun_ajaran']) ?></option>
+                                    <?php endwhile; ?>
                                 </select>
-
                                 <button type="button" class="btn-create-year" id="buatTahunBtn">
-                                    <i class="fas fa-plus"></i>
-                                    Buat Tahun Berikutnya
+                                    <i class="fas fa-plus"></i> Buat Tahun Berikutnya
                                 </button>
                             </div>
                         </div>
 
-                        <div class="section-heading">
-                            <h2>Set Wali Kelas Baru</h2>
-                            <p>Pilih wali kelas untuk setiap kelas sebelum proses naik kelas dijalankan.</p>
+                        <div class="section-heading flex-between">
+                            <div>
+                                <h2>Set Wali Kelas Baru</h2>
+                                <p>Pilih wali kelas untuk setiap kelas sebelum proses naik kelas dijalankan.</p>
+                            </div>
+                            <button type="button" class="btn-tambah-kelas" id="btnTambahKelas">
+                                <i class="fas fa-plus-circle"></i> Buat Kelas Baru
+                            </button>
                         </div>
 
                         <div class="form-grid" id="waliKelasGrid">
@@ -147,47 +251,40 @@
                                 <div class="preview-pagination-info" id="previewPaginationInfo">
                                     Menampilkan 0 sampai 0 dari 0 siswa
                                 </div>
-
                                 <div class="preview-pagination-btns" id="previewPaginationBtns"></div>
                             </div>
                         </div>
 
                         <div class="action-row">
                             <a href="export_excel.php" class="btn-secondary">
-                                <i class="fas fa-file-excel"></i>
-                                Unduh Excel
+                                <i class="fas fa-file-excel"></i> Unduh Excel
                             </a>
-
                             <button type="submit" class="btn-primary">
-                                <i class="fas fa-arrow-up"></i>
-                                Proses Naik Kelas
+                                <i class="fas fa-arrow-up"></i> Proses Naik Kelas
                             </button>
                         </div>
 
                         <div id="formMessage" class="form-message"></div>
                     </form>
                 </section>
-
             </div>
         </main>
     </div>
 
+    <!-- Modal konfirmasi naik kelas -->
     <div class="custom-popup-overlay" id="confirmPopup">
         <div class="custom-popup-box">
             <div class="custom-popup-header">
                 <h3>Konfirmasi Naik Kelas</h3>
                 <button type="button" class="custom-popup-close" id="closeConfirmPopup">&times;</button>
             </div>
-
             <div class="custom-popup-body">
                 <div class="confirm-input-group">
                     <label for="confirmText">Ketik NAIKKELAS untuk melanjutkan</label>
                     <input type="text" id="confirmText" placeholder="NAIKKELAS">
                 </div>
-
                 <div id="confirmMessage" class="confirm-message"></div>
             </div>
-
             <div class="custom-popup-footer">
                 <button type="button" class="custom-btn-secondary" id="cancelConfirmBtn">Batal</button>
                 <button type="button" class="custom-btn-primary" id="confirmProcessBtn">Ya, Proses</button>
@@ -195,31 +292,122 @@
         </div>
     </div>
 
+    <!-- Modal buat tahun ajaran berikutnya -->
     <div class="custom-popup-overlay" id="tahunAjaranPopup">
         <div class="custom-popup-box">
             <div class="custom-popup-header">
                 <h3>Buat Tahun Ajaran Berikutnya?</h3>
                 <button type="button" class="custom-popup-close" id="closeTahunAjaranPopup">&times;</button>
             </div>
-
             <div class="custom-popup-body">
-                <p>
-                    Sistem akan membuat tahun ajaran berikutnya otomatis dari data terakhir di database.
-                </p>
-
+                <p>Sistem akan membuat tahun ajaran berikutnya otomatis dari data terakhir di database.</p>
                 <div id="tahunAjaranMessage" class="confirm-message"></div>
             </div>
-
             <div class="custom-popup-footer">
                 <button type="button" class="custom-btn-secondary" id="cancelTahunAjaranBtn">Batal</button>
-                <button type="button" class="custom-btn-primary" id="confirmTahunAjaranBtn">
-                    Ya, Buat
-                </button>
+                <button type="button" class="custom-btn-primary" id="confirmTahunAjaranBtn">Ya, Buat</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH KELAS BARU -->
+    <div id="modalTambahKelas" class="modal-kelas">
+        <div class="modal-box">
+            <h3><i class="fas fa-plus-circle"></i> Tambah Kelas Baru</h3>
+            <form id="formTambahKelas">
+                <div class="form-group">
+                    <label>Nama Kelas (contoh: 7D, 8E, 9F)</label>
+                    <input type="text" name="nama_kelas" id="nama_kelas" required placeholder="7D">
+                </div>
+                <div class="form-group">
+                    <label>Tingkat</label>
+                    <select name="tingkat" id="tingkat" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="7">7 (Kelas 7)</option>
+                        <option value="8">8 (Kelas 8)</option>
+                        <option value="9">9 (Kelas 9)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Wali Kelas</label>
+                    <select name="id_wali_kelas" id="id_wali_kelas" required>
+                        <option value="">-- Pilih Guru --</option>
+                        <?php
+                        $guru = mysqli_query($conn, "SELECT id_guru, nama FROM guru ORDER BY nama");
+                        while($g = mysqli_fetch_assoc($guru)) {
+                            echo "<option value='{$g['id_guru']}'>{$g['nama']}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Kapasitas Siswa</label>
+                    <input type="number" name="kapasitas" id="kapasitas" value="30" min="1" max="60" required>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-batal" id="btnBatalModal">Batal</button>
+                    <button type="submit" class="btn-simpan">Simpan Kelas</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script src="../components/admin-nav.js"></script>
     <script src="naik_kelas.js"></script>
+    <script>
+        // Script tambahan untuk modal kelas
+        const modalTambah = document.getElementById('modalTambahKelas');
+        const btnTambah = document.getElementById('btnTambahKelas');
+        const btnBatalModal = document.getElementById('btnBatalModal');
+        const formTambah = document.getElementById('formTambahKelas');
+
+        if (btnTambah) {
+            btnTambah.addEventListener('click', function() {
+                modalTambah.classList.add('active');
+            });
+        }
+        if (btnBatalModal) {
+            btnBatalModal.addEventListener('click', function() {
+                modalTambah.classList.remove('active');
+            });
+        }
+        // Tutup modal klik overlay
+        modalTambah.addEventListener('click', function(e) {
+            if (e.target === modalTambah) modalTambah.classList.remove('active');
+        });
+        // Submit form tambah kelas via AJAX
+        if (formTambah) {
+            formTambah.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const idTahun = document.getElementById('id_tahun_ajaran').value;
+                if (!idTahun) {
+                    alert('Pilih tahun ajaran terlebih dahulu.');
+                    return;
+                }
+                const formData = new FormData(formTambah);
+                formData.append('id_tahun_ajaran', idTahun);
+                
+                fetch('ajax_tambah_kelas.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Kelas berhasil ditambahkan!');
+                        modalTambah.classList.remove('active');
+                        // Reload data wali kelas grid di halaman (panggil fungsi dari naik_kelas.js jika ada)
+                        if (typeof loadWaliKelasGrid === 'function') loadWaliKelasGrid();
+                        else location.reload();
+                    } else {
+                        alert('Gagal: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    alert('Terjadi kesalahan: ' + err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
