@@ -123,9 +123,88 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pendaftaran Siswa</title>
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=104">
+    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=105">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Anda bisa letakkan seluruh CSS dari file pendaftaran.css di sini, atau impor */
+        /* Saya asumsikan Anda sudah memiliki file pendaftaran.css terpisah, tapi untuk keperluan modal atur, kita tambahkan style modal */
+        .modal-atur {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+        }
+        .modal-atur .modal-box {
+            background: white;
+            width: 500px;
+            max-width: 90%;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+        .modal-atur h3 {
+            margin-bottom: 20px;
+            color: #064e4b;
+        }
+        .modal-atur .form-group {
+            margin-bottom: 15px;
+        }
+        .modal-atur label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .modal-atur input, .modal-atur select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .modal-atur .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .modal-atur button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-batal {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .btn-simpan {
+            background: #064e4b;
+            color: white;
+        }
+        .btn-atur-pendaftaran {
+            background: #0f5d5d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-atur-pendaftaran:hover {
+            background: #053f3d;
+        }
+    </style>
 </head>
 <body data-page="pendaftaran" data-nav-path="/admin/components/admin-nav.html">
 <div class="container">
@@ -145,7 +224,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
                 </div>
             </div>
 
-            <!-- DROPDOWN TAHUN, KUOTA, CETAK -->
+            <!-- DROPDOWN TAHUN, KUOTA, CETAK, TOMBOL ATUR -->
             <div class="filter-bar" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                 <form method="GET" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <label style="font-weight: bold;">Tahun Ajaran:</label>
@@ -174,6 +253,10 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
                     <a href="cetak_kurang_mampu.php?id_tahun=<?= $id_tahun_terpilih ?>" class="btn btn-warning btn-sm" target="_blank" style="background:#ffc107; padding:5px 12px; border-radius:20px; text-decoration:none; color:#000;">
                         <i class="fas fa-print"></i> Cetak Kurang Mampu
                     </a>
+
+                    <button type="button" class="btn-atur-pendaftaran" onclick="openModalAtur()">
+                        <i class="fas fa-cog"></i> Atur Pendaftaran
+                    </button>
                 </form>
 
                 <!-- Form pencarian -->
@@ -189,6 +272,40 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
                     <?php endif; ?>
                 </form>
             </div>
+
+            <!-- REMINDER WA BELUM TERKIRIM (jika ada) -->
+            <?php
+            $query_reminder = "SELECT id_pendaftaran, nama_lengkap, no_hp, status 
+                               FROM pendaftaran 
+                               WHERE id_tahun_ajaran = $id_tahun_terpilih 
+                               AND wa_sent = 0 
+                               AND status IN ('diterima', 'ditolak')
+                               ORDER BY id_pendaftaran DESC";
+            $res_reminder = mysqli_query($conn, $query_reminder);
+            if (mysqli_num_rows($res_reminder) > 0) {
+                echo '<div class="reminder-box" style="background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 8px;">';
+                echo '<strong><i class="fas fa-bell"></i> Reminder Belum Kirim WhatsApp:</strong><br>';
+                echo '<table style="width:100%; margin-top:10px; border-collapse:collapse;">';
+                echo '<tr><th>Nama</th><th>Status</th><th>Aksi</th></tr>';
+                while ($row = mysqli_fetch_assoc($res_reminder)) {
+                    $nama = htmlspecialchars($row['nama_lengkap']);
+                    $status = $row['status'];
+                    $no_hp = $row['no_hp'];
+                    $clean_no = preg_replace('/[^0-9]/', '', $no_hp);
+                    if (substr($clean_no, 0, 1) == '0') $clean_no = '62' . substr($clean_no, 1);
+                    $wa_link = "https://wa.me/$clean_no?text=" . urlencode("Halo $nama, pendaftaran Anda dinyatakan $status. Terima kasih.");
+                    echo "<tr>
+                            <td>$nama</td>
+                            <td>$status</td>
+                            <td>
+                                <a href='$wa_link' target='_blank' class='btn-wa-reminder' style='background:#25d366; color:white; padding:4px 12px; border-radius:20px; text-decoration:none; font-size:12px;'>Kirim WA</a>
+                                <button onclick='tandaiTerikirim($row[id_pendaftaran])' class='btn-tandai' style='background:#6c757d; color:white; border:none; padding:4px 12px; border-radius:20px; margin-left:5px;'>Tandai Terkirim</button>
+                             </td>
+                          </tr>";
+                }
+                echo '</table></div>';
+            }
+            ?>
 
             <!-- TABEL -->
             <div class="table-card">
@@ -290,8 +407,93 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
     </main>
 </div>
 
+<!-- MODAL ATUR PENDAFTARAN -->
+<div id="modalAturPendaftaran" class="modal-atur">
+    <div class="modal-box">
+        <h3>Atur Pendaftaran</h3>
+        <form id="formAturPendaftaran">
+            <div class="form-group">
+                <label>Tahun Ajaran</label>
+                <select name="id_tahun_ajaran" id="id_tahun_ajaran" required>
+                    <?php
+                    $ta_all = mysqli_query($conn, "SELECT * FROM tahun_ajaran ORDER BY tahun_ajaran DESC");
+                    while($ta = mysqli_fetch_assoc($ta_all)):
+                    ?>
+                        <option value="<?= $ta['id_tahun_ajaran'] ?>" <?= $ta['status'] == 'aktif' ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($ta['tahun_ajaran']) ?> (<?= $ta['status'] ?>)
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Kuota</label>
+                <input type="number" name="kuota" id="kuota" required>
+            </div>
+            <div class="form-group">
+                <label>Tanggal Buka Pendaftaran</label>
+                <input type="date" name="tgl_buka" id="tgl_buka" required>
+            </div>
+            <div class="form-group">
+                <label>Tanggal Tutup Pendaftaran</label>
+                <input type="date" name="tgl_tutup" id="tgl_tutup" required>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status" id="status">
+                    <option value="aktif">Aktif</option>
+                    <option value="nonaktif">Nonaktif</option>
+                </select>
+                <small style="color:gray;">Hanya satu tahun ajaran yang boleh aktif.</small>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn-batal" onclick="closeModalAtur()">Batal</button>
+                <button type="submit" class="btn-simpan">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="/admin/components/admin-nav.js?v=999"></script>
 <script>
+// Fungsi untuk modal atur pendaftaran
+function openModalAtur() {
+    let idTahun = <?= $id_tahun_terpilih ?>;
+    fetch(`/admin/ajax_get_tahun_ajaran.php?id=${idTahun}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('id_tahun_ajaran').value = data.id_tahun_ajaran;
+            document.getElementById('kuota').value = data.kuota;
+            document.getElementById('tgl_buka').value = data.tgl_buka;
+            document.getElementById('tgl_tutup').value = data.tgl_tutup;
+            document.getElementById('status').value = data.status;
+            document.getElementById('modalAturPendaftaran').style.display = 'flex';
+        });
+}
+
+function closeModalAtur() {
+    document.getElementById('modalAturPendaftaran').style.display = 'none';
+}
+
+document.getElementById('formAturPendaftaran').addEventListener('submit', function(e) {
+    e.preventDefault();
+    let formData = new FormData(this);
+    fetch('/admin/ajax_update_tahun_ajaran.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Berhasil', 'Pengaturan pendaftaran disimpan', 'success').then(() => {
+                location.reload();
+            });
+        } else {
+            Swal.fire('Gagal', data.message, 'error');
+        }
+    });
+});
+
+// Fungsi konfirmasi aksi (Terima/Tolak) sama seperti sebelumnya
 function konfirmasiAksi(event, url, aksi, elemenTombol) {
     event.preventDefault(); 
     let judul = aksi === 'terima' ? 'Terima Pendaftaran?' : 'Tolak Pendaftaran?';
@@ -356,6 +558,16 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
             .catch(error => { Swal.fire('Error!', 'Terjadi kesalahan pada server.', 'error'); console.error(error); });
         }
     });
+}
+
+// Fungsi tandai terkirim WA (untuk reminder)
+function tandaiTerikirim(id) {
+    fetch(`/admin/mark_wa_sent.php?id=${id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) location.reload();
+            else Swal.fire('Gagal', 'Gagal menandai WA terkirim', 'error');
+        });
 }
 </script>
 </body>
