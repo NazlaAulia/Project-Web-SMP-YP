@@ -17,7 +17,7 @@ try {
 
     $kelas = [];
     $result = $conn->query("
-        SELECT id_kelas, nama_kelas, tingkat, id_wali_kelas
+        SELECT id_kelas, nama_kelas, tingkat, id_wali_kelas, kapasitas
         FROM kelas
         ORDER BY tingkat ASC, nama_kelas ASC
     ");
@@ -74,3 +74,4 @@ try {
         'message' => 'Gagal mengambil data naik kelas.'
     ]);
 }
+?>
