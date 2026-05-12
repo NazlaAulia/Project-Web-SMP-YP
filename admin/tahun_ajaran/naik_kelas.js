@@ -337,6 +337,7 @@ function getAwalTahunAjaran(tahunAjaran) {
     return Number(match[1]);
 }
 
+// MODIFIKASI RENDER WALI KELAS DENGAN KAPASITAS
 function renderWaliKelas(kelas, guru) {
     if (!kelas.length) {
         waliKelasGrid.innerHTML = `<div class="empty-cell">Data kelas belum tersedia.</div>`;
@@ -355,6 +356,7 @@ function renderWaliKelas(kelas, guru) {
         const select = document.createElement("select");
         select.name = `wali_kelas[${item.id_kelas}]`;
         select.required = true;
+        select.setAttribute("data-kelas-id", item.id_kelas);
 
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
@@ -373,8 +375,24 @@ function renderWaliKelas(kelas, guru) {
             select.appendChild(option);
         });
 
+        // Input kapasitas
+        const kapasitasInput = document.createElement("input");
+        kapasitasInput.type = "number";
+        kapasitasInput.name = `kapasitas[${item.id_kelas}]`;
+        kapasitasInput.value = item.kapasitas || 30;
+        kapasitasInput.min = 1;
+        kapasitasInput.max = 60;
+        kapasitasInput.placeholder = "Kapasitas Siswa";
+        kapasitasInput.className = "kapasitas-input";
+        kapasitasInput.style.width = "100%";
+        kapasitasInput.style.marginTop = "8px";
+        kapasitasInput.style.padding = "8px";
+        kapasitasInput.style.borderRadius = "8px";
+        kapasitasInput.style.border = "1px solid #ccc";
+
         group.appendChild(label);
         group.appendChild(select);
+        group.appendChild(kapasitasInput);
 
         waliKelasGrid.appendChild(group);
     });
