@@ -1,17 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const inputs = document.querySelectorAll('.form-group input, .form-group select, .form-group textarea');
 
-    inputs.forEach(input => {
-        input.addEventListener('focus', () => {
-            input.parentElement.style.transform = 'translateX(10px)';
-            input.parentElement.style.transition = 'all 0.3s ease';
-        });
-
-        input.addEventListener('blur', () => {
-            input.parentElement.style.transform = 'translateX(0)';
-        });
-    });
-
     const form = document.getElementById("formPendaftaran");
     const alertBox = document.getElementById("formAlert");
     const modal = document.getElementById("successModal");
@@ -27,10 +16,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!form) return;
 
+    // ===== Input animation =====
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            input.parentElement.style.transform = 'translateX(10px)';
+            input.parentElement.style.transition = 'all 0.3s ease';
+        });
+
+        input.addEventListener('blur', () => {
+            input.parentElement.style.transform = 'translateX(0)';
+        });
+    });
+
+    // ===== Update Kuota =====
     function updateKuotaDisplay(data) {
-        if (statKuota) {
-            statKuota.textContent = data.kuota_tersisa;
-        }
+        if (statKuota) statKuota.textContent = data.kuota_tersisa;
 
         if (statPersen && progressBar && data.kuota_max) {
             const terisi = data.kuota_max - data.kuota_tersisa;
@@ -44,6 +44,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // ===== Cek localStorage untuk modal persistent =====
+    const savedData = localStorage.getItem('pendaftaranSuccess');
+    if (savedData && waBtn && waReminder && waReminderLink && modal) {
+        const data = JSON.parse(savedData);
+        waBtn.href = data.waLink;
+        waReminderLink.href = data.waLink;
+        waReminder.style.display = "block";
+        modal.classList.add("active");
+    }
+
+    // ===== Submit Form =====
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
 
@@ -62,9 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const raw = await response.text();
-            console.log("RAW RESPONSE:", raw);
-            console.log("STATUS HTTP:", response.status);
-
             let result;
             try {
                 result = JSON.parse(raw);
@@ -107,6 +115,10 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
             updateKuotaDisplay(result.data);
 
             modal.classList.add("active");
+
+            // ===== Simpan ke localStorage untuk modal persistent =====
+            localStorage.setItem('pendaftaranSuccess', JSON.stringify({ waLink }));
+
             form.reset();
 
         } catch (error) {
@@ -119,4 +131,13 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
             submitBtn.style.pointerEvents = "auto";
         }
     });
+
+    // ===== Klik WA → modal hilang permanen =====
+    if (waBtn) {
+        waBtn.addEventListener('click', () => {
+            modal.classList.remove("active");
+            localStorage.removeItem('pendaftaranSuccess');
+        });
+    }
+
 });
