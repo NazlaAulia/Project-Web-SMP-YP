@@ -56,17 +56,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 updateKuotaDisplay(data);
 
+                // Jika belum dibuka
                 if (today < data.tgl_buka) {
                     alert("Pendaftaran belum dibuka.");
                     submitBtn.disabled = true;
                     submitBtn.style.opacity = "0.5";
                     submitBtn.style.pointerEvents = "none";
-                } else if (today > data.tgl_tutup || data.kuota_tersisa <= 0) {
+                } 
+                // Jika sudah tutup atau kuota penuh
+                else if (today > data.tgl_tutup || data.kuota_tersisa <= 0) {
                     alert("Maaf, pendaftaran sudah ditutup atau kuota penuh.");
                     submitBtn.disabled = true;
                     submitBtn.style.opacity = "0.5";
                     submitBtn.style.pointerEvents = "none";
-                } else {
+                } 
+                // Form aktif jika valid
+                else {
                     submitBtn.disabled = false;
                     submitBtn.style.opacity = "1";
                     submitBtn.style.pointerEvents = "auto";
@@ -77,7 +82,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    loadStatPPDB(); // Panggil saat halaman load
+    // Panggil saat halaman load
+    loadStatPPDB();
+
+    // ===== Persistent Modal WA =====
+    const savedData = localStorage.getItem('pendaftaranSuccess');
+    if (savedData && waBtn && waReminder && waReminderLink && modal) {
+        const data = JSON.parse(savedData);
+        waBtn.href = data.waLink;
+        waReminderLink.href = data.waLink;
+        waReminder.style.display = "block";
+        modal.classList.add("active"); // modal tetap muncul meski refresh
+    }
+
+    // Klik WA → hapus modal & localStorage
+    if (waBtn) {
+        waBtn.addEventListener('click', () => {
+            modal.classList.remove("active");
+            localStorage.removeItem('pendaftaranSuccess');
+        });
+    }
 
     // ===== Submit Form =====
     form.addEventListener("submit", async function (e) {
@@ -141,7 +165,7 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
 
             modal.classList.add("active");
 
-            // ===== Simpan ke localStorage untuk modal persistent =====
+            // Simpan ke localStorage agar modal persistent
             localStorage.setItem('pendaftaranSuccess', JSON.stringify({ waLink }));
 
             form.reset();
@@ -156,12 +180,4 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
             submitBtn.style.pointerEvents = "auto";
         }
     });
-
-    // ===== Klik WA → modal hilang permanen =====
-    if (waBtn) {
-        waBtn.addEventListener('click', () => {
-            modal.classList.remove("active");
-            localStorage.removeItem('pendaftaranSuccess');
-        });
-    }
 });
