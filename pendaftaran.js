@@ -54,6 +54,22 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.classList.add("active");
     }
 
+    async function loadStatPPDB() {
+    try {
+        const response = await fetch("get_stat_ppdb.php");
+        const result = await response.json();
+
+        if (result.status === "success") {
+            updateKuotaDisplay(result.data);
+        }
+    } catch (error) {
+        console.error("Gagal load stat PPDB:", error);
+    }
+}
+
+loadStatPPDB();
+
+
     // ===== Submit Form =====
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
