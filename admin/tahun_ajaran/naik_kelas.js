@@ -260,6 +260,38 @@ function renderTahunAjaran(data, selectedId) {
     });
 }
 
+async function hapusKelas(idKelas, namaKelas) {
+    const result = await Swal.fire({
+        title: 'Hapus Kelas?',
+        text: `Apakah Anda yakin ingin menghapus kelas ${namaKelas}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+        const response = await fetch('ajax_hapus_kelas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id_kelas=${idKelas}`
+        });
+        const data = await response.json();
+        if (data.success) {
+            Swal.fire('Terhapus', data.message, 'success');
+            loadNaikKelasData(); // reload grid
+        } else {
+            Swal.fire('Gagal', data.message, 'error');
+        }
+    } catch (error) {
+        Swal.fire('Error', 'Terjadi kesalahan saat menghapus kelas.', 'error');
+    }
+}
+
 function renderWaliKelas(kelas, guru) {
     if (!waliKelasGrid) return;
     if (!kelas.length) {
@@ -309,9 +341,30 @@ function renderWaliKelas(kelas, guru) {
         kapasitasInput.style.borderRadius = "8px";
         kapasitasInput.style.border = "1px solid #ccc";
 
+        // Tombol hapus
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.textContent = "Hapus Kelas";
+        deleteBtn.className = "btn-hapus-kelas";
+        deleteBtn.style.width = "100%";
+        deleteBtn.style.marginTop = "8px";
+        deleteBtn.style.padding = "8px";
+        deleteBtn.style.borderRadius = "8px";
+        deleteBtn.style.border = "1px solid #dc3545";
+        deleteBtn.style.backgroundColor = "#fff";
+        deleteBtn.style.color = "#dc3545";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.setAttribute("data-id-kelas", item.id_kelas);
+        deleteBtn.setAttribute("data-nama-kelas", item.nama_kelas);
+        deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            hapusKelas(item.id_kelas, item.nama_kelas);
+        });
+
         group.appendChild(label);
         group.appendChild(select);
         group.appendChild(kapasitasInput);
+        group.appendChild(deleteBtn);
         waliKelasGrid.appendChild(group);
     });
 }
