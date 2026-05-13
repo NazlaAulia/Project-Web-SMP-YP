@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 require_once '../koneksi.php';
+require_once 'fungsi_siswa.php';
 
 function respon($status, $message, $data = null) {
     echo json_encode([
@@ -27,6 +28,19 @@ if ($id_siswa <= 0 || $nisn === '' || $nama === '' || $jenis_kelamin === '' || $
 
 if (!in_array($jenis_kelamin, ['L', 'P'])) {
     respon("error", "Jenis kelamin tidak valid.");
+}
+
+// Ambil kelas lama siswa
+$query_kelas_lama = mysqli_query($conn, "SELECT id_kelas FROM siswa WHERE id_siswa = $id_siswa");
+$kelas_lama = mysqli_fetch_assoc($query_kelas_lama);
+$id_kelas_lama = $kelas_lama ? $kelas_lama['id_kelas'] : 0;
+
+// Cek kapasitas kelas baru jika berbeda
+if ($id_kelas != $id_kelas_lama) {
+    $cekKapasitas = cekKapasitasKelas($conn, $id_kelas, $id_siswa);
+    if (!$cekKapasitas['tersedia']) {
+        respon("error", "Kelas tujuan sudah penuh! ({$cekKapasitas['jumlah_saat_ini']}/{$cekKapasitas['kapasitas']}) siswa. Sisa kuota: 0");
+    }
 }
 
 $cek = $conn->prepare("SELECT id_siswa FROM siswa WHERE nisn = ? AND id_siswa != ?");

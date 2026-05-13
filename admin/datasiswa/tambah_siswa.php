@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 require_once 'koneksi.php';
+require_once 'fungsi_siswa.php';
 
 function respon($status, $message, $data = null) {
     echo json_encode([
@@ -30,6 +31,12 @@ if (!in_array($jenis_kelamin, ['L', 'P'])) {
 
 $id_kelas = (int)$id_kelas;
 
+// Cek kapasitas kelas sebelum tambah
+$cekKapasitas = cekKapasitasKelas($conn, $id_kelas);
+if (!$cekKapasitas['tersedia']) {
+    respon("error", "Kelas sudah penuh! ({$cekKapasitas['jumlah_saat_ini']}/{$cekKapasitas['kapasitas']}) siswa. Sisa kuota: 0");
+}
+
 $cek = $conn->prepare("SELECT id_siswa FROM siswa WHERE nisn = ?");
 if (!$cek) {
     respon("error", "Prepare cek gagal: " . $conn->error);
@@ -45,12 +52,7 @@ if ($cek->num_rows > 0) {
 }
 $cek->close();
 
-/*
-Kalau DB-mu punya trigger auto create user untuk siswa:
-cukup insert ke tabel siswa.
-Kalau belum, nanti file ini bisa ditambah insert ke tabel user.
-*/
-$stmt = $conn->prepare("INSERT INTO siswa (nisn, nama, jenis_kelamin, id_kelas) VALUES (?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO siswa (nisn, nama, jenis_kelamin, id_kelas, status) VALUES (?, ?, ?, ?, 'aktif')");
 if (!$stmt) {
     respon("error", "Prepare insert gagal: " . $conn->error);
 }
