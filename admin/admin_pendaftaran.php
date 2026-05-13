@@ -123,12 +123,10 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pendaftaran Siswa</title>
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
-    <link rel="stylesheet" href="/admin/admin_pendaftaran.css?v=105">
+    <link rel="stylesheet" href="/admin/data_pendaftaran.css?v=105">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Anda bisa letakkan seluruh CSS dari file pendaftaran.css di sini, atau impor */
-        /* Saya asumsikan Anda sudah memiliki file pendaftaran.css terpisah, tapi untuk keperluan modal atur, kita tambahkan style modal */
         .modal-atur {
             display: none;
             position: fixed;
@@ -273,7 +271,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
                 </form>
             </div>
 
-            <!-- REMINDER WA BELUM TERKIRIM (jika ada) -->
+            <!-- REMINDER WA BELUM TERKIRIM -->
             <?php
             $query_reminder = "SELECT id_pendaftaran, nama_lengkap, no_hp, status 
                                FROM pendaftaran 
@@ -455,7 +453,6 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun)
 
 <script src="/admin/components/admin-nav.js?v=999"></script>
 <script>
-// Fungsi untuk modal atur pendaftaran
 function openModalAtur() {
     let idTahun = <?= $id_tahun_terpilih ?>;
     fetch(`/admin/ajax_get_tahun_ajaran.php?id=${idTahun}`)
@@ -469,11 +466,9 @@ function openModalAtur() {
             document.getElementById('modalAturPendaftaran').style.display = 'flex';
         });
 }
-
 function closeModalAtur() {
     document.getElementById('modalAturPendaftaran').style.display = 'none';
 }
-
 document.getElementById('formAturPendaftaran').addEventListener('submit', function(e) {
     e.preventDefault();
     let formData = new FormData(this);
@@ -492,14 +487,11 @@ document.getElementById('formAturPendaftaran').addEventListener('submit', functi
         }
     });
 });
-
-// Fungsi konfirmasi aksi (Terima/Tolak) sama seperti sebelumnya
 function konfirmasiAksi(event, url, aksi, elemenTombol) {
     event.preventDefault(); 
     let judul = aksi === 'terima' ? 'Terima Pendaftaran?' : 'Tolak Pendaftaran?';
     let teks = aksi === 'terima' ? 'Siswa akan resmi terdaftar di sistem.' : 'Data pendaftaran siswa ini akan ditolak.';
     let warnaTombol = aksi === 'terima' ? '#22c55e' : '#ef4444'; 
-
     Swal.fire({
         title: judul,
         text: teks,
@@ -559,8 +551,6 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
         }
     });
 }
-
-// Fungsi tandai terkirim WA (untuk reminder)
 function tandaiTerikirim(id) {
     fetch(`/admin/mark_wa_sent.php?id=${id}`)
         .then(response => response.json())
