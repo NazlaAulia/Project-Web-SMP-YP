@@ -44,31 +44,40 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ===== Cek localStorage untuk modal persistent =====
-    const savedData = localStorage.getItem('pendaftaranSuccess');
-    if (savedData && waBtn && waReminder && waReminderLink && modal) {
-        const data = JSON.parse(savedData);
-        waBtn.href = data.waLink;
-        waReminderLink.href = data.waLink;
-        waReminder.style.display = "block";
-        modal.classList.add("active");
-    }
-
+    // ===== Load stat PPDB + pop-up kuota/tanggal =====
     async function loadStatPPDB() {
-    try {
-        const response = await fetch("get_stat_ppdb.php");
-        const result = await response.json();
+        try {
+            const response = await fetch("get_stat_ppdb.php");
+            const result = await response.json();
 
-        if (result.status === "success") {
-            updateKuotaDisplay(result.data);
+            if (result.status === "success") {
+                const data = result.data;
+                const today = new Date().toISOString().slice(0,10); // format YYYY-MM-DD
+
+                updateKuotaDisplay(data);
+
+                if (today < data.tgl_buka) {
+                    alert("Pendaftaran belum dibuka.");
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = "0.5";
+                    submitBtn.style.pointerEvents = "none";
+                } else if (today > data.tgl_tutup || data.kuota_tersisa <= 0) {
+                    alert("Maaf, pendaftaran sudah ditutup atau kuota penuh.");
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = "0.5";
+                    submitBtn.style.pointerEvents = "none";
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = "1";
+                    submitBtn.style.pointerEvents = "auto";
+                }
+            }
+        } catch (err) {
+            console.error("Gagal load stat PPDB:", err);
         }
-    } catch (error) {
-        console.error("Gagal load stat PPDB:", error);
     }
-}
 
-loadStatPPDB();
-
+    loadStatPPDB(); // Panggil saat halaman load
 
     // ===== Submit Form =====
     form.addEventListener("submit", async function (e) {
@@ -155,5 +164,4 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
             localStorage.removeItem('pendaftaranSuccess');
         });
     }
-
 });

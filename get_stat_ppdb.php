@@ -33,6 +33,8 @@ echo json_encode([
         'tahun_ajaran' => $ta['tahun_ajaran'],
         'jumlah_pendaftar' => (int)$jumlah_pendaftar,
         'kuota_max' => $kuota,
-        'kuota_tersisa' => $kuota_tersisa
+        'kuota_tersisa' => $kuota_tersisa,
+        'tgl_buka' => $ta['tgl_buka'],
+        'tgl_tutup' => $ta['tgl_tutup']
     ]
 ]);
