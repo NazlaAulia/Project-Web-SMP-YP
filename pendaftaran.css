@@ -585,7 +585,7 @@ body {
 .popup-content button {
     padding: 8px 20px;
     border: none;
-    background: #25d366;
+    background: #0b6164;
     color: #fff;
     border-radius: 8px;
     cursor: pointer;
@@ -616,7 +616,7 @@ body {
 .popup-icon {
     font-size: 40px;
     margin-bottom: 15px;
-    color: #4CAF50; /* hijau aksen seperti tema website */
+    color: #0b6164; /* hijau aksen seperti tema website */
 }
 
 .popup-content p {
@@ -628,7 +628,7 @@ body {
 .popup-content button {
     padding: 10px 25px;
     border: none;
-    background: #4CAF50; /* hijau tema */
+    background: #0b6164; /* hijau tema */
     color: white;
     border-radius: 8px;
     cursor: pointer;
@@ -637,7 +637,7 @@ body {
 }
 
 .popup-content button:hover {
-    background: #45a049;
+    background: #0b6164;
 }
 
 /* Tambahan Font Awesome nek durung onok neng <head> */
