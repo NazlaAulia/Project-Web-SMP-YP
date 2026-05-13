@@ -13,14 +13,15 @@ if (!$nama_kelas || !$tingkat || !$id_wali_kelas || !$id_tahun_ajaran) {
     exit;
 }
 
-// Cek apakah kelas dengan nama yang sama sudah ada di tahun ajaran ini
+// Cek duplikat (nama_kelas + id_tahun_ajaran)
 $cek = mysqli_query($conn, "SELECT id_kelas FROM kelas WHERE nama_kelas = '$nama_kelas' AND id_tahun_ajaran = $id_tahun_ajaran");
 if (mysqli_num_rows($cek) > 0) {
     echo json_encode(['success' => false, 'message' => 'Kelas sudah ada di tahun ajaran ini']);
     exit;
 }
 
-$query = "INSERT INTO kelas (nama_kelas, tingkat, id_wali_kelas, kapasitas, id_tahun_ajaran) VALUES ('$nama_kelas', $tingkat, $id_wali_kelas, $kapasitas, $id_tahun_ajaran)";
+$query = "INSERT INTO kelas (nama_kelas, tingkat, id_wali_kelas, kapasitas, id_tahun_ajaran) 
+          VALUES ('$nama_kelas', $tingkat, $id_wali_kelas, $kapasitas, $id_tahun_ajaran)";
 if (mysqli_query($conn, $query)) {
     echo json_encode(['success' => true, 'message' => 'Kelas berhasil ditambahkan']);
 } else {

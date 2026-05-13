@@ -34,14 +34,27 @@ let filteredPreviewData = [];
 let currentPreviewPage = 1;
 const previewRowsPerPage = 10;
 
+let currentIdTahunAjaran = 0;
+
 document.addEventListener("DOMContentLoaded", () => {
     loadNaikKelasData();
     loadPreviewNaikKelas();
+    
+    if (tahunSelect) {
+        tahunSelect.addEventListener("change", () => {
+            loadNaikKelasData();
+            loadPreviewNaikKelas();
+        });
+    }
 });
 
 async function loadNaikKelasData() {
+    const idTahun = tahunSelect ? tahunSelect.value : 0;
+    let url = "naik_kelas_data.php";
+    if (idTahun) url += "?id_tahun_ajaran=" + idTahun;
+    
     try {
-        const response = await fetch("naik_kelas_data.php");
+        const response = await fetch(url);
         const result = await response.json();
 
         if (!result.success) {
@@ -49,8 +62,9 @@ async function loadNaikKelasData() {
             return;
         }
 
+        currentIdTahunAjaran = result.id_tahun_ajaran_terpilih || 0;
         renderSummary(result.summary);
-        renderTahunAjaran(result.tahun_ajaran);
+        renderTahunAjaran(result.tahun_ajaran, result.id_tahun_ajaran_terpilih);
         renderWaliKelas(result.kelas, result.guru);
     } catch (error) {
         showMessage("Terjadi kesalahan saat memuat data.", "error");
@@ -58,21 +72,18 @@ async function loadNaikKelasData() {
 }
 
 async function loadPreviewNaikKelas() {
-    if (!previewNaikBody || !previewSummary) {
-        return;
-    }
+    if (!previewNaikBody || !previewSummary) return;
+
+    const idTahun = tahunSelect ? tahunSelect.value : 0;
+    let url = "preview_naik_kelas.php";
+    if (idTahun) url += "?id_tahun_ajaran=" + idTahun;
 
     try {
-        const response = await fetch("preview_naik_kelas.php");
+        const response = await fetch(url);
         const result = await response.json();
 
         if (!result.success) {
-            previewNaikBody.innerHTML = `
-                <tr>
-                    <td colspan="9" class="empty-cell">${result.message || "Gagal memuat preview."}</td>
-                </tr>
-            `;
-
+            previewNaikBody.innerHTML = `<tr><td colspan="9" class="empty-cell">${result.message || "Gagal memuat preview."}</td></tr>`;
             previewSummary.textContent = "Preview kenaikan kelas gagal dimuat.";
             updatePreviewPaginationInfo(0, 0, 0);
             clearPreviewPaginationBtns();
@@ -86,12 +97,7 @@ async function loadPreviewNaikKelas() {
         renderPreviewSummary(result.summary);
         renderPreviewTable();
     } catch (error) {
-        previewNaikBody.innerHTML = `
-            <tr>
-                <td colspan="9" class="empty-cell">Terjadi kesalahan saat memuat preview.</td>
-            </tr>
-        `;
-
+        previewNaikBody.innerHTML = `<tr><td colspan="9" class="empty-cell">Terjadi kesalahan saat memuat preview.</td></tr>`;
         previewSummary.textContent = "Preview kenaikan kelas gagal dimuat.";
         updatePreviewPaginationInfo(0, 0, 0);
         clearPreviewPaginationBtns();
@@ -99,10 +105,7 @@ async function loadPreviewNaikKelas() {
 }
 
 function renderPreviewSummary(summary) {
-    if (!previewSummary) {
-        return;
-    }
-
+    if (!previewSummary) return;
     previewSummary.innerHTML = `
         <strong>Ringkasan:</strong>
         Naik Kelas: ${summary?.naik_kelas || 0} siswa,
@@ -113,17 +116,10 @@ function renderPreviewSummary(summary) {
 }
 
 function renderPreviewTable() {
-    if (!previewNaikBody) {
-        return;
-    }
+    if (!previewNaikBody) return;
 
     if (!filteredPreviewData.length) {
-        previewNaikBody.innerHTML = `
-            <tr>
-                <td colspan="9" class="empty-cell">Data siswa tidak ditemukan.</td>
-            </tr>
-        `;
-
+        previewNaikBody.innerHTML = `<tr><td colspan="9" class="empty-cell">Data siswa tidak ditemukan.</td></tr>`;
         updatePreviewPaginationInfo(0, 0, 0);
         clearPreviewPaginationBtns();
         return;
@@ -131,21 +127,16 @@ function renderPreviewTable() {
 
     const totalData = filteredPreviewData.length;
     const totalPages = Math.ceil(totalData / previewRowsPerPage);
-
-    if (currentPreviewPage > totalPages) {
-        currentPreviewPage = totalPages;
-    }
+    if (currentPreviewPage > totalPages) currentPreviewPage = totalPages;
 
     const startIndex = (currentPreviewPage - 1) * previewRowsPerPage;
     const endIndex = startIndex + previewRowsPerPage;
     const paginatedData = filteredPreviewData.slice(startIndex, endIndex);
 
     previewNaikBody.innerHTML = "";
-
     paginatedData.forEach((item) => {
         const tr = document.createElement("tr");
         const statusClass = getStatusClass(item.status_kenaikan);
-
         tr.innerHTML = `
             <td>${escapeHtml(item.nama)}</td>
             <td>${escapeHtml(item.kelas_lama)}</td>
@@ -155,13 +146,8 @@ function renderPreviewTable() {
             <td>${escapeHtml(item.izin)}</td>
             <td>${escapeHtml(item.sakit)}</td>
             <td>${escapeHtml(item.alfa)}</td>
-            <td>
-                <span class="status-badge ${statusClass}">
-                    ${escapeHtml(item.status_kenaikan)}
-                </span>
-            </td>
+            <td><span class="status-badge ${statusClass}">${escapeHtml(item.status_kenaikan)}</span></td>
         `;
-
         previewNaikBody.appendChild(tr);
     });
 
@@ -170,24 +156,17 @@ function renderPreviewTable() {
 }
 
 function updatePreviewPaginationInfo(start, end, total) {
-    if (!previewPaginationInfo) {
-        return;
+    if (previewPaginationInfo) {
+        previewPaginationInfo.textContent = `Menampilkan ${start} sampai ${end} dari ${total} siswa`;
     }
-
-    previewPaginationInfo.textContent = `Menampilkan ${start} sampai ${end} dari ${total} siswa`;
 }
 
 function clearPreviewPaginationBtns() {
-    if (previewPaginationBtns) {
-        previewPaginationBtns.innerHTML = "";
-    }
+    if (previewPaginationBtns) previewPaginationBtns.innerHTML = "";
 }
 
 function renderPreviewPaginationBtns(totalPages) {
-    if (!previewPaginationBtns) {
-        return;
-    }
-
+    if (!previewPaginationBtns) return;
     previewPaginationBtns.innerHTML = "";
 
     const prevBtn = document.createElement("button");
@@ -206,7 +185,6 @@ function renderPreviewPaginationBtns(totalPages) {
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPreviewPage - 2);
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
     if (endPage - startPage < maxVisiblePages - 1) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -216,12 +194,10 @@ function renderPreviewPaginationBtns(totalPages) {
         pageBtn.type = "button";
         pageBtn.className = `preview-page-btn ${page === currentPreviewPage ? "active" : ""}`;
         pageBtn.textContent = page;
-
         pageBtn.addEventListener("click", () => {
             currentPreviewPage = page;
             renderPreviewTable();
         });
-
         previewPaginationBtns.appendChild(pageBtn);
     }
 
@@ -242,55 +218,28 @@ function renderPreviewPaginationBtns(totalPages) {
 if (searchPreview) {
     searchPreview.addEventListener("input", () => {
         const keyword = searchPreview.value.trim().toLowerCase();
-
         filteredPreviewData = previewData.filter((item) => {
             const searchableText = [
-                item.nama,
-                item.kelas_lama,
-                item.kelas_baru,
-                item.rata_rata,
-                item.mapel_tidak_lulus,
-                item.izin,
-                item.sakit,
-                item.alfa,
-                item.status_kenaikan
+                item.nama, item.kelas_lama, item.kelas_baru, item.rata_rata,
+                item.mapel_tidak_lulus, item.izin, item.sakit, item.alfa, item.status_kenaikan
             ].join(" ").toLowerCase();
-
             return searchableText.includes(keyword);
         });
-
         currentPreviewPage = 1;
         renderPreviewTable();
     });
 }
 
 function getStatusClass(status) {
-    if (status === "Naik Kelas") {
-        return "status-naik";
-    }
-
-    if (status === "Tidak Naik Kelas") {
-        return "status-tidak-naik";
-    }
-
-    if (status === "Lulus") {
-        return "status-lulus";
-    }
-
-    if (status === "Siswa Baru") {
-        return "status-baru";
-    }
-
+    if (status === "Naik Kelas") return "status-naik";
+    if (status === "Tidak Naik Kelas") return "status-tidak-naik";
+    if (status === "Lulus") return "status-lulus";
+    if (status === "Siswa Baru") return "status-baru";
     return "";
 }
 
 function escapeHtml(value) {
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 }
 
 function renderSummary(summary) {
@@ -299,53 +248,26 @@ function renderSummary(summary) {
     jumlahKelas9.textContent = summary.kelas_9 || 0;
 }
 
-function renderTahunAjaran(data) {
-    tahunSelect.innerHTML = `<option value="">-- Pilih Tahun Ajaran Baru --</option>`;
-
-    const tahunAktif = data.find((item) => item.status === "aktif");
-    const awalTahunAktif = tahunAktif ? getAwalTahunAjaran(tahunAktif.tahun_ajaran) : 0;
-
-    const calonTahunBaru = data.filter((item) => {
-        const awalTahun = getAwalTahunAjaran(item.tahun_ajaran);
-        return item.status !== "aktif" && awalTahun > awalTahunAktif;
-    });
-
-    if (!calonTahunBaru.length) {
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = "Belum ada tahun ajaran berikutnya";
-        option.disabled = true;
-        tahunSelect.appendChild(option);
-        return;
-    }
-
-    calonTahunBaru.forEach((item) => {
+function renderTahunAjaran(data, selectedId) {
+    if (!tahunSelect) return;
+    tahunSelect.innerHTML = '<option value="">-- Pilih Tahun Ajaran Baru --</option>';
+    data.forEach((item) => {
         const option = document.createElement("option");
         option.value = item.id_tahun_ajaran;
-        option.textContent = item.tahun_ajaran;
+        option.textContent = item.tahun_ajaran + (item.status === "aktif" ? " (Aktif)" : "");
+        if (selectedId && selectedId == item.id_tahun_ajaran) option.selected = true;
         tahunSelect.appendChild(option);
     });
 }
 
-function getAwalTahunAjaran(tahunAjaran) {
-    const match = String(tahunAjaran || "").match(/^(\d{4})[/-](\d{4})$/);
-
-    if (!match) {
-        return 0;
-    }
-
-    return Number(match[1]);
-}
-
-// MODIFIKASI RENDER WALI KELAS DENGAN KAPASITAS
 function renderWaliKelas(kelas, guru) {
+    if (!waliKelasGrid) return;
     if (!kelas.length) {
-        waliKelasGrid.innerHTML = `<div class="empty-cell">Data kelas belum tersedia.</div>`;
+        waliKelasGrid.innerHTML = `<div class="empty-cell">Data kelas belum tersedia untuk tahun ajaran ini.</div>`;
         return;
     }
 
     waliKelasGrid.innerHTML = "";
-
     kelas.forEach((item) => {
         const group = document.createElement("div");
         group.className = "form-group";
@@ -367,15 +289,12 @@ function renderWaliKelas(kelas, guru) {
             const option = document.createElement("option");
             option.value = g.id_guru;
             option.textContent = g.nip ? `${g.nama} - ${g.nip}` : g.nama;
-
             if (String(item.id_wali_kelas || "") === String(g.id_guru)) {
                 option.selected = true;
             }
-
             select.appendChild(option);
         });
 
-        // Input kapasitas
         const kapasitasInput = document.createElement("input");
         kapasitasInput.type = "number";
         kapasitasInput.name = `kapasitas[${item.id_kelas}]`;
@@ -393,26 +312,22 @@ function renderWaliKelas(kelas, guru) {
         group.appendChild(label);
         group.appendChild(select);
         group.appendChild(kapasitasInput);
-
         waliKelasGrid.appendChild(group);
     });
 }
 
 naikKelasForm.addEventListener("submit", (event) => {
     event.preventDefault();
-
-    if (!tahunSelect.value) {
+    if (!tahunSelect || !tahunSelect.value) {
         showMessage("Tahun ajaran baru wajib dipilih.", "error");
         return;
     }
-
     pendingFormData = new FormData(naikKelasForm);
     openPopup();
 });
 
 confirmProcessBtn.addEventListener("click", async () => {
     if (!pendingFormData) return;
-
     if (!confirmText || confirmText.value.trim().toUpperCase() !== "NAIKKELAS") {
         showConfirmMessage("Ketik NAIKKELAS dulu untuk melanjutkan.");
         return;
@@ -426,9 +341,7 @@ confirmProcessBtn.addEventListener("click", async () => {
             method: "POST",
             body: pendingFormData
         });
-
         const result = await response.json();
-
         if (result.success) {
             closePopup();
             showMessage(result.message || "Proses naik kelas berhasil.", "success");
@@ -451,28 +364,18 @@ cancelConfirmBtn.addEventListener("click", closePopup);
 
 function openPopup() {
     confirmPopup.classList.add("active");
-
     if (confirmText) {
         confirmText.value = "";
         setTimeout(() => confirmText.focus(), 100);
     }
-
-    if (confirmMessage) {
-        confirmMessage.textContent = "";
-    }
+    if (confirmMessage) confirmMessage.textContent = "";
 }
 
 function closePopup() {
     confirmPopup.classList.remove("active");
     pendingFormData = null;
-
-    if (confirmText) {
-        confirmText.value = "";
-    }
-
-    if (confirmMessage) {
-        confirmMessage.textContent = "";
-    }
+    if (confirmText) confirmText.value = "";
+    if (confirmMessage) confirmMessage.textContent = "";
 }
 
 function showMessage(message, type) {
@@ -481,11 +384,8 @@ function showMessage(message, type) {
 }
 
 function showConfirmMessage(message) {
-    if (confirmMessage) {
-        confirmMessage.textContent = message;
-    } else {
-        showMessage(message, "error");
-    }
+    if (confirmMessage) confirmMessage.textContent = message;
+    else showMessage(message, "error");
 }
 
 function openTahunAjaranPopup() {
@@ -493,55 +393,32 @@ function openTahunAjaranPopup() {
         tahunAjaranMessage.textContent = "";
         tahunAjaranMessage.className = "confirm-message";
     }
-
-    if (tahunAjaranPopup) {
-        tahunAjaranPopup.classList.add("active");
-    }
+    if (tahunAjaranPopup) tahunAjaranPopup.classList.add("active");
 }
 
 function closeTahunAjaranModal() {
-    if (tahunAjaranPopup) {
-        tahunAjaranPopup.classList.remove("active");
-    }
+    if (tahunAjaranPopup) tahunAjaranPopup.classList.remove("active");
 }
 
-if (buatTahunBtn) {
-    buatTahunBtn.addEventListener("click", openTahunAjaranPopup);
-}
-
-if (closeTahunAjaranPopup) {
-    closeTahunAjaranPopup.addEventListener("click", closeTahunAjaranModal);
-}
-
-if (cancelTahunAjaranBtn) {
-    cancelTahunAjaranBtn.addEventListener("click", closeTahunAjaranModal);
-}
-
+if (buatTahunBtn) buatTahunBtn.addEventListener("click", openTahunAjaranPopup);
+if (closeTahunAjaranPopup) closeTahunAjaranPopup.addEventListener("click", closeTahunAjaranModal);
+if (cancelTahunAjaranBtn) cancelTahunAjaranBtn.addEventListener("click", closeTahunAjaranModal);
 if (tahunAjaranPopup) {
     tahunAjaranPopup.addEventListener("click", (event) => {
-        if (event.target === tahunAjaranPopup) {
-            closeTahunAjaranModal();
-        }
+        if (event.target === tahunAjaranPopup) closeTahunAjaranModal();
     });
 }
-
 if (confirmTahunAjaranBtn) {
     confirmTahunAjaranBtn.addEventListener("click", async () => {
         try {
             confirmTahunAjaranBtn.disabled = true;
             confirmTahunAjaranBtn.textContent = "Membuat...";
-
             if (tahunAjaranMessage) {
                 tahunAjaranMessage.textContent = "Sedang membuat tahun ajaran berikutnya...";
                 tahunAjaranMessage.className = "confirm-message";
             }
-
-            const response = await fetch("buat_tahun_ajaran.php", {
-                method: "POST"
-            });
-
+            const response = await fetch("buat_tahun_ajaran.php", { method: "POST" });
             const result = await response.json();
-
             if (!result.success) {
                 if (tahunAjaranMessage) {
                     tahunAjaranMessage.textContent = result.message || "Gagal membuat tahun ajaran.";
@@ -549,18 +426,13 @@ if (confirmTahunAjaranBtn) {
                 }
                 return;
             }
-
             if (tahunAjaranMessage) {
                 tahunAjaranMessage.textContent = result.message || "Tahun ajaran berhasil dibuat.";
                 tahunAjaranMessage.className = "confirm-message success";
             }
-
             await loadNaikKelasData();
             await loadPreviewNaikKelas();
-
-            setTimeout(() => {
-                closeTahunAjaranModal();
-            }, 800);
+            setTimeout(() => closeTahunAjaranModal(), 800);
         } catch (error) {
             if (tahunAjaranMessage) {
                 tahunAjaranMessage.textContent = "Gagal membuat tahun ajaran: " + error.message;

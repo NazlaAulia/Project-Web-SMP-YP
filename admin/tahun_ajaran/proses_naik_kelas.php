@@ -4,10 +4,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../koneksi.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Metode tidak valid.'
-    ]);
+    echo json_encode(['success' => false, 'message' => 'Metode tidak valid.']);
     exit;
 }
 
@@ -16,29 +13,15 @@ $wali_kelas = isset($_POST['wali_kelas']) && is_array($_POST['wali_kelas']) ? $_
 $kapasitas_data = isset($_POST['kapasitas']) && is_array($_POST['kapasitas']) ? $_POST['kapasitas'] : [];
 
 if ($id_tahun_ajaran <= 0) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Tahun ajaran baru wajib dipilih.'
-    ]);
+    echo json_encode(['success' => false, 'message' => 'Tahun ajaran baru wajib dipilih.']);
     exit;
 }
 
 if (empty($wali_kelas)) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Wali kelas wajib dipilih.'
-    ]);
+    echo json_encode(['success' => false, 'message' => 'Wali kelas wajib dipilih.']);
     exit;
 }
 
-/*
-    Aturan kenaikan kelas:
-    - Rata-rata nilai minimal 75
-    - Mapel di bawah KKM maksimal 2
-    - Alfa maksimal 10
-    - Total izin + sakit maksimal 30
-    - Siswa tidak punya nilai dianggap tidak naik kelas
-*/
 $kkm = 75;
 $maksMapelTidakLulus = 2;
 $maksAlfa = 10;
@@ -47,7 +30,7 @@ $maksIzinSakit = 30;
 $conn->begin_transaction();
 
 try {
-    // ========== UPDATE KAPASITAS KELAS ==========
+    // Update kapasitas kelas
     foreach ($kapasitas_data as $id_kelas => $kapasitas) {
         $id_kelas = (int) $id_kelas;
         $kapasitas = (int) $kapasitas;
@@ -60,19 +43,13 @@ try {
     $conn->query("UPDATE tahun_ajaran SET status = 'nonaktif'");
 
     // Aktifkan tahun ajaran baru
-    $stmt = $conn->prepare("
-        UPDATE tahun_ajaran
-        SET status = 'aktif'
-        WHERE id_tahun_ajaran = ?
-    ");
-    if (!$stmt) throw new Exception($conn->error);
+    $stmt = $conn->prepare("UPDATE tahun_ajaran SET status = 'aktif' WHERE id_tahun_ajaran = ?");
     $stmt->bind_param("i", $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
     // Update wali kelas
     $stmtWali = $conn->prepare("UPDATE kelas SET id_wali_kelas = ? WHERE id_kelas = ?");
-    if (!$stmtWali) throw new Exception($conn->error);
     foreach ($wali_kelas as $id_kelas => $id_guru) {
         $id_kelas = (int) $id_kelas;
         $id_guru = (int) $id_guru;
@@ -98,8 +75,7 @@ try {
             COALESCE(SUM(n.alfa), 0) AS total_alfa,
             COUNT(n.id_siswa) AS jumlah_nilai,
             CASE
-                WHEN 
-                    COUNT(n.id_siswa) > 0
+                WHEN COUNT(n.id_siswa) > 0
                     AND AVG(n.nilai_angka) >= $kkm
                     AND SUM(CASE WHEN n.nilai_angka < $kkm THEN 1 ELSE 0 END) <= $maksMapelTidakLulus
                     AND COALESCE(SUM(n.alfa), 0) <= $maksAlfa
@@ -113,16 +89,15 @@ try {
         WHERE s.status = 'aktif'
         GROUP BY s.id_siswa, k.tingkat, k.nama_kelas
     ";
-    if (!$conn->query($createTempQuery)) throw new Exception($conn->error);
+    $conn->query($createTempQuery);
 
-    // Kelas 9 yang layak -> lulus
+    // Kelas 9 layak -> lulus
     $stmt = $conn->prepare("
         UPDATE siswa s
         JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
         SET s.status = 'lulus', s.id_tahun_ajaran = ?
         WHERE t.tingkat = 9 AND t.layak_naik = 1 AND s.status = 'aktif'
     ");
-    if (!$stmt) throw new Exception($conn->error);
     $stmt->bind_param("i", $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
@@ -136,7 +111,6 @@ try {
         SET s.id_kelas = k_baru.id_kelas, s.id_tahun_ajaran = ?
         WHERE t.tingkat = 8 AND t.layak_naik = 1 AND s.status = 'aktif'
     ");
-    if (!$stmt) throw new Exception($conn->error);
     $stmt->bind_param("i", $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
@@ -150,49 +124,38 @@ try {
         SET s.id_kelas = k_baru.id_kelas, s.id_tahun_ajaran = ?
         WHERE t.tingkat = 7 AND t.layak_naik = 1 AND s.status = 'aktif'
     ");
-    if (!$stmt) throw new Exception($conn->error);
     $stmt->bind_param("i", $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
-    // Siswa aktif tidak layak naik -> hanya update tahun ajaran
+    // Siswa aktif tidak layak -> update tahun ajaran saja
     $stmt = $conn->prepare("
         UPDATE siswa s
         JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
         SET s.id_tahun_ajaran = ?
         WHERE t.layak_naik = 0 AND s.status = 'aktif'
     ");
-    if (!$stmt) throw new Exception($conn->error);
     $stmt->bind_param("i", $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
-    // Tempatkan siswa baru ke kelas 7 round robin
+    // Tempatkan siswa baru ke kelas 7
     $kelas7 = [];
-    $resultKelas7 = $conn->query("SELECT id_kelas FROM kelas WHERE tingkat = 7 ORDER BY nama_kelas ASC");
-    if (!$resultKelas7) throw new Exception($conn->error);
+    $resultKelas7 = $conn->query("SELECT id_kelas FROM kelas WHERE tingkat = 7 AND id_tahun_ajaran = $id_tahun_ajaran ORDER BY nama_kelas ASC");
     while ($row = $resultKelas7->fetch_assoc()) {
         $kelas7[] = (int) $row['id_kelas'];
     }
     if (count($kelas7) === 0) {
-        throw new Exception("Data kelas tingkat 7 belum tersedia.");
+        throw new Exception("Data kelas tingkat 7 belum tersedia untuk tahun ajaran ini.");
     }
 
     $resultSiswaBaru = $conn->query("
-        SELECT id_siswa
-        FROM siswa
+        SELECT id_siswa FROM siswa
         WHERE status = 'baru' AND id_kelas IS NULL
         ORDER BY nama ASC, id_siswa ASC
     ");
-    if (!$resultSiswaBaru) throw new Exception($conn->error);
 
-    $stmtSiswaBaru = $conn->prepare("
-        UPDATE siswa
-        SET id_kelas = ?, id_tahun_ajaran = ?, status = 'aktif'
-        WHERE id_siswa = ?
-    ");
-    if (!$stmtSiswaBaru) throw new Exception($conn->error);
-
+    $stmtSiswaBaru = $conn->prepare("UPDATE siswa SET id_kelas = ?, id_tahun_ajaran = ?, status = 'aktif' WHERE id_siswa = ?");
     $i = 0;
     while ($siswa = $resultSiswaBaru->fetch_assoc()) {
         $id_kelas_baru = $kelas7[$i % count($kelas7)];
@@ -207,7 +170,7 @@ try {
 
     echo json_encode([
         'success' => true,
-        'message' => 'Proses naik kelas berhasil dijalankan. Siswa yang memenuhi syarat naik kelas, siswa yang tidak memenuhi syarat tetap di kelas lama.'
+        'message' => 'Proses naik kelas berhasil dijalankan.'
     ]);
 } catch (Exception $e) {
     $conn->rollback();
