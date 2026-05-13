@@ -1,33 +1,55 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const inputs = document.querySelectorAll('.form-group input, .form-group select, .form-group textarea');
     const form = document.getElementById("formPendaftaran");
+    const alertBox = document.getElementById("formAlert");
     const modal = document.getElementById("successModal");
     const waBtn = document.getElementById("waAdminBtn");
     const waReminder = document.getElementById("waReminder");
     const waReminderLink = document.getElementById("waReminderLink");
     const submitBtn = document.querySelector(".btn-submit");
-    const alertBox = document.getElementById("formAlert");
+    const statHariIni = document.getElementById("statHariIni");
+    const statKuota = document.getElementById("statKuota");
+    const statPersen = document.getElementById("statPersen");
+    const progressBar = document.getElementById("progressBar");
 
     if (!form) return;
 
-    function showModal() {
-        modal.classList.add("active");
+    // Input animation
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            input.parentElement.style.transform = 'translateX(10px)';
+            input.parentElement.style.transition = 'all 0.3s ease';
+        });
+        input.addEventListener('blur', () => {
+            input.parentElement.style.transform = 'translateX(0)';
+        });
+    });
+
+    // Fungsi update kuota
+    function updateKuotaDisplay(data) {
+        if (statKuota) statKuota.textContent = data.kuota_tersisa;
+        if (statPersen && progressBar && data.kuota_max) {
+            const terisi = data.kuota_max - data.kuota_tersisa;
+            const persen = Math.round((terisi / data.kuota_max) * 100);
+            statPersen.textContent = `${persen}% Terisi`;
+            progressBar.style.width = `${persen}%`;
+        }
+        if (statHariIni && typeof data.jumlah_pendaftar !== "undefined") {
+            statHariIni.textContent = data.jumlah_pendaftar;
+        }
     }
 
-    function hideModalPermanent() {
-        modal.classList.remove("active");
-        localStorage.removeItem('pendaftaranSuccess');
-    }
-
-    // Cek localStorage → modal muncul otomatis setelah refresh
+    // Cek localStorage: kalau sudah daftar sebelumnya, modal muncul
     const savedData = localStorage.getItem('pendaftaranSuccess');
     if (savedData) {
         const data = JSON.parse(savedData);
         waBtn.href = data.waLink;
         waReminderLink.href = data.waLink;
         waReminder.style.display = "block";
-        showModal();
+        modal.classList.add("active");
     }
 
+    // Submit form
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
         const originalText = submitBtn.innerHTML;
@@ -45,13 +67,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const raw = await response.text();
-            let result = JSON.parse(raw);
+            const result = JSON.parse(raw);
 
             if (result.status !== "success") {
                 alertBox.innerHTML = `<div class="alert error">${result.message}</div>`;
                 return;
             }
 
+            // Buat WA link
             const nomorAdmin = "6283846311788";
             const pesanWa = `Halo Admin SMP YP 17 Surabaya,
 Saya atas nama *${result.data.nama_lengkap}* telah melakukan pendaftaran PPDB.
@@ -66,9 +89,14 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
 
             const waLink = `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesanWa)}`;
 
+            // Update modal & reminder
             waBtn.href = waLink;
             waReminderLink.href = waLink;
             waReminder.style.display = "block";
+            modal.classList.add("active");
+
+            // Simpan ke localStorage supaya modal tetap muncul setelah refresh
+            localStorage.setItem('pendaftaranSuccess', JSON.stringify({ waLink }));
 
             alertBox.innerHTML = `<div class="alert success">
                 ${result.message}<br>
@@ -76,14 +104,12 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
                 Kuota tersisa: ${result.data.kuota_tersisa} / ${result.data.kuota_max}
             </div>`;
 
-            localStorage.setItem('pendaftaranSuccess', JSON.stringify({ waLink }));
-
-            showModal();
+            updateKuotaDisplay(result.data);
             form.reset();
 
-        } catch (err) {
-            console.error(err);
-            alertBox.innerHTML = `<div class="alert error">${err.message}</div>`;
+        } catch (error) {
+            console.error(error);
+            alertBox.innerHTML = `<div class="alert error">${error.message}</div>`;
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
@@ -94,6 +120,7 @@ Mohon konfirmasi pendaftaran saya. Terima kasih.`;
 
     // Klik WA → modal hilang permanen
     waBtn.addEventListener('click', () => {
-        hideModalPermanent();
+        modal.classList.remove("active");
+        localStorage.removeItem('pendaftaranSuccess');
     });
 });
