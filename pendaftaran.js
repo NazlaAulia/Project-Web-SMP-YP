@@ -44,7 +44,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ===== Load stat PPDB + pop-up kuota/tanggal =====
+    // ===== Popup cantik kuota/tutup =====
+    const popupKuota = document.getElementById("popupKuota");
+    const popupText = document.getElementById("popupText");
+    const popupOk = document.getElementById("popupOk");
+
     async function loadStatPPDB() {
         try {
             const response = await fetch("get_stat_ppdb.php");
@@ -52,26 +56,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (result.status === "success") {
                 const data = result.data;
-                const today = new Date().toISOString().slice(0,10); // format YYYY-MM-DD
+                const today = new Date().toISOString().slice(0,10);
 
                 updateKuotaDisplay(data);
 
-                // Jika belum dibuka
+                let message = "";
                 if (today < data.tgl_buka) {
-                    alert("Pendaftaran belum dibuka.");
+                    message = "Pendaftaran belum dibuka.";
+                } else if (today > data.tgl_tutup || data.kuota_tersisa <= 0) {
+                    message = "Maaf, pendaftaran sudah ditutup atau kuota penuh.";
+                }
+
+                if (message) {
+                    popupText.textContent = message;
+                    popupKuota.style.display = "flex";
                     submitBtn.disabled = true;
                     submitBtn.style.opacity = "0.5";
                     submitBtn.style.pointerEvents = "none";
-                } 
-                // Jika sudah tutup atau kuota penuh
-                else if (today > data.tgl_tutup || data.kuota_tersisa <= 0) {
-                    alert("Maaf, pendaftaran sudah ditutup atau kuota penuh.");
-                    submitBtn.disabled = true;
-                    submitBtn.style.opacity = "0.5";
-                    submitBtn.style.pointerEvents = "none";
-                } 
-                // Form aktif jika valid
-                else {
+                } else {
                     submitBtn.disabled = false;
                     submitBtn.style.opacity = "1";
                     submitBtn.style.pointerEvents = "auto";
@@ -82,8 +84,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Panggil saat halaman load
     loadStatPPDB();
+
+    // ===== Tombol OK untuk popup =====
+    popupOk.addEventListener('click', () => {
+        popupKuota.style.display = "none";
+    });
 
     // ===== Persistent Modal WA =====
     const savedData = localStorage.getItem('pendaftaranSuccess');
@@ -95,13 +101,10 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.classList.add("active"); // modal tetap muncul meski refresh
     }
 
-    // Klik WA → hapus modal & localStorage
-    if (waBtn) {
-        waBtn.addEventListener('click', () => {
-            modal.classList.remove("active");
-            localStorage.removeItem('pendaftaranSuccess');
-        });
-    }
+    waBtn.addEventListener('click', () => {
+        modal.classList.remove("active");
+        localStorage.removeItem('pendaftaranSuccess');
+    });
 
     // ===== Submit Form =====
     form.addEventListener("submit", async function (e) {
