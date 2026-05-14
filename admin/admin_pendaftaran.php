@@ -150,6 +150,10 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
         .btn-simpan { background: #064e4b; color: white; }
         .btn-atur-pendaftaran { background: #0f5d5d; color: white; border: none; padding: 8px 16px; border-radius: 20px; margin-left: 10px; cursor: pointer; font-size: 13px; }
         .btn-atur-pendaftaran:hover { background: #053f3d; }
+        /* Perbaikan kursor tombol */
+        .btn-tandai {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body data-page="pendaftaran" data-nav-path="/admin/components/admin-nav.html">
@@ -241,7 +245,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                              </td>
                            </tr>";
                 }
-                echo '</tbody></table></div>';
+                echo '</tbody><tr></div>';
             }
             ?>
 
@@ -276,7 +280,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                                 <?php endif; ?>
                             </td>
                         </tr>
-                        <?php } } else { ?><tr><td colspan="12" class="empty-data">Data tidak ditemukan.</td></tr><?php } ?>
+                        <?php } } else { ?><tr><td colspan="12" class="empty-data">Data tidak ditemukan. </td></tr><?php } ?>
                     </tbody>
                 </table>
                 <!-- PAGINATION -->
@@ -346,7 +350,7 @@ document.getElementById('formAturPendaftaran').addEventListener('submit', functi
         });
 });
 
-// ========== FUNGSI KONFIRMASI AKSI (TERIMA/TOLAK) + TAMBAH REMINDER DINAMIS ==========
+// ========== FUNGSI KONFIRMASI AKSI (TERIMA/TOLAK) + REMINDER HANYA SAAT KLIK "NANTI SAJA" ==========
 function konfirmasiAksi(event, url, aksi, elemenTombol) {
     event.preventDefault(); 
     let judul = aksi === 'terima' ? 'Terima Pendaftaran?' : 'Tolak Pendaftaran?';
@@ -364,7 +368,7 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update baris di tabel utama
+                    // 1. Update tampilan di tabel utama
                     let tr = elemenTombol.closest('tr');
                     let tdStatus = tr.querySelector('td:nth-child(11)');
                     let tdAksi = tr.querySelector('.action-cell');
@@ -375,7 +379,8 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
                         tdStatus.innerHTML = '<span class="badge rejected">Ditolak</span>';
                         tdAksi.innerHTML = '<button type="button" class="btn-disabled rejected-disabled" disabled>Sudah ditolak</button>';
                     }
-                    // Ambil data untuk reminder
+
+                    // 2. Ambil data untuk reminder (nama, status baru, no_hp, id)
                     let nama = tr.querySelector('td:nth-child(2)').innerText;
                     let statusBaru = aksi === 'terima' ? 'diterima' : 'ditolak';
                     let no_hp = tr.querySelector('td:nth-child(7)').innerText;
@@ -383,34 +388,18 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
                     let clean_no = no_hp.replace(/[^0-9]/g, '');
                     if (clean_no.startsWith('0')) clean_no = '62' + clean_no.substring(1);
                     let wa_link = `https://wa.me/${clean_no}?text=${encodeURIComponent('Halo ' + nama + ', pendaftaran Anda dinyatakan ' + statusBaru + '. Terima kasih.')}`;
-                    
-                    // Tambah ke reminder box (buat jika belum ada)
-                    let reminderBox = document.querySelector('.reminder-box');
-                    let reminderTable = reminderBox ? reminderBox.querySelector('table') : null;
-                    if (!reminderBox) {
-                        let newBox = document.createElement('div');
-                        newBox.className = 'reminder-box';
-                        newBox.style.cssText = 'background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 8px;';
-                        newBox.innerHTML = '<strong><i class="fas fa-bell"></i> Reminder Belum Kirim WhatsApp:</strong><br>';
-                        let newTable = document.createElement('table');
-                        newTable.style.width = '100%';
-                        newTable.style.marginTop = '10px';
-                        newTable.style.borderCollapse = 'collapse';
-                        newTable.innerHTML = '<thead><tr><th>Nama</th><th>Status</th><th>Aksi</th></tr></thead><tbody></tbody>';
-                        newBox.appendChild(newTable);
-                        document.querySelector('.table-card').parentNode.insertBefore(newBox, document.querySelector('.table-card'));
-                        reminderBox = newBox;
-                        reminderTable = newTable;
-                    }
-                    let tbody = reminderTable.querySelector('tbody');
-                    let newRow = document.createElement('tr');
-                    newRow.setAttribute('data-id', idPendaftaran);
-                    newRow.innerHTML = `<td>${nama}</td><td>${statusBaru}</td><td><a href="${wa_link}" target="_blank" class="btn-wa-reminder" style="background:#25d366; color:white; padding:4px 12px; border-radius:20px; text-decoration:none; font-size:12px;">Kirim WA</a> <button onclick="tandaiWA(${idPendaftaran}, this)" class="btn-tandai" style="background:#6c757d; color:white; border:none; padding:4px 12px; border-radius:20px; margin-left:5px;">Tandai Terkirim</button></td>`;
-                    tbody.appendChild(newRow);
-                    // Tampilkan popup hasil
+
+                    // 3. Tampilkan popup hasil (dengan tombol Kirim WA / Nanti Saja)
                     let judulHasil = aksi === 'terima' ? 'Pendaftaran Diterima' : 'Pendaftaran Ditolak';
-                    let textHasil = data.link_wa !== '' ? `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}. Kirim pemberitahuan WhatsApp?` : `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}.`;
-                    let swalOptions = { title: judulHasil, text: textHasil, icon: aksi === 'terima' ? 'success' : 'error', borderRadius: '24px' };
+                    let textHasil = data.link_wa !== '' 
+                        ? `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}. Kirim pemberitahuan WhatsApp?` 
+                        : `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}.`;
+                    let swalOptions = {
+                        title: judulHasil,
+                        text: textHasil,
+                        icon: aksi === 'terima' ? 'success' : 'error',
+                        borderRadius: '24px'
+                    };
                     if (data.link_wa !== '') {
                         swalOptions.showCancelButton = true;
                         swalOptions.confirmButtonColor = '#22c55e';
@@ -422,7 +411,23 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
                         swalOptions.confirmButtonColor = '#0f5d5d';
                         swalOptions.confirmButtonText = 'Tutup';
                     }
-                    Swal.fire(swalOptions).then((result2) => { if (result2.isConfirmed && data.link_wa !== '') window.open(data.link_wa, '_blank'); });
+                    
+                    Swal.fire(swalOptions).then((result2) => {
+                        // Jika klik "Kirim ke WhatsApp" -> buka WA, jangan tambah reminder
+                        if (result2.isConfirmed && data.link_wa !== '') {
+                            window.open(data.link_wa, '_blank');
+                            // Tidak tambah reminder
+                        } 
+                        // Jika klik "Nanti Saja" (cancel) atau jika tidak ada WA (tutup)
+                        else if ((result2.dismiss === Swal.DismissReason.cancel) || (data.link_wa === '' && result2.isConfirmed)) {
+                            // Tambah reminder
+                            tambahKeReminder(nama, statusBaru, wa_link, idPendaftaran);
+                        }
+                        // Jika popup hanya memiliki tombol "Tutup" (tidak ada WA) dan user klik Tutup -> tambah reminder
+                        else if (data.link_wa === '' && result2.isConfirmed) {
+                            tambahKeReminder(nama, statusBaru, wa_link, idPendaftaran);
+                        }
+                    });
                 } else {
                     Swal.fire({ title: 'Oops!', text: data.message, icon: 'warning', confirmButtonColor: '#0f5d5d' });
                 }
@@ -432,7 +437,33 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
     });
 }
 
-// ========== FUNGSI TANDAI WA TERKIRIM (BERHASIL HAPUS BARIS) ==========
+// Fungsi untuk menambah baris ke reminder box (digunakan hanya saat "Nanti Saja")
+function tambahKeReminder(nama, statusBaru, wa_link, idPendaftaran) {
+    let reminderBox = document.querySelector('.reminder-box');
+    let reminderTable = reminderBox ? reminderBox.querySelector('table') : null;
+    if (!reminderBox) {
+        let newBox = document.createElement('div');
+        newBox.className = 'reminder-box';
+        newBox.style.cssText = 'background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 8px;';
+        newBox.innerHTML = '<strong><i class="fas fa-bell"></i> Reminder Belum Kirim WhatsApp:</strong><br>';
+        let newTable = document.createElement('table');
+        newTable.style.width = '100%';
+        newTable.style.marginTop = '10px';
+        newTable.style.borderCollapse = 'collapse';
+        newTable.innerHTML = '<thead><tr><th>Nama</th><th>Status</th><th>Aksi</th></tr></thead><tbody></tbody>';
+        newBox.appendChild(newTable);
+        document.querySelector('.table-card').parentNode.insertBefore(newBox, document.querySelector('.table-card'));
+        reminderBox = newBox;
+        reminderTable = newTable;
+    }
+    let tbody = reminderTable.querySelector('tbody');
+    let newRow = document.createElement('tr');
+    newRow.setAttribute('data-id', idPendaftaran);
+    newRow.innerHTML = `<td>${nama}</td><td>${statusBaru}</td><td><a href="${wa_link}" target="_blank" class="btn-wa-reminder" style="background:#25d366; color:white; padding:4px 12px; border-radius:20px; text-decoration:none; font-size:12px;">Kirim WA</a> <button onclick="tandaiWA(${idPendaftaran}, this)" class="btn-tandai" style="background:#6c757d; color:white; border:none; padding:4px 12px; border-radius:20px; margin-left:5px;">Tandai Terkirim</button></td>`;
+    tbody.appendChild(newRow);
+}
+
+// ========== FUNGSI TANDAI WA TERKIRIM (HAPUS BARIS TANPA RELOAD) ==========
 function tandaiWA(id, btn) {
     Swal.fire({ title: 'Menandai...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     fetch(`/admin/mark_wa_sent.php?id=${id}`)
