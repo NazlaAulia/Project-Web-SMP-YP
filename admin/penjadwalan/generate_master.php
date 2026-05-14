@@ -411,7 +411,7 @@ function cariKandidatGanjilUntukHari($tasks, $jp_per_hari, $kelas_terpakai, $gur
     return $kandidat[0];
 }
 
-// ========== TAMBAHAN: MODIFIKASI FUNGSI PASANGKANDIDAT DENGAN ID_TAHUN_AJARAN ==========
+// ========== FUNGSI PASANGKANDIDAT DENGAN STATUS 'draft' ==========
 function pasangKandidat(&$stmtInsert, &$tasks, $kandidat, $id_kelas, $hari, &$kelas_terpakai, &$guru_terpakai, &$mapel_hari_terpakai, &$beban_guru, &$jumlah_berhasil, $id_tahun_ajaran)
 {
     $taskIndex = $kandidat['task_index'];
@@ -426,9 +426,11 @@ function pasangKandidat(&$stmtInsert, &$tasks, $kandidat, $id_kelas, $hari, &$ke
     $jumlah_jp = (int)$task['jp_per_pertemuan'];
     $id_mapel_insert = (int)$task['id_mapel'];
 
-    // BIND 9 PARAMETER (tambah id_tahun_ajaran)
+    // BIND 10 PARAMETER (tambah id_tahun_ajaran dan status)
+    // status = 'draft' (hardcoded)
+    $status = 'draft';
     $stmtInsert->bind_param(
-        "iiissiiii",
+        "iiissiiiis",
         $id_guru_insert,
         $id_kelas,
         $id_mapel_insert,
@@ -437,7 +439,8 @@ function pasangKandidat(&$stmtInsert, &$tasks, $kandidat, $id_kelas, $hari, &$ke
         $jp_mulai,
         $jp_selesai,
         $jumlah_jp,
-        $id_tahun_ajaran
+        $id_tahun_ajaran,
+        $status
     );
 
     if (!$stmtInsert->execute()) {
@@ -528,7 +531,6 @@ try {
     }
 
     // Target otomatis dari jam_pelajaran
-    // Senin-Kamis idealnya 11 JP, Jumat 8 JP
     $target_harian = [];
 
     foreach ($jp_per_hari as $hari => $list_jp) {
@@ -633,12 +635,12 @@ try {
     $stmtDelete->close();
 
     // ===============================
-    // PREPARE INSERT JADWAL (DENGAN ID_TAHUN_AJARAN)
+    // PREPARE INSERT JADWAL (DENGAN ID_TAHUN_AJARAN DAN STATUS)
     // ===============================
     $stmtInsert = $conn->prepare("
         INSERT INTO jadwal
-        (id_guru, id_kelas, id_mapel, hari, jam, jp_mulai, jp_selesai, jumlah_jp, id_tahun_ajaran)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (id_guru, id_kelas, id_mapel, hari, jam, jp_mulai, jp_selesai, jumlah_jp, id_tahun_ajaran, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
     if (!$stmtInsert) {
@@ -735,7 +737,7 @@ try {
                     $mapel_hari_terpakai,
                     $beban_guru,
                     $jumlah_berhasil,
-                    $id_tahun_aktif   // TAMBAHAN: kirim id_tahun_aktif
+                    $id_tahun_aktif
                 );
             }
         }
@@ -791,7 +793,7 @@ try {
                     $mapel_hari_terpakai,
                     $beban_guru,
                     $jumlah_berhasil,
-                    $id_tahun_aktif   // TAMBAHAN: kirim id_tahun_aktif
+                    $id_tahun_aktif
                 );
             }
         }
@@ -813,7 +815,7 @@ try {
 
     $conn->commit();
 
-    $message = 'Generate jadwal berhasil. ' . $jumlah_berhasil . ' jadwal dibuat dengan sistem JP full harian.';
+    $message = 'Generate jadwal berhasil. ' . $jumlah_berhasil . ' jadwal dibuat dengan status draft.';
 
     if ($jumlah_request_lama > 0) {
         $message .= ' ' . $jumlah_request_lama . ' request jadwal lama dibersihkan.';

@@ -55,6 +55,7 @@ $stmt = $conn->prepare("
         j.jp_mulai,
         j.jp_selesai,
         j.jumlah_jp,
+        j.status,
         g.nama AS nama_guru,
         k.nama_kelas,
         m.nama_mapel
@@ -96,7 +97,8 @@ while ($row = $result->fetch_assoc()) {
         "jam" => $row["jam"] ?? "-",
         "jp_mulai" => $row["jp_mulai"],
         "jp_selesai" => $row["jp_selesai"],
-        "jumlah_jp" => (int)($row["jumlah_jp"] ?? 1)
+        "jumlah_jp" => (int)($row["jumlah_jp"] ?? 1),
+        "status" => $row["status"] ?? "draft"
     ];
 }
 

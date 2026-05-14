@@ -92,11 +92,13 @@ $hariInggris = date('l');
 $hariDb = $hariIndonesia[$hariInggris];
 $hariIniText = $hariIndonesia[$hariInggris] . ', ' . date('d') . ' ' . $bulanIndonesia[(int)date('n')] . ' ' . date('Y');
 
+// ========== QUERY TOTAL PELAJARAN (HANYA STATUS FIX) ==========
 $queryTotal = mysqli_query($conn, "
     SELECT COUNT(j.id_jadwal) AS total_pelajaran
     FROM jadwal j
     INNER JOIN siswa s ON s.id_kelas = j.id_kelas
     WHERE s.id_siswa = $id_siswa
+      AND j.status = 'fix'
 ");
 
 if (!$queryTotal) {
@@ -112,12 +114,14 @@ if ($rowTotal = mysqli_fetch_assoc($queryTotal)) {
     $totalPelajaran = (int)$rowTotal['total_pelajaran'];
 }
 
+// ========== QUERY MAPEL UTAMA (HANYA STATUS FIX) ==========
 $queryUtama = mysqli_query($conn, "
     SELECT mp.nama_mapel, COUNT(*) AS total
     FROM jadwal j
     INNER JOIN mapel mp ON j.id_mapel = mp.id_mapel
     INNER JOIN siswa s ON s.id_kelas = j.id_kelas
     WHERE s.id_siswa = $id_siswa
+      AND j.status = 'fix'
     GROUP BY mp.nama_mapel
     ORDER BY total DESC
     LIMIT 3
@@ -136,6 +140,7 @@ while ($rowUtama = mysqli_fetch_assoc($queryUtama)) {
     $mapelUtama[] = $rowUtama['nama_mapel'];
 }
 
+// ========== QUERY HARI INI (HANYA STATUS FIX) ==========
 $queryHariIni = mysqli_query($conn, "
     SELECT 
         j.jam AS jam_mulai,
@@ -150,6 +155,7 @@ $queryHariIni = mysqli_query($conn, "
     INNER JOIN siswa s ON s.id_kelas = j.id_kelas
     WHERE s.id_siswa = $id_siswa
       AND j.hari = '$hariDb'
+      AND j.status = 'fix'
     ORDER BY j.jam ASC
 ");
 
@@ -170,6 +176,7 @@ while ($rowHariIni = mysqli_fetch_assoc($queryHariIni)) {
     ];
 }
 
+// ========== QUERY JADWAL MINGGU (HANYA STATUS FIX) ==========
 $queryJadwal = mysqli_query($conn, "
     SELECT 
         j.hari AS hari,
@@ -182,6 +189,7 @@ $queryJadwal = mysqli_query($conn, "
     LEFT JOIN guru g ON j.id_guru = g.id_guru
     INNER JOIN siswa s ON s.id_kelas = j.id_kelas
     WHERE s.id_siswa = $id_siswa
+      AND j.status = 'fix'
     ORDER BY FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'), j.jam ASC
 ");
 
