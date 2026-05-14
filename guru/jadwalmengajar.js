@@ -121,10 +121,22 @@ function renderJadwal(data) {
             ? `JP ${item.jp_mulai}-${item.jp_selesai} | ${item.jumlah_jp} JP`
             : `${item.jumlah_jp || 1} JP`;
 
+        // Cek status jadwal
+        const isLocked = (item.status === 'fix');
+        
+        // Tombol request: disabled jika fix
+        const buttonDisabled = isLocked ? 'disabled' : '';
+        const buttonStyle = isLocked ? 'opacity:0.6; cursor:not-allowed;' : '';
+        const buttonText = isLocked ? '🔒 Jadwal Terkunci' : 'Ajukan Ganti';
+        
+        // Label kecil jika fix
+        const lockBadge = isLocked ? '<span class="lock-badge" style="background:#f59e0b; color:white; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:600; margin-left:8px;">Terkunci</span>' : '';
+
         card.innerHTML = `
             <div class="schedule-top">
                 <span class="day-badge">${escapeHtml(item.hari)}</span>
                 <span class="time-badge">${escapeHtml(item.jam)}</span>
+                ${lockBadge}
             </div>
 
             <h3>${escapeHtml(item.mapel)}</h3>
@@ -145,9 +157,9 @@ function renderJadwal(data) {
             </div>
 
             <div class="schedule-actions">
-                <button type="button" onclick="ajukanGantiJadwal(${item.id_jadwal})">
+                <button type="button" onclick="ajukanGantiJadwal(${item.id_jadwal})" ${buttonDisabled} style="${buttonStyle}">
                     <i class="bi bi-arrow-repeat"></i>
-                    Ajukan Ganti
+                    ${buttonText}
                 </button>
             </div>
         `;
@@ -175,6 +187,13 @@ function filterData() {
 function ajukanGantiJadwal(idJadwal) {
     if (!idJadwal) {
         alert("ID jadwal tidak valid.");
+        return;
+    }
+    
+    // Cari data jadwal berdasarkan id untuk cek status (double check)
+    const jadwal = jadwalData.find(item => item.id_jadwal === idJadwal);
+    if (jadwal && jadwal.status === 'fix') {
+        alert("Jadwal sudah terkunci. Tidak dapat mengajukan perubahan.");
         return;
     }
 

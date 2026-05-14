@@ -68,7 +68,7 @@ if ($qKelas) $total_kelas = $qKelas->fetch_assoc()['total'];
 $qMapel = $conn->query("SELECT COUNT(*) AS total FROM mapel");
 if ($qMapel) $total_mapel = $qMapel->fetch_assoc()['total'];
 
-// ========== QUERY JADWAL BERDASARKAN TAHUN DIPILIH ==========
+// ========== QUERY JADWAL BERDASARKAN TAHUN DIPILIH (TAMBAHKAN STATUS) ==========
 $jadwal_by_kelas = [];
 $hari_urutan = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
@@ -81,6 +81,7 @@ if ($id_tahun_dipilih > 0) {
             j.jp_mulai,
             j.jp_selesai,
             j.jumlah_jp,
+            j.status,
             k.id_kelas,
             g.nama AS nama_guru,
             k.nama_kelas,
@@ -122,6 +123,7 @@ if ($id_tahun_dipilih > 0) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary-teal: #064e4b;
@@ -134,6 +136,10 @@ if ($id_tahun_dipilih > 0) {
             --success: #22c55e;
             --blue-soft: #eff6ff;
             --blue: #2563eb;
+            --draft-bg: #fef3c7;
+            --draft-text: #92400e;
+            --fix-bg: #dcfce7;
+            --fix-text: #166534;
         }
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { margin: 0; background: #f5f7fb; color: var(--dark-text); }
@@ -184,12 +190,15 @@ if ($id_tahun_dipilih > 0) {
         .day-title { padding: 14px 16px; background: #f8fafc; color: var(--primary-teal); font-weight: 700; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .day-title small { color: #64748b; font-weight: 600; background: #e2e8f0; padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
         .lesson-list { padding: 12px; display: grid; gap: 10px; }
-        .lesson-card { border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; background: #ffffff; transition: 0.2s ease; }
+        .lesson-card { border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; background: #ffffff; transition: 0.2s ease; position: relative; }
         .lesson-card:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08); }
         .lesson-time { font-size: 12px; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
         .lesson-mapel { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 5px; }
         .lesson-guru { font-size: 12px; color: #64748b; line-height: 1.5; display: flex; align-items: flex-start; gap: 6px; }
         .lesson-jp { margin-top: 8px; display: inline-flex; padding: 4px 8px; border-radius: 999px; background: var(--soft-teal); color: var(--primary-teal); font-size: 11px; font-weight: 700; }
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; margin-left: 8px; }
+        .status-draft { background: #fef3c7; color: #92400e; }
+        .status-fix { background: #dcfce7; color: #166534; }
         .empty-day { padding: 20px 14px; color: #94a3b8; font-size: 13px; text-align: center; }
         .empty-state { text-align: center; padding: 42px 20px; color: var(--muted-text); }
         .empty-state i { font-size: 38px; color: #cbd5e1; margin-bottom: 12px; }
@@ -351,7 +360,12 @@ if ($id_tahun_dipilih > 0) {
                                                     <?php foreach ($list_jadwal as $item): ?>
                                                         <div class="lesson-card">
                                                             <div class="lesson-time"><i class="fas fa-clock"></i> <?php echo htmlspecialchars($item['jam'] ?? '-'); ?></div>
-                                                            <div class="lesson-mapel"><?php echo htmlspecialchars($item['nama_mapel'] ?? '-'); ?></div>
+                                                            <div class="lesson-mapel">
+                                                                <?php echo htmlspecialchars($item['nama_mapel'] ?? '-'); ?>
+                                                                <span class="status-badge <?php echo $item['status'] == 'fix' ? 'status-fix' : 'status-draft'; ?>">
+                                                                    <?php echo $item['status'] == 'fix' ? '🔒 FIX' : '📝 DRAFT'; ?>
+                                                                </span>
+                                                            </div>
                                                             <div class="lesson-guru"><i class="fas fa-chalkboard-user"></i> <span><?php echo htmlspecialchars($item['nama_guru'] ?? 'Belum ada guru'); ?></span></div>
                                                             <div class="lesson-jp">JP <?php echo htmlspecialchars($item['jp_mulai'] ?? '-'); ?> - <?php echo htmlspecialchars($item['jp_selesai'] ?? '-'); ?> | <?php echo (int)($item['jumlah_jp'] ?? 1); ?> JP</div>
                                                         </div>
@@ -377,7 +391,7 @@ if ($id_tahun_dipilih > 0) {
         </main>
     </div>
 
-    <!-- MODAL KONFIRMASI -->
+    <!-- MODAL KONFIRMASI GENERATE -->
     <div class="custom-modal-overlay" id="generateModal">
         <div class="custom-modal-box">
             <div class="custom-modal-icon"><i class="fas fa-check"></i></div>
@@ -390,7 +404,7 @@ if ($id_tahun_dipilih > 0) {
         </div>
     </div>
 
-    <!-- MODAL HASIL -->
+    <!-- MODAL HASIL GENERATE -->
     <div class="custom-modal-overlay" id="resultModal">
         <div class="custom-modal-box">
             <div class="custom-modal-icon" id="resultModalIcon"><i class="fas fa-check"></i></div>
@@ -478,15 +492,44 @@ if ($id_tahun_dipilih > 0) {
                 cards.forEach(card => { card.style.display = card.innerText.toLowerCase().includes(keyword) ? '' : 'none'; });
             });
         }
+        
+        // ========== TOMBOL KUNCI JADWAL DENGAN SWEETALERT ==========
         const lockBtn = document.getElementById('lockJadwalBtn');
         if (lockBtn) {
             lockBtn.addEventListener('click', function() {
-                if (confirm("Yakin akan mengunci jadwal untuk tahun ajaran ini? Setelah dikunci, generate jadwal tidak dapat dilakukan lagi.")) {
-                    fetch('/admin/penjadwalan/kunci_jadwal.php', { method: 'POST' })
-                    .then(res => res.json())
-                    .then(data => { if(data.success){ alert(data.message); window.location.href = 'jadwal.php?id_tahun=<?= $id_tahun_dipilih ?>'; } else alert('Gagal: '+data.message); })
-                    .catch(err => alert('Terjadi kesalahan: '+err));
-                }
+                Swal.fire({
+                    title: 'Kunci Jadwal?',
+                    text: "Setelah dikunci, jadwal untuk tahun ajaran ini tidak dapat digenerate ulang dan guru tidak bisa mengajukan perubahan.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#f59e0b',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Kunci Sekarang!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Memproses...',
+                            text: 'Sedang mengunci jadwal',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+                        fetch('/admin/penjadwalan/kunci_jadwal.php', { method: 'POST' })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Berhasil!', data.message, 'success').then(() => {
+                                    window.location.href = 'jadwal.php?id_tahun=<?= $id_tahun_dipilih ?>';
+                                });
+                            } else {
+                                Swal.fire('Gagal!', data.message, 'error');
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire('Error!', 'Terjadi kesalahan: ' + err, 'error');
+                        });
+                    }
+                });
             });
         }
     </script>

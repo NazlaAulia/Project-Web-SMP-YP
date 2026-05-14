@@ -27,6 +27,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn->begin_transaction();
 
+        // ========== CEK APAKAH TAHUN AJARAN AKTIF SUDAH DIKUNCI ==========
+        $cekLock = $conn->query("SELECT jadwal_locked, tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+        if (!$cekLock || $cekLock->num_rows === 0) {
+            throw new Exception('Tidak ada tahun ajaran yang aktif.');
+        }
+        $lockData = $cekLock->fetch_assoc();
+        if ($lockData['jadwal_locked'] == 1) {
+            throw new Exception('Jadwal untuk tahun ajaran ' . $lockData['tahun_ajaran'] . ' sudah dikunci. Tidak dapat menerima request perubahan jadwal.');
+        }
+        // ================================================================
+
         $stmtReq = $conn->prepare("
             SELECT 
                 id_request,
@@ -834,82 +845,6 @@ foreach ($requests as $r) {
         .modal-btn.cancel {
             background: #e9eef1;
             color: #244;
-        }
-
-        /* ===============================
-           FIX SIDEBAR ADMIN DI HALAMAN REQUEST
-        =============================== */
-
-        .sidebar {
-            background: #064e4b !important;
-            color: #ffffff !important;
-            z-index: 3000 !important;
-        }
-
-        .sidebar .logo strong,
-        .sidebar .logo span,
-        .sidebar .nav-label,
-        .sidebar .nav-item,
-        .sidebar .nav-item span,
-        .sidebar summary,
-        .sidebar summary span,
-        .sidebar .sub-menu a,
-        .sidebar .logout,
-        .sidebar .logout span {
-            color: #ffffff !important;
-        }
-
-        .sidebar .nav-label {
-            color: rgba(255, 255, 255, 0.62) !important;
-            letter-spacing: 2px;
-            font-weight: 700;
-        }
-
-        .sidebar .nav-item {
-            background: transparent !important;
-        }
-
-        .sidebar .nav-item:hover {
-            background: rgba(255, 255, 255, 0.12) !important;
-        }
-
-        .sidebar .sub-menu a {
-            color: rgba(255, 255, 255, 0.88) !important;
-            background: transparent !important;
-        }
-
-        .sidebar .sub-menu a:hover {
-            background: rgba(255, 255, 255, 0.14) !important;
-            color: #ffffff !important;
-        }
-
-        .sidebar .sub-menu a.active-submenu {
-            background: #ffffff !important;
-            color: #0f766e !important;
-            font-weight: 800 !important;
-            border-radius: 999px !important;
-        }
-
-        .sidebar .sub-menu a.active-submenu * {
-            color: #0f766e !important;
-        }
-
-        .sidebar details[open] > summary.nav-item {
-            background: rgba(0, 0, 0, 0.08) !important;
-        }
-
-        .sidebar i {
-            color: inherit !important;
-        }
-
-        .mobile-topbar {
-            background: #0f766e !important;
-            color: #ffffff !important;
-            z-index: 3001 !important;
-        }
-
-        .sidebar-overlay {
-            z-index: 2999 !important;
         }
 
         @keyframes modalFadeIn {
