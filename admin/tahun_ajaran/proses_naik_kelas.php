@@ -22,6 +22,47 @@ if (empty($wali_kelas)) {
     exit;
 }
 
+// ========== CEK PENDAFTAR YANG MASIH MENUNGGU DI TAHUN AJARAN LAMA ==========
+// Ambil tahun ajaran lama (yang aktif saat ini)
+$query_tahun_lama = "SELECT id_tahun_ajaran, tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1";
+$result_tahun_lama = mysqli_query($conn, $query_tahun_lama);
+$tahun_lama = mysqli_fetch_assoc($result_tahun_lama);
+
+if ($tahun_lama) {
+    $id_tahun_lama = $tahun_lama['id_tahun_ajaran'];
+    $tahun_ajaran_lama = $tahun_lama['tahun_ajaran'];
+    
+    // Cek pendaftar dengan status 'menunggu' di tahun ajaran lama
+    $query_cek = "SELECT COUNT(*) as total FROM pendaftaran WHERE id_tahun_ajaran = $id_tahun_lama AND status = 'menunggu'";
+    $result_cek = mysqli_query($conn, $query_cek);
+    $data_cek = mysqli_fetch_assoc($result_cek);
+    $jumlah_menunggu = $data_cek['total'];
+    
+    if ($jumlah_menunggu > 0) {
+        // Ambil daftar nama pendaftar yang masih menunggu (maksimal 10 untuk ditampilkan)
+        $query_nama = "SELECT id_pendaftaran, nama_lengkap FROM pendaftaran WHERE id_tahun_ajaran = $id_tahun_lama AND status = 'menunggu' LIMIT 10";
+        $result_nama = mysqli_query($conn, $query_nama);
+        $daftar_menunggu = [];
+        while ($row = mysqli_fetch_assoc($result_nama)) {
+            $daftar_menunggu[] = $row;
+        }
+        
+        $pesan_error = "Tidak dapat melanjutkan proses naik kelas. Masih ada <strong>$jumlah_menunggu pendaftar</strong> yang statusnya 'MENUNGGU' di tahun ajaran <strong>$tahun_ajaran_lama</strong>.<br><br>";
+        $pesan_error .= "<strong>Daftar pendaftar yang belum diproses:</strong><br><ul>";
+        foreach ($daftar_menunggu as $dm) {
+            $pesan_error .= "<li>{$dm['nama_lengkap']} - <a href='/admin/admin_pendaftaran.php?id_tahun={$id_tahun_lama}&filter=menunggu' target='_blank'>Proses Sekarang</a></li>";
+        }
+        if ($jumlah_menunggu > 10) {
+            $pesan_error .= "<li><em>... dan " . ($jumlah_menunggu - 10) . " pendaftar lainnya</em></li>";
+        }
+        $pesan_error .= "</ul><br>Silakan proses terlebih dahulu (terima atau tolak) semua pendaftar tersebut sebelum melanjutkan naik kelas. Anda bisa menggunakan tombol <strong>'Proses Semua Pendaftar'</strong> di halaman pendaftaran untuk mempercepat.";
+        
+        echo json_encode(['success' => false, 'message' => $pesan_error]);
+        exit;
+    }
+}
+// =======================================================================
+
 $kkm = 75;
 $maksMapelTidakLulus = 2;
 $maksAlfa = 10;
