@@ -17,6 +17,12 @@ $diterima = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FRO
 $kuota = $info_ta['kuota'];
 $sisa = $kuota - $diterima;
 
+// ========== CEK JUMLAH PENDAFTAR MENUNGGU ==========
+$query_menunggu = "SELECT COUNT(*) as total FROM pendaftaran WHERE id_tahun_ajaran = $id_tahun_terpilih AND status = 'menunggu'";
+$result_menunggu = mysqli_query($conn, $query_menunggu);
+$data_menunggu = mysqli_fetch_assoc($result_menunggu);
+$jumlah_menunggu = $data_menunggu['total'];
+
 // ========== 2. PAGINATION & SEARCH ==========
 $limit = 10;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -150,7 +156,19 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
         .btn-simpan { background: #064e4b; color: white; }
         .btn-atur-pendaftaran { background: #0f5d5d; color: white; border: none; padding: 8px 16px; border-radius: 20px; margin-left: 10px; cursor: pointer; font-size: 13px; }
         .btn-atur-pendaftaran:hover { background: #053f3d; }
-        /* Perbaikan kursor tombol */
+        .btn-proses-semua {
+            background: #0f5d5d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-proses-semua:hover {
+            background: #053f3d;
+        }
         .btn-tandai {
             cursor: pointer;
         }
@@ -174,7 +192,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                 </div>
             </div>
 
-            <!-- DROPDOWN TAHUN, KUOTA, CETAK, TOMBOL ATUR -->
+            <!-- DROPDOWN TAHUN, KUOTA, CETAK, TOMBOL ATUR, TOMBOL PROSES SEMUA -->
             <div class="filter-bar" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                 <form method="GET" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <label style="font-weight: bold;">Tahun Ajaran:</label>
@@ -215,6 +233,15 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                 </form>
             </div>
 
+            <!-- TOMBOL PROSES SEMUA (jika ada pendaftar menunggu) -->
+            <?php if ($jumlah_menunggu > 0 && !$is_nonaktif): ?>
+            <div class="bulk-actions" style="margin-bottom: 15px; text-align: right;">
+                <button type="button" id="btnProsesSemua" class="btn-proses-semua">
+                    <i class="fas fa-tasks"></i> Proses Semua Pendaftar (<?= $jumlah_menunggu ?>)
+                </button>
+            </div>
+            <?php endif; ?>
+
             <!-- REMINDER WA BELUM TERKIRIM -->
             <?php
             $query_reminder = "SELECT id_pendaftaran, nama_lengkap, no_hp, status 
@@ -228,7 +255,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                 echo '<div class="reminder-box" style="background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 8px;">';
                 echo '<strong><i class="fas fa-bell"></i> Reminder Belum Kirim WhatsApp:</strong><br>';
                 echo '<table style="width:100%; margin-top:10px; border-collapse:collapse;">';
-                echo '<thead><tr><th>Nama</th><th>Status</th><th>Aksi</th></tr></thead><tbody>';
+                echo '<thead><tr><th>Nama</th><th>Status</th><th>Aksi</th></td></thead><tbody>';
                 while ($row = mysqli_fetch_assoc($res_reminder)) {
                     $nama = htmlspecialchars($row['nama_lengkap']);
                     $status = $row['status'];
@@ -245,14 +272,14 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                              </td>
                            </tr>";
                 }
-                echo '</tbody><tr></div>';
+                echo '</tbody></table></div>';
             }
             ?>
 
             <!-- TABEL PENDAFTARAN -->
             <div class="table-card">
                 <table id="tablePendaftaran">
-                    <thead><tr><th>No</th><th>Nama Lengkap</th><th>NISN</th><th>Tanggal Daftar</th><th>JK</th><th>Tanggal Lahir</th><th>No HP Wali</th><th>Asal Sekolah</th><th>Nama Wali</th><th>Pendapatan</th><th>Status</th><th>Aksi</th></tr></thead>
+                    <thead><tr><th>No</th><th>Nama Lengkap</th><th>NISN</th><th>Tanggal Daftar</th><th>JK</th><th>Tanggal Lahir</th><th>No HP Wali</th><th>Asal Sekolah</th><th>Nama Wali</th><th>Pendapatan</th><th>Status</th><th>Aksi</th></table></thead>
                     <tbody>
                         <?php $no = $offset + 1; if ($result && mysqli_num_rows($result) > 0) { while ($row = mysqli_fetch_assoc($result)) { ?>
                         <tr>
@@ -348,6 +375,41 @@ document.getElementById('formAturPendaftaran').addEventListener('submit', functi
             if (data.success) Swal.fire('Berhasil', 'Pengaturan pendaftaran disimpan', 'success').then(() => location.reload());
             else Swal.fire('Gagal', data.message, 'error');
         });
+});
+
+// ========== PROSES SEMUA PENDAFTAR ==========
+document.getElementById('btnProsesSemua')?.addEventListener('click', function() {
+    Swal.fire({
+        title: 'Proses Semua Pendaftar?',
+        text: 'Semua pendaftar dengan status "Menunggu" akan diproses otomatis (diterima jika kuota masih ada, ditolak jika kuota penuh).',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#0f5d5d',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Proses Semua!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Memproses...',
+                text: 'Mohon tunggu',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+            fetch('/admin/proses_semua_pendaftar.php?id_tahun=<?= $id_tahun_terpilih ?>')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Berhasil!', data.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Gagal!', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Error!', 'Terjadi kesalahan: ' + error, 'error');
+                });
+        }
+    });
 });
 
 // ========== FUNGSI KONFIRMASI AKSI (TERIMA/TOLAK) + REMINDER HANYA SAAT KLIK "NANTI SAJA" ==========
