@@ -117,10 +117,13 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pendaftaran Siswa</title>
-    <link rel="stylesheet" href="/admin/components/admin-nav.css">
+    <link rel="stylesheet" href="components/admin-nav.css">
     <link rel="stylesheet" href="admin_pendaftaran.css?v=105">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         .modal-atur {
             display: none;
