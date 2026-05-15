@@ -834,17 +834,6 @@ foreach ($requests as $r) {
     overflow: hidden !important;
 }
 
-#admin-nav-root .force-active-ganti {
-    background: #ffffff !important;
-    color: #064e4b !important;
-    border-radius: 999px !important;
-    padding: 12px 22px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-
-    max-width: calc(100% - 32px) !important;
-    margin: 6px 16px !important;
-}
 
 #admin-nav-root .force-active-ganti,
 #admin-nav-root .force-active-ganti i,
