@@ -792,24 +792,7 @@ foreach ($requests as $r) {
     overflow: hidden;
 }
 
-/* Active submenu request jadwal */
-#admin-nav-root .active-submenu {
-    background: #ffffff !important;
-    color: #064e4b !important;
-}
 
-#admin-nav-root .active-submenu * {
-    color: #064e4b !important;
-}
-
-/* Biar tombol logout modal navbar tetap normal */
-#admin-nav-root .logout-modal-box .btn-confirm {
-    color: #ffffff !important;
-}
-
-#admin-nav-root .logout-modal-box .btn-cancel {
-    color: #064e4b !important;
-}
 
 
 #actionModal.modal-overlay {
