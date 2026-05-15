@@ -892,7 +892,12 @@ foreach ($requests as $r) {
     background: rgba(255, 255, 255, 0.08) !important;
 }
 
-
+#admin-nav-root .active,
+#admin-nav-root a.active,
+#admin-nav-root .nav-link.active {
+    background: rgba(255, 255, 255, 0.16) !important;
+    color: #0f766e !important;
+}
 
 /* FIX KONTEN BIAR ORA MELEBAR NUTUP LAYAR */
 .container {
