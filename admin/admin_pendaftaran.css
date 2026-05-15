@@ -1123,12 +1123,14 @@ body {
 ========================= */
 
 /* LAPTOP / DESKTOP */
+/* DESKTOP: pagination tetap ikut lebar tabel/card */
 @media (min-width: 769px) {
     .pagination-wrapper {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
         gap: 18px !important;
+        min-width: 1320px !important;
     }
 
     .pagination-info {
@@ -1138,7 +1140,7 @@ body {
 
     .pagination {
         width: auto !important;
-        margin-left: auto !important;
+        margin-left: 0 !important;
         justify-content: flex-end !important;
     }
 }
