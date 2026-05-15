@@ -502,32 +502,20 @@ foreach ($requests as $r) {
 
     
     <style>
-      * {
-    box-sizing: border-box;
-}
-
-body {
+     body {
     margin: 0;
     background: #f5f7fb;
     color: #1f2937;
     font-family: 'Poppins', sans-serif;
 }
 
-.container {
-    display: flex;
-    width: 100%;
-    min-height: 100vh;
-}
-
-.main-content {
-    flex: 1;
-    min-width: 0;
-}
-
-/* Semua style halaman ini dibatasi ke approve-page supaya tidak nabrak admin-nav */
 .approve-page {
     overflow-x: hidden;
     padding: 32px;
+}
+
+.approve-page * {
+    box-sizing: border-box;
 }
 
 .approve-page .page-header {
@@ -773,11 +761,10 @@ body {
     border: 1px solid #e5e7eb;
 }
 
-/* Modal khusus request jadwal, tidak kena modal logout admin-nav */
 #actionModal.modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15,23,42,.45);
+    background: rgba(15, 23, 42, 0.45);
     display: none;
     align-items: center;
     justify-content: center;
@@ -789,12 +776,13 @@ body {
 }
 
 #actionModal .modal-box {
+    box-sizing: border-box;
     width: 100%;
     max-width: 520px;
     background: white;
     border-radius: 24px;
     padding: 28px;
-    box-shadow: 0 24px 48px rgba(0,0,0,.18);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18);
 }
 
 #actionModal .modal-actions {
