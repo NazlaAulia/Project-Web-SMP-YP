@@ -279,7 +279,22 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
             <!-- TABEL PENDAFTARAN -->
             <div class="table-card">
                 <table id="tablePendaftaran">
-                    <thead><tr><th>No</th><th>Nama Lengkap</th><th>NISN</th><th>Tanggal Daftar</th><th>JK</th><th>Tanggal Lahir</th><th>No HP Wali</th><th>Asal Sekolah</th><th>Nama Wali</th><th>Pendapatan</th><th>Status</th><th>Aksi</th></table></thead>
+                 <thead>
+    <tr>
+        <th>No</th>
+        <th>Nama Lengkap</th>
+        <th>NISN</th>
+        <th>Tanggal Daftar</th>
+        <th>JK</th>
+        <th>Tanggal Lahir</th>
+        <th>No HP Wali</th>
+        <th>Asal Sekolah</th>
+        <th>Nama Wali</th>
+        <th>Pendapatan</th>
+        <th>Status</th>
+        <th>Aksi</th>
+    </tr>
+</thead>
                     <tbody>
                         <?php $no = $offset + 1; if ($result && mysqli_num_rows($result) > 0) { while ($row = mysqli_fetch_assoc($result)) { ?>
                         <tr>
