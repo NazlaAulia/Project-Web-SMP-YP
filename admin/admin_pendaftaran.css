@@ -1336,3 +1336,42 @@ body {
     background: #eab308;
     color: #1f2937;
 }
+
+
+.pagination-wrapper {
+    margin-top: 18px !important;
+    padding: 18px 22px !important;
+    background: #ffffff !important;
+    border-radius: 18px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 18px !important;
+    width: 100% !important;
+}
+
+.pagination-info {
+    width: auto !important;
+    text-align: left !important;
+}
+
+.pagination {
+    width: auto !important;
+    margin-left: auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+}
+
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .pagination {
+        margin-left: 0 !important;
+        justify-content: flex-start !important;
+        flex-wrap: wrap !important;
+    }
+}
