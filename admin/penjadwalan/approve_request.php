@@ -501,279 +501,17 @@ foreach ($requests as $r) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+      * {
+    box-sizing: border-box;
+}
 
-        body {
-            margin: 0;
-            background: #f5f7fb;
-            color: #1f2937;
-        }
+body {
+    margin: 0;
+    background: #f5f7fb;
+    color: #1f2937;
+    font-family: 'Poppins', sans-serif;
+}
 
-        .page-header {
-            background: linear-gradient(135deg, #064e4b, #115e59);
-            color: white;
-            padding: 26px;
-            border-radius: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 14px 30px rgba(15, 118, 110, 0.20);
-        }
-
-        .page-header h1 {
-            margin: 0;
-            font-size: 28px;
-        }
-
-        .page-header p {
-            margin: 8px 0 0;
-            opacity: .9;
-            line-height: 1.6;
-            font-size: 14px;
-        }
-
-        .alert {
-            padding: 14px 16px;
-            border-radius: 16px;
-            margin-bottom: 18px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            background: #ecfdf5;
-            color: #0f766e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        .stat-card span {
-            color: #6b7280;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .stat-card h3 {
-            margin: 4px 0 0;
-            font-size: 26px;
-        }
-
-        .request-list {
-            display: grid;
-            gap: 18px;
-        }
-
-        .request-card {
-            background: white;
-            border-radius: 22px;
-            border: 1px solid #e5e7eb;
-            padding: 22px;
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-        }
-
-        .request-top {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 14px;
-            margin-bottom: 16px;
-        }
-
-        .request-top h2 {
-            margin: 0;
-            font-size: 20px;
-        }
-
-        .request-top p {
-            margin: 6px 0 0;
-            color: #6b7280;
-            font-size: 14px;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 11px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .badge-menunggu {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-diterima {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-ditolak {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .badge-tukar {
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
-
-        .grid-detail {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .detail-box {
-            border: 1px solid #e5e7eb;
-            background: #f8fafc;
-            border-radius: 18px;
-            padding: 16px;
-        }
-
-        .detail-box h3 {
-            margin: 0 0 12px;
-            font-size: 15px;
-            color: #0f766e;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-
-        .detail-row span {
-            color: #64748b;
-        }
-
-        .detail-row strong {
-            color: #0f172a;
-            text-align: right;
-        }
-
-        .ai-box {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            border-radius: 18px;
-            padding: 15px;
-            margin-bottom: 16px;
-            color: #78350f;
-            font-size: 14px;
-            line-height: 1.7;
-        }
-
-        .reason-box {
-            background: #f8fafc;
-            border: 1px solid #e5e7eb;
-            border-radius: 18px;
-            padding: 15px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            line-height: 1.7;
-            color: #374151;
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 13px;
-            padding: 11px 15px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-accept {
-            background: #16a34a;
-            color: white;
-        }
-
-        .btn-reject {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .empty-state {
-            background: white;
-            border-radius: 22px;
-            padding: 40px 20px;
-            text-align: center;
-            color: #64748b;
-            border: 1px solid #e5e7eb;
-        }
-
-       
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(16px) scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @media (max-width: 900px) {
-            .stats-grid,
-            .grid-detail {
-                grid-template-columns: 1fr;
-            }
-        }
-
-     /* Layout halaman saja, jangan ubah warna navbar */
 .container {
     display: flex;
     width: 100%;
@@ -783,18 +521,258 @@ foreach ($requests as $r) {
 .main-content {
     flex: 1;
     min-width: 0;
+}
+
+/* Semua style halaman ini dibatasi ke approve-page supaya tidak nabrak admin-nav */
+.approve-page {
     overflow-x: hidden;
     padding: 32px;
 }
 
-.page-header {
+.approve-page .page-header {
     max-width: 100%;
     overflow: hidden;
+    background: linear-gradient(135deg, #064e4b, #115e59);
+    color: white;
+    padding: 26px;
+    border-radius: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 14px 30px rgba(15, 118, 110, 0.20);
 }
 
+.approve-page .page-header h1 {
+    margin: 0;
+    font-size: 28px;
+}
 
+.approve-page .page-header p {
+    margin: 8px 0 0;
+    opacity: .9;
+    line-height: 1.6;
+    font-size: 14px;
+}
 
+.approve-page .alert {
+    padding: 14px 16px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    font-weight: 500;
+}
 
+.approve-page .alert-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.approve-page .alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.approve-page .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.approve-page .stat-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.approve-page .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: #ecfdf5;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.approve-page .stat-card span {
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.approve-page .stat-card h3 {
+    margin: 4px 0 0;
+    font-size: 26px;
+}
+
+.approve-page .request-list {
+    display: grid;
+    gap: 18px;
+}
+
+.approve-page .request-card {
+    background: white;
+    border-radius: 22px;
+    border: 1px solid #e5e7eb;
+    padding: 22px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.approve-page .request-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+}
+
+.approve-page .request-top h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.approve-page .request-top p {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.approve-page .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.approve-page .badge-menunggu {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.approve-page .badge-diterima {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.approve-page .badge-ditolak {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.approve-page .badge-tukar {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.approve-page .grid-detail {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.approve-page .detail-box {
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    border-radius: 18px;
+    padding: 16px;
+}
+
+.approve-page .detail-box h3 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    color: #0f766e;
+}
+
+.approve-page .detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.approve-page .detail-row span {
+    color: #64748b;
+}
+
+.approve-page .detail-row strong {
+    color: #0f172a;
+    text-align: right;
+}
+
+.approve-page .ai-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 18px;
+    padding: 15px;
+    margin-bottom: 16px;
+    color: #78350f;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.approve-page .reason-box {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 15px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #374151;
+}
+
+.approve-page .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.approve-page .btn {
+    border: none;
+    border-radius: 13px;
+    padding: 11px 15px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.approve-page .btn-accept {
+    background: #16a34a;
+    color: white;
+}
+
+.approve-page .btn-reject {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.approve-page .empty-state {
+    background: white;
+    border-radius: 22px;
+    padding: 40px 20px;
+    text-align: center;
+    color: #64748b;
+    border: 1px solid #e5e7eb;
+}
+
+/* Modal khusus request jadwal, tidak kena modal logout admin-nav */
 #actionModal.modal-overlay {
     position: fixed;
     inset: 0;
@@ -881,6 +859,13 @@ foreach ($requests as $r) {
     color: #064e4b;
 }
 
+@media (max-width: 900px) {
+    .approve-page .stats-grid,
+    .approve-page .grid-detail {
+        grid-template-columns: 1fr;
+    }
+}
+
 
     </style>
 </head>
@@ -889,7 +874,8 @@ foreach ($requests as $r) {
     <div class="container">
         <div id="admin-nav-root"></div>
 
-        <main class="main-content">
+  <main class="main-content approve-page">
+
 
             <section class="page-header">
                 <h1>Terima ganti Jadwal</h1>
