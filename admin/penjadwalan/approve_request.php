@@ -866,31 +866,6 @@ body {
     }
 }
 
-.sidebar-overlay {
-    display: none;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
-@media (min-width: 769px) {
-    .sidebar-overlay,
-    .sidebar-overlay.active {
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-    }
-
-    .sidebar {
-        z-index: 20 !important;
-    }
-
-    .main-content {
-        position: relative;
-        z-index: 1;
-    }
-}
 
 
     </style>
