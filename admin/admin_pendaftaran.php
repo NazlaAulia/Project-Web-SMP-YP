@@ -117,14 +117,10 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pendaftaran Siswa</title>
-    <link rel="stylesheet" href="components/admin-nav.css">
+    <link rel="stylesheet" href="/admin/components/admin-nav.css">
     <link rel="stylesheet" href="admin_pendaftaran.css?v=105">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    
     <style>
         .modal-atur {
             display: none;
@@ -178,7 +174,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
         }
     </style>
 </head>
-<body data-page="pendaftaran" data-nav-path="components/admin-nav.html">
+<body data-page="pendaftaran" data-nav-path="/admin/components/admin-nav.html">
 <div class="container">
     <div id="admin-nav-root"></div>
     <main class="main-content">
@@ -216,13 +212,10 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                     <div style="background: #eef2f3; padding: 5px 12px; border-radius: 20px;">
                         <i class="fas fa-users"></i> Kuota: <?= $diterima ?> / <?= $kuota ?> | Sisa: <?= $sisa ?>
                     </div>
-<a href="cetak_kurang_mampu.php?id_tahun=<?= $id_tahun_terpilih ?>" 
-   class="btn-print-pdf" 
-   target="_blank">
-    <i class="fas fa-file-pdf"></i>
-    Cetak Kurang Mampu
-</a>
 
+                    <a href="cetak_kurang_mampu.php?id_tahun=<?= $id_tahun_terpilih ?>" class="btn btn-warning btn-sm" target="_blank" style="background:#ffc107; padding:5px 12px; border-radius:20px; text-decoration:none; color:#000;">
+                        <i class="fas fa-print"></i> Cetak Kurang Mampu
+                    </a>
 
                     <button type="button" class="btn-atur-pendaftaran" onclick="openModalAtur()">
                         <i class="fas fa-cog"></i> Atur Pendaftaran
@@ -285,73 +278,38 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
 
             <!-- TABEL PENDAFTARAN -->
             <div class="table-card">
-          <table id="tablePendaftaran">
-    <thead>
-        <tr>
-            <th>No</th>
-            <th>Nama Lengkap</th>
-            <th>NISN</th>
-            <th>Tanggal Daftar</th>
-            <th>JK</th>
-            <th>Tanggal Lahir</th>
-            <th>No HP Wali</th>
-            <th>Asal Sekolah</th>
-            <th>Nama Wali</th>
-            <th>Pendapatan</th>
-            <th>Status</th>
-            <th>Aksi</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <?php $no = $offset + 1; ?>
-
-        <?php if ($result && mysqli_num_rows($result) > 0): ?>
-            <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                <tr>
-                    <td><?= $no++; ?></td>
-                    <td><?= htmlspecialchars($row['nama_lengkap']); ?></td>
-                    <td><?= htmlspecialchars($row['nisn']); ?></td>
-                    <td><?= date('d-m-Y H:i:s', strtotime($row['tanggal_daftar'])); ?></td>
-                    <td><?= $row['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?></td>
-                    <td><?= htmlspecialchars($row['tanggal_lahir']); ?></td>
-                    <td><?= htmlspecialchars($row['no_hp']); ?></td>
-                    <td><?= htmlspecialchars($row['asal_sekolah']); ?></td>
-                    <td><?= htmlspecialchars($row['nama_wali']); ?></td>
-                    <td>Rp <?= number_format($row['pendapatan_ortu'], 0, ',', '.'); ?></td>
-
-                    <td>
-                        <?php if ($row['status'] == 'menunggu'): ?>
-                            <span class="badge waiting">Menunggu</span>
-                        <?php elseif ($row['status'] == 'diterima'): ?>
-                            <span class="badge accepted">Diterima</span>
-                        <?php else: ?>
-                            <span class="badge rejected">Ditolak</span>
-                        <?php endif; ?>
-                    </td>
-
-                    <td class="action-cell">
-                        <?php if ($is_nonaktif): ?>
-                            <span class="badge badge-secondary">Arsip</span>
-                        <?php elseif ($row['status'] == 'menunggu'): ?>
-                            <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima&id_tahun=<?= $id_tahun_terpilih ?>" class="btn-accept" onclick="konfirmasiAksi(event, this.href, 'terima', this)">Terima</a>
-                            <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak&id_tahun=<?= $id_tahun_terpilih ?>" class="btn-reject" onclick="konfirmasiAksi(event, this.href, 'tolak', this)">Tolak</a>
-                        <?php elseif ($row['status'] == 'diterima'): ?>
-                            <button disabled class="btn-disabled accepted-disabled">Sudah diterima</button>
-                        <?php else: ?>
-                            <button disabled class="btn-disabled rejected-disabled">Sudah ditolak</button>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="12" class="empty-data">Data tidak ditemukan.</td>
-            </tr>
-        <?php endif; ?>
-    </tbody>
-</table>
-
+                <table id="tablePendaftaran">
+                    <thead><tr><th>No</th><th>Nama Lengkap</th><th>NISN</th><th>Tanggal Daftar</th><th>JK</th><th>Tanggal Lahir</th><th>No HP Wali</th><th>Asal Sekolah</th><th>Nama Wali</th><th>Pendapatan</th><th>Status</th><th>Aksi</th></table></thead>
+                    <tbody>
+                        <?php $no = $offset + 1; if ($result && mysqli_num_rows($result) > 0) { while ($row = mysqli_fetch_assoc($result)) { ?>
+                        <tr>
+                            <td><?= $no++; ?></td>
+                            <td><?= htmlspecialchars($row['nama_lengkap']); ?></td>
+                            <td><?= htmlspecialchars($row['nisn']); ?></td>
+                            <td><?= date('d-m-Y H:i:s', strtotime($row['tanggal_daftar'])); ?></td>
+                            <td><?= $row['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?></td>
+                            <td><?= htmlspecialchars($row['tanggal_lahir']); ?></td>
+                            <td><?= htmlspecialchars($row['no_hp']); ?></td>
+                            <td><?= htmlspecialchars($row['asal_sekolah']); ?></td>
+                            <td><?= htmlspecialchars($row['nama_wali']); ?></td>
+                            <td>Rp <?= number_format($row['pendapatan_ortu'], 0, ',', '.'); ?></td>
+                            <td><?php if ($row['status'] == 'menunggu') { ?><span class="badge waiting">Menunggu</span><?php } elseif ($row['status'] == 'diterima') { ?><span class="badge accepted">Diterima</span><?php } else { ?><span class="badge rejected">Ditolak</span><?php } ?></td>
+                            <td class="action-cell">
+                                <?php if ($is_nonaktif): ?>
+                                    <span class="badge badge-secondary">Arsip</span>
+                                <?php elseif ($row['status'] == 'menunggu'): ?>
+                                    <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima&id_tahun=<?= $id_tahun_terpilih ?>" class="btn-accept" onclick="konfirmasiAksi(event, this.href, 'terima', this)">Terima</a>
+                                    <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak&id_tahun=<?= $id_tahun_terpilih ?>" class="btn-reject" onclick="konfirmasiAksi(event, this.href, 'tolak', this)">Tolak</a>
+                                <?php elseif ($row['status'] == 'diterima'): ?>
+                                    <button disabled class="btn-disabled accepted-disabled">Sudah diterima</button>
+                                <?php else: ?>
+                                    <button disabled class="btn-disabled rejected-disabled">Sudah ditolak</button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php } } else { ?><tr><td colspan="12" class="empty-data">Data tidak ditemukan. </td></tr><?php } ?>
+                    </tbody>
+                </table>
                 <!-- PAGINATION -->
                 <div class="pagination-wrapper">
                     <p class="pagination-info">Menampilkan <?= $startData; ?> sampai <?= $endData; ?> dari <?= $totalData; ?> Pendaftar</p>
