@@ -940,6 +940,73 @@ foreach ($requests as $r) {
     }
 }
 
+@media (max-width: 768px) {
+    .approve-page {
+        padding: 18px 14px 28px;
+    }
+
+    .approve-page .page-header {
+        margin-top: 22px;
+        padding: 24px 26px;
+        border-radius: 26px;
+        margin-bottom: 18px;
+    }
+
+    .approve-page .page-header h1 {
+        font-size: 34px;
+        line-height: 1.22;
+        margin: 0;
+    }
+
+    .approve-page .page-header p {
+        font-size: 16px;
+        line-height: 1.5;
+        margin-top: 18px;
+    }
+
+    .approve-page .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .approve-page .stat-card {
+        padding: 22px 24px;
+        border-radius: 22px;
+    }
+
+    .approve-page .request-card {
+        padding: 18px;
+        border-radius: 20px;
+    }
+
+    .approve-page .grid-detail {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .approve-page {
+        padding: 16px 12px 24px;
+    }
+
+    .approve-page .page-header {
+        margin-top: 40px;
+        padding: 22px 24px;
+        border-radius: 24px;
+    }
+
+    .approve-page .page-header h1 {
+        font-size: 32px;
+        line-height: 1.22;
+    }
+
+    .approve-page .page-header p {
+        font-size: 15px;
+        line-height: 1.5;
+        margin-top: 16px;
+    }
+}
+
 
     </style>
 </head>
