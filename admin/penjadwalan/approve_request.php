@@ -876,15 +876,36 @@ foreach ($requests as $r) {
     color: #ffffff !important;
 }
 
-#admin-nav-root a,
-#admin-nav-root span,
-#admin-nav-root p,
-#admin-nav-root h1,
-#admin-nav-root h2,
-#admin-nav-root h3,
-#admin-nav-root i {
-    color: #ffffff !important;
+/* FIX SIDEBAR AKTIF */
+#admin-nav-root .active,
+#admin-nav-root a.active,
+#admin-nav-root .nav-link.active,
+#admin-nav-root .submenu-link.active {
+    background: #ffffff !important;
+    color: #064e4b !important;
 }
+
+#admin-nav-root .active *,
+#admin-nav-root a.active *,
+#admin-nav-root .nav-link.active *,
+#admin-nav-root .submenu-link.active * {
+    color: #064e4b !important;
+}
+
+/* FIX KONTEN */
+.container {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+}
+
+.main-content {
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    padding: 32px !important;
+}
+
 
 #admin-nav-root .submenu,
 #admin-nav-root .submenu-list,
