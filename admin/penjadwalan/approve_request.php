@@ -753,100 +753,101 @@ foreach ($requests as $r) {
             border: 1px solid #e5e7eb;
         }
 
-        .custom-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.45);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 5000;
-            padding: 20px;
-        }
+       #actionModal.custom-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+    padding: 20px;
+}
 
-        .custom-modal-overlay.active {
-            display: flex;
-        }
+#actionModal.custom-modal-overlay.active {
+    display: flex;
+}
 
-        .custom-modal-box {
-            width: 100%;
-            max-width: 540px;
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 34px 28px 26px;
-            text-align: center;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
-            animation: modalFadeIn 0.25s ease;
-        }
+#actionModal .custom-modal-box {
+    width: 100%;
+    max-width: 540px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 34px 28px 26px;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+    animation: modalFadeIn 0.25s ease;
+}
 
-        .custom-modal-icon {
-            width: 96px;
-            height: 96px;
-            border-radius: 50%;
-            margin: 0 auto 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 42px;
-            border: 4px solid #d9f0d2;
-            color: #8bc34a;
-            background: #f7fff3;
-        }
+#actionModal .custom-modal-icon {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    border: 4px solid #d9f0d2;
+    color: #8bc34a;
+    background: #f7fff3;
+}
 
-        .custom-modal-icon.reject {
-            color: #ef4444;
-            border-color: #fecaca;
-            background: #fff5f5;
-        }
+#actionModal .custom-modal-icon.reject {
+    color: #ef4444;
+    border-color: #fecaca;
+    background: #fff5f5;
+}
 
-        .custom-modal-box h3 {
-            margin: 0 0 8px;
-            font-size: 25px;
-            color: #444;
-            font-weight: 700;
-        }
+#actionModal .custom-modal-box h3 {
+    margin: 0 0 8px;
+    font-size: 25px;
+    color: #444;
+    font-weight: 700;
+}
 
-        .custom-modal-box p {
-            margin: 0;
-            font-size: 15px;
-            color: #666;
-            line-height: 1.7;
-        }
+#actionModal .custom-modal-box p {
+    margin: 0;
+    font-size: 15px;
+    color: #666;
+    line-height: 1.7;
+}
 
-        .custom-modal-actions {
-            margin-top: 26px;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+#actionModal .custom-modal-actions {
+    margin-top: 26px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
 
-        .modal-btn {
-            min-width: 138px;
-            height: 46px;
-            padding: 0 18px;
-            border-radius: 12px;
-            border: none;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.25s ease;
-        }
+#actionModal .modal-btn {
+    min-width: 138px;
+    height: 46px;
+    padding: 0 18px;
+    border-radius: 12px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
 
-        .modal-btn.confirm {
-            background: #22c55e;
-            color: white;
-        }
+#actionModal .modal-btn.confirm {
+    background: #22c55e;
+    color: white;
+}
 
-        .modal-btn.reject {
-            background: #ef4444;
-            color: white;
-        }
+#actionModal .modal-btn.reject {
+    background: #ef4444;
+    color: white;
+}
 
-        .modal-btn.cancel {
-            background: #e9eef1;
-            color: #244;
-        }
+#actionModal .modal-btn.cancel {
+    background: #e9eef1;
+    color: #244;
+}
+
 
         @keyframes modalFadeIn {
             from {
