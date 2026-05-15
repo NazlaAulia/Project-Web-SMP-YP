@@ -773,91 +773,46 @@ foreach ($requests as $r) {
             }
         }
 
-        /* FIX SIDEBAR ADMIN NAV BIAR TETAP HIJAU */
-#admin-nav-root,
-#admin-nav-root .sidebar,
-#admin-nav-root .admin-sidebar,
-#admin-nav-root .side-nav,
-#admin-nav-root nav {
-    background: #064e4b !important;
-    color: #ffffff !important;
-}
-
-
-
-#admin-nav-root .active *,
-#admin-nav-root a.active *,
-#admin-nav-root .nav-link.active *,
-#admin-nav-root .submenu-link.active * {
-    color: #064e4b !important;
-}
-
-/* FIX KONTEN */
+     /* Layout halaman saja, jangan ubah warna navbar */
 .container {
-    display: flex !important;
-    width: 100% !important;
-    min-height: 100vh !important;
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
 }
 
 .main-content {
-    flex: 1 !important;
-    min-width: 0 !important;
-    overflow-x: hidden !important;
-    padding: 32px !important;
-}
-
-
-#admin-nav-root .submenu,
-#admin-nav-root .submenu-list,
-#admin-nav-root .nav-submenu {
-    background: rgba(255, 255, 255, 0.08) !important;
-}
-
-
-
-/* FIX KONTEN BIAR ORA MELEBAR NUTUP LAYAR */
-.container {
-    display: flex !important;
-    width: 100% !important;
-    min-height: 100vh !important;
-}
-
-.main-content {
-    flex: 1 !important;
-    min-width: 0 !important;
-    overflow-x: hidden !important;
-    padding: 32px !important;
+    flex: 1;
+    min-width: 0;
+    overflow-x: hidden;
+    padding: 32px;
 }
 
 .page-header {
-    max-width: 100% !important;
-    overflow: hidden !important;
+    max-width: 100%;
+    overflow: hidden;
 }
 
+/* Active submenu request jadwal */
+#admin-nav-root .active-submenu {
+    background: #ffffff !important;
+    color: #064e4b !important;
+}
 
-#admin-nav-root .force-active-ganti,
-#admin-nav-root .force-active-ganti i,
-#admin-nav-root .force-active-ganti span {
+#admin-nav-root .active-submenu * {
+    color: #064e4b !important;
+}
+
+/* Biar tombol logout modal navbar tetap normal */
+#admin-nav-root .logout-modal-box .btn-confirm {
+    color: #ffffff !important;
+}
+
+#admin-nav-root .logout-modal-box .btn-cancel {
     color: #064e4b !important;
 }
 
 
-
-#admin-nav-root a.active i,
-#admin-nav-root .active i,
-#admin-nav-root .nav-link.active i,
-#admin-nav-root .submenu-link.active i {
-    color: #064e4b !important;
-}
-
-#admin-nav-root a.active span,
-#admin-nav-root .active span,
-#admin-nav-root .nav-link.active span,
-#admin-nav-root .submenu-link.active span {
-    color: #064e4b !important;
-}
-
-.modal-overlay{
+#actionModal.modal-overlay {
     position: fixed;
     inset: 0;
     background: rgba(15,23,42,.45);
@@ -867,25 +822,82 @@ foreach ($requests as $r) {
     z-index: 9999;
 }
 
-.modal-overlay.active{
-    display:flex;
+#actionModal.modal-overlay.active {
+    display: flex;
 }
 
-.modal-box{
-    width:100%;
-    max-width:520px;
-    background:white;
-    border-radius:24px;
-    padding:28px;
-    box-shadow:0 24px 48px rgba(0,0,0,.18);
+#actionModal .modal-box {
+    width: 100%;
+    max-width: 520px;
+    background: white;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 24px 48px rgba(0,0,0,.18);
 }
 
-.modal-actions{
-    display:flex;
-    justify-content:flex-end;
-    gap:12px;
-    margin-top:24px;
+#actionModal .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
 }
+
+#actionModal .custom-modal-icon {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    background: #ecfdf5;
+    color: #0f766e;
+}
+
+#actionModal .custom-modal-icon.reject {
+    background: #fff5f5;
+    color: #ef4444;
+}
+
+#actionModal .modal-box h3 {
+    margin: 0 0 8px;
+    text-align: center;
+    color: #064e4b;
+    font-size: 24px;
+}
+
+#actionModal .modal-box p {
+    margin: 0;
+    text-align: center;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+#actionModal .modal-btn {
+    min-width: 130px;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#actionModal .modal-btn.confirm {
+    background: #16a34a;
+    color: white;
+}
+
+#actionModal .modal-btn.reject {
+    background: #ef4444;
+    color: white;
+}
+
+#actionModal .modal-btn.cancel {
+    background: #e9eef1;
+    color: #064e4b;
+}
+
 
     </style>
 </head>
