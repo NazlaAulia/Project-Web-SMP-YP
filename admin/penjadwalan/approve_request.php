@@ -935,6 +935,27 @@ foreach ($requests as $r) {
     color: #064e4b !important;
 }
 
+#admin-nav-root a.active,
+#admin-nav-root .active,
+#admin-nav-root .nav-link.active,
+#admin-nav-root .submenu-link.active {
+    color: #064e4b !important;
+}
+
+#admin-nav-root a.active i,
+#admin-nav-root .active i,
+#admin-nav-root .nav-link.active i,
+#admin-nav-root .submenu-link.active i {
+    color: #064e4b !important;
+}
+
+#admin-nav-root a.active span,
+#admin-nav-root .active span,
+#admin-nav-root .nav-link.active span,
+#admin-nav-root .submenu-link.active span {
+    color: #064e4b !important;
+}
+
     </style>
 </head>
 
