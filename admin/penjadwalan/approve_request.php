@@ -867,11 +867,12 @@ foreach ($requests as $r) {
     </style>
 </head>
 
-<body data-page="request_jadwal">
-    <div id="admin-nav-root"></div>
-
+<body data-page="request_jadwal" data-nav-path="/admin/components/admin-nav.html">
     <div class="container">
+        <div id="admin-nav-root"></div>
+
         <main class="main-content">
+
             <section class="page-header">
                 <h1>Terima ganti Jadwal</h1>
                 <p>

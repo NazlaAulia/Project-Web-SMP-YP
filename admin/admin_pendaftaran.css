@@ -1161,3 +1161,176 @@ body {
         justify-content: flex-start !important;
     }
 }
+
+/* =========================
+   FIX FINAL TABEL PENDAFTARAN
+========================= */
+.table-card {
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 22px !important;
+    border-radius: 22px !important;
+}
+
+#tablePendaftaran {
+    width: 100% !important;
+    min-width: 1320px !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    table-layout: fixed !important;
+}
+
+#tablePendaftaran thead tr {
+    background: #e8f3f2 !important;
+}
+
+#tablePendaftaran thead th {
+    padding: 15px 12px !important;
+    color: #064e4b !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    line-height: 1.35 !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+}
+
+#tablePendaftaran tbody tr {
+    background: #ffffff !important;
+    border-bottom: 1px solid #edf1f0 !important;
+}
+
+#tablePendaftaran tbody tr:hover {
+    background: #f8fbfa !important;
+}
+
+#tablePendaftaran tbody td {
+    padding: 15px 12px !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    color: #123 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+#tablePendaftaran th:nth-child(1),
+#tablePendaftaran td:nth-child(1) {
+    width: 55px !important;
+    text-align: center !important;
+}
+
+#tablePendaftaran th:nth-child(2),
+#tablePendaftaran td:nth-child(2) {
+    width: 170px !important;
+    white-space: normal !important;
+}
+
+#tablePendaftaran th:nth-child(3),
+#tablePendaftaran td:nth-child(3) {
+    width: 120px !important;
+}
+
+#tablePendaftaran th:nth-child(4),
+#tablePendaftaran td:nth-child(4) {
+    width: 150px !important;
+}
+
+#tablePendaftaran th:nth-child(5),
+#tablePendaftaran td:nth-child(5) {
+    width: 110px !important;
+}
+
+#tablePendaftaran th:nth-child(6),
+#tablePendaftaran td:nth-child(6) {
+    width: 130px !important;
+}
+
+#tablePendaftaran th:nth-child(7),
+#tablePendaftaran td:nth-child(7) {
+    width: 140px !important;
+}
+
+#tablePendaftaran th:nth-child(8),
+#tablePendaftaran td:nth-child(8) {
+    width: 160px !important;
+    white-space: normal !important;
+}
+
+#tablePendaftaran th:nth-child(9),
+#tablePendaftaran td:nth-child(9) {
+    width: 150px !important;
+    white-space: normal !important;
+}
+
+#tablePendaftaran th:nth-child(10),
+#tablePendaftaran td:nth-child(10) {
+    width: 130px !important;
+}
+
+#tablePendaftaran th:nth-child(11),
+#tablePendaftaran td:nth-child(11) {
+    width: 110px !important;
+    text-align: center !important;
+}
+
+#tablePendaftaran th:nth-child(12),
+#tablePendaftaran td:nth-child(12) {
+    width: 150px !important;
+    text-align: center !important;
+}
+
+#tablePendaftaran .badge,
+#tablePendaftaran .btn-disabled,
+#tablePendaftaran .btn-accept,
+#tablePendaftaran .btn-reject {
+    font-size: 12px !important;
+    border-radius: 12px !important;
+    padding: 8px 12px !important;
+    white-space: nowrap !important;
+}
+
+#tablePendaftaran .action-cell {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+}
+
+@media (max-width: 768px) {
+    .table-card {
+        padding: 14px !important;
+        overflow-x: auto !important;
+    }
+
+    #tablePendaftaran {
+        min-width: 1320px !important;
+    }
+
+    #tablePendaftaran thead th,
+    #tablePendaftaran tbody td {
+        font-size: 12px !important;
+        padding: 13px 10px !important;
+    }
+}
+
+.btn-print-pdf {
+    background: #facc15;
+    color: #1f2937;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-print-pdf:hover {
+    background: #eab308;
+    color: #1f2937;
+}
