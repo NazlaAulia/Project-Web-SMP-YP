@@ -281,7 +281,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
 
             <!-- TABEL PENDAFTARAN -->
             <div class="table-card">
-           <table id="tablePendaftaran">
+          <table id="tablePendaftaran">
     <thead>
         <tr>
             <th>No</th>
@@ -300,8 +300,54 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
     </thead>
 
     <tbody>
+        <?php $no = $offset + 1; ?>
 
-                </table>
+        <?php if ($result && mysqli_num_rows($result) > 0): ?>
+            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                <tr>
+                    <td><?= $no++; ?></td>
+                    <td><?= htmlspecialchars($row['nama_lengkap']); ?></td>
+                    <td><?= htmlspecialchars($row['nisn']); ?></td>
+                    <td><?= date('d-m-Y H:i:s', strtotime($row['tanggal_daftar'])); ?></td>
+                    <td><?= $row['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?></td>
+                    <td><?= htmlspecialchars($row['tanggal_lahir']); ?></td>
+                    <td><?= htmlspecialchars($row['no_hp']); ?></td>
+                    <td><?= htmlspecialchars($row['asal_sekolah']); ?></td>
+                    <td><?= htmlspecialchars($row['nama_wali']); ?></td>
+                    <td>Rp <?= number_format($row['pendapatan_ortu'], 0, ',', '.'); ?></td>
+
+                    <td>
+                        <?php if ($row['status'] == 'menunggu'): ?>
+                            <span class="badge waiting">Menunggu</span>
+                        <?php elseif ($row['status'] == 'diterima'): ?>
+                            <span class="badge accepted">Diterima</span>
+                        <?php else: ?>
+                            <span class="badge rejected">Ditolak</span>
+                        <?php endif; ?>
+                    </td>
+
+                    <td class="action-cell">
+                        <?php if ($is_nonaktif): ?>
+                            <span class="badge badge-secondary">Arsip</span>
+                        <?php elseif ($row['status'] == 'menunggu'): ?>
+                            <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=diterima&id_tahun=<?= $id_tahun_terpilih ?>" class="btn-accept" onclick="konfirmasiAksi(event, this.href, 'terima', this)">Terima</a>
+                            <a href="/admin/update_status.php?id=<?= $row['id_pendaftaran']; ?>&status=ditolak&id_tahun=<?= $id_tahun_terpilih ?>" class="btn-reject" onclick="konfirmasiAksi(event, this.href, 'tolak', this)">Tolak</a>
+                        <?php elseif ($row['status'] == 'diterima'): ?>
+                            <button disabled class="btn-disabled accepted-disabled">Sudah diterima</button>
+                        <?php else: ?>
+                            <button disabled class="btn-disabled rejected-disabled">Sudah ditolak</button>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="12" class="empty-data">Data tidak ditemukan.</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+
                 <!-- PAGINATION -->
                 <div class="pagination-wrapper">
                     <p class="pagination-info">Menampilkan <?= $startData; ?> sampai <?= $endData; ?> dari <?= $totalData; ?> Pendaftar</p>
