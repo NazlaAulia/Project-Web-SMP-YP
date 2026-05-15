@@ -496,7 +496,8 @@ foreach ($requests as $r) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/admin/components/admin-nav.css?v=500">
+    <link rel="stylesheet" href="/admin/components/admin-nav.css?v=501">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -864,6 +865,59 @@ foreach ($requests as $r) {
                 grid-template-columns: 1fr;
             }
         }
+
+        /* FIX SIDEBAR ADMIN NAV BIAR TETAP HIJAU */
+#admin-nav-root,
+#admin-nav-root .sidebar,
+#admin-nav-root .admin-sidebar,
+#admin-nav-root .side-nav,
+#admin-nav-root nav {
+    background: #064e4b !important;
+    color: #ffffff !important;
+}
+
+#admin-nav-root a,
+#admin-nav-root span,
+#admin-nav-root p,
+#admin-nav-root h1,
+#admin-nav-root h2,
+#admin-nav-root h3,
+#admin-nav-root i {
+    color: #ffffff !important;
+}
+
+#admin-nav-root .submenu,
+#admin-nav-root .submenu-list,
+#admin-nav-root .nav-submenu {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+#admin-nav-root .active,
+#admin-nav-root a.active,
+#admin-nav-root .nav-link.active {
+    background: rgba(255, 255, 255, 0.16) !important;
+    color: #ffffff !important;
+}
+
+/* FIX KONTEN BIAR ORA MELEBAR NUTUP LAYAR */
+.container {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+}
+
+.main-content {
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    padding: 32px !important;
+}
+
+.page-header {
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
     </style>
 </head>
 
@@ -1083,7 +1137,8 @@ foreach ($requests as $r) {
         </div>
     </div>
 
-    <script src="/admin/components/admin-nav.js?v=500"></script>
+  <script src="/admin/components/admin-nav.js?v=501"></script>
+
 
     <script>
         let selectedActionFormId = null;
