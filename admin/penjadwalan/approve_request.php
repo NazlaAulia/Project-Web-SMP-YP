@@ -783,19 +783,7 @@ foreach ($requests as $r) {
     color: #ffffff !important;
 }
 
-/* FIX SIDEBAR AKTIF */
-#admin-nav-root .submenu-link.active {
-    background: #ffffff !important;
-    color: #064e4b !important;
 
-    display: inline-flex !important;
-    align-items: center;
-
-    width: auto !important;
-    padding: 12px 20px !important;
-    margin: 6px 16px !important;
-    border-radius: 999px !important;
-}
 
 #admin-nav-root .active *,
 #admin-nav-root a.active *,
