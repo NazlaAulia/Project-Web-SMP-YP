@@ -502,6 +502,23 @@ foreach ($requests as $r) {
 
     
     <style>
+        :root {
+    --primary-teal: #064e4b;
+    --bg-light: #f4f7f6;
+    --white: #ffffff;
+    --text-dark: #2c3e50;
+    --muted: #6b7280;
+    --border: #edf1f0;
+    --soft-teal: #e8f3f2;
+    --danger-soft: #fee2e2;
+    --danger-text: #ef4444;
+    --success-soft: #dcfce7;
+    --success-text: #16a34a;
+    --warning-soft: #fef3c7;
+    --warning-text: #d97706;
+}
+
+
      body {
     margin: 0;
     background: #f5f7fb;
