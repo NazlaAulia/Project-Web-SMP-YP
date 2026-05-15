@@ -851,10 +851,11 @@ foreach ($requests as $r) {
     color: #064e4b !important;
     border-radius: 999px !important;
     padding: 12px 22px !important;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
-    width: calc(100% - 24px) !important;
-    margin: 6px 12px !important;
+
+    max-width: calc(100% - 32px) !important;
+    margin: 6px 16px !important;
 }
 
 #admin-nav-root .force-active-ganti,
@@ -882,6 +883,36 @@ foreach ($requests as $r) {
 #admin-nav-root .nav-link.active span,
 #admin-nav-root .submenu-link.active span {
     color: #064e4b !important;
+}
+
+.modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-overlay.active{
+    display:flex;
+}
+
+.modal-box{
+    width:100%;
+    max-width:520px;
+    background:white;
+    border-radius:24px;
+    padding:28px;
+    box-shadow:0 24px 48px rgba(0,0,0,.18);
+}
+
+.modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    margin-top:24px;
 }
 
     </style>
@@ -1083,8 +1114,8 @@ foreach ($requests as $r) {
         </main>
     </div>
 
-    <div class="custom-modal-overlay" id="actionModal">
-        <div class="custom-modal-box">
+<div class="modal-overlay" id="actionModal">
+    <div class="modal-box">
             <div class="custom-modal-icon" id="actionModalIcon">
                 <i class="fas fa-check"></i>
             </div>
@@ -1092,7 +1123,7 @@ foreach ($requests as $r) {
             <h3 id="actionModalTitle">Konfirmasi</h3>
             <p id="actionModalText">Apakah Anda yakin ingin memproses request ini?</p>
 
-            <div class="custom-modal-actions">
+          <div class="modal-actions">
                 <button type="button" class="modal-btn confirm" id="actionModalConfirm">
                     Ya, Lanjutkan!
                 </button>
