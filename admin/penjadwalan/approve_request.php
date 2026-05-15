@@ -892,12 +892,7 @@ foreach ($requests as $r) {
     background: rgba(255, 255, 255, 0.08) !important;
 }
 
-#admin-nav-root .active,
-#admin-nav-root a.active,
-#admin-nav-root .nav-link.active {
-    background: rgba(255, 255, 255, 0.16) !important;
-    color: #ffffff !important;
-}
+
 
 /* FIX KONTEN BIAR ORA MELEBAR NUTUP LAYAR */
 .container {
@@ -921,8 +916,7 @@ foreach ($requests as $r) {
     </style>
 </head>
 
-<body data-page="kelola_jadwal" data-nav-path="/admin/components/admin-nav.html">
-
+<body data-page="request_jadwal" data-nav-path="/admin/components/admin-nav.html">
     <div class="container">
         <div id="admin-nav-root"></div>
 
