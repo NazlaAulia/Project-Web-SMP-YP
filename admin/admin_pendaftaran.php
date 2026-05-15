@@ -124,7 +124,59 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
+    
+    <style>
+        .modal-atur {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+        }
+        .modal-atur .modal-box {
+            background: white;
+            width: 500px;
+            max-width: 90%;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+        .modal-atur h3 {
+            margin-bottom: 20px;
+            color: #064e4b;
+        }
+        .modal-atur .form-group { margin-bottom: 15px; }
+        .modal-atur label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+        .modal-atur input, .modal-atur select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
+        .modal-atur .btn-group { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
+        .modal-atur button { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-batal { background: #e0e0e0; color: #333; }
+        .btn-simpan { background: #064e4b; color: white; }
+        .btn-atur-pendaftaran { background: #0f5d5d; color: white; border: none; padding: 8px 16px; border-radius: 20px; margin-left: 10px; cursor: pointer; font-size: 13px; }
+        .btn-atur-pendaftaran:hover { background: #053f3d; }
+        .btn-proses-semua {
+            background: #0f5d5d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-proses-semua:hover {
+            background: #053f3d;
+        }
+        .btn-tandai {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body data-page="pendaftaran" data-nav-path="components/admin-nav.html">
 <div class="container">
