@@ -921,7 +921,8 @@ foreach ($requests as $r) {
     </style>
 </head>
 
-<body data-page="request_jadwal" data-nav-path="/admin/components/admin-nav.html">
+<body data-page="kelola_jadwal" data-nav-path="/admin/components/admin-nav.html">
+
     <div class="container">
         <div id="admin-nav-root"></div>
 
