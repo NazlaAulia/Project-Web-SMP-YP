@@ -873,6 +873,73 @@ foreach ($requests as $r) {
 }
 
 
+@media (max-width: 768px) {
+    .approve-page {
+        padding: 16px 14px;
+    }
+
+    .approve-page .page-header {
+        padding: 28px 26px;
+        border-radius: 28px;
+        margin-bottom: 20px;
+    }
+
+    .approve-page .page-header h1 {
+        font-size: 36px;
+        line-height: 1.25;
+        word-break: normal;
+    }
+
+    .approve-page .page-header p {
+        font-size: 18px;
+        line-height: 1.55;
+    }
+
+    .approve-page .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .approve-page .stat-card {
+        padding: 24px 28px;
+        border-radius: 24px;
+    }
+
+    .approve-page .request-card {
+        padding: 20px;
+        border-radius: 22px;
+    }
+
+    .approve-page .grid-detail {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .approve-page {
+        padding: 14px 12px;
+    }
+
+    .approve-page .page-header {
+        padding: 24px 22px;
+        border-radius: 26px;
+    }
+
+    .approve-page .page-header h1 {
+        font-size: 34px;
+        line-height: 1.25;
+    }
+
+    .approve-page .page-header p {
+        font-size: 17px;
+        line-height: 1.55;
+    }
+
+    .approve-page .stat-card {
+        padding: 22px 26px;
+    }
+}
+
 
     </style>
 </head>
