@@ -9,12 +9,21 @@ if ($id_kelas <= 0) {
     exit;
 }
 
-// Cek apakah kelas memiliki siswa aktif
-$cek = $conn->query("SELECT COUNT(*) as total FROM siswa WHERE id_kelas = $id_kelas AND status = 'aktif'");
-$row = $cek->fetch_assoc();
+// 1. Cek apakah kelas memiliki siswa aktif
+$cek_siswa = $conn->query("SELECT COUNT(*) as total FROM siswa WHERE id_kelas = $id_kelas AND status = 'aktif'");
+$row_siswa = $cek_siswa->fetch_assoc();
 
-if ($row['total'] > 0) {
+if ($row_siswa['total'] > 0) {
     echo json_encode(['success' => false, 'message' => 'Kelas masih memiliki siswa aktif. Tidak bisa dihapus.']);
+    exit;
+}
+
+// 2. Cek apakah kelas masih digunakan di jadwal
+$cek_jadwal = $conn->query("SELECT COUNT(*) as total FROM jadwal WHERE id_kelas = $id_kelas");
+$row_jadwal = $cek_jadwal->fetch_assoc();
+
+if ($row_jadwal['total'] > 0) {
+    echo json_encode(['success' => false, 'message' => 'Kelas masih memiliki jadwal. Tidak bisa dihapus.']);
     exit;
 }
 
@@ -25,4 +34,4 @@ if ($conn->query($query)) {
 } else {
     echo json_encode(['success' => false, 'message' => $conn->error]);
 }
-?>  
+?>
