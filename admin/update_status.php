@@ -53,28 +53,7 @@ if ($statusLama !== 'menunggu') {
 }
 
 // Jika diterima, cek ketersediaan kelas 7 (atau kelas tujuan)
-if ($status === 'diterima') {
-    // Cari kelas 7 yang masih ada kuota (default: tingkat 7, urut berdasarkan yang paling sedikit siswanya)
-    $query_kelas = "SELECT k.id_kelas, k.kapasitas, 
-                    (SELECT COUNT(*) FROM siswa WHERE id_kelas = k.id_kelas AND status = 'aktif') as terisi 
-                    FROM kelas k WHERE k.tingkat = 7 
-                    ORDER BY terisi ASC LIMIT 1";
-    $result_kelas = mysqli_query($conn, $query_kelas);
-    $kelas_tujuan = mysqli_fetch_assoc($result_kelas);
-    
-    if (!$kelas_tujuan) {
-        echo json_encode(['success' => false, 'message' => 'Tidak ada kelas 7 yang tersedia.']);
-        exit;
-    }
-    
-    if ($kelas_tujuan['terisi'] >= $kelas_tujuan['kapasitas']) {
-        echo json_encode(['success' => false, 'message' => 'Semua kelas 7 sudah penuh. Tidak bisa menerima pendaftaran baru.']);
-        exit;
-    }
-    
-    // Simpan id_kelas_tujuan untuk digunakan nanti (misal di trigger atau insert manual)
-    $id_kelas_tujuan = $kelas_tujuan['id_kelas'];
-}
+
 
 // Proses Update: jika diterima dan ada id_tahun, update juga kolom id_tahun_ajaran
 if ($status === 'diterima' && $id_tahun > 0) {
@@ -94,7 +73,14 @@ mysqli_stmt_close($stmt);
 // Jika status diterima, update juga tabel siswa (trigger biasanya otomatis, tapi pastikan id_kelas terisi)
 if ($status === 'diterima') {
     // Update siswa yang baru dibuat oleh trigger dengan id_kelas yang sudah ditentukan
-    $update_siswa = mysqli_query($conn, "UPDATE siswa SET id_kelas = $id_kelas_tujuan, id_tahun_ajaran = $id_tahun, status = 'aktif' WHERE id_pendaftaran = $id_pendaftaran");
+$update_siswa = mysqli_query($conn, "
+    UPDATE siswa 
+    SET 
+        id_kelas = NULL,
+        id_tahun_ajaran = $id_tahun,
+        status = 'aktif'
+    WHERE id_pendaftaran = $id_pendaftaran
+");
     if (!$update_siswa) {
         // Jika gagal, log error tapi tetap lanjut (trigger mungkin sudah handle)
     }
