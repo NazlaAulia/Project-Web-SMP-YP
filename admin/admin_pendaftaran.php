@@ -293,7 +293,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                 echo '<div class="reminder-box" style="background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 8px;">';
                 echo '<strong><i class="fas fa-bell"></i> Reminder Belum Kirim WhatsApp:</strong><br>';
                 echo '<table style="width:100%; margin-top:10px; border-collapse:collapse;">';
-                echo '<thead><tr><th>Nama</th><th>Status</th><th>Aksi</th></td></thead><tbody>';
+                echo '<thead><tr><th>Nama</th><th>Status</th><th>Aksi</th><tr></thead><tbody>';
                 while ($row = mysqli_fetch_assoc($res_reminder)) {
                     $nama = htmlspecialchars($row['nama_lengkap']);
                     $status = $row['status'];
@@ -360,7 +360,7 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                                 <?php endif; ?>
                             </td>
                         </tr>
-                        <?php } } else { ?><tr><td colspan="12" class="empty-data">Data tidak ditemukan. </td></table><?php } ?>
+                        <?php } } else { ?><tr><td colspan="12" class="empty-data">Data tidak ditemukan. </td></td><?php } ?>
                     </tbody>
                 </table>
             </div>
@@ -466,7 +466,7 @@ document.getElementById('btnProsesSemua')?.addEventListener('click', function() 
     });
 });
 
-// ========== FUNGSI KONFIRMASI AKSI (TERIMA/TOLAK) + REMINDER HANYA SAAT KLIK "NANTI SAJA" ==========
+// ========== FUNGSI KONFIRMASI AKSI (TERIMA/TOLAK) + LANGSUNG UPDATE WA_SENT JIKA KLIK KIRIM WA ==========
 function konfirmasiAksi(event, url, aksi, elemenTombol) {
     event.preventDefault(); 
     let judul = aksi === 'terima' ? 'Terima Pendaftaran?' : 'Tolak Pendaftaran?';
@@ -488,6 +488,8 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
                     let tr = elemenTombol.closest('tr');
                     let tdStatus = tr.querySelector('td:nth-child(11)');
                     let tdAksi = tr.querySelector('.action-cell');
+                    let idPendaftaran = url.match(/id=(\d+)/)[1];
+                    
                     if (aksi === 'terima') {
                         tdStatus.innerHTML = '<span class="badge accepted">Diterima</span>';
                         tdAksi.innerHTML = '<button type="button" class="btn-disabled accepted-disabled" disabled>Sudah diterima</button>';
@@ -496,16 +498,15 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
                         tdAksi.innerHTML = '<button type="button" class="btn-disabled rejected-disabled" disabled>Sudah ditolak</button>';
                     }
 
-                    // 2. Ambil data untuk reminder (nama, status baru, no_hp, id)
+                    // 2. Ambil data untuk reminder
                     let nama = tr.querySelector('td:nth-child(2)').innerText;
                     let statusBaru = aksi === 'terima' ? 'diterima' : 'ditolak';
                     let no_hp = tr.querySelector('td:nth-child(7)').innerText;
-                    let idPendaftaran = url.match(/id=(\d+)/)[1];
                     let clean_no = no_hp.replace(/[^0-9]/g, '');
                     if (clean_no.startsWith('0')) clean_no = '62' + clean_no.substring(1);
                     let wa_link = `https://wa.me/${clean_no}?text=${encodeURIComponent('Halo ' + nama + ', pendaftaran Anda dinyatakan ' + statusBaru + '. Terima kasih.')}`;
 
-                    // 3. Tampilkan popup hasil (dengan tombol Kirim WA / Nanti Saja)
+                    // 3. Tampilkan popup hasil
                     let judulHasil = aksi === 'terima' ? 'Pendaftaran Diterima' : 'Pendaftaran Ditolak';
                     let textHasil = data.link_wa !== '' 
                         ? `Data pendaftaran ${data.nama_siswa} berhasil ${aksi}. Kirim pemberitahuan WhatsApp?` 
@@ -516,6 +517,7 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
                         icon: aksi === 'terima' ? 'success' : 'error',
                         borderRadius: '24px'
                     };
+                    
                     if (data.link_wa !== '') {
                         swalOptions.showCancelButton = true;
                         swalOptions.confirmButtonColor = '#22c55e';
@@ -529,17 +531,18 @@ function konfirmasiAksi(event, url, aksi, elemenTombol) {
                     }
                     
                     Swal.fire(swalOptions).then((result2) => {
-                        // Jika klik "Kirim ke WhatsApp" -> buka WA, jangan tambah reminder
                         if (result2.isConfirmed && data.link_wa !== '') {
+                            // Buka WA
                             window.open(data.link_wa, '_blank');
+                            // LANGSUNG UPDATE WA_SENT = 1 (agar tidak masuk reminder)
+                            fetch(`/admin/mark_wa_sent.php?id=${idPendaftaran}`)
+                                .catch(err => console.error('Gagal update wa_sent:', err));
                             // Tidak tambah reminder
                         } 
-                        // Jika klik "Nanti Saja" (cancel) atau jika tidak ada WA (tutup)
                         else if ((result2.dismiss === Swal.DismissReason.cancel) || (data.link_wa === '' && result2.isConfirmed)) {
-                            // Tambah reminder
+                            // Tambah reminder (karena klik Nanti Saja atau tutup)
                             tambahKeReminder(nama, statusBaru, wa_link, idPendaftaran);
                         }
-                        // Jika popup hanya memiliki tombol "Tutup" (tidak ada WA) dan user klik Tutup -> tambah reminder
                         else if (data.link_wa === '' && result2.isConfirmed) {
                             tambahKeReminder(nama, statusBaru, wa_link, idPendaftaran);
                         }
