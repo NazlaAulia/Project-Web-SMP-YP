@@ -144,28 +144,42 @@ try {
     $stmt->close();
 
     // Kelas 8 layak -> naik ke kelas 9 (huruf sama)
-    $stmt = $conn->prepare("
-        UPDATE siswa s
-        JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
-        JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
-        JOIN kelas k_baru ON k_baru.tingkat = 9 AND RIGHT(k_baru.nama_kelas, 1) = RIGHT(k_lama.nama_kelas, 1)
-        SET s.id_kelas = k_baru.id_kelas, s.id_tahun_ajaran = ?
-        WHERE t.tingkat = 8 AND t.layak_naik = 1 AND s.status = 'aktif'
-    ");
-    $stmt->bind_param("i", $id_tahun_ajaran);
+   $stmt = $conn->prepare("
+    UPDATE siswa s
+    JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
+    JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
+    JOIN kelas k_baru 
+        ON k_baru.tingkat = 9
+        AND RIGHT(k_baru.nama_kelas, 1) = RIGHT(k_lama.nama_kelas, 1)
+        AND k_baru.id_tahun_ajaran = ?
+    SET s.id_kelas = k_baru.id_kelas,
+        s.id_tahun_ajaran = ?
+    WHERE t.tingkat = 8
+    AND t.layak_naik = 1
+    AND s.status = 'aktif'
+");
+
+$stmt->bind_param("ii", $id_tahun_ajaran, $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
     // Kelas 7 layak -> naik ke kelas 8 (huruf sama)
-    $stmt = $conn->prepare("
-        UPDATE siswa s
-        JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
-        JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
-        JOIN kelas k_baru ON k_baru.tingkat = 8 AND RIGHT(k_baru.nama_kelas, 1) = RIGHT(k_lama.nama_kelas, 1)
-        SET s.id_kelas = k_baru.id_kelas, s.id_tahun_ajaran = ?
-        WHERE t.tingkat = 7 AND t.layak_naik = 1 AND s.status = 'aktif'
-    ");
-    $stmt->bind_param("i", $id_tahun_ajaran);
+   $stmt = $conn->prepare("
+    UPDATE siswa s
+    JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
+    JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
+    JOIN kelas k_baru 
+        ON k_baru.tingkat = 8
+        AND RIGHT(k_baru.nama_kelas, 1) = RIGHT(k_lama.nama_kelas, 1)
+        AND k_baru.id_tahun_ajaran = ?
+    SET s.id_kelas = k_baru.id_kelas,
+        s.id_tahun_ajaran = ?
+    WHERE t.tingkat = 7
+    AND t.layak_naik = 1
+    AND s.status = 'aktif'
+");
+
+$stmt->bind_param("ii", $id_tahun_ajaran, $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
