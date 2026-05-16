@@ -15,11 +15,9 @@ try {
     ");
 
     if (!$result || $result->num_rows === 0) {
-        $tahunBaru = '2026/2027';
-        $isFirstYear = true;
+        $tahunBaru = '2025/2026';
     } else {
         $last = $result->fetch_assoc()['tahun_ajaran'];
-        $isFirstYear = false;
 
         if (!preg_match('/^(\d{4})\/(\d{4})$/', $last, $match)) {
             throw new Exception('Format tahun ajaran terakhir tidak valid.');
@@ -62,23 +60,25 @@ try {
     // ============ 4. COPY KELAS DARI TAHUN SEBELUMNYA ============
     $kelasTersalin = 0;
     
-    if (!$isFirstYear) {
-        // Ambil tahun sebelumnya
-        $queryPrev = "SELECT id_tahun_ajaran FROM tahun_ajaran 
-                     WHERE tahun_ajaran = ?";
-        $stmtPrev = $conn->prepare($queryPrev);
-        $stmtPrev->bind_param("s", $last);
-        $stmtPrev->execute();
-        $prevResult = $stmtPrev->get_result();
+    // Cari tahun ajaran sebelumnya (yang status aktif atau terbaru selain yang baru)
+    $queryPrev = "
+        SELECT id_tahun_ajaran 
+        FROM tahun_ajaran 
+        WHERE tahun_ajaran != '$tahunBaru'
+        ORDER BY id_tahun_ajaran DESC 
+        LIMIT 1
+    ";
+    $prevResult = $conn->query($queryPrev);
+    
+    if ($prevResult && $prevResult->num_rows > 0) {
         $prevYear = $prevResult->fetch_assoc();
         $id_tahun_lama = $prevYear['id_tahun_ajaran'];
         
-        // Ambil semua kelas dari tahun sebelumnya
+        // Ambil semua kelas dari tahun sebelumnya (langsung dari tabel kelas)
         $queryKelas = "
-            SELECT k.id_kelas, k.nama_kelas, k.tingkat, k.kapasitas
-            FROM kelas k
-            INNER JOIN kelas_tahun kt ON k.id_kelas = kt.id_kelas
-            WHERE kt.id_tahun_ajaran = ?
+            SELECT id_kelas, nama_kelas, tingkat, kapasitas, id_wali_kelas
+            FROM kelas
+            WHERE id_tahun_ajaran = ?
         ";
         $stmtKelas = $conn->prepare($queryKelas);
         $stmtKelas->bind_param("i", $id_tahun_lama);
@@ -86,13 +86,20 @@ try {
         $kelasResult = $stmtKelas->get_result();
         
         while ($kelas = $kelasResult->fetch_assoc()) {
-            // Hubungkan kelas yang sudah ada dengan tahun ajaran baru
-            $insertKT = $conn->prepare("
-                INSERT INTO kelas_tahun (id_kelas, id_tahun_ajaran)
-                VALUES (?, ?)
+            // Insert kelas baru untuk tahun ajaran baru (copy semua data)
+            $insertKelas = $conn->prepare("
+                INSERT INTO kelas (nama_kelas, tingkat, kapasitas, id_wali_kelas, id_tahun_ajaran)
+                VALUES (?, ?, ?, ?, ?)
             ");
-            $insertKT->bind_param("ii", $kelas['id_kelas'], $id_tahun_baru);
-            $insertKT->execute();
+            $insertKelas->bind_param(
+                "siiii", 
+                $kelas['nama_kelas'], 
+                $kelas['tingkat'], 
+                $kelas['kapasitas'], 
+                $kelas['id_wali_kelas'], 
+                $id_tahun_baru
+            );
+            $insertKelas->execute();
             $kelasTersalin++;
         }
     }
@@ -106,33 +113,12 @@ try {
         ];
         
         foreach ($defaultClasses as $class) {
-            // Cek apakah kelas sudah ada di tabel kelas
-            $cekKelas = $conn->prepare("SELECT id_kelas FROM kelas WHERE nama_kelas = ?");
-            $cekKelas->bind_param("s", $class[0]);
-            $cekKelas->execute();
-            $resultKelas = $cekKelas->get_result();
-            
-            if ($resultKelas->num_rows > 0) {
-                $existingKelas = $resultKelas->fetch_assoc();
-                $id_kelas = $existingKelas['id_kelas'];
-            } else {
-                // Buat kelas baru
-                $insertKelas = $conn->prepare("
-                    INSERT INTO kelas (nama_kelas, tingkat, kapasitas)
-                    VALUES (?, ?, ?)
-                ");
-                $insertKelas->bind_param("sii", $class[0], $class[1], $class[2]);
-                $insertKelas->execute();
-                $id_kelas = $conn->insert_id;
-            }
-            
-            // Hubungkan dengan tahun ajaran baru
-            $insertKT = $conn->prepare("
-                INSERT INTO kelas_tahun (id_kelas, id_tahun_ajaran)
-                VALUES (?, ?)
+            $insertKelas = $conn->prepare("
+                INSERT INTO kelas (nama_kelas, tingkat, kapasitas, id_tahun_ajaran)
+                VALUES (?, ?, ?, ?)
             ");
-            $insertKT->bind_param("ii", $id_kelas, $id_tahun_baru);
-            $insertKT->execute();
+            $insertKelas->bind_param("siii", $class[0], $class[1], $class[2], $id_tahun_baru);
+            $insertKelas->execute();
             $kelasTersalin++;
         }
     }
