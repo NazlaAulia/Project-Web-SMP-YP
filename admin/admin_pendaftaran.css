@@ -1387,54 +1387,56 @@ body {
 }
 
 /* =========================
-   PAGINATION - TULISAN "PENDAFTAR" DIKANAN
+   HILANGKAN KOLOM NO
 ========================= */
+#tablePendaftaran th:first-child,
+#tablePendaftaran td:first-child {
+    display: none !important;
+}
 
-/* Wrapper pagination */
+/* =========================
+   PAGINATION - Kata "Pendaftar" di pojok kiri
+========================= */
 .pagination-wrapper {
     display: flex !important;
-    justify-content: flex-end !important; /* semua isi ke kanan */
-    align-items: center !important;
-    gap: 10px !important;
-    flex-wrap: wrap;
+    justify-content: space-between !important; /* teks kiri, tombol kanan */
+    align-items: flex-end !important;
     margin-top: 20px !important;
-    padding: 18px 22px !important;
-    background: #ffffff !important;
-    border-radius: 18px !important;
+    padding: 10px 0 !important;
+    width: 100% !important;
 }
 
-/* Teks info (misal "Pendaftar") */
 .pagination-info {
-    width: auto !important;
-    text-align: right !important;  /* geser ke kanan */
-    margin-left: auto !important;  /* dorong ke kanan */
     font-size: 14px;
-    color: #6b7280; /* sama seperti muted text */
+    color: #6b7280; /* muted text */
+    text-align: left !important; /* tetap di kiri */
+    margin-left: 0 !important;
 }
 
-/* Tombol pagination tetap di kanan, tapi rapih */
 .pagination {
     display: flex !important;
-    justify-content: flex-end !important;
+    justify-content: flex-end !important; /* tombol di kanan */
     gap: 8px !important;
-    width: auto !important;
 }
 
-/* MOBILE RESPONSIVE */
+/* =========================
+   RESPONSIVE MOBILE
+========================= */
 @media (max-width: 768px) {
     .pagination-wrapper {
         flex-direction: column !important;
-        align-items: flex-end !important; /* tetap kanan */
+        align-items: flex-start !important; /* teks tetap kiri bawah */
     }
 
     .pagination-info {
-        text-align: right !important;
+        text-align: left !important;
         width: 100% !important;
         margin-left: 0 !important;
+        margin-bottom: 6px; /* beri jarak dari tombol */
     }
 
     .pagination {
-        justify-content: flex-end !important;
+        justify-content: flex-start !important; /* tombol tetap di kanan bawah */
         width: 100% !important;
         flex-wrap: wrap !important;
     }
