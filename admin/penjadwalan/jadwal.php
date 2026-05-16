@@ -68,7 +68,7 @@ if ($qKelas) $total_kelas = $qKelas->fetch_assoc()['total'];
 $qMapel = $conn->query("SELECT COUNT(*) AS total FROM mapel");
 if ($qMapel) $total_mapel = $qMapel->fetch_assoc()['total'];
 
-// ========== QUERY JADWAL BERDASARKAN TAHUN DIPILIH (TAMBAHKAN STATUS) ==========
+// ========== QUERY JADWAL BERDASARKAN TAHUN DIPILIH ==========
 $jadwal_by_kelas = [];
 $hari_urutan = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
@@ -167,6 +167,8 @@ if ($id_tahun_dipilih > 0) {
         .btn-danger { background: #dc2626; color: white; }
         .btn-danger:hover { background: #b91c1c; }
         .btn-light { background: #eef2f7; color: #334155; }
+        .btn-hapus-kelas { background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-hapus-kelas:hover { background: #b91c1c; }
         .status-box { display: none; margin-top: 14px; padding: 13px 15px; border-radius: 14px; font-size: 14px; font-weight: 500; }
         .status-loading { display: block; background: var(--blue-soft); color: #1d4ed8; }
         .status-success { display: block; background: #dcfce7; color: #166534; }
@@ -239,6 +241,7 @@ if ($id_tahun_dipilih > 0) {
             .modal-btn { width: 100%; }
             .lesson-mapel { flex-direction: column; align-items: flex-start; }
             .btn-hapus-jadwal { width: 100%; }
+            .btn-hapus-kelas { width: 100%; margin-top: 8px; }
         }
     </style>
 </head>
@@ -352,6 +355,11 @@ if ($id_tahun_dipilih > 0) {
                                             <a href="/admin/penjadwalan/cetak_jadwal_kelas.php?id_kelas=<?php echo $id_kelas_cetak; ?>" target="_blank" class="print-class-btn">
                                                 <i class="fas fa-file-pdf"></i> Cetak PDF
                                             </a>
+                                            <?php if (!$is_locked && $is_tahun_aktif): ?>
+                                                <button type="button" class="btn-hapus-kelas" onclick="hapusJadwalPerKelas(<?= $id_kelas_cetak ?>, '<?= htmlspecialchars($nama_kelas) ?>', this)">
+                                                    <i class="fas fa-trash-alt"></i> Hapus Semua Jadwal Kelas Ini
+                                                </button>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -518,7 +526,6 @@ if ($id_tahun_dipilih > 0) {
                         if (data.success) {
                             card.remove();
                             Swal.fire('Berhasil!', 'Jadwal dihapus', 'success');
-                            // Update total jadwal di statistik
                             let totalSpan = document.querySelector('.stats-grid .stat-card:first-child .stat-info h3');
                             if (totalSpan) totalSpan.textContent = parseInt(totalSpan.textContent) - 1;
                         } else {
@@ -530,7 +537,44 @@ if ($id_tahun_dipilih > 0) {
             });
         }
         
-        // ========== HAPUS SEMUA JADWAL ==========
+        // ========== HAPUS SEMUA JADWAL DALAM SATU KELAS ==========
+        function hapusJadwalPerKelas(idKelas, namaKelas, btn) {
+            let cardKelas = btn.closest('.class-schedule-card');
+            
+            Swal.fire({
+                title: 'Hapus Semua Jadwal?',
+                html: `Apakah Anda yakin ingin menghapus <strong>SEMUA jadwal untuk kelas ${namaKelas}</strong>?<br>Tindakan ini tidak dapat dibatalkan!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus Semua!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    fetch('/admin/penjadwalan/hapus_jadwal_per_kelas.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'id_kelas=' + idKelas + '&id_tahun=<?= $id_tahun_dipilih ?>'
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            cardKelas.remove();
+                            Swal.fire('Berhasil!', data.message, 'success');
+                            let totalSpan = document.querySelector('.stats-grid .stat-card:first-child .stat-info h3');
+                            if (totalSpan) totalSpan.textContent = parseInt(totalSpan.textContent) - data.jumlah;
+                        } else {
+                            Swal.fire('Gagal!', data.message, 'error');
+                        }
+                    })
+                    .catch(error => Swal.fire('Error!', 'Terjadi kesalahan', 'error'));
+                }
+            });
+        }
+        
+        // ========== HAPUS SEMUA JADWAL (SEMUA KELAS) ==========
         const hapusSemuaBtn = document.getElementById('hapusSemuaJadwalBtn');
         if (hapusSemuaBtn) {
             hapusSemuaBtn.addEventListener('click', function() {
