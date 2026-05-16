@@ -969,11 +969,13 @@ body {
         overflow-wrap: anywhere !important;
     }
 
-    #tablePendaftaran th:nth-child(1),
-    #tablePendaftaran td:nth-child(1) {
-        width: 34px !important;
-        text-align: center !important;
-    }
+  #tablePendaftaran th:nth-child(1),
+#tablePendaftaran td:nth-child(1) {
+    width: 80px !important;
+    min-width: 80px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
 
     #tablePendaftaran th:nth-child(2),
     #tablePendaftaran td:nth-child(2) {
@@ -1212,9 +1214,8 @@ body {
     line-height: 1.5 !important;
     color: #123 !important;
     vertical-align: middle !important;
-    white-space: nowrap !important;
-    word-break: normal !important;
-    overflow-wrap: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
 }
 
 #tablePendaftaran th:nth-child(1),
@@ -1374,4 +1375,13 @@ body {
         justify-content: flex-start !important;
         flex-wrap: wrap !important;
     }
+}
+
+.pagination-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
