@@ -190,31 +190,59 @@ try {
     $stmt->execute();
     $stmt->close();
 
-    // ========== TEMPATKAN SISWA BARU KE KELAS 7 ==========
-    $kelas7 = [];
+  // ========== TEMPATKAN SISWA BARU KE KELAS 7 ==========
+
+// 1. PASTIKAN KELAS 7 TERSEDIA (BUAT OTOMATIS JIKA BELUM ADA)
+$kelas7 = [];
+$resultKelas7 = $conn->query("SELECT id_kelas, nama_kelas FROM kelas WHERE tingkat = 7 AND id_tahun_ajaran = $id_tahun_ajaran ORDER BY nama_kelas ASC");
+
+if ($resultKelas7->num_rows === 0) {
+    // Buat kelas 7 otomatis jika belum ada
+    $defaultKelas7 = ['7A', '7B', '7C'];
+    foreach ($defaultKelas7 as $namaKelas) {
+        $insertKelas = $conn->prepare("
+            INSERT INTO kelas (nama_kelas, tingkat, kapasitas, id_tahun_ajaran)
+            VALUES (?, 7, 30, ?)
+        ");
+        $insertKelas->bind_param("si", $namaKelas, $id_tahun_ajaran);
+        $insertKelas->execute();
+    }
+    // Ambil lagi setelah dibuat
     $resultKelas7 = $conn->query("SELECT id_kelas FROM kelas WHERE tingkat = 7 AND id_tahun_ajaran = $id_tahun_ajaran ORDER BY nama_kelas ASC");
-    while ($row = $resultKelas7->fetch_assoc()) {
-        $kelas7[] = (int) $row['id_kelas'];
-    }
-    if (count($kelas7) === 0) {
-        throw new Exception("Data kelas tingkat 7 belum tersedia untuk tahun ajaran ini.");
-    }
+}
 
-    $resultSiswaBaru = $conn->query("
-        SELECT id_siswa FROM siswa
-        WHERE status = 'baru' AND id_kelas IS NULL
-        ORDER BY nama ASC, id_siswa ASC
-    ");
+while ($row = $resultKelas7->fetch_assoc()) {
+    $kelas7[] = (int) $row['id_kelas'];
+}
 
-    $stmtSiswaBaru = $conn->prepare("UPDATE siswa SET id_kelas = ?, id_tahun_ajaran = ?, status = 'aktif' WHERE id_siswa = ?");
-    $i = 0;
-    while ($siswa = $resultSiswaBaru->fetch_assoc()) {
-        $id_kelas_baru = $kelas7[$i % count($kelas7)];
-        $stmtSiswaBaru->bind_param("iii", $id_kelas_baru, $id_tahun_ajaran, $siswa['id_siswa']);
-        $stmtSiswaBaru->execute();
-        $i++;
-    }
-    $stmtSiswaBaru->close();
+if (count($kelas7) === 0) {
+    throw new Exception("Data kelas tingkat 7 belum tersedia untuk tahun ajaran ini.");
+}
+
+// 2. AMBIL SISWA BARU (TANPA FILTER STATUS, YANG PENTING BELUM PUNYA KELAS)
+$resultSiswaBaru = $conn->query("
+    SELECT id_siswa, nama, status 
+    FROM siswa 
+    WHERE (id_kelas IS NULL OR id_kelas = 0)
+    AND status != 'lulus'
+    ORDER BY nama ASC, id_siswa ASC
+");
+
+$stmtSiswaBaru = $conn->prepare("UPDATE siswa SET id_kelas = ?, id_tahun_ajaran = ?, status = 'aktif' WHERE id_siswa = ?");
+$i = 0;
+$jumlahSiswaBaru = 0;
+
+while ($siswa = $resultSiswaBaru->fetch_assoc()) {
+    $id_kelas_baru = $kelas7[$i % count($kelas7)];
+    $stmtSiswaBaru->bind_param("iii", $id_kelas_baru, $id_tahun_ajaran, $siswa['id_siswa']);
+    $stmtSiswaBaru->execute();
+    $jumlahSiswaBaru++;
+    $i++;
+}
+$stmtSiswaBaru->close();
+
+// Optional: tambah info ke response
+// $jumlahSiswaBaru ini bisa ditambahkan ke response json
 
     $conn->query("DROP TEMPORARY TABLE IF EXISTS tmp_siswa_layak_naik");
     $conn->commit();
