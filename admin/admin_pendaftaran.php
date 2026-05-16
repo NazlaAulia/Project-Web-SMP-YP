@@ -420,14 +420,50 @@ function openModalAtur() {
 function closeModalAtur() {
     document.getElementById('modalAturPendaftaran').style.display = 'none';
 }
+
 document.getElementById('formAturPendaftaran').addEventListener('submit', function(e) {
     e.preventDefault();
     let formData = new FormData(this);
+    
+    // Tampilkan loading
+    Swal.fire({
+        title: 'Menyimpan...',
+        text: 'Mohon tunggu',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+    
     fetch('/admin/ajax_update_tahun_ajaran.php', { method: 'POST', body: formData })
         .then(res => res.json())
         .then(data => {
-            if (data.success) Swal.fire('Berhasil', 'Pengaturan pendaftaran disimpan', 'success').then(() => location.reload());
-            else Swal.fire('Gagal', data.message, 'error');
+            // TUTUP MODAL DULU sebelum SweetAlert
+            closeModalAtur(); // <-- INI KUNCINYA!
+            
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Pengaturan pendaftaran disimpan',
+                    confirmButtonColor: '#064e4b',
+                    timer: 2000
+                }).then(() => location.reload());
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: data.message,
+                    confirmButtonColor: '#064e4b'
+                });
+            }
+        })
+        .catch(error => {
+            closeModalAtur();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Terjadi kesalahan: ' + error,
+                confirmButtonColor: '#064e4b'
+            });
         });
 });
 
