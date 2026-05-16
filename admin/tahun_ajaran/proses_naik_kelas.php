@@ -23,7 +23,6 @@ if (empty($wali_kelas)) {
 }
 
 // ========== CEK PENDAFTAR YANG MASIH MENUNGGU DI TAHUN AJARAN LAMA ==========
-// Ambil tahun ajaran lama (yang aktif saat ini)
 $query_tahun_lama = "SELECT id_tahun_ajaran, tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1";
 $result_tahun_lama = mysqli_query($conn, $query_tahun_lama);
 $tahun_lama = mysqli_fetch_assoc($result_tahun_lama);
@@ -32,14 +31,12 @@ if ($tahun_lama) {
     $id_tahun_lama = $tahun_lama['id_tahun_ajaran'];
     $tahun_ajaran_lama = $tahun_lama['tahun_ajaran'];
     
-    // Cek pendaftar dengan status 'menunggu' di tahun ajaran lama
     $query_cek = "SELECT COUNT(*) as total FROM pendaftaran WHERE id_tahun_ajaran = $id_tahun_lama AND status = 'menunggu'";
     $result_cek = mysqli_query($conn, $query_cek);
     $data_cek = mysqli_fetch_assoc($result_cek);
     $jumlah_menunggu = $data_cek['total'];
     
     if ($jumlah_menunggu > 0) {
-        // Ambil daftar nama pendaftar yang masih menunggu (maksimal 10 untuk ditampilkan)
         $query_nama = "SELECT id_pendaftaran, nama_lengkap FROM pendaftaran WHERE id_tahun_ajaran = $id_tahun_lama AND status = 'menunggu' LIMIT 10";
         $result_nama = mysqli_query($conn, $query_nama);
         $daftar_menunggu = [];
@@ -101,7 +98,7 @@ try {
     }
     $stmtWali->close();
 
-    // Buat temporary table untuk siswa yang layak naik
+    // ========== PERBAIKAN: Hanya siswa yang sudah punya kelas yang dihitung layak naik ==========
     $conn->query("DROP TEMPORARY TABLE IF EXISTS tmp_siswa_layak_naik");
     $createTempQuery = "
         CREATE TEMPORARY TABLE tmp_siswa_layak_naik AS
@@ -128,6 +125,7 @@ try {
         JOIN kelas k ON s.id_kelas = k.id_kelas
         LEFT JOIN nilai n ON s.id_siswa = n.id_siswa
         WHERE s.status = 'aktif'
+          AND s.id_kelas IS NOT NULL   -- HANYA SISWA YANG SUDAH PUNYA KELAS
         GROUP BY s.id_siswa, k.tingkat, k.nama_kelas
     ";
     $conn->query($createTempQuery);
@@ -144,42 +142,40 @@ try {
     $stmt->close();
 
     // Kelas 8 layak -> naik ke kelas 9 (huruf sama)
-   $stmt = $conn->prepare("
-    UPDATE siswa s
-    JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
-    JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
-    JOIN kelas k_baru 
-        ON k_baru.tingkat = 9
-        AND RIGHT(k_baru.nama_kelas, 1) = RIGHT(k_lama.nama_kelas, 1)
-        AND k_baru.id_tahun_ajaran = ?
-    SET s.id_kelas = k_baru.id_kelas,
-        s.id_tahun_ajaran = ?
-    WHERE t.tingkat = 8
-    AND t.layak_naik = 1
-    AND s.status = 'aktif'
-");
-
-$stmt->bind_param("ii", $id_tahun_ajaran, $id_tahun_ajaran);
+    $stmt = $conn->prepare("
+        UPDATE siswa s
+        JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
+        JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
+        JOIN kelas k_baru 
+            ON k_baru.tingkat = 9
+            AND RIGHT(k_baru.nama_kelas, 1) = RIGHT(k_lama.nama_kelas, 1)
+            AND k_baru.id_tahun_ajaran = ?
+        SET s.id_kelas = k_baru.id_kelas,
+            s.id_tahun_ajaran = ?
+        WHERE t.tingkat = 8
+        AND t.layak_naik = 1
+        AND s.status = 'aktif'
+    ");
+    $stmt->bind_param("ii", $id_tahun_ajaran, $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
     // Kelas 7 layak -> naik ke kelas 8 (huruf sama)
-   $stmt = $conn->prepare("
-    UPDATE siswa s
-    JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
-    JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
-    JOIN kelas k_baru 
-        ON k_baru.tingkat = 8
-        AND RIGHT(k_baru.nama_kelas, 1) = RIGHT(k_lama.nama_kelas, 1)
-        AND k_baru.id_tahun_ajaran = ?
-    SET s.id_kelas = k_baru.id_kelas,
-        s.id_tahun_ajaran = ?
-    WHERE t.tingkat = 7
-    AND t.layak_naik = 1
-    AND s.status = 'aktif'
-");
-
-$stmt->bind_param("ii", $id_tahun_ajaran, $id_tahun_ajaran);
+    $stmt = $conn->prepare("
+        UPDATE siswa s
+        JOIN tmp_siswa_layak_naik t ON s.id_siswa = t.id_siswa
+        JOIN kelas k_lama ON s.id_kelas = k_lama.id_kelas
+        JOIN kelas k_baru 
+            ON k_baru.tingkat = 8
+            AND RIGHT(k_baru.nama_kelas, 1) = RIGHT(k_lama.nama_kelas, 1)
+            AND k_baru.id_tahun_ajaran = ?
+        SET s.id_kelas = k_baru.id_kelas,
+            s.id_tahun_ajaran = ?
+        WHERE t.tingkat = 7
+        AND t.layak_naik = 1
+        AND s.status = 'aktif'
+    ");
+    $stmt->bind_param("ii", $id_tahun_ajaran, $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
@@ -194,7 +190,7 @@ $stmt->bind_param("ii", $id_tahun_ajaran, $id_tahun_ajaran);
     $stmt->execute();
     $stmt->close();
 
-    // Tempatkan siswa baru ke kelas 7
+    // ========== TEMPATKAN SISWA BARU KE KELAS 7 ==========
     $kelas7 = [];
     $resultKelas7 = $conn->query("SELECT id_kelas FROM kelas WHERE tingkat = 7 AND id_tahun_ajaran = $id_tahun_ajaran ORDER BY nama_kelas ASC");
     while ($row = $resultKelas7->fetch_assoc()) {
