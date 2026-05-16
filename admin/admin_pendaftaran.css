@@ -1395,33 +1395,34 @@ body {
 }
 
 /* =========================
-   PAGINATION - Kata "Pendaftar" di kiri bawah, tombol di kanan
+   PAGINATION - Teks di kiri, tombol di kanan
 ========================= */
 .pagination-wrapper {
     display: flex !important;
-    justify-content: space-between !important; /* teks kiri, tombol kanan */
-    align-items: flex-end !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     margin-top: 20px !important;
-    padding: 10px 22px !important;
-    width: calc(100% - 250px) !important; /* kurangi lebar sidebar */
-    margin-left: 250px !important; /* geser sesuai sidebar */
-    box-sizing: border-box;
-    background: #ffffff !important;
-    border-radius: 18px !important;
+    padding: 10px 0 !important;
+    width: 100% !important;
+    background: transparent !important;
+    border-radius: 0 !important;
     gap: 10px !important;
 }
 
 .pagination-info {
     font-size: 14px;
-    color: #6b7280; /* muted text */
-    text-align: left !important; /* tetap di kiri */
-    margin-left: 0 !important;
+    color: #6b7280;
+    text-align: left !important;
+    margin: 0 !important;
+    width: auto !important;
 }
 
 .pagination {
     display: flex !important;
-    justify-content: flex-end !important; /* tombol di kanan */
+    justify-content: flex-end !important;
     gap: 8px !important;
+    width: auto !important;
+    margin-left: auto !important;
 }
 
 /* =========================
@@ -1429,24 +1430,19 @@ body {
 ========================= */
 @media (max-width: 768px) {
     .pagination-wrapper {
-        width: 100% !important;
-        margin-left: 0 !important; /* tidak perlu offset sidebar di mobile */
         flex-direction: column !important;
-        align-items: flex-start !important; /* teks tetap di kiri bawah */
-        padding: 10px !important;
+        align-items: flex-start !important;
     }
-
+    
     .pagination-info {
-        text-align: left !important;
+        margin-bottom: 10px !important;
+        width: 100% !important;
+    }
+    
+    .pagination {
+        justify-content: flex-start !important;
         width: 100% !important;
         margin-left: 0 !important;
-        margin-bottom: 6px;
-    }
-
-    .pagination {
-        justify-content: flex-start !important; /* tombol tetap rapi di bawah */
-        width: 100% !important;
-        flex-wrap: wrap !important;
     }
 }
 
