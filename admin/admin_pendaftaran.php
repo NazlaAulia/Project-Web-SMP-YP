@@ -328,7 +328,13 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                         <?php } } else { ?><tr><td colspan="12" class="empty-data">Data tidak ditemukan. </td></tr><?php } ?>
                     </tbody>
                 </table>
-                <!-- PAGINATION -->
+            
+            </div>
+        </div>
+    </main>
+</div>
+
+    <!-- PAGINATION -->
                 <div class="pagination-wrapper">
                     <p class="pagination-info">Menampilkan <?= $startData; ?> sampai <?= $endData; ?> dari <?= $totalData; ?> Pendaftar</p>
                     <div class="pagination">
@@ -342,10 +348,6 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                         <?php if ($page < $totalPages) { ?><a href="<?= buildPageUrl($page+1, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><i class="fas fa-chevron-right"></i></a><?php } else { ?><span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span><?php } ?>
                     </div>
                 </div>
-            </div>
-        </div>
-    </main>
-</div>
 
 <!-- MODAL ATUR PENDAFTARAN -->
 <div id="modalAturPendaftaran" class="modal-atur">
