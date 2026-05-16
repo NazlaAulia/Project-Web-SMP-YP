@@ -175,6 +175,36 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
         .btn-tandai {
             cursor: pointer;
         }
+        .search-container-elegant {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            padding: 8px 15px;
+            border-radius: 50px;
+            width: 280px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            gap: 8px;
+        }
+        .search-container-elegant i {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .search-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+            background: transparent;
+        }
+        .search-clear {
+            margin-left: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .search-clear:hover {
+            color: #ef4444;
+        }
     </style>
 </head>
 <body data-page="pendaftaran" data-nav-path="/admin/components/admin-nav.html">
@@ -189,13 +219,13 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                 </div>
                 <div class="header-filter-actions">
                     <a href="<?= buildPageUrl(1, $search, $isMenungguMode ? '' : 'menunggu', $id_tahun_terpilih); ?>" 
-                       class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>">
+                    class="btn-filter-waiting <?= $isMenungguMode ? 'active' : ''; ?>">
                         <i class="fas fa-clock"></i> Menunggu
                     </a>
                 </div>
             </div>
 
-            <!-- DROPDOWN TAHUN, KUOTA, CETAK, TOMBOL ATUR, TOMBOL PROSES SEMUA -->
+            <!-- DROPDOWN TAHUN, KUOTA, CETAK, TOMBOL ATUR -->
             <div class="filter-bar" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                 <form method="GET" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <label style="font-weight: bold;">Tahun Ajaran:</label>
@@ -225,13 +255,18 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                     </button>
                 </form>
 
-                <form method="GET" action="" style="display: flex; gap: 5px;">
+                <!-- Form pencarian dengan icon di dalam input -->
+                <form method="GET" action="" style="display: flex; gap: 5px; align-items: center;">
                     <input type="hidden" name="id_tahun" value="<?= $id_tahun_terpilih ?>">
-                    <?php if($filter !== ''): ?><input type="hidden" name="filter" value="<?= htmlspecialchars($filter); ?>"><?php endif; ?>
-                    <input type="text" name="q" value="<?= htmlspecialchars($search); ?>" placeholder="Cari nama, NISN..." style="padding:6px 12px; border-radius:20px; border:1px solid #ccc;">
-                    <button type="submit" style="border-radius:20px; padding:6px 12px;"><i class="fas fa-search"></i></button>
+                    <?php if($filter !== ''): ?>
+                        <input type="hidden" name="filter" value="<?= htmlspecialchars($filter); ?>">
+                    <?php endif; ?>
+                    <div class="search-container-elegant">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="q" class="search-input" placeholder="Cari nama, NISN..." value="<?= htmlspecialchars($search); ?>">
+                    </div>
                     <?php if($search !== ''): ?>
-                        <a href="?id_tahun=<?= $id_tahun_terpilih ?><?= $filter ? '&filter='.$filter : '' ?>" style="border-radius:50%; background:#ccc; padding:6px 10px;">✕</a>
+                        <a href="?id_tahun=<?= $id_tahun_terpilih ?><?= $filter ? '&filter='.$filter : '' ?>" class="search-clear">✕</a>
                     <?php endif; ?>
                 </form>
             </div>
@@ -248,11 +283,11 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
             <!-- REMINDER WA BELUM TERKIRIM -->
             <?php
             $query_reminder = "SELECT id_pendaftaran, nama_lengkap, no_hp, status 
-                               FROM pendaftaran 
-                               WHERE id_tahun_ajaran = $id_tahun_terpilih 
-                               AND wa_sent = 0 
-                               AND status IN ('diterima', 'ditolak')
-                               ORDER BY id_pendaftaran DESC";
+                            FROM pendaftaran 
+                            WHERE id_tahun_ajaran = $id_tahun_terpilih 
+                            AND wa_sent = 0 
+                            AND status IN ('diterima', 'ditolak')
+                            ORDER BY id_pendaftaran DESC";
             $res_reminder = mysqli_query($conn, $query_reminder);
             if (mysqli_num_rows($res_reminder) > 0) {
                 echo '<div class="reminder-box" style="background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 8px;">';
@@ -267,13 +302,13 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                     if (substr($clean_no, 0, 1) == '0') $clean_no = '62' . substr($clean_no, 1);
                     $wa_link = "https://wa.me/$clean_no?text=" . urlencode("Halo $nama, pendaftaran Anda dinyatakan $status. Terima kasih.");
                     echo "<tr data-id='{$row['id_pendaftaran']}'>
-                             <td>{$nama}</td>
-                             <td>{$status}</td>
-                             <td>
+                            <td>{$nama}</td>
+                            <td>{$status}</td>
+                            <td>
                                 <a href='{$wa_link}' target='_blank' class='btn-wa-reminder' style='background:#25d366; color:white; padding:4px 12px; border-radius:20px; text-decoration:none; font-size:12px;'>Kirim WA</a>
                                 <button onclick='tandaiWA({$row['id_pendaftaran']}, this)' class='btn-tandai' style='background:#6c757d; color:white; border:none; padding:4px 12px; border-radius:20px; margin-left:5px;'>Tandai Terkirim</button>
-                             </td>
-                           </tr>";
+                            </td>
+                          </tr>";
                 }
                 echo '</tbody></table></div>';
             }
@@ -282,22 +317,22 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
             <!-- TABEL PENDAFTARAN -->
             <div class="table-card">
                 <table id="tablePendaftaran">
-                 <thead>
-    <tr>
-        <th>No</th>
-        <th>Nama Lengkap</th>
-        <th>NISN</th>
-        <th>Tanggal Daftar</th>
-        <th>JK</th>
-        <th>Tanggal Lahir</th>
-        <th>No HP Wali</th>
-        <th>Asal Sekolah</th>
-        <th>Nama Wali</th>
-        <th>Pendapatan</th>
-        <th>Status</th>
-        <th>Aksi</th>
-    </tr>
-</thead>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Lengkap</th>
+                            <th>NISN</th>
+                            <th>Tanggal Daftar</th>
+                            <th>JK</th>
+                            <th>Tanggal Lahir</th>
+                            <th>No HP Wali</th>
+                            <th>Asal Sekolah</th>
+                            <th>Nama Wali</th>
+                            <th>Pendapatan</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <?php $no = $offset + 1; if ($result && mysqli_num_rows($result) > 0) { while ($row = mysqli_fetch_assoc($result)) { ?>
                         <tr>
@@ -325,29 +360,28 @@ function buildPageUrl($pageNumber, $search, $filter, $id_tahun) {
                                 <?php endif; ?>
                             </td>
                         </tr>
-                        <?php } } else { ?><tr><td colspan="12" class="empty-data">Data tidak ditemukan. </td></tr><?php } ?>
+                        <?php } } else { ?><tr><td colspan="12" class="empty-data">Data tidak ditemukan. </td></table><?php } ?>
                     </tbody>
                 </table>
-            
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="pagination-wrapper">
+                <p class="pagination-info">Menampilkan <?= $startData; ?> sampai <?= $endData; ?> dari <?= $totalData; ?> Pendaftar</p>
+                <div class="pagination">
+                    <?php if ($page > 1) { ?><a href="<?= buildPageUrl($page-1, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><i class="fas fa-chevron-left"></i></a><?php } else { ?><span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span><?php }
+                    $startPage = max(1, $page-2); $endPage = min($totalPages, $page+2);
+                    if ($page <= 3) $endPage = min($totalPages,5);
+                    if ($page > $totalPages-2) $startPage = max(1, $totalPages-4);
+                    for ($i=$startPage; $i<=$endPage; $i++) { ?>
+                        <?php if ($i == $page) { ?><span class="page-btn active"><?= $i; ?></span><?php } else { ?><a href="<?= buildPageUrl($i, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><?= $i; ?></a><?php } ?>
+                    <?php } ?>
+                    <?php if ($page < $totalPages) { ?><a href="<?= buildPageUrl($page+1, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><i class="fas fa-chevron-right"></i></a><?php } else { ?><span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span><?php } ?>
+                </div>
             </div>
         </div>
     </main>
 </div>
-
-    <!-- PAGINATION -->
-                <div class="pagination-wrapper">
-                    <p class="pagination-info">Menampilkan <?= $startData; ?> sampai <?= $endData; ?> dari <?= $totalData; ?> Pendaftar</p>
-                    <div class="pagination">
-                        <?php if ($page > 1) { ?><a href="<?= buildPageUrl($page-1, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><i class="fas fa-chevron-left"></i></a><?php } else { ?><span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span><?php }
-                        $startPage = max(1, $page-2); $endPage = min($totalPages, $page+2);
-                        if ($page <= 3) $endPage = min($totalPages,5);
-                        if ($page > $totalPages-2) $startPage = max(1, $totalPages-4);
-                        for ($i=$startPage; $i<=$endPage; $i++) { ?>
-                            <?php if ($i == $page) { ?><span class="page-btn active"><?= $i; ?></span><?php } else { ?><a href="<?= buildPageUrl($i, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><?= $i; ?></a><?php } ?>
-                        <?php } ?>
-                        <?php if ($page < $totalPages) { ?><a href="<?= buildPageUrl($page+1, $search, $filter, $id_tahun_terpilih); ?>" class="page-btn"><i class="fas fa-chevron-right"></i></a><?php } else { ?><span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span><?php } ?>
-                    </div>
-                </div>
 
 <!-- MODAL ATUR PENDAFTARAN -->
 <div id="modalAturPendaftaran" class="modal-atur">
