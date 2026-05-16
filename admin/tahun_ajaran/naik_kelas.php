@@ -301,7 +301,7 @@ $result_ta = mysqli_query($conn, $query_ta);
                 <button type="button" class="custom-popup-close" id="closeTahunAjaranPopup">&times;</button>
             </div>
             <div class="custom-popup-body">
-                <p>Sistem akan membuat tahun ajaran berikutnya otomatis dari data terakhir di database.</p>
+                <p>Sistem akan membuat tahun ajaran berikutnya otomatis dari数据 terakhir di database.</p>
                 <div id="tahunAjaranMessage" class="confirm-message"></div>
             </div>
             <div class="custom-popup-footer">
@@ -376,13 +376,19 @@ $result_ta = mysqli_query($conn, $query_ta);
         modalTambah.addEventListener('click', function(e) {
             if (e.target === modalTambah) modalTambah.classList.remove('active');
         });
-        // Submit form tambah kelas via AJAX
+        
+        // Submit form tambah kelas via AJAX dengan SweetAlert
         if (formTambah) {
             formTambah.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const idTahun = document.getElementById('id_tahun_ajaran').value;
                 if (!idTahun) {
-                    alert('Pilih tahun ajaran terlebih dahulu.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Peringatan',
+                        text: 'Pilih tahun ajaran terlebih dahulu.',
+                        confirmButtonColor: '#064e4b'
+                    });
                     return;
                 }
                 const formData = new FormData(formTambah);
@@ -395,17 +401,32 @@ $result_ta = mysqli_query($conn, $query_ta);
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Kelas berhasil ditambahkan!');
-                        modalTambah.classList.remove('active');
-                        // Reload data wali kelas grid di halaman (panggil fungsi dari naik_kelas.js jika ada)
-                        if (typeof loadWaliKelasGrid === 'function') loadWaliKelasGrid();
-                        else location.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Kelas berhasil ditambahkan',
+                            confirmButtonColor: '#064e4b'
+                        }).then(() => {
+                            modalTambah.classList.remove('active');
+                            if (typeof loadWaliKelasGrid === 'function') loadWaliKelasGrid();
+                            else location.reload();
+                        });
                     } else {
-                        alert('Gagal: ' + data.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: data.message,
+                            confirmButtonColor: '#064e4b'
+                        });
                     }
                 })
                 .catch(err => {
-                    alert('Terjadi kesalahan: ' + err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan: ' + err,
+                        confirmButtonColor: '#064e4b'
+                    });
                 });
             });
         }
