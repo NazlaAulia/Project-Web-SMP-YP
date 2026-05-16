@@ -1385,3 +1385,57 @@ body {
     flex-wrap: wrap;
     gap: 10px;
 }
+
+/* =========================
+   PAGINATION - TULISAN "PENDAFTAR" DIKANAN
+========================= */
+
+/* Wrapper pagination */
+.pagination-wrapper {
+    display: flex !important;
+    justify-content: flex-end !important; /* semua isi ke kanan */
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: wrap;
+    margin-top: 20px !important;
+    padding: 18px 22px !important;
+    background: #ffffff !important;
+    border-radius: 18px !important;
+}
+
+/* Teks info (misal "Pendaftar") */
+.pagination-info {
+    width: auto !important;
+    text-align: right !important;  /* geser ke kanan */
+    margin-left: auto !important;  /* dorong ke kanan */
+    font-size: 14px;
+    color: #6b7280; /* sama seperti muted text */
+}
+
+/* Tombol pagination tetap di kanan, tapi rapih */
+.pagination {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    width: auto !important;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        flex-direction: column !important;
+        align-items: flex-end !important; /* tetap kanan */
+    }
+
+    .pagination-info {
+        text-align: right !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    .pagination {
+        justify-content: flex-end !important;
+        width: 100% !important;
+        flex-wrap: wrap !important;
+    }
+}
