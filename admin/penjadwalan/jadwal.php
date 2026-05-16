@@ -164,6 +164,8 @@ if ($id_tahun_dipilih > 0) {
         .btn-primary:hover { background: #115e59; transform: translateY(-1px); }
         .btn-warning { background: #f59e0b; color: white; }
         .btn-warning:hover { background: #d97706; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
         .btn-light { background: #eef2f7; color: #334155; }
         .status-box { display: none; margin-top: 14px; padding: 13px 15px; border-radius: 14px; font-size: 14px; font-weight: 500; }
         .status-loading { display: block; background: var(--blue-soft); color: #1d4ed8; }
@@ -193,10 +195,12 @@ if ($id_tahun_dipilih > 0) {
         .lesson-card { border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; background: #ffffff; transition: 0.2s ease; position: relative; }
         .lesson-card:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08); }
         .lesson-time { font-size: 12px; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-        .lesson-mapel { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 5px; }
+        .lesson-mapel { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 5px; }
         .lesson-guru { font-size: 12px; color: #64748b; line-height: 1.5; display: flex; align-items: flex-start; gap: 6px; }
         .lesson-jp { margin-top: 8px; display: inline-flex; padding: 4px 8px; border-radius: 999px; background: var(--soft-teal); color: var(--primary-teal); font-size: 11px; font-weight: 700; }
-        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; margin-left: 8px; }
+        .btn-hapus-jadwal { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; transition: 0.2s; margin-top: 8px; width: 100%; }
+        .btn-hapus-jadwal:hover { background: #dc2626; }
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; }
         .status-draft { background: #fef3c7; color: #92400e; }
         .status-fix { background: #dcfce7; color: #166534; }
         .empty-day { padding: 20px 14px; color: #94a3b8; font-size: 13px; text-align: center; }
@@ -233,6 +237,8 @@ if ($id_tahun_dipilih > 0) {
             .custom-modal-box { padding: 28px 20px 22px; }
             .custom-modal-actions { flex-direction: column; }
             .modal-btn { width: 100%; }
+            .lesson-mapel { flex-direction: column; align-items: flex-start; }
+            .btn-hapus-jadwal { width: 100%; }
         }
     </style>
 </head>
@@ -284,6 +290,9 @@ if ($id_tahun_dipilih > 0) {
                         </button>
                         <button type="button" class="btn btn-warning" id="lockJadwalBtn">
                             <i class="fas fa-lock"></i> Kunci Jadwal
+                        </button>
+                        <button type="button" class="btn btn-danger" id="hapusSemuaJadwalBtn">
+                            <i class="fas fa-trash-alt"></i> Hapus Semua Jadwal
                         </button>
                     <?php else: ?>
                         <button type="button" class="btn btn-primary" disabled style="opacity:0.6; cursor:not-allowed;">
@@ -358,16 +367,21 @@ if ($id_tahun_dipilih > 0) {
                                             <?php if (!empty($list_jadwal)): ?>
                                                 <div class="lesson-list">
                                                     <?php foreach ($list_jadwal as $item): ?>
-                                                        <div class="lesson-card">
+                                                        <div class="lesson-card" data-id-jadwal="<?= $item['id_jadwal'] ?>">
                                                             <div class="lesson-time"><i class="fas fa-clock"></i> <?php echo htmlspecialchars($item['jam'] ?? '-'); ?></div>
                                                             <div class="lesson-mapel">
-                                                                <?php echo htmlspecialchars($item['nama_mapel'] ?? '-'); ?>
+                                                                <span><?php echo htmlspecialchars($item['nama_mapel'] ?? '-'); ?></span>
                                                                 <span class="status-badge <?php echo $item['status'] == 'fix' ? 'status-fix' : 'status-draft'; ?>">
                                                                     <?php echo $item['status'] == 'fix' ? '🔒 FIX' : '📝 DRAFT'; ?>
                                                                 </span>
                                                             </div>
                                                             <div class="lesson-guru"><i class="fas fa-chalkboard-user"></i> <span><?php echo htmlspecialchars($item['nama_guru'] ?? 'Belum ada guru'); ?></span></div>
                                                             <div class="lesson-jp">JP <?php echo htmlspecialchars($item['jp_mulai'] ?? '-'); ?> - <?php echo htmlspecialchars($item['jp_selesai'] ?? '-'); ?> | <?php echo (int)($item['jumlah_jp'] ?? 1); ?> JP</div>
+                                                            <?php if (!$is_locked && $is_tahun_aktif): ?>
+                                                                <button type="button" class="btn-hapus-jadwal" onclick="hapusJadwal(<?= $item['id_jadwal'] ?>, this)">
+                                                                    <i class="fas fa-trash"></i> Hapus
+                                                                </button>
+                                                            <?php endif; ?>
                                                         </div>
                                                     <?php endforeach; ?>
                                                 </div>
@@ -477,6 +491,82 @@ if ($id_tahun_dipilih > 0) {
                 showResultModal('error', 'Generate Gagal', error.message);
             });
         }
+        
+        // ========== HAPUS SATU JADWAL ==========
+        function hapusJadwal(idJadwal, btn) {
+            let card = btn.closest('.lesson-card');
+            
+            Swal.fire({
+                title: 'Hapus Jadwal?',
+                text: 'Jadwal ini akan dihapus secara permanen.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    fetch('/admin/penjadwalan/hapus_jadwal.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'id_jadwal=' + idJadwal
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            card.remove();
+                            Swal.fire('Berhasil!', 'Jadwal dihapus', 'success');
+                            // Update total jadwal di statistik
+                            let totalSpan = document.querySelector('.stats-grid .stat-card:first-child .stat-info h3');
+                            if (totalSpan) totalSpan.textContent = parseInt(totalSpan.textContent) - 1;
+                        } else {
+                            Swal.fire('Gagal!', data.message, 'error');
+                        }
+                    })
+                    .catch(error => Swal.fire('Error!', 'Terjadi kesalahan', 'error'));
+                }
+            });
+        }
+        
+        // ========== HAPUS SEMUA JADWAL ==========
+        const hapusSemuaBtn = document.getElementById('hapusSemuaJadwalBtn');
+        if (hapusSemuaBtn) {
+            hapusSemuaBtn.addEventListener('click', function() {
+                let idTahun = <?= $id_tahun_dipilih ?>;
+                
+                Swal.fire({
+                    title: 'Hapus Semua Jadwal?',
+                    text: 'SEMUA jadwal untuk tahun ajaran ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan!',
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Hapus Semua!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                        fetch('/admin/penjadwalan/hapus_semua_jadwal.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'id_tahun=' + idTahun
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Berhasil!', data.message, 'success').then(() => location.reload());
+                            } else {
+                                Swal.fire('Gagal!', data.message, 'error');
+                            }
+                        })
+                        .catch(error => Swal.fire('Error!', 'Terjadi kesalahan', 'error'));
+                    }
+                });
+            });
+        }
+        
         const confirmGenerateBtn = document.getElementById('confirmGenerateBtn');
         if (confirmGenerateBtn) confirmGenerateBtn.addEventListener('click', runGenerateJadwal);
         const generateModal = document.getElementById('generateModal');
