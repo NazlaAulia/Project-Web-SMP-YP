@@ -1395,15 +1395,20 @@ body {
 }
 
 /* =========================
-   PAGINATION - Kata "Pendaftar" di pojok kiri
+   PAGINATION - Kata "Pendaftar" di kiri bawah, tombol di kanan
 ========================= */
 .pagination-wrapper {
     display: flex !important;
     justify-content: space-between !important; /* teks kiri, tombol kanan */
     align-items: flex-end !important;
     margin-top: 20px !important;
-    padding: 10px 0 !important;
-    width: 100% !important;
+    padding: 10px 22px !important;
+    width: calc(100% - 250px) !important; /* kurangi lebar sidebar */
+    margin-left: 250px !important; /* geser sesuai sidebar */
+    box-sizing: border-box;
+    background: #ffffff !important;
+    border-radius: 18px !important;
+    gap: 10px !important;
 }
 
 .pagination-info {
@@ -1424,19 +1429,22 @@ body {
 ========================= */
 @media (max-width: 768px) {
     .pagination-wrapper {
+        width: 100% !important;
+        margin-left: 0 !important; /* tidak perlu offset sidebar di mobile */
         flex-direction: column !important;
-        align-items: flex-start !important; /* teks tetap kiri bawah */
+        align-items: flex-start !important; /* teks tetap di kiri bawah */
+        padding: 10px !important;
     }
 
     .pagination-info {
         text-align: left !important;
         width: 100% !important;
         margin-left: 0 !important;
-        margin-bottom: 6px; /* beri jarak dari tombol */
+        margin-bottom: 6px;
     }
 
     .pagination {
-        justify-content: flex-start !important; /* tombol tetap di kanan bawah */
+        justify-content: flex-start !important; /* tombol tetap rapi di bawah */
         width: 100% !important;
         flex-wrap: wrap !important;
     }
