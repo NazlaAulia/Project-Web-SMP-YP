@@ -254,7 +254,7 @@ if ($id_tahun_dipilih > 0) {
                     <div class="page-title">
                         <h1>Jadwal Mengajar</h1>
                         <p>
-                            Pilih tahun ajaran untuk melihat jadwal. Untuk tahun aktif, Anda dapat generate atau mengunci jadwal.
+                            Pilih tahun ajaran untuk melihat jadwal. Untuk tahun aktif, Anda dapat membuat atau mengunci jadwal.
                         </p>
                     </div>
                     <div class="tahun-selector">
@@ -282,14 +282,14 @@ if ($id_tahun_dipilih > 0) {
             <?php if ($is_tahun_aktif): ?>
             <section class="action-panel">
                 <div class="action-text">
-                    <h2>Generate Jadwal Otomatis</h2>
-                    <p>Klik tombol generate untuk menjalankan proses pembuatan jadwal untuk tahun ajaran <strong><?= htmlspecialchars($tahun_dipilih['tahun_ajaran']) ?></strong>.</p>
+                    <h2>Membuat Jadwal Otomatis</h2>
+                    <p>Klik tombol Membuat untuk menjalankan proses pembuatan jadwal untuk tahun ajaran <strong><?= htmlspecialchars($tahun_dipilih['tahun_ajaran']) ?></strong>.</p>
                     <div id="statusBox" class="status-box"></div>
                 </div>
                 <div class="action-buttons">
                     <?php if (!$is_locked): ?>
                         <button type="button" class="btn btn-primary" onclick="openGenerateModal()">
-                            <i class="fas fa-wand-magic-sparkles"></i> Generate Jadwal
+                            <i class="fas fa-wand-magic-sparkles"></i> Membuat Jadwal
                         </button>
                         <button type="button" class="btn btn-warning" id="lockJadwalBtn">
                             <i class="fas fa-lock"></i> Kunci Jadwal
@@ -628,44 +628,49 @@ if ($id_tahun_dipilih > 0) {
         }
         
         // ========== TOMBOL KUNCI JADWAL DENGAN SWEETALERT ==========
-        const lockBtn = document.getElementById('lockJadwalBtn');
-        if (lockBtn) {
-            lockBtn.addEventListener('click', function() {
+       const lockBtn = document.getElementById('lockJadwalBtn');
+if (lockBtn) {
+    lockBtn.addEventListener('click', function() {
+        Swal.fire({
+            title: 'Kunci Jadwal?',
+            text: "Setelah dikunci, jadwal untuk tahun ajaran ini tidak dapat digenerate ulang dan guru tidak bisa mengajukan perubahan.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Kunci Sekarang!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
                 Swal.fire({
-                    title: 'Kunci Jadwal?',
-                    text: "Setelah dikunci, jadwal untuk tahun ajaran ini tidak dapat digenerate ulang dan guru tidak bisa mengajukan perubahan.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#f59e0b',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Kunci Sekarang!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Memproses...',
-                            text: 'Sedang mengunci jadwal',
-                            allowOutsideClick: false,
-                            didOpen: () => Swal.showLoading()
-                        });
-                        fetch('/admin/penjadwalan/kunci_jadwal.php', { method: 'POST' })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire('Berhasil!', data.message, 'success').then(() => {
-                                    window.location.href = 'jadwal.php?id_tahun=<?= $id_tahun_dipilih ?>';
-                                });
-                            } else {
-                                Swal.fire('Gagal!', data.message, 'error');
-                            }
-                        })
-                        .catch(err => {
-                            Swal.fire('Error!', 'Terjadi kesalahan: ' + err, 'error');
-                        });
-                    }
+                    title: 'Memproses...',
+                    text: 'Sedang mengunci jadwal',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
                 });
-            });
-        }
+                
+                // TAMBAHKAN credentials: 'include' DI SINI!
+                fetch('/admin/penjadwalan/kunci_jadwal.php', { 
+                    method: 'POST',
+                    credentials: 'include'  // <-- INI PENTING!
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Berhasil!', data.message, 'success').then(() => {
+                            window.location.href = 'jadwal.php?id_tahun=<?= $id_tahun_dipilih ?>';
+                        });
+                    } else {
+                        Swal.fire('Gagal!', data.message, 'error');
+                    }
+                })
+                .catch(err => {
+                    Swal.fire('Error!', 'Terjadi kesalahan: ' + err, 'error');
+                });
+            }
+        });
+    });
+}
     </script>
 </body>
 </html>

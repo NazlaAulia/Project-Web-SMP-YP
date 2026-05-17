@@ -814,7 +814,7 @@ $total_mapel = count($mapel_list);
                         <input type="hidden" name="action" value="reset_jam_default">
                         <button type="submit" class="btn btn-warning">
                             <i class="fas fa-rotate"></i>
-                            Buat Jam Default
+                            Buat Jam Bawaan
                         </button>
                     </form>
                 </div>
