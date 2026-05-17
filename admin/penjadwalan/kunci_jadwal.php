@@ -2,9 +2,27 @@
 require_once __DIR__ . '/../koneksi.php';
 session_start();
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+// DEBUG: Lihat isi session (akan muncul di error log)
+error_log("=== KUNCI JADWAL DEBUG ===");
+error_log("SESSION: " . print_r($_SESSION, true));
+
+// Cek apakah session role ada
+if (!isset($_SESSION['role'])) {
     http_response_code(403);
-    echo json_encode(['success'=>false,'message'=>'Akses ditolak']);
+    echo json_encode([
+        'success'=>false, 
+        'message'=>'Session tidak ditemukan. Silakan login ulang.'
+    ]);
+    exit;
+}
+
+// Cek apakah role admin
+if ($_SESSION['role'] !== 'admin') {
+    http_response_code(403);
+    echo json_encode([
+        'success'=>false, 
+        'message'=>"Akses ditolak. Role Anda: " . $_SESSION['role']
+    ]);
     exit;
 }
 
