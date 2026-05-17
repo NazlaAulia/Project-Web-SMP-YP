@@ -409,23 +409,23 @@ if (formTambah) {
       .then(data => {
     if (data.success) {
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: data.message || 'Kelas berhasil ditambahkan',
-            confirmButtonColor: '#064e4b'
-        }).then(() => {
+      modalTambah.classList.remove('active');
+formTambah.reset();
 
-            modalTambah.classList.remove('active');
-            formTambah.reset();
+Swal.fire({
+    icon: 'success',
+    title: 'Berhasil!',
+    text: data.message || 'Kelas berhasil ditambahkan',
+    confirmButtonColor: '#064e4b'
+}).then(() => {
 
-            if (typeof loadWaliKelasGrid === 'function') {
-                loadWaliKelasGrid();
-            } else {
-                location.reload();
-            }
+    if (typeof loadWaliKelasGrid === 'function') {
+        loadWaliKelasGrid();
+    } else {
+        location.reload();
+    }
 
-        });
+});
 
     } else {
         Swal.fire({
