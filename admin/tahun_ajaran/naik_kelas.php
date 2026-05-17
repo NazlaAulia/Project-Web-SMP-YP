@@ -406,28 +406,36 @@ if (formTambah) {
             body: formData
         })
         .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: data.message || 'Kelas berhasil ditambahkan',
-                    confirmButtonColor: '#064e4b',
-                    timer: 2000
-                });
-                modalTambah.classList.remove('active');
-                formTambah.reset();
-                if (typeof loadWaliKelasGrid === 'function') loadWaliKelasGrid();
-                else location.reload();
+      .then(data => {
+    if (data.success) {
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: data.message || 'Kelas berhasil ditambahkan',
+            confirmButtonColor: '#064e4b'
+        }).then(() => {
+
+            modalTambah.classList.remove('active');
+            formTambah.reset();
+
+            if (typeof loadWaliKelasGrid === 'function') {
+                loadWaliKelasGrid();
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: data.message || 'Terjadi kesalahan',
-                    confirmButtonColor: '#d33'
-                });
+                location.reload();
             }
-        })
+
+        });
+
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: data.message || 'Terjadi kesalahan',
+            confirmButtonColor: '#d33'
+        });
+    }
+})
         .catch(err => {
             Swal.fire({
                 icon: 'error',
