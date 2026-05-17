@@ -382,12 +382,24 @@ if (formTambah) {
         e.preventDefault();
         const idTahun = document.getElementById('id_tahun_ajaran').value;
         if (!idTahun) {
-            alert('Pilih tahun ajaran terlebih dahulu!');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Pilih tahun ajaran terlebih dahulu!',
+                confirmButtonColor: '#064e4b'
+            });
             return;
         }
         
         const formData = new FormData(formTambah);
         formData.append('id_tahun_ajaran', idTahun);
+        
+        Swal.fire({
+            title: 'Menyimpan...',
+            text: 'Mohon tunggu',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
         
         fetch('ajax_tambah_kelas.php', {
             method: 'POST',
@@ -396,16 +408,33 @@ if (formTambah) {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert(data.message || 'Kelas berhasil ditambahkan');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: data.message || 'Kelas berhasil ditambahkan',
+                    confirmButtonColor: '#064e4b',
+                    timer: 2000
+                });
                 modalTambah.classList.remove('active');
                 formTambah.reset();
-                location.reload();
+                if (typeof loadWaliKelasGrid === 'function') loadWaliKelasGrid();
+                else location.reload();
             } else {
-                alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: data.message || 'Terjadi kesalahan',
+                    confirmButtonColor: '#d33'
+                });
             }
         })
         .catch(err => {
-            alert('Error: ' + err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Terjadi kesalahan: ' + err,
+                confirmButtonColor: '#d33'
+            });
         });
     });
 }
