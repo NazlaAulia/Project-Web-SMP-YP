@@ -376,40 +376,97 @@ naikKelasForm.addEventListener("submit", (event) => {
         return;
     }
     pendingFormData = new FormData(naikKelasForm);
-    openPopup();
+    //openPopup();
+     confirmProcessBtn.click(); 
 });
 
 confirmProcessBtn.addEventListener("click", async () => {
-    if (!pendingFormData) return;
-    if (!confirmText || confirmText.value.trim().toUpperCase() !== "NAIKKELAS") {
-        showConfirmMessage("Ketik NAIKKELAS dulu untuk melanjutkan.");
+    if (!pendingFormData) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Peringatan',
+            text: 'Data tidak lengkap. Silakan isi form terlebih dahulu.',
+            confirmButtonColor: '#064e4b'
+        });
         return;
     }
-
-    confirmProcessBtn.disabled = true;
-    confirmProcessBtn.textContent = "Memproses...";
-
-    try {
-        const response = await fetch("proses_naik_kelas.php", {
-            method: "POST",
-            body: pendingFormData
-        });
-        const result = await response.json();
-        if (result.success) {
-            closePopup();
-            showMessage(result.message || "Proses naik kelas berhasil.", "success");
-            loadNaikKelasData();
-            loadPreviewNaikKelas();
-        } else {
-            showConfirmMessage(result.message || "Proses naik kelas gagal.");
+    
+    Swal.fire({
+        title: 'Proses Naik Kelas?',
+        html: `
+            <div style="text-align:left">
+                <p>Pastikan:</p>
+                <ul style="text-align:left">
+                    <li>✓ Semua wali kelas sudah dipilih</li>
+                    <li>✓ Data nilai siswa sudah lengkap</li>
+                    <li>✓ Kapasitas kelas sudah sesuai</li>
+                </ul>
+                <p style="color:red"><strong>⚠️ Tindakan ini TIDAK BISA DIBATALKAN!</strong></p>
+                <div style="margin-top:15px">
+                    <label>Ketik <span style="color:#d33">NAIKKELAS</span> untuk melanjutkan:</label>
+                    <input type="text" id="swalConfirmText" class="swal2-input" placeholder="NAIKKELAS">
+                </div>
+            </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Proses Sekarang!',
+        cancelButtonText: 'Batal',
+        preConfirm: () => {
+            const input = document.getElementById('swalConfirmText');
+            if (!input || input.value !== 'NAIKKELAS') {
+                Swal.showValidationMessage('Harus ketik NAIKKELAS!');
+                return false;
+            }
+            return true;
         }
-    } catch (error) {
-        showConfirmMessage("Terjadi kesalahan server saat proses naik kelas.");
-    } finally {
-        confirmProcessBtn.disabled = false;
-        confirmProcessBtn.textContent = "Ya, Proses";
-        pendingFormData = null;
-    }
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Memproses...',
+                text: 'Mohon tunggu',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+            
+            try {
+                const response = await fetch("proses_naik_kelas.php", {
+                    method: "POST",
+                    body: pendingFormData
+                });
+                const resultData = await response.json();
+                
+                if (resultData.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: resultData.message,
+                        confirmButtonColor: '#064e4b'
+                    }).then(() => {
+                        pendingFormData = null;
+                        loadNaikKelasData();
+                        loadPreviewNaikKelas();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: resultData.message,
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan: ' + error,
+                    confirmButtonColor: '#d33'
+                });
+            }
+        }
+    });
 });
 
 closeConfirmPopup.addEventListener("click", closePopup);

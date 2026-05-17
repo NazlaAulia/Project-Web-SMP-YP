@@ -946,3 +946,7 @@ button,
         padding: 12px 13px !important;
     }
 }
+
+#confirmPopup {
+    display: none !important;
+}

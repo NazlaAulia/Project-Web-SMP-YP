@@ -377,38 +377,72 @@ $result_ta = mysqli_query($conn, $query_ta);
             if (e.target === modalTambah) modalTambah.classList.remove('active');
         });
         // Submit form tambah kelas via AJAX
-        if (formTambah) {
-            formTambah.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const idTahun = document.getElementById('id_tahun_ajaran').value;
-                if (!idTahun) {
-                    alert('Pilih tahun ajaran terlebih dahulu.');
-                    return;
-                }
-                const formData = new FormData(formTambah);
-                formData.append('id_tahun_ajaran', idTahun);
-                
-                fetch('ajax_tambah_kelas.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Kelas berhasil ditambahkan!');
-                        modalTambah.classList.remove('active');
-                        // Reload data wali kelas grid di halaman (panggil fungsi dari naik_kelas.js jika ada)
-                        if (typeof loadWaliKelasGrid === 'function') loadWaliKelasGrid();
-                        else location.reload();
-                    } else {
-                        alert('Gagal: ' + data.message);
-                    }
-                })
-                .catch(err => {
-                    alert('Terjadi kesalahan: ' + err);
-                });
+      if (formTambah) {
+    formTambah.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const idTahun = document.getElementById('id_tahun_ajaran').value;
+        if (!idTahun) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Pilih tahun ajaran terlebih dahulu!',
+                confirmButtonColor: '#064e4b',
+                borderRadius: '12px'
             });
+            return;
         }
+        
+        const formData = new FormData(formTambah);
+        formData.append('id_tahun_ajaran', idTahun);
+        
+        Swal.fire({
+            title: 'Menyimpan...',
+            text: 'Mohon tunggu',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+            borderRadius: '12px'
+        });
+        
+        fetch('ajax_tambah_kelas.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: data.message || 'Kelas berhasil ditambahkan',
+                    confirmButtonColor: '#064e4b',
+                    timer: 2000,
+                    borderRadius: '12px'
+                });
+                modalTambah.classList.remove('active');
+                formTambah.reset();
+                if (typeof loadWaliKelasGrid === 'function') loadWaliKelasGrid();
+                else location.reload();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: data.message || 'Terjadi kesalahan',
+                    confirmButtonColor: '#d33',
+                    borderRadius: '12px'
+                });
+            }
+        })
+        .catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Terjadi kesalahan: ' + err,
+                confirmButtonColor: '#d33',
+                borderRadius: '12px'
+            });
+        });
+    });
+}
     </script>
 </body>
 </html>
