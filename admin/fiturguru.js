@@ -454,28 +454,51 @@ function renderGuru() {
 // ==========================
 // PAGINATION
 // ==========================
+// ==========================
+// PAGINATION
+// ==========================
 function renderPagination(totalPages) {
     const paginationBtns = document.getElementById("paginationBtns");
     if (!paginationBtns) return;
 
     paginationBtns.innerHTML = "";
 
+    // Tombol prev
     const prevBtn = document.createElement("button");
     prevBtn.className = "btn-page";
     prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i>`;
     prevBtn.disabled = currentPage === 1;
+
     prevBtn.addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
             renderGuru();
         }
     });
+
     paginationBtns.appendChild(prevBtn);
 
-    for (let i = 1; i <= totalPages; i++) {
+    // ======================
+    // MAX 5 PAGE BUTTON
+    // ======================
+
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+
+    // biar tetap 5 tombol kalau di akhir
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
         const pageBtn = document.createElement("button");
+
         pageBtn.className = "btn-page";
-        if (i === currentPage) pageBtn.classList.add("active");
+
+        if (i === currentPage) {
+            pageBtn.classList.add("active");
+        }
+
         pageBtn.textContent = i;
 
         pageBtn.addEventListener("click", () => {
@@ -486,19 +509,21 @@ function renderPagination(totalPages) {
         paginationBtns.appendChild(pageBtn);
     }
 
+    // Tombol next
     const nextBtn = document.createElement("button");
     nextBtn.className = "btn-page";
     nextBtn.innerHTML = `<i class="fas fa-chevron-right"></i>`;
     nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
     nextBtn.addEventListener("click", () => {
         if (currentPage < totalPages) {
             currentPage++;
             renderGuru();
         }
     });
+
     paginationBtns.appendChild(nextBtn);
 }
-
 // ==========================
 // LOAD MAPEL
 // ==========================
