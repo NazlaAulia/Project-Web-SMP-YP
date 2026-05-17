@@ -377,31 +377,17 @@ $result_ta = mysqli_query($conn, $query_ta);
             if (e.target === modalTambah) modalTambah.classList.remove('active');
         });
         // Submit form tambah kelas via AJAX
-      if (formTambah) {
+if (formTambah) {
     formTambah.addEventListener('submit', function(e) {
         e.preventDefault();
         const idTahun = document.getElementById('id_tahun_ajaran').value;
         if (!idTahun) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Peringatan',
-                text: 'Pilih tahun ajaran terlebih dahulu!',
-                confirmButtonColor: '#064e4b',
-                borderRadius: '12px'
-            });
+            alert('Pilih tahun ajaran terlebih dahulu!');
             return;
         }
         
         const formData = new FormData(formTambah);
         formData.append('id_tahun_ajaran', idTahun);
-        
-        Swal.fire({
-            title: 'Menyimpan...',
-            text: 'Mohon tunggu',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
-            borderRadius: '12px'
-        });
         
         fetch('ajax_tambah_kelas.php', {
             method: 'POST',
@@ -410,36 +396,16 @@ $result_ta = mysqli_query($conn, $query_ta);
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: data.message || 'Kelas berhasil ditambahkan',
-                    confirmButtonColor: '#064e4b',
-                    timer: 2000,
-                    borderRadius: '12px'
-                });
+                alert(data.message || 'Kelas berhasil ditambahkan');
                 modalTambah.classList.remove('active');
                 formTambah.reset();
-                if (typeof loadWaliKelasGrid === 'function') loadWaliKelasGrid();
-                else location.reload();
+                location.reload();
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: data.message || 'Terjadi kesalahan',
-                    confirmButtonColor: '#d33',
-                    borderRadius: '12px'
-                });
+                alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
             }
         })
         .catch(err => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Terjadi kesalahan: ' + err,
-                confirmButtonColor: '#d33',
-                borderRadius: '12px'
-            });
+            alert('Error: ' + err);
         });
     });
 }
