@@ -91,6 +91,7 @@ $bulanIndonesia = [
 $hariInggris = date('l');
 $hariDb = $hariIndonesia[$hariInggris];
 $hariIniText = $hariIndonesia[$hariInggris] . ', ' . date('d') . ' ' . $bulanIndonesia[(int)date('n')] . ' ' . date('Y');
+$jamSekarang = date('H:i:s');
 
 // ========== QUERY TOTAL PELAJARAN (HANYA STATUS FIX) ==========
 $queryTotal = mysqli_query($conn, "
@@ -140,15 +141,43 @@ while ($rowUtama = mysqli_fetch_assoc($queryUtama)) {
     $mapelUtama[] = $rowUtama['nama_mapel'];
 }
 
-// ========== QUERY HARI INI (HANYA STATUS FIX) ==========
+// ========== QUERY HARI INI (DENGAN STATUS BERDASARKAN JP) ==========
 $queryHariIni = mysqli_query($conn, "
     SELECT 
-        j.jam AS jam_mulai,
-        j.jam AS jam_selesai,
+        j.jp_mulai,
+        j.jp_selesai,
         mp.nama_mapel,
         COALESCE(g.nama, '-') AS nama_guru,
         '-' AS ruangan,
-        'Mendatang' AS status_jadwal
+        (
+            SELECT jam_mulai 
+            FROM jam_pelajaran jp 
+            WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_mulai
+            LIMIT 1
+        ) AS jam_mulai,
+        (
+            SELECT jam_selesai 
+            FROM jam_pelajaran jp 
+            WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_selesai
+            LIMIT 1
+        ) AS jam_selesai,
+        CASE
+            WHEN TIME(NOW()) < (
+                SELECT jam_mulai FROM jam_pelajaran jp 
+                WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_mulai
+                LIMIT 1
+            ) THEN 'Mendatang'
+            WHEN TIME(NOW()) BETWEEN (
+                SELECT jam_mulai FROM jam_pelajaran jp 
+                WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_mulai
+                LIMIT 1
+            ) AND (
+                SELECT jam_selesai FROM jam_pelajaran jp 
+                WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_selesai
+                LIMIT 1
+            ) THEN 'Berlangsung'
+            ELSE 'Selesai'
+        END AS status_jadwal
     FROM jadwal j
     INNER JOIN mapel mp ON j.id_mapel = mp.id_mapel
     LEFT JOIN guru g ON j.id_guru = g.id_guru
@@ -156,7 +185,7 @@ $queryHariIni = mysqli_query($conn, "
     WHERE s.id_siswa = $id_siswa
       AND j.hari = '$hariDb'
       AND j.status = 'fix'
-    ORDER BY j.jam ASC
+    ORDER BY j.jp_mulai ASC
 ");
 
 if (!$queryHariIni) {
@@ -170,27 +199,67 @@ if (!$queryHariIni) {
 $updateTerbaru = [];
 while ($rowHariIni = mysqli_fetch_assoc($queryHariIni)) {
     $updateTerbaru[] = [
-        "jam_mulai" => substr($rowHariIni['jam_mulai'], 0, 5),
+        "jam_mulai" => date('H:i', strtotime($rowHariIni['jam_mulai'])),
         "mapel" => $rowHariIni['nama_mapel'],
-        "ruangan" => $rowHariIni['ruangan']
+        "ruangan" => $rowHariIni['ruangan'],
+        "status" => $rowHariIni['status_jadwal']
     ];
 }
 
-// ========== QUERY JADWAL MINGGU (HANYA STATUS FIX) ==========
+// ========== QUERY JADWAL MINGGU (DENGAN STATUS BERDASARKAN JP) ==========
 $queryJadwal = mysqli_query($conn, "
     SELECT 
         j.hari AS hari,
-        j.jam AS jam,
+        j.jp_mulai,
+        j.jp_selesai,
         mp.nama_mapel AS mata_pelajaran,
         COALESCE(g.nama, '-') AS guru,
-        'Mendatang' AS status
+        (
+            SELECT jam_mulai 
+            FROM jam_pelajaran jp 
+            WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_mulai
+            LIMIT 1
+        ) AS jam_mulai,
+        (
+            SELECT jam_selesai 
+            FROM jam_pelajaran jp 
+            WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_selesai
+            LIMIT 1
+        ) AS jam_selesai,
+        CASE
+            WHEN j.hari = '$hariDb' THEN
+                CASE
+                    WHEN TIME(NOW()) < (
+                        SELECT jam_mulai FROM jam_pelajaran jp 
+                        WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_mulai
+                        LIMIT 1
+                    ) THEN 'Mendatang'
+                    WHEN TIME(NOW()) BETWEEN (
+                        SELECT jam_mulai FROM jam_pelajaran jp 
+                        WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_mulai
+                        LIMIT 1
+                    ) AND (
+                        SELECT jam_selesai FROM jam_pelajaran jp 
+                        WHERE jp.hari = j.hari AND jp.nomor_jp = j.jp_selesai
+                        LIMIT 1
+                    ) THEN 'Berlangsung'
+                    ELSE 'Selesai'
+                END
+            ELSE
+                CASE
+                    WHEN FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu') 
+                         > FIELD('$hariDb', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu') 
+                         THEN 'Mendatang'
+                    ELSE 'Selesai'
+                END
+        END AS status
     FROM jadwal j
     INNER JOIN mapel mp ON j.id_mapel = mp.id_mapel
     LEFT JOIN guru g ON j.id_guru = g.id_guru
     INNER JOIN siswa s ON s.id_kelas = j.id_kelas
     WHERE s.id_siswa = $id_siswa
       AND j.status = 'fix'
-    ORDER BY FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'), j.jam ASC
+    ORDER BY FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'), j.jp_mulai ASC
 ");
 
 if (!$queryJadwal) {
@@ -204,9 +273,13 @@ if (!$queryJadwal) {
 $jadwalMinggu = [];
 
 while ($rowJadwal = mysqli_fetch_assoc($queryJadwal)) {
+    // Format jam untuk ditampilkan
+    $jamMulai = date('H:i', strtotime($rowJadwal['jam_mulai']));
+    $jamSelesai = date('H:i', strtotime($rowJadwal['jam_selesai']));
+    
     $jadwalMinggu[] = [
         "hari" => $rowJadwal['hari'],
-        "jam" => $rowJadwal['jam'],
+        "jam" => $jamMulai . '-' . $jamSelesai,
         "mata_pelajaran" => $rowJadwal['mata_pelajaran'],
         "guru" => $rowJadwal['guru'],
         "status" => $rowJadwal['status']
