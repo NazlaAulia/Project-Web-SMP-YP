@@ -1,5 +1,6 @@
 let dataNilai = [];
 
+
 const filterKelasWaliLabel = document.querySelector('label[for="filterKelasWali"]');
 const printBtn = document.getElementById("printBtn");
 const fileInput = document.getElementById("fileInput");
