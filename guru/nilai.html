@@ -7,14 +7,13 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="components/sidebar.css">
-  <link rel="stylesheet" href="nilai.css?v=99">
+  <link rel="stylesheet" href="nilai.css?v=1003">
   <link rel="stylesheet" href="components/fix-mobile.css">
 </head>
 <body>
   <div class="app-container">
     <div id="sidebar-container"></div>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
 
     <main class="main-content">
       <header class="page-header">
@@ -25,11 +24,10 @@
           </span>
           <h1>Manajemen Nilai Guru</h1>
           <p>Masukan nilai siswa melalui file CSV tanpa input manual satu per satu.</p>
-
-     
         </div>
       </header>
 
+      <!-- SECTION UPLOAD CSV (HANYA UNTUK GURU MAPEL) -->
       <section class="card import-card">
         <div class="card-heading">
           <div>
@@ -64,52 +62,49 @@
         <div id="messageBox" class="message-box"></div>
       </section>
 
-        <section class="card filter-card nilai-filter-card" id="filterWaliKelasBox" style="display: none;">
-          <div class="filter-header">
-            <div>
-              <h3>Filter Data Nilai</h3>
-              <p>Pilih tampilan nilai berdasarkan mapel guru atau kelas wali.</p>
+      <!-- SECTION FILTER (UNTUK GURU MAPEL & WALI KELAS) -->
+      <section class="card filter-card nilai-filter-card" id="filterWaliKelasBox" style="display: none;">
+        <div class="filter-header">
+          <div>
+            <h3>Filter Data Nilai</h3>
+            <p>Pilih tampilan nilai berdasarkan mapel guru atau kelas wali.</p>
+          </div>
+        </div>
+
+        <div class="filter-grid nilai-filter-grid">
+          <div class="filter-group nilai-filter-group">
+            <label for="modeNilai">Tampilkan Data</label>
+            <div class="select-clean">
+              <select id="modeNilai">
+                <option value="mapel">Mapel Saya</option>
+                <option value="wali">Wali Kelas</option>
+              </select>
+              <i class="bi bi-chevron-down"></i>
             </div>
           </div>
 
-          <div class="filter-grid nilai-filter-grid">
-            <div class="filter-group nilai-filter-group">
-              <label for="modeNilai">Tampilkan Data</label>
-              <div class="select-clean">
-                <select id="modeNilai">
-                  <option value="mapel">Mapel Saya</option>
-                  <option value="wali">Wali Kelas</option>
-                </select>
-                <i class="bi bi-chevron-down"></i>
-              </div>
-            </div>
-
-            <div class="filter-group nilai-filter-group" id="filterKelasWaliGroup">
-              <label for="filterKelasWali">Kelas Wali</label>
-              <div class="select-clean">
-                <select id="filterKelasWali"></select>
-                <i class="bi bi-chevron-down"></i>
-              </div>
+          <div class="filter-group nilai-filter-group" id="filterKelasWaliGroup">
+            <label for="filterKelasWali" id="filterKelasWaliLabel">Kelas Mapel Saya</label>
+            <div class="select-clean">
+              <select id="filterKelasWali"></select>
+              <i class="bi bi-chevron-down"></i>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section class="card table-card nilai-table-card">
+      <!-- SECTION TABEL DATA -->
+      <section class="card table-card nilai-table-card">
         <div class="table-header nilai-table-header">
           <div class="table-title">
             <h3>Data Nilai Siswa</h3>
-
             <p>Preview data nilai.</p>
-
+          </div>
 
           <div class="table-tools">
             <div class="search-box nilai-search-box">
               <i class="bi bi-search"></i>
-              <input
-                type="text"
-                id="searchInput"
-                placeholder="Cari nilai siswa"
-              />
+              <input type="text" id="searchInput" placeholder="Cari nilai siswa" />
             </div>
 
             <button id="printBtn" class="btn btn-outline btn-print-clean" type="button">
@@ -122,26 +117,23 @@
         <div class="table-wrapper nilai-table-wrapper">
           <table id="nilaiTable">
             <thead>
-            <tr>
-              <th>No</th>
-              <th>ID Siswa</th>
-              <th>Nama Siswa</th>
-              <th>Kelas</th>
-              <th>Semester</th>
-              <th>Nilai</th>
-              <th>Hadir</th>
-              <th>Izin</th>
-              <th>Sakit</th>
-              <th>Alfa</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-
+              <tr>
+                <th>No</th>
+                <th>ID Siswa</th>
+                <th>Nama Siswa</th>
+                <th>Kelas</th>
+                <th>Semester</th>
+                <th>Nilai</th>
+                <th>Hadir</th>
+                <th>Izin</th>
+                <th>Sakit</th>
+                <th>Alfa</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
             <tbody id="nilaiTableBody">
               <tr>
-                <td colspan="13" class="empty-state">
-                  Belum ada data yang sesuai.
-                </td>
+                <td colspan="11" class="empty-state">Belum ada data yang sesuai.</td>
               </tr>
             </tbody>
           </table>
@@ -151,6 +143,6 @@
   </div>
 
   <script src="components/sidebar-guru.js"></script>
-  <script src="nilai.js?v=1002"></script>
+  <script src="nilai.js?v=1003"></script>
 </body>
 </html>
