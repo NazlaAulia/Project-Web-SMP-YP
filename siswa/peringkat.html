@@ -61,10 +61,14 @@
 
       <div class="peringkat-filter-wrap">
         <div class="filter-group">
-          <label for="semester">Tahun Ajaran/Semester</label>
+          <label for="tahunAjaran">Tahun Ajaran</label>
+          <select id="tahunAjaran"></select>
+        </div>
+        <div class="filter-group">
+          <label for="semester">Semester</label>
           <select id="semester">
-            <option selected>2025/2026 - Genap</option>
-            <option>2025/2026 - Ganjil</option>
+            <option value="1">Ganjil</option>
+            <option value="2" selected>Genap</option>
           </select>
         </div>
       </div>
