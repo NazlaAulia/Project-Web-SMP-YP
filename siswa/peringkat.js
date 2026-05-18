@@ -21,14 +21,41 @@ function isiHeaderDariLocalStorage() {
   if (avatarText) avatarText.textContent = avatar;
 }
 
+async function loadTahunAjaran() {
+  try {
+    const response = await fetch(`get_peringkat.php?action=get_tahun_ajaran`, {
+      method: "GET",
+      credentials: "same-origin"
+    });
+    
+    const result = await response.json();
+    
+    if (result.success && result.tahun_ajaran_list) {
+      const tahunSelect = document.getElementById("tahunAjaran");
+      if (tahunSelect) {
+        tahunSelect.innerHTML = result.tahun_ajaran_list.map(ta => 
+          `<option value="${ta.id_tahun_ajaran}" ${ta.status === 'aktif' ? 'selected' : ''}>
+            ${ta.tahun_ajaran}
+          </option>`
+        ).join("");
+        
+        tahunSelect.addEventListener("change", () => loadPeringkat());
+      }
+    }
+  } catch (error) {
+    console.error("Error loading tahun ajaran:", error);
+  }
+}
+
 async function loadPeringkat() {
   try {
     const kelas = localStorage.getItem("kelas_siswa") || "";
-    const semester = document.getElementById("semester").value;
     const idSiswa = localStorage.getItem("id_siswa") || "";
+    const tahunAjaran = document.getElementById("tahunAjaran")?.value || "";
+    const semester = document.getElementById("semester")?.value || "2";
 
     const response = await fetch(
-      `get_peringkat.php?id_siswa=${encodeURIComponent(idSiswa)}&kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`,
+      `get_peringkat.php?id_siswa=${encodeURIComponent(idSiswa)}&kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}&tahun_ajaran=${encodeURIComponent(tahunAjaran)}`,
       {
         method: "GET",
         credentials: "same-origin"
@@ -75,12 +102,12 @@ async function loadPeringkat() {
   }
 }
 
-function getStatusArrow(status) {
-  if (status === "naik") return "↑";
-  if (status === "turun") return "↓";
-  if (status === "tetap") return "↔";
-  if (status === "-") return "-";
-  return "↔";
+function getStatusBadge(status) {
+  if (status === "naik") return '<span class="status-badge status-up">↑ Naik</span>';
+  if (status === "turun") return '<span class="status-badge status-down">↓ Turun</span>';
+  if (status === "tetap") return '<span class="status-badge status-steady">↔ Tetap</span>';
+  if (status === "baru") return '<span class="status-badge status-new">● Baru</span>';
+  return '<span class="status-badge status-na">-</span>';
 }
 
 function renderTable() {
@@ -103,12 +130,14 @@ function renderTable() {
     const isLoginUser =
       String(item.id_siswa) === idLogin || item.nama === namaLogin;
 
+    const statusValue = item.status || "-";
+    
     row.innerHTML = `
       <td>${item.rank}</td>
       <td>${item.nama}</td>
       <td>${item.kelas}</td>
       <td>${item.nilai}</td>
-      <td>${getStatusArrow(item.status)}</td>
+      <td>${getStatusBadge(statusValue)}</td>
     `;
 
     if (isLoginUser) {
@@ -121,9 +150,16 @@ function renderTable() {
 
 function aktifkanFilter() {
   const semester = document.getElementById("semester");
+  const tahunAjaran = document.getElementById("tahunAjaran");
 
   if (semester) {
     semester.addEventListener("change", async () => {
+      await loadPeringkat();
+    });
+  }
+  
+  if (tahunAjaran) {
+    tahunAjaran.addEventListener("change", async () => {
       await loadPeringkat();
     });
   }
@@ -131,6 +167,7 @@ function aktifkanFilter() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   isiHeaderDariLocalStorage();
+  await loadTahunAjaran();
   aktifkanFilter();
   await loadPeringkat();
 });
