@@ -1,6 +1,4 @@
 let dataNilai = [];
-let uploadSection = null;
-let btnCetakSemua = null;
 
 const filterKelasWaliLabel = document.querySelector('label[for="filterKelasWali"]');
 const printBtn = document.getElementById("printBtn");
@@ -13,8 +11,6 @@ const nilaiTableBody = document.getElementById("nilaiTableBody");
 
 const modeNilai = document.getElementById("modeNilai");
 const filterKelasWali = document.getElementById("filterKelasWali");
-uploadSection = document.querySelector(".import-card");
-
 const filterWaliKelasBox = document.getElementById("filterWaliKelasBox");
 const filterKelasWaliGroup = document.getElementById("filterKelasWaliGroup");
 
@@ -117,65 +113,7 @@ function updateRekap() {
 
 function renderTable(filteredData = dataNilai) {
   if (!nilaiTableBody) return;
-  
-  const mode = modeNilai ? modeNilai.value : "mapel";
-  
-  // ========== WALI KELAS MODE ==========
-  if (mode === "wali") {
-    // Kelompokkan data berdasarkan siswa (unik)
-    const siswaUnik = {};
-    filteredData.forEach(item => {
-      if (!siswaUnik[item.id_siswa]) {
-        siswaUnik[item.id_siswa] = {
-          id_siswa: item.id_siswa,
-          nama_siswa: item.nama_siswa || "-",
-          nama_kelas: item.nama_kelas || "-"
-        };
-      }
-    });
-    
-    const daftarSiswa = Object.values(siswaUnik);
-    
-    if (daftarSiswa.length === 0) {
-      nilaiTableBody.innerHTML = `
-        <tr>
-          <td colspan="4" class="empty-state">Tidak ada siswa di kelas ini.</td>
-        </tr>
-      `;
-      return;
-    }
-    
-    // Tampilkan daftar siswa dengan tombol cetak rapor
-    nilaiTableBody.innerHTML = `
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>ID Siswa</th>
-          <th>Nama Siswa</th>
-          <th>Kelas</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${daftarSiswa.map((siswa, index) => `
-          <tr>
-            <td class="center">${index + 1}</td>
-            <td>${siswa.id_siswa}</td>
-            <td><strong>${escapeHtml(siswa.nama_siswa)}</strong></td>
-            <td>${escapeHtml(siswa.nama_kelas)}</td>
-            <td>
-              <button class="btn-cetak-row" onclick="cetakRaporPerSiswa(${siswa.id_siswa})">
-                <i class="bi bi-printer"></i> Cetak Rapor
-              </button>
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    `;
-    return;
-  }
-  
-  // ========== GURU MAPEL MODE (tampilan biasa seperti sekarang) ==========
+
   if (filteredData.length === 0) {
     nilaiTableBody.innerHTML = `
       <tr>
@@ -256,6 +194,10 @@ function cetakNilaiSiswa(idSiswa) {
     return;
   }
 
+  if (mode !== "wali") {
+    alert("Cetak rekap nilai siswa hanya tersedia pada mode Wali Kelas.");
+    return;
+  }
 
   if (!idKelas) {
     alert("Pilih kelas wali terlebih dahulu.");
@@ -582,55 +524,6 @@ function aturTampilanMode() {
   }
 }
 
-// ==================================================
-// FUNGSI UNTUK WALI KELAS (SEMBUNYIKAN UPLOAD)
-// ==================================================
-function aturTampilanWaliKelas() {
-  const mode = modeNilai ? modeNilai.value : "mapel";
-  
-  if (!uploadSection) {
-    uploadSection = document.querySelector(".import-card");
-  }
-  
-  if (mode === "wali") {
-    // Sembunyikan form upload CSV untuk wali kelas
-    if (uploadSection) {
-      uploadSection.style.display = "none";
-    }
-    
-    // Tambah tombol cetak semua rapor (jika belum ada)
-    const filterGrid = document.querySelector(".nilai-filter-grid");
-    if (filterGrid && !document.getElementById("btnCetakSemuaRapor")) {
-      const btn = document.createElement("button");
-      btn.id = "btnCetakSemuaRapor";
-      btn.className = "btn btn-primary";
-      btn.innerHTML = '<i class="bi bi-printer"></i> Cetak Semua Rapor Kelas';
-      btn.style.marginLeft = "auto";
-      btn.onclick = function() {
-        const idKelas = filterKelasWali ? filterKelasWali.value : "";
-        if (!idKelas) {
-          alert("Pilih kelas wali terlebih dahulu.");
-          return;
-        }
-        const url = `cetak_nilai_wali.html?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&id_kelas=${idKelas}`;
-        window.open(url, "_blank");
-      };
-      filterGrid.appendChild(btn);
-    }
-  } else {
-    // Mode mapel: tampilkan form upload
-    if (uploadSection) {
-      uploadSection.style.display = "block";
-    }
-    
-    // Hapus tombol cetak semua rapor jika ada
-    const btnExist = document.getElementById("btnCetakSemuaRapor");
-    if (btnExist) {
-      btnExist.remove();
-    }
-  }
-}
-
 /* =========================
    LOAD DATA DATABASE
 ========================= */
@@ -645,14 +538,6 @@ function loadNilaiDatabase() {
   const mode = modeNilai ? modeNilai.value : "mapel";
   const idKelas = filterKelasWali ? filterKelasWali.value : "";
 
-  // TAMBAH CEK INI (setelah deklarasi, BUKAN sebelumnya)
-  if (mode === "wali" && !idKelas) {
-    if (nilaiTableBody) {
-      nilaiTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Pilih kelas wali terlebih dahulu.</td></tr>`;
-    }
-    return;
-  }
-
   let url = `get_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${mode}`;
 
   if (idKelas) {
@@ -664,7 +549,6 @@ function loadNilaiDatabase() {
     .then(result => {
       if (result.status === "success") {
         dataNilai = result.data || [];
-        aturTampilanWaliKelas();
 
         if (filterWaliKelasBox) {
           filterWaliKelasBox.style.display = "block";
@@ -812,7 +696,6 @@ if (searchInput) {
 if (modeNilai) {
   modeNilai.addEventListener("change", function () {
     aturTampilanMode();
-    aturTampilanWaliKelas();  // <-- TAMBAHKAN INI
     loadNilaiDatabase();
   });
 }
@@ -861,29 +744,3 @@ if (printBtn) {
   });
 }
 loadNilaiDatabase();
-
-// ==================================================
-// CETAK RAPOR PER SISWA (UNTUK WALI KELAS)
-// ==================================================
-window.cetakRaporPerSiswa = function(idSiswa) {
-  const idKelas = filterKelasWali ? filterKelasWali.value : "";
-  
-  if (!idKelas) {
-    alert("Pilih kelas wali terlebih dahulu.");
-    return;
-  }
-  
-  const url = `cetak_nilai_wali.html?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&id_kelas=${idKelas}&id_siswa=${idSiswa}`;
-  window.open(url, "_blank");
-};
-
-// Fungsi bantu escape HTML biar aman
-function escapeHtml(str) {
-  if (!str) return "";
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
-}
