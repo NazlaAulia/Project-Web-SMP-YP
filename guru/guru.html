@@ -76,58 +76,60 @@
             <div class="course-grid" id="courseGrid"></div>
 
             <div class="right-column">
-                <div class="side-card dashboard-mini-card">
-                    <div class="mini-card-head">
-                        <div class="mini-card-icon hadir">
-                            <i class="bi bi-check-circle"></i>
-                        </div>
-                        <div>
-                            <h3>Kehadiran</h3>
-                            <p>Rekap dari data nilai</p>
-                        </div>
-                    </div>
 
-                    <div class="mini-card-main">
-                        <strong id="dashboardPersenHadir">0%</strong>
-                        <span>Siswa Hadir</span>
-                    </div>
+  <div class="side-card dashboard-mini-card">
+    <div class="mini-card-head">
+      <div class="mini-card-icon hadir">
+        <i class="bi bi-check-circle"></i>
+      </div>
+      <div>
+        <h3>Kehadiran</h3>
+        <p>Rekap dari data nilai</p>
+      </div>
+    </div>
 
-                    <div class="mini-card-footer">
-                        <span>Data terisi</span>
-                        <b id="dashboardKelasTerisi">0/0 Kelas</b>
-                    </div>
-                </div>
+    <div class="mini-card-main">
+      <strong id="dashboardPersenHadir">0%</strong>
+      <span>Siswa Hadir</span>
+    </div>
 
-                <div class="side-card dashboard-mini-card ranking-card">
-                    <div class="mini-card-head">
-                        <div class="mini-card-icon rank">
-                            <i class="bi bi-trophy"></i>
-                        </div>
-                        <div>
-                            <h3>Peringkat Teratas</h3>
-                            <p>Berdasarkan rata-rata nilai</p>
-                        </div>
-                    </div>
+    <div class="mini-card-footer">
+      <span>Data terisi</span>
+      <b id="dashboardKelasTerisi">0/0 Kelas</b>
+    </div>
+  </div>
 
-                    <div class="side-card dashboard-mini-card request-card">
-                    <div class="mini-card-head">
-                        <div class="mini-card-icon rank">
-                            <i class="bi bi-calendar-check"></i>
-                        </div>
-                        <div>
-                            <h3>Request Jadwal</h3>
-                            <p>Pengajuan ganti jadwal saya</p>
-                        </div>
-                    </div>
+  <div class="side-card dashboard-mini-card ranking-card">
+    <div class="mini-card-head">
+      <div class="mini-card-icon rank">
+        <i class="bi bi-trophy"></i>
+      </div>
+      <div>
+        <h3>Peringkat Teratas</h3>
+        <p>Berdasarkan rata-rata nilai</p>
+      </div>
+    </div>
 
-                    <div id="dashboardRequestJadwal" class="dashboard-ranking-list">
-                        <p>Memuat request jadwal...</p>
-                    </div>
-                </div>
+    <div id="dashboardRankingList" class="dashboard-ranking-list"></div>
+  </div>
 
-                    <div id="dashboardRankingList" class="dashboard-ranking-list"></div>
-                </div>
-            </div>
+  <div class="side-card dashboard-mini-card request-card">
+    <div class="mini-card-head">
+      <div class="mini-card-icon rank">
+        <i class="bi bi-calendar-check"></i>
+      </div>
+      <div>
+        <h3>Request Jadwal</h3>
+        <p>Pengajuan ganti jadwal saya</p>
+      </div>
+    </div>
+
+    <div id="dashboardRequestJadwal" class="dashboard-ranking-list">
+      <p>Memuat request jadwal...</p>
+    </div>
+  </div>
+
+</div>
         </main>
     </div>
     <script src="components/sidebar-guru.js"></script>
