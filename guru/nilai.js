@@ -1,8 +1,14 @@
 let dataNilai = [];
 let uploadSection = null;
-let btnCetakSemua = null;
+let currentMode = "mapel"; // 'mapel' atau 'wali'
+let waliKelasList = [];
+let mapelDiajarList = [];
+let kelasMapelList = [];
 
-const filterKelasWaliLabel = document.querySelector('label[for="filterKelasWali"]');
+const filterKelasLabel = document.getElementById("filterKelasLabel");
+const filterTitle = document.getElementById("filterTitle");
+const filterDesc = document.getElementById("filterDesc");
+const tableDesc = document.getElementById("tableDesc");
 const printBtn = document.getElementById("printBtn");
 const fileInput = document.getElementById("fileInput");
 const uploadBtn = document.getElementById("uploadBtn");
@@ -10,13 +16,9 @@ const downloadTemplateBtn = document.getElementById("downloadTemplateBtn");
 const searchInput = document.getElementById("searchInput");
 const messageBox = document.getElementById("messageBox");
 const nilaiTableBody = document.getElementById("nilaiTableBody");
-
-const modeNilai = document.getElementById("modeNilai");
-const filterKelasWali = document.getElementById("filterKelasWali");
-uploadSection = document.querySelector(".import-card");
-
+const filterKelas = document.getElementById("filterKelas");
 const filterWaliKelasBox = document.getElementById("filterWaliKelasBox");
-const filterKelasWaliGroup = document.getElementById("filterKelasWaliGroup");
+const tabPeranContainer = document.getElementById("tabPeranContainer");
 
 const idGuruLogin = localStorage.getItem("id_guru");
 const roleIdLogin = localStorage.getItem("role_id");
@@ -110,19 +112,19 @@ function updateRekap() {
   totalAlfaEl.textContent = totalAlfa;
 }
 
-// ========== FUNGSI UNTUK MODE WALI KELAS ==========
-function aturTampilanWaliKelas() {
-  const mode = modeNilai ? modeNilai.value : "mapel";
+// ========== FUNGSI ATUR TAMPILAN BERDASARKAN MODE ==========
+function aturTampilanMode() {
+  uploadSection = document.querySelector(".import-card");
   
-  if (!uploadSection) {
-    uploadSection = document.querySelector(".import-card");
-  }
-  
-  if (mode === "wali") {
-    if (uploadSection) {
-      uploadSection.style.display = "none";
-    }
+  if (currentMode === "wali") {
+    // Mode wali kelas: sembunyikan upload, tampilkan tombol cetak semua
+    if (uploadSection) uploadSection.style.display = "none";
+    if (filterTitle) filterTitle.textContent = "Cetak Rapor Siswa";
+    if (filterDesc) filterDesc.textContent = "Pilih kelas wali untuk mencetak rapor siswa.";
+    if (tableDesc) tableDesc.textContent = "Daftar siswa di kelas wali Anda.";
+    if (filterKelasLabel) filterKelasLabel.textContent = "Kelas Wali";
     
+    // Tambah tombol cetak semua rapor
     const filterGrid = document.querySelector(".nilai-filter-grid");
     if (filterGrid && !document.getElementById("btnCetakSemuaRapor")) {
       const btn = document.createElement("button");
@@ -131,7 +133,7 @@ function aturTampilanWaliKelas() {
       btn.innerHTML = '<i class="bi bi-printer"></i> Cetak Semua Rapor Kelas';
       btn.style.marginLeft = "auto";
       btn.onclick = function() {
-        const idKelas = filterKelasWali ? filterKelasWali.value : "";
+        const idKelas = filterKelas ? filterKelas.value : "";
         if (!idKelas) {
           alert("Pilih kelas wali terlebih dahulu.");
           return;
@@ -142,24 +144,24 @@ function aturTampilanWaliKelas() {
       filterGrid.appendChild(btn);
     }
   } else {
-    if (uploadSection) {
-      uploadSection.style.display = "block";
-    }
+    // Mode mapel: tampilkan upload
+    if (uploadSection) uploadSection.style.display = "block";
+    if (filterTitle) filterTitle.textContent = "Filter Data Nilai";
+    if (filterDesc) filterDesc.textContent = "Pilih kelas untuk melihat data nilai mata pelajaran Anda.";
+    if (tableDesc) tableDesc.textContent = "Preview data nilai.";
+    if (filterKelasLabel) filterKelasLabel.textContent = "Kelas Mapel";
+    
     const btnExist = document.getElementById("btnCetakSemuaRapor");
-    if (btnExist) {
-      btnExist.remove();
-    }
+    if (btnExist) btnExist.remove();
   }
 }
 
-// ========== RENDER TABLE (LENGKAP DENGAN MODE WALI) ==========
+// ========== RENDER TABLE (WALI MODE vs MAPEL MODE) ==========
 function renderTable(filteredData = dataNilai) {
   if (!nilaiTableBody) return;
   
-  const mode = modeNilai ? modeNilai.value : "mapel";
-  
-  // MODE WALI KELAS
-  if (mode === "wali") {
+  if (currentMode === "wali") {
+    // Mode wali kelas: tampilkan daftar siswa + tombol cetak rapor
     const siswaUnik = {};
     filteredData.forEach(item => {
       if (!siswaUnik[item.id_siswa]) {
@@ -174,7 +176,7 @@ function renderTable(filteredData = dataNilai) {
     const daftarSiswa = Object.values(siswaUnik);
     
     if (daftarSiswa.length === 0) {
-      nilaiTableBody.innerHTML = `<tr><td colspan="4" class="empty-state">Tidak ada siswa di kelas ini.</td></tr>`;
+      nilaiTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Tidak ada siswa di kelas ini.</td></tr>`;
       return;
     }
     
@@ -207,7 +209,7 @@ function renderTable(filteredData = dataNilai) {
     return;
   }
   
-  // MODE GURU MAPEL
+  // ========== MODE GURU MAPEL ==========
   if (filteredData.length === 0) {
     nilaiTableBody.innerHTML = `<tr><td colspan="11" class="empty-state">Belum ada data yang sesuai.</td></tr>`;
     return;
@@ -260,9 +262,9 @@ function renderTable(filteredData = dataNilai) {
   }).join("");
 }
 
-// CETAK RAPOR PER SISWA (WALI KELAS)
+// ========== CETAK FUNCTIONS ==========
 window.cetakRaporPerSiswa = function(idSiswa) {
-  const idKelas = filterKelasWali ? filterKelasWali.value : "";
+  const idKelas = filterKelas ? filterKelas.value : "";
   if (!idKelas) {
     alert("Pilih kelas wali terlebih dahulu.");
     return;
@@ -271,9 +273,8 @@ window.cetakRaporPerSiswa = function(idSiswa) {
   window.open(url, "_blank");
 };
 
-// CETAK NILAI SISWA (GURU MAPEL)
 function cetakNilaiSiswa(idSiswa) {
-  const idKelas = filterKelasWali ? filterKelasWali.value : "";
+  const idKelas = filterKelas ? filterKelas.value : "";
   if (!idGuruLogin || roleIdLogin !== "2") {
     alert("Silakan login sebagai guru terlebih dahulu.");
     window.location.href = "../login.html";
@@ -285,6 +286,152 @@ function cetakNilaiSiswa(idSiswa) {
   }
   const url = `cetak_nilai_wali.html?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&id_kelas=${idKelas}&id_siswa=${idSiswa}`;
   window.open(url, "_blank");
+}
+
+// ========== LOAD PERAN GURU DARI SERVER ==========
+function loadPeranGuru() {
+  if (!idGuruLogin || roleIdLogin !== "2") {
+    alert("Silakan login sebagai guru terlebih dahulu.");
+    window.location.href = "../login.html";
+    return;
+  }
+  
+  fetch(`get_peran_guru.php?id_guru=${idGuruLogin}`)
+    .then(res => res.json())
+    .then(result => {
+      if (result.status === "success") {
+        const data = result.data;
+        waliKelasList = data.wali_kelas || [];
+        mapelDiajarList = data.mapel_diajar || [];
+        kelasMapelList = data.kelas_mapel || [];
+        
+        const isWali = data.is_wali;
+        const isGuruMapel = data.is_guru_mapel;
+        
+        if (isWali && isGuruMapel) {
+          // Punya dua peran: tampilkan tab
+          if (tabPeranContainer) tabPeranContainer.style.display = "block";
+          setupTabPeran();
+          currentMode = "mapel"; // default
+          aturTampilanMode();
+          isiDropdownKelasMapel(kelasMapelList);
+        } else if (isWali) {
+          // Cuma wali kelas
+          currentMode = "wali";
+          aturTampilanMode();
+          isiDropdownWaliKelas(waliKelasList);
+        } else if (isGuruMapel) {
+          // Cuma guru mapel
+          currentMode = "mapel";
+          aturTampilanMode();
+          isiDropdownKelasMapel(kelasMapelList);
+        } else {
+          showMessage("Anda tidak memiliki akses sebagai guru mapel atau wali kelas.", "error");
+          return;
+        }
+        
+        loadNilaiDatabase();
+      } else {
+        showMessage(result.message, "error");
+      }
+    })
+    .catch(err => {
+      console.error("Gagal load peran guru:", err);
+      showMessage("Gagal memuat data peran guru.", "error");
+    });
+}
+
+function setupTabPeran() {
+  const tabMapelBtn = document.getElementById("tabMapelBtn");
+  const tabWaliBtn = document.getElementById("tabWaliBtn");
+  
+  if (tabMapelBtn) {
+    tabMapelBtn.onclick = () => {
+      currentMode = "mapel";
+      tabMapelBtn.classList.add("active");
+      tabWaliBtn.classList.remove("active");
+      aturTampilanMode();
+      isiDropdownKelasMapel(kelasMapelList);
+      loadNilaiDatabase();
+    };
+  }
+  
+  if (tabWaliBtn) {
+    tabWaliBtn.onclick = () => {
+      currentMode = "wali";
+      tabWaliBtn.classList.add("active");
+      tabMapelBtn.classList.remove("active");
+      aturTampilanMode();
+      isiDropdownWaliKelas(waliKelasList);
+      loadNilaiDatabase();
+    };
+  }
+}
+
+// ========== DROPDOWN ==========
+function isiDropdownWaliKelas(waliKelas) {
+  if (!filterKelas) return;
+  const nilaiSebelumnya = filterKelas.value;
+  filterKelas.innerHTML = "";
+  if (waliKelas.length === 0) {
+    filterKelas.innerHTML = '<option value="">Tidak ada kelas wali</option>';
+    return;
+  }
+  waliKelas.forEach(kelas => {
+    filterKelas.innerHTML += `<option value="${kelas.id_kelas}">Kelas ${kelas.nama_kelas}</option>`;
+  });
+  if (nilaiSebelumnya && waliKelas.some(k => k.id_kelas == nilaiSebelumnya)) {
+    filterKelas.value = nilaiSebelumnya;
+  }
+}
+
+function isiDropdownKelasMapel(kelasMapel) {
+  if (!filterKelas) return;
+  const nilaiSebelumnya = filterKelas.value;
+  filterKelas.innerHTML = '<option value="">Semua Kelas</option>';
+  kelasMapel.forEach(kelas => {
+    filterKelas.innerHTML += `<option value="${kelas.id_kelas}">Kelas ${kelas.nama_kelas}</option>`;
+  });
+  if (nilaiSebelumnya && kelasMapel.some(k => k.id_kelas == nilaiSebelumnya)) {
+    filterKelas.value = nilaiSebelumnya;
+  }
+}
+
+// ========== LOAD DATA NILAI ==========
+function loadNilaiDatabase() {
+  if (!idGuruLogin || roleIdLogin !== "2") {
+    alert("Silakan login sebagai guru terlebih dahulu.");
+    window.location.href = "../login.html";
+    return;
+  }
+
+  const idKelas = filterKelas ? filterKelas.value : "";
+
+  if (currentMode === "wali" && !idKelas) {
+    if (nilaiTableBody) {
+      nilaiTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Pilih kelas wali terlebih dahulu.</td></tr>`;
+    }
+    return;
+  }
+
+  let url = `get_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${currentMode}`;
+  if (idKelas) url += `&id_kelas=${idKelas}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(result => {
+      if (result.status === "success") {
+        dataNilai = result.data || [];
+        renderTable();
+        updateRekap();
+      } else {
+        showMessage(result.message, "error");
+      }
+    })
+    .catch(err => {
+      console.error("Gagal load nilai:", err);
+      showMessage("Gagal memuat data nilai.", "error");
+    });
 }
 
 // ========== PARSE CSV (SAMA KAYAK SEBELUMNYA) ==========
@@ -419,86 +566,6 @@ function parseCSV(text) {
   throw new Error("Belum ada nilai yang bisa disimpan. Isi dulu kolom nilai mapel di file CSV, lalu simpan ulang sebagai CSV.");
 }
 
-// ========== DROPDOWN ==========
-function isiDropdownWaliKelas(waliKelas) {
-  if (!filterKelasWali) return;
-  const nilaiSebelumnya = filterKelasWali.value;
-  filterKelasWali.innerHTML = "";
-  waliKelas.forEach(kelas => {
-    filterKelasWali.innerHTML += `<option value="${kelas.id_kelas}">Kelas ${kelas.nama_kelas}</option>`;
-  });
-  if (nilaiSebelumnya) filterKelasWali.value = nilaiSebelumnya;
-}
-
-function isiDropdownKelasMapel(kelasMapel) {
-  if (!filterKelasWali) return;
-  const nilaiSebelumnya = filterKelasWali.value;
-  filterKelasWali.innerHTML = `<option value="">Semua Kelas Mapel Saya</option>`;
-  kelasMapel.forEach(kelas => {
-    filterKelasWali.innerHTML += `<option value="${kelas.id_kelas}">Kelas ${kelas.nama_kelas}</option>`;
-  });
-  if (nilaiSebelumnya) filterKelasWali.value = nilaiSebelumnya;
-}
-
-function aturTampilanMode() {
-  const mode = modeNilai ? modeNilai.value : "mapel";
-  if (!filterKelasWaliGroup || !filterKelasWali) return;
-  filterKelasWaliGroup.style.display = "flex";
-  filterKelasWali.disabled = false;
-  filterKelasWaliGroup.classList.remove("filter-disabled");
-  if (filterKelasWaliLabel) {
-    filterKelasWaliLabel.textContent = mode === "wali" ? "Kelas Wali" : "Kelas Mapel Saya";
-  }
-}
-
-// ========== LOAD DATA ==========
-function loadNilaiDatabase() {
-  if (!idGuruLogin || roleIdLogin !== "2") {
-    alert("Silakan login sebagai guru terlebih dahulu.");
-    window.location.href = "../login.html";
-    return;
-  }
-
-  const mode = modeNilai ? modeNilai.value : "mapel";
-  const idKelas = filterKelasWali ? filterKelasWali.value : "";
-
-  if (mode === "wali" && !idKelas) {
-    if (nilaiTableBody) {
-      nilaiTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Pilih kelas wali terlebih dahulu.</td></tr>`;
-    }
-    return;
-  }
-
-  let url = `get_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${mode}`;
-  if (idKelas) url += `&id_kelas=${idKelas}`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(result => {
-      if (result.status === "success") {
-        dataNilai = result.data || [];
-        aturTampilanWaliKelas();
-        if (filterWaliKelasBox) {
-          filterWaliKelasBox.style.display = "block";
-          if (mode === "wali") {
-            isiDropdownWaliKelas(result.wali_kelas || []);
-          } else {
-            isiDropdownKelasMapel(result.kelas_mapel || []);
-          }
-        }
-        aturTampilanMode();
-        renderTable();
-        updateRekap();
-      } else {
-        showMessage(result.message, "error");
-      }
-    })
-    .catch(err => {
-      console.error("Gagal load nilai:", err);
-      showMessage("Gagal memuat data nilai.", "error");
-    });
-}
-
 function simpanNilaiKeDatabase() {
   const formData = new FormData();
   formData.append("id_guru", idGuruLogin);
@@ -576,16 +643,8 @@ if (searchInput) {
   searchInput.addEventListener("input", filterSearchNilai);
 }
 
-if (modeNilai) {
-  modeNilai.addEventListener("change", function() {
-    aturTampilanMode();
-    aturTampilanWaliKelas();
-    loadNilaiDatabase();
-  });
-}
-
-if (filterKelasWali) {
-  filterKelasWali.addEventListener("change", loadNilaiDatabase);
+if (filterKelas) {
+  filterKelas.addEventListener("change", loadNilaiDatabase);
 }
 
 if (downloadTemplateBtn) {
@@ -595,10 +654,9 @@ if (downloadTemplateBtn) {
       window.location.href = "../login.html";
       return;
     }
-    const mode = modeNilai ? modeNilai.value : "mapel";
-    const idKelas = filterKelasWali ? filterKelasWali.value : "";
-    let templateUrl = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${mode}`;
-    if (mode === "wali" && idKelas) templateUrl += `&id_kelas=${idKelas}`;
+    const idKelas = filterKelas ? filterKelas.value : "";
+    let templateUrl = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${currentMode}`;
+    if (currentMode === "wali" && idKelas) templateUrl += `&id_kelas=${idKelas}`;
     const link = document.createElement("a");
     link.href = templateUrl;
     link.download = "template_import_nilai_siswa.csv";
@@ -614,4 +672,5 @@ if (printBtn) {
   });
 }
 
-loadNilaiDatabase();
+// ========== START ==========
+loadPeranGuru();
