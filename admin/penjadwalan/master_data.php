@@ -41,6 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Data jam pelajaran belum lengkap.');
             }
 
+            // CEK DUPLIKAT JAM (hari + nomor_jp)
+            $cekDuplikat = $conn->prepare("SELECT id_jp FROM jam_pelajaran WHERE hari = ? AND nomor_jp = ?");
+            $cekDuplikat->bind_param("si", $hari, $nomor_jp);
+            $cekDuplikat->execute();
+            $cekDuplikat->store_result();
+            if ($cekDuplikat->num_rows > 0) {
+                $cekDuplikat->close();
+                throw new Exception("Jam pelajaran untuk hari $hari JP $nomor_jp sudah ada.");
+            }
+            $cekDuplikat->close();
+
             $stmt = $conn->prepare("
                 INSERT INTO jam_pelajaran (hari, nomor_jp, jam_mulai, jam_selesai, aktif)
                 VALUES (?, ?, ?, ?, ?)
@@ -68,6 +79,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('ID jam pelajaran tidak valid.');
             }
 
+            // CEK APAKAH JAM PERNAH DIGUNAKAN DI JADWAL (hanya peringatan, tetap boleh hapus)
+            $cekJadwal = $conn->prepare("
+                SELECT COUNT(*) as total FROM jadwal j 
+                JOIN jam_pelajaran jp ON j.hari = jp.hari AND j.jp_mulai = jp.nomor_jp
+                WHERE jp.id_jp = ?
+            ");
+            $cekJadwal->bind_param("i", $id_jp);
+            $cekJadwal->execute();
+            $resultJadwal = $cekJadwal->get_result();
+            $used = $resultJadwal->fetch_assoc()['total'];
+            $cekJadwal->close();
+
+            if ($used > 0) {
+                // Tampilkan peringatan tapi tetap hapus (bisa juga tolak jika ingin lebih ketat)
+                // Di sini saya biarkan hapus dengan peringatan via error message
+                redirectSelf('error', "Jam pelajaran ini sedang digunakan di $used jadwal. Hapus jadwal terlebih dahulu atau generate ulang.");
+                exit;
+            }
+
             $stmt = $conn->prepare("DELETE FROM jam_pelajaran WHERE id_jp = ?");
             if (!$stmt) {
                 throw new Exception('Gagal prepare hapus jam: ' . $conn->error);
@@ -85,6 +115,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($action === 'reset_jam_default') {
+            // CEK APAKAH SUDAH ADA JADWAL UNTUK TAHUN AKTIF
+            $queryTahun = "SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1";
+            $resultTahun = $conn->query($queryTahun);
+            if ($resultTahun && $resultTahun->num_rows > 0) {
+                $id_tahun_aktif = $resultTahun->fetch_assoc()['id_tahun_ajaran'];
+                $cekJadwal = $conn->query("SELECT COUNT(*) as total FROM jadwal WHERE id_tahun_ajaran = $id_tahun_aktif");
+                $totalJadwal = $cekJadwal->fetch_assoc()['total'];
+                if ($totalJadwal > 0) {
+                    redirectSelf('error', "Tidak bisa reset jam karena sudah ada jadwal untuk tahun ajaran aktif. Hapus jadwal terlebih dahulu (generate ulang akan otomatis menghapus).");
+                    exit;
+                }
+            }
+
             $conn->begin_transaction();
 
             if (!$conn->query("DELETE FROM jam_pelajaran")) {
@@ -185,8 +228,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Data aturan mapel belum lengkap.');
             }
 
+            // Batasan maksimal pertemuan per minggu (misal 5 kali)
+            if ($pertemuan > 5) {
+                throw new Exception('Pertemuan per minggu maksimal 5 kali.');
+            }
+
+            // Batasan JP per pertemuan (maks 4 JP)
+            if ($jp > 4) {
+                throw new Exception('JP per pertemuan maksimal 4.');
+            }
+
             if (!in_array($tingkat, ['sulit', 'sedang', 'ringan'])) {
                 $tingkat = 'sedang';
+            }
+
+            // Cek apakah mapel memiliki guru
+            $cekGuru = $conn->prepare("SELECT COUNT(*) as total FROM guru WHERE id_mapel = ?");
+            $cekGuru->bind_param("i", $id_mapel);
+            $cekGuru->execute();
+            $guruCount = $cekGuru->get_result()->fetch_assoc()['total'];
+            $cekGuru->close();
+
+            if ($guruCount == 0) {
+                // Peringatan tapi tetap simpan (tidak menghentikan proses)
+                // Bisa disimpan ke session untuk ditampilkan nanti
+                $warning_guru = "Peringatan: Mapel ini belum memiliki guru. Jadwal tidak akan bisa digenerate.";
+            } else {
+                $warning_guru = "";
             }
 
             $cek = $conn->prepare("SELECT id_aturan FROM aturan_mapel WHERE id_mapel = ? LIMIT 1");
@@ -232,7 +300,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmt->close();
 
-            redirectSelf('success', 'Aturan mapel berhasil disimpan.');
+            $message = 'Aturan mapel berhasil disimpan.';
+            if ($warning_guru) {
+                $message .= ' ' . $warning_guru;
+            }
+            redirectSelf('success', $message);
         }
 
         if ($action === 'hapus_aturan') {
@@ -273,6 +345,15 @@ $qMapel = $conn->query("SELECT id_mapel, nama_mapel FROM mapel ORDER BY id_mapel
 if ($qMapel) {
     while ($row = $qMapel->fetch_assoc()) {
         $mapel_list[] = $row;
+    }
+}
+
+// TAMBAHAN: Ambil info guru per mapel untuk ditampilkan
+$guru_per_mapel = [];
+$qGuruMapel = $conn->query("SELECT id_mapel, COUNT(*) as total FROM guru WHERE id_mapel IS NOT NULL GROUP BY id_mapel");
+if ($qGuruMapel) {
+    while ($row = $qGuruMapel->fetch_assoc()) {
+        $guru_per_mapel[$row['id_mapel']] = $row['total'];
     }
 }
 
@@ -325,6 +406,7 @@ $total_mapel = count($mapel_list);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link rel="stylesheet" href="/admin/components/admin-nav.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
@@ -786,7 +868,7 @@ $total_mapel = count($mapel_list);
 
                         <div class="form-group">
                             <label>Nomor JP</label>
-                            <input type="number" name="nomor_jp" min="1" required placeholder="Contoh: 1">
+                            <input type="number" name="nomor_jp" min="1" max="20" required placeholder="Contoh: 1">
                         </div>
 
                         <div class="form-group">
@@ -810,9 +892,9 @@ $total_mapel = count($mapel_list);
                         </button>
                     </form>
 
-                    <form method="POST" style="margin-top: 12px;" onsubmit="return confirm('Reset jam pelajaran ke default? Data jam lama akan dihapus.');">
+                    <form method="POST" style="margin-top: 12px;" id="resetJamForm">
                         <input type="hidden" name="action" value="reset_jam_default">
-                        <button type="submit" class="btn btn-warning">
+                        <button type="button" class="btn btn-warning" id="resetJamBtn">
                             <i class="fas fa-rotate"></i>
                             Buat Jam Bawaan
                         </button>
@@ -833,19 +915,22 @@ $total_mapel = count($mapel_list);
                                 <?php foreach ($mapel_list as $mapel): ?>
                                     <option value="<?php echo (int)$mapel['id_mapel']; ?>">
                                         <?php echo e($mapel['nama_mapel']); ?>
+                                        <?php if (isset($guru_per_mapel[$mapel['id_mapel']]) && $guru_per_mapel[$mapel['id_mapel']] == 0): ?>
+                                            (⚠️ Belum ada guru)
+                                        <?php endif; ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label>Pertemuan per Minggu</label>
-                            <input type="number" name="pertemuan_per_minggu" min="1" required placeholder="Contoh: 3">
+                            <label>Pertemuan per Minggu (maks 5)</label>
+                            <input type="number" name="pertemuan_per_minggu" min="1" max="5" required placeholder="Contoh: 3">
                         </div>
 
                         <div class="form-group">
-                            <label>JP per Pertemuan</label>
-                            <input type="number" name="jp_per_pertemuan" min="1" required placeholder="Contoh: 2">
+                            <label>JP per Pertemuan (maks 4)</label>
+                            <input type="number" name="jp_per_pertemuan" min="1" max="4" required placeholder="Contoh: 2">
                         </div>
 
                         <div class="form-group">
@@ -902,10 +987,10 @@ $total_mapel = count($mapel_list);
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <form method="POST" class="inline-form" onsubmit="return confirm('Hapus jam pelajaran ini?');">
+                                            <form method="POST" class="inline-form" id="hapusJamForm-<?php echo $jam['id_jp']; ?>">
                                                 <input type="hidden" name="action" value="hapus_jam">
                                                 <input type="hidden" name="id_jp" value="<?php echo (int)$jam['id_jp']; ?>">
-                                                <button type="submit" class="btn btn-danger">
+                                                <button type="button" class="btn btn-danger" onclick="confirmHapusJam(<?php echo $jam['id_jp']; ?>)">
                                                     <i class="fas fa-trash"></i>
                                                     Hapus
                                                 </button>
@@ -918,7 +1003,7 @@ $total_mapel = count($mapel_list);
                     </div>
                 <?php else: ?>
                     <div class="empty-state">
-                        Belum ada data jam pelajaran. Klik tombol <strong>Buat Jam Default</strong>.
+                        Belum ada data jam pelajaran. Klik tombol <strong>Buat Jam Bawaan</strong>.
                     </div>
                 <?php endif; ?>
             </section>
@@ -945,9 +1030,14 @@ $total_mapel = count($mapel_list);
                                 <?php foreach ($aturan_list as $aturan): ?>
                                     <?php
                                         $total_jp = (int)$aturan['pertemuan_per_minggu'] * (int)$aturan['jp_per_pertemuan'];
+                                        $adaGuru = isset($guru_per_mapel[$aturan['id_mapel']]) && $guru_per_mapel[$aturan['id_mapel']] > 0;
                                     ?>
                                     <tr>
-                                        <td><strong><?php echo e($aturan['nama_mapel'] ?? '-'); ?></strong></td>
+                                        <td><strong><?php echo e($aturan['nama_mapel'] ?? '-'); ?></strong>
+                                            <?php if (!$adaGuru): ?>
+                                                <span class="badge badge-danger" style="margin-left: 8px;">⚠️ Tidak ada guru</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td><?php echo (int)$aturan['pertemuan_per_minggu']; ?> kali</td>
                                         <td><?php echo (int)$aturan['jp_per_pertemuan']; ?> JP</td>
                                         <td><span class="badge"><?php echo $total_jp; ?> JP</span></td>
@@ -964,15 +1054,15 @@ $total_mapel = count($mapel_list);
                                             <?php echo ((int)$aturan['prioritas_pagi'] === 1) ? 'Ya' : 'Tidak'; ?>
                                         </td>
                                         <td>
-                                            <form method="POST" class="inline-form" onsubmit="return confirm('Hapus aturan mapel ini?');">
+                                            <form method="POST" class="inline-form" id="hapusAturanForm-<?php echo $aturan['id_aturan']; ?>">
                                                 <input type="hidden" name="action" value="hapus_aturan">
                                                 <input type="hidden" name="id_aturan" value="<?php echo (int)$aturan['id_aturan']; ?>">
-                                                <button type="submit" class="btn btn-danger">
+                                                <button type="button" class="btn btn-danger" onclick="confirmHapusAturan(<?php echo $aturan['id_aturan']; ?>)">
                                                     <i class="fas fa-trash"></i>
                                                     Hapus
                                                 </button>
                                             </form>
-                                        </td>
+                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -988,6 +1078,61 @@ $total_mapel = count($mapel_list);
     </div>
 
     <script src="/admin/components/admin-nav.js"></script>
+    <script>
+        // Konfirmasi reset jam dengan SweetAlert
+        document.getElementById('resetJamBtn')?.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Reset Jam Pelajaran?',
+                text: 'Semua jam pelajaran akan dihapus dan diganti dengan jam default. Pastikan belum ada jadwal yang digenerate.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f59e0b',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Reset!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('resetJamForm').submit();
+                }
+            });
+        });
+
+        // Konfirmasi hapus jam dengan SweetAlert
+        function confirmHapusJam(idJp) {
+            Swal.fire({
+                title: 'Hapus Jam Pelajaran?',
+                text: 'Jam pelajaran yang dihapus tidak dapat dikembalikan. Jika sudah digunakan di jadwal, generate ulang mungkin akan error.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('hapusJamForm-' + idJp).submit();
+                }
+            });
+        }
+
+        // Konfirmasi hapus aturan dengan SweetAlert
+        function confirmHapusAturan(idAturan) {
+            Swal.fire({
+                title: 'Hapus Aturan Mapel?',
+                text: 'Aturan mapel yang dihapus tidak dapat dikembalikan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('hapusAturanForm-' + idAturan).submit();
+                }
+            });
+        }
+    </script>
 </body>
 </html>
 

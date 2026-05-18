@@ -26,6 +26,38 @@ if ($tahunAktif['jadwal_locked'] == 1) {
 $id_tahun_aktif = (int)$tahunAktif['id_tahun_ajaran'];
 // ===============================================================
 
+// ========== VALIDASI ATURAN MAPEL (TAMBAHAN BARU) ==========
+// Cek apakah ada aturan mapel
+$cekAturan = $conn->query("SELECT COUNT(*) as total FROM aturan_mapel");
+$totalAturan = $cekAturan->fetch_assoc()['total'];
+if ($totalAturan == 0) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Belum ada aturan mapel. Silakan tambahkan aturan mapel terlebih dahulu di halaman <a href="/admin/penjadwalan/master_data.php" target="_blank">Kelola Jadwal</a>.'
+    ]);
+    exit;
+}
+
+// Cek apakah setiap mapel memiliki aturan (opsional, hanya peringatan)
+$qMapelCek = $conn->query("
+    SELECT m.id_mapel, m.nama_mapel, 
+           (SELECT COUNT(*) FROM aturan_mapel WHERE id_mapel = m.id_mapel) as ada_aturan
+    FROM mapel m
+");
+$mapelTanpaAturan = [];
+while ($row = $qMapelCek->fetch_assoc()) {
+    if ($row['ada_aturan'] == 0) {
+        $mapelTanpaAturan[] = $row['nama_mapel'];
+    }
+}
+if (!empty($mapelTanpaAturan)) {
+    // Hanya simpan sebagai warning, tidak menghentikan proses
+    $warningMapel = "Peringatan: Mapel berikut belum memiliki aturan (" . implode(', ', $mapelTanpaAturan) . "). Akan menggunakan default (1x/minggu, 1 JP). ";
+} else {
+    $warningMapel = "";
+}
+// ===============================================================
+
 function formatJam($jam)
 {
     return substr($jam, 0, 5);
@@ -822,7 +854,13 @@ try {
     }
 
     if (!empty($gagal)) {
+        $uniqueMapel = array_unique(array_column($gagal, 'mapel'));
         $message .= ' Ada ' . count($gagal) . ' jadwal yang belum bisa dipasang.';
+        $message .= ' Periksa mapel: ' . implode(', ', $uniqueMapel);
+    }
+
+    if (!empty($warningMapel)) {
+        $message = $warningMapel . ' ' . $message;
     }
 
     echo json_encode([
