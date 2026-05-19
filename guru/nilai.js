@@ -156,58 +156,6 @@ function aturTampilanWaliKelas() {
 function renderTable(filteredData = dataNilai) {
   if (!nilaiTableBody) return;
   
-  const mode = modeNilai ? modeNilai.value : "mapel";
-  
-  // MODE WALI KELAS
-  if (mode === "wali") {
-    const siswaUnik = {};
-    filteredData.forEach(item => {
-      if (!siswaUnik[item.id_siswa]) {
-        siswaUnik[item.id_siswa] = {
-          id_siswa: item.id_siswa,
-          nama_siswa: item.nama_siswa || "-",
-          nama_kelas: item.nama_kelas || "-"
-        };
-      }
-    });
-    
-    const daftarSiswa = Object.values(siswaUnik);
-    
-    if (daftarSiswa.length === 0) {
-      nilaiTableBody.innerHTML = `<td><td colspan="4" class="empty-state">Tidak ada siswa di kelas ini.</td></tr>`;
-      return;
-    }
-    
-    nilaiTableBody.innerHTML = `
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>ID Siswa</th>
-          <th>Nama Siswa</th>
-          <th>Kelas</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${daftarSiswa.map((siswa, index) => `
-          <tr>
-            <td class="center">${index + 1}</td>
-            <td>${siswa.id_siswa}</td>
-            <td><strong>${escapeHtml(siswa.nama_siswa)}</strong></td>
-            <td>${escapeHtml(siswa.nama_kelas)}</td>
-            <td>
-              <button class="btn-cetak-row" onclick="cetakRaporPerSiswa(${siswa.id_siswa})">
-                <i class="bi bi-printer"></i> Cetak Rapor
-              </button>
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    `;
-    return;
-  }
-  
-  // MODE GURU MAPEL
   if (filteredData.length === 0) {
     nilaiTableBody.innerHTML = `<tr><td colspan="11" class="empty-state">Belum ada data yang sesuai.</td></tr>`;
     return;
@@ -259,7 +207,7 @@ function renderTable(filteredData = dataNilai) {
     `;
   }).join("");
 }
-
+  
 // CETAK RAPOR PER SISWA (WALI KELAS)
 window.cetakRaporPerSiswa = function(idSiswa) {
   const idKelas = filterKelasWali ? filterKelasWali.value : "";
