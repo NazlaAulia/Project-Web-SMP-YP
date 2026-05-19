@@ -140,25 +140,27 @@ if ($mode === "wali") {
 
 /* QUERY DATA NILAI */
 if ($mode === "wali") {
-    // MODE WALI KELAS
+    // MODE WALI KELAS - ambil nilai semua mapel untuk setiap siswa
     $stmt = $conn->prepare("
-        SELECT
+        SELECT 
             s.id_siswa,
             s.nama AS nama_siswa,
             s.id_kelas,
             k.nama_kelas,
-            NULL AS id_mapel,
-            NULL AS nama_mapel,
-            NULL AS semester,
-            NULL AS nilai_angka,
-            NULL AS hadir,
-            NULL AS izin,
-            NULL AS sakit,
-            NULL AS alfa
+            m.id_mapel,
+            m.nama_mapel,
+            COALESCE(n.semester, 1) AS semester,
+            COALESCE(n.nilai_angka, 0) AS nilai_angka,
+            COALESCE(n.hadir, 0) AS hadir,
+            COALESCE(n.izin, 0) AS izin,
+            COALESCE(n.sakit, 0) AS sakit,
+            COALESCE(n.alfa, 0) AS alfa
         FROM siswa s
         INNER JOIN kelas k ON s.id_kelas = k.id_kelas
+        CROSS JOIN mapel m
+        LEFT JOIN nilai n ON n.id_siswa = s.id_siswa AND n.id_mapel = m.id_mapel
         WHERE s.id_kelas = ?
-        ORDER BY s.nama ASC
+        ORDER BY s.nama ASC, m.id_mapel ASC
     ");
 
     if (!$stmt) {
@@ -201,15 +203,15 @@ $result = $stmt->get_result();
 
 $data = [];
 while ($row = $result->fetch_assoc()) {
-    $semesterAngka = $row["semester"] ? (int) $row["semester"] : 1;
+    $semesterAngka = (int) $row["semester"];
     
     $data[] = [
         "id_siswa" => (int) $row["id_siswa"],
         "nama_siswa" => $row["nama_siswa"] ?? "-",
         "id_kelas" => (int) ($row["id_kelas"] ?? 0),
         "nama_kelas" => $row["nama_kelas"] ?? "-",
-        "id_mapel" => (int) ($row["id_mapel"] ?? $id_mapel_guru),
-        "nama_mapel" => $row["nama_mapel"] ?? $nama_mapel_guru,
+        "id_mapel" => (int) $row["id_mapel"],
+        "nama_mapel" => $row["nama_mapel"] ?? "-",
         "semester" => $semesterAngka,
         "semester_text" => $semesterAngka === 1 ? "Ganjil" : "Genap",
         "nilai_angka" => (int) ($row["nilai_angka"] ?? 0),
