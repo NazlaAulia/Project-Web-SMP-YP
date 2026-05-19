@@ -205,7 +205,7 @@ function callGeminiAPI($api_key, $prompt, $model) {
         ],
         "generationConfig" => [
             "temperature" => 0.7,
-            "maxOutputTokens" => 800,
+            "maxOutputTokens" => 2048,  // 🔥 DIUBAH dari 800 jadi 2048
             "topP" => 0.95,
             "topK" => 40
         ]
@@ -265,7 +265,6 @@ foreach ($models as $model) {
         break;
     } else {
         $error_message = $result['error'];
-        // Lanjut ke model berikutnya
         continue;
     }
 }
