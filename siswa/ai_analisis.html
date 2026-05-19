@@ -2,21 +2,25 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>AI Analisis Belajar - SMP YP 17 Surabaya</title>
+    <title>AI Analisis Belajar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { background: #f0f7f5; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .ai-card {
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f7f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
             background: white;
             border-radius: 24px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #064e4b;
         }
         .mapel-badge {
             display: inline-block;
@@ -43,7 +47,6 @@
             border-radius: 16px;
             margin-top: 20px;
             white-space: pre-wrap;
-            font-size: 15px;
             line-height: 1.6;
         }
         .refresh-btn {
@@ -55,9 +58,6 @@
             cursor: pointer;
             margin-top: 20px;
             font-size: 14px;
-        }
-        .refresh-btn:hover {
-            background: #0a7c78;
         }
         .error-box {
             background: #fee2e2;
@@ -79,96 +79,70 @@
     </style>
 </head>
 <body>
-    <div id="navbar-container"></div>
     <div class="container">
-        <div class="ai-card">
-            <h2><i class="fas fa-robot"></i> Analisis Belajar AI</h2>
-            <p>AI akan menganalisis nilai belajarmu dan memberikan saran untuk meningkatkan prestasi.</p>
-            
-            <div id="nilaiRingkasan" style="margin: 20px 0; min-height: 100px;">
-                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Memuat data nilai...</div>
-            </div>
-            
-            <div id="aiResponse" class="loading">
-                <i class="fas fa-spinner fa-spin"></i> Sedang menganalisis data nilai...
-            </div>
-            
-            <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i> Analisis Ulang</button>
+        <h2>🤖 Analisis Belajar AI</h2>
+        <p>AI akan menganalisis nilai belajarmu dan memberikan saran untuk meningkatkan prestasi.</p>
+        
+        <div id="nilaiRingkasan" style="margin: 20px 0; min-height: 100px;">
+            <div class="loading">⏳ Memuat data nilai...</div>
         </div>
+        
+        <div id="aiResponse" class="loading">
+            ⏳ Sedang menganalisis data nilai...
+        </div>
+        
+        <button class="refresh-btn" id="refreshBtn">🔄 Analisis Ulang</button>
     </div>
 
-    <script src="navbar.js"></script>
     <script>
-        // Fungsi untuk memuat analisis
         function loadAnalisis(forceRefresh = false) {
-            // Tampilkan loading
-            document.getElementById('nilaiRingkasan').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Memuat data nilai...</div>';
-            document.getElementById('aiResponse').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Sedang menganalisis data nilai...</div>';
+            document.getElementById('nilaiRingkasan').innerHTML = '<div class="loading">⏳ Memuat data nilai...</div>';
+            document.getElementById('aiResponse').innerHTML = '<div class="loading">⏳ Sedang menganalisis data nilai...</div>';
             
             const url = forceRefresh ? 'get_analisis_ai.php?refresh=1&t=' + Date.now() : 'get_analisis_ai.php?t=' + Date.now();
             
-            fetch(url, {
-                method: 'GET',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('HTTP ' + res.status + ': ' + res.statusText);
-                }
-                return res.json();
-            })
-            .then(data => {
-                console.log('Response:', data);
-                
-                if (data.success) {
-                    // Tampilkan ringkasan nilai
-                    if (data.data.semua_nilai && data.data.semua_nilai.length > 0) {
-                        let html = '<strong>📊 Rata-rata Nilai per Mapel:</strong><br><div style="margin-top: 10px;">';
-                        data.data.semua_nilai.forEach(mapel => {
-                            let cls = mapel.rata_rata < 75 ? 'lowest' : '';
-                            html += `<span class="mapel-badge ${cls}">${mapel.nama_mapel}: ${mapel.rata_rata}</span>`;
-                        });
-                        html += '</div>';
-                        html += `<p style="margin-top: 15px;"><strong>⚠️ Mapel terendah:</strong> ${data.data.mapel_terendah} (${data.data.nilai_terendah})</p>`;
-                        document.getElementById('nilaiRingkasan').innerHTML = html;
-                    } else {
-                        document.getElementById('nilaiRingkasan').innerHTML = '<p>Tidak ada data nilai</p>';
-                    }
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Response:', data);
                     
-                    // Tampilkan respons AI
-                    let aiHtml = (data.data.ai_response || 'Tidak ada respons AI').replace(/\n/g, '<br>');
-                    if (data.data.note) {
-                        aiHtml += `<div class="success-note">ℹ️ ${data.data.note}</div>`;
+                    if (data.success) {
+                        // Ringkasan nilai
+                        if (data.data.semua_nilai && data.data.semua_nilai.length > 0) {
+                            let html = '<strong>📊 Rata-rata Nilai per Mapel:</strong><br><div style="margin-top: 10px;">';
+                            data.data.semua_nilai.forEach(mapel => {
+                                let cls = mapel.rata_rata < 75 ? 'lowest' : '';
+                                html += `<span class="mapel-badge ${cls}">${mapel.nama_mapel}: ${mapel.rata_rata}</span>`;
+                            });
+                            html += '</div>';
+                            html += `<p style="margin-top: 15px;"><strong>⚠️ Mapel terendah:</strong> ${data.data.mapel_terendah} (${data.data.nilai_terendah})</p>`;
+                            document.getElementById('nilaiRingkasan').innerHTML = html;
+                        } else {
+                            document.getElementById('nilaiRingkasan').innerHTML = '<p>❌ Tidak ada data nilai</p>';
+                        }
+                        
+                        // Response AI
+                        let aiHtml = (data.data.ai_response || 'Tidak ada respons').replace(/\n/g, '<br>');
+                        if (data.data.note) {
+                            aiHtml += `<div class="success-note">ℹ️ ${data.data.note}</div>`;
+                        }
+                        document.getElementById('aiResponse').innerHTML = `<div class="ai-response">${aiHtml}</div>`;
+                    } else {
+                        document.getElementById('nilaiRingkasan').innerHTML = '<p>❌ Gagal memuat data</p>';
+                        document.getElementById('aiResponse').innerHTML = `<div class="error-box">❌ ${data.message || 'Terjadi kesalahan'}</div>`;
                     }
-                    document.getElementById('aiResponse').innerHTML = `<div class="ai-response">${aiHtml}</div>`;
-                } else {
-                    document.getElementById('nilaiRingkasan').innerHTML = '<p>❌ Gagal memuat data</p>';
-                    document.getElementById('aiResponse').innerHTML = `<div class="error-box">❌ ${data.message || 'Terjadi kesalahan'}</div>`;
-                }
-            })
-            .catch(err => {
-                console.error('Fetch error:', err);
-                document.getElementById('nilaiRingkasan').innerHTML = '<p>❌ Gagal terhubung ke server</p>';
-                document.getElementById('aiResponse').innerHTML = `<div class="error-box">❌ Error koneksi: ${err.message}<br><br>Pastikan server berjalan dan file get_analisis_ai.php dapat diakses.</div>`;
-            });
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    document.getElementById('aiResponse').innerHTML = `<div class="error-box">❌ Error: ${err.message}</div>`;
+                });
         }
         
-        // Jalankan saat halaman siap
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Halaman siap, memuat analisis...');
-            
-            const refreshBtn = document.getElementById('refreshBtn');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', function() {
-                    loadAnalisis(true);
-                });
-            }
-            
-            loadAnalisis();
-        });
+        document.getElementById('refreshBtn').addEventListener('click', () => loadAnalisis(true));
+        loadAnalisis();
     </script>
 </body>
 </html>
