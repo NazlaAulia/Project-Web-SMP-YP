@@ -52,6 +52,7 @@ if ($resultGuru->num_rows === 0) {
 
 $guru = $resultGuru->fetch_assoc();
 $id_mapel_guru = (int) $guru["id_mapel"];
+$nama_mapel_guru = $guru["nama_mapel"] ?? "-";
 
 /* AMBIL KELAS WALI */
 $getWali = $conn->prepare("
@@ -73,7 +74,6 @@ $getWali->execute();
 $resultWali = $getWali->get_result();
 
 $wali_kelas = [];
-
 while ($row = $resultWali->fetch_assoc()) {
     $wali_kelas[] = [
         "id_kelas" => (int) $row["id_kelas"],
@@ -86,7 +86,6 @@ $is_wali_kelas = count($wali_kelas) > 0;
 
 /* AMBIL KELAS MAPEL YANG DIAJAR GURU */
 $kelas_mapel = [];
-
 $getKelasMapel = $conn->prepare("
     SELECT DISTINCT
         k.id_kelas,
@@ -127,7 +126,6 @@ if ($mode === "wali") {
     }
 
     $bolehAksesKelas = false;
-
     foreach ($wali_kelas as $kelas) {
         if ((int) $kelas["id_kelas"] === $id_kelas) {
             $bolehAksesKelas = true;
@@ -142,105 +140,83 @@ if ($mode === "wali") {
 
 /* QUERY DATA NILAI */
 if ($mode === "wali") {
+    // MODE WALI KELAS
     $stmt = $conn->prepare("
         SELECT
-            n.id_siswa,
+            s.id_siswa,
             s.nama AS nama_siswa,
             s.id_kelas,
             k.nama_kelas,
-            n.id_mapel,
-            m.nama_mapel,
-            n.semester,
-            n.nilai_angka,
-            n.hadir,
-            n.izin,
-            n.sakit,
-            n.alfa
-        FROM nilai n
-        LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
-        LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-        LEFT JOIN mapel m ON n.id_mapel = m.id_mapel
+            NULL AS id_mapel,
+            NULL AS nama_mapel,
+            NULL AS semester,
+            NULL AS nilai_angka,
+            NULL AS hadir,
+            NULL AS izin,
+            NULL AS sakit,
+            NULL AS alfa
+        FROM siswa s
+        INNER JOIN kelas k ON s.id_kelas = k.id_kelas
         WHERE s.id_kelas = ?
-        ORDER BY s.nama ASC, m.nama_mapel ASC, n.semester ASC
+        ORDER BY s.nama ASC
     ");
 
     if (!$stmt) {
-        kirim_json("error", "Query nilai wali kelas gagal: " . $conn->error);
+        kirim_json("error", "Query wali kelas gagal: " . $conn->error);
     }
 
     $stmt->bind_param("i", $id_kelas);
 } else {
-    $sql = "
-        SELECT DISTINCT
-            n.id_siswa,
+    // MODE GURU MAPEL - ambil SEMUA siswa di kelas
+    $stmt = $conn->prepare("
+        SELECT 
+            s.id_siswa,
             s.nama AS nama_siswa,
             s.id_kelas,
             k.nama_kelas,
-            n.id_mapel,
-            m.nama_mapel,
-            n.semester,
-            n.nilai_angka,
-            n.hadir,
-            n.izin,
-            n.sakit,
-            n.alfa
-        FROM nilai n
-        INNER JOIN siswa s ON n.id_siswa = s.id_siswa
+            ? AS id_mapel,
+            ? AS nama_mapel,
+            COALESCE(n.semester, 1) AS semester,
+            COALESCE(n.nilai_angka, 0) AS nilai_angka,
+            COALESCE(n.hadir, 0) AS hadir,
+            COALESCE(n.izin, 0) AS izin,
+            COALESCE(n.sakit, 0) AS sakit,
+            COALESCE(n.alfa, 0) AS alfa
+        FROM siswa s
         INNER JOIN kelas k ON s.id_kelas = k.id_kelas
-        INNER JOIN mapel m ON n.id_mapel = m.id_mapel
-        INNER JOIN guru g ON g.id_guru = ?
-        WHERE n.id_mapel = g.id_mapel
-          AND EXISTS (
-              SELECT 1
-              FROM jadwal j
-              WHERE j.id_guru = ?
-                AND j.id_kelas = s.id_kelas
-                AND j.id_mapel = n.id_mapel
-          )
-    ";
-
-    $types = "ii";
-    $params = [$id_guru, $id_guru];
-
-    if ($id_kelas > 0) {
-        $sql .= " AND s.id_kelas = ?";
-        $types .= "i";
-        $params[] = $id_kelas;
-    }
-
-    $sql .= " ORDER BY k.tingkat ASC, k.nama_kelas ASC, s.nama ASC, n.semester ASC";
-
-    $stmt = $conn->prepare($sql);
+        LEFT JOIN nilai n ON n.id_siswa = s.id_siswa AND n.id_mapel = ?
+        WHERE s.id_kelas = ?
+        ORDER BY s.nama ASC
+    ");
 
     if (!$stmt) {
         kirim_json("error", "Query nilai mapel gagal: " . $conn->error);
     }
 
-    $stmt->bind_param($types, ...$params);
+    $stmt->bind_param("isii", $id_mapel_guru, $nama_mapel_guru, $id_mapel_guru, $id_kelas);
 }
 
 $stmt->execute();
 $result = $stmt->get_result();
 
 $data = [];
-
 while ($row = $result->fetch_assoc()) {
-    $semesterAngka = (int) $row["semester"];
-
+    $semesterAngka = $row["semester"] ? (int) $row["semester"] : 1;
+    
     $data[] = [
         "id_siswa" => (int) $row["id_siswa"],
         "nama_siswa" => $row["nama_siswa"] ?? "-",
         "id_kelas" => (int) ($row["id_kelas"] ?? 0),
         "nama_kelas" => $row["nama_kelas"] ?? "-",
-        "id_mapel" => (int) $row["id_mapel"],
-        "nama_mapel" => $row["nama_mapel"] ?? "-",
+        "id_mapel" => (int) ($row["id_mapel"] ?? $id_mapel_guru),
+        "nama_mapel" => $row["nama_mapel"] ?? $nama_mapel_guru,
         "semester" => $semesterAngka,
         "semester_text" => $semesterAngka === 1 ? "Ganjil" : "Genap",
-        "nilai_angka" => (int) $row["nilai_angka"],
-        "hadir" => (int) $row["hadir"],
-        "izin" => (int) $row["izin"],
-        "sakit" => (int) $row["sakit"],
-        "alfa" => (int) $row["alfa"]
+        "nilai_angka" => (int) ($row["nilai_angka"] ?? 0),
+        "hadir" => (int) ($row["hadir"] ?? 0),
+        "izin" => (int) ($row["izin"] ?? 0),
+        "sakit" => (int) ($row["sakit"] ?? 0),
+        "alfa" => (int) ($row["alfa"] ?? 0)
     ];
 }
 
@@ -250,7 +226,7 @@ kirim_json("success", "Data nilai berhasil dimuat.", [
         "id_guru" => (int) $guru["id_guru"],
         "nama" => $guru["nama"],
         "id_mapel" => $id_mapel_guru,
-        "nama_mapel" => $guru["nama_mapel"] ?? "-"
+        "nama_mapel" => $nama_mapel_guru
     ],
     "is_wali_kelas" => $is_wali_kelas,
     "wali_kelas" => $wali_kelas,
