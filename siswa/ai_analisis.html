@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { background: #f0f7f5; font-family: 'Poppins', sans-serif; }
+        body { background: #f0f7f5; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: 0 auto; padding: 20px; }
         .ai-card {
             background: white;
@@ -34,6 +34,7 @@
         .loading {
             text-align: center;
             padding: 50px;
+            color: #064e4b;
         }
         .ai-response {
             background: #f9fafb;
@@ -55,6 +56,26 @@
             margin-top: 20px;
             font-size: 14px;
         }
+        .refresh-btn:hover {
+            background: #0a7c78;
+        }
+        .error-box {
+            background: #fee2e2;
+            border-left: 5px solid #dc2626;
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 20px;
+            color: #991b1b;
+        }
+        .success-note {
+            background: #dcfce7;
+            border-left: 5px solid #16a34a;
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #166534;
+        }
     </style>
 </head>
 <body>
@@ -64,46 +85,90 @@
             <h2><i class="fas fa-robot"></i> Analisis Belajar AI</h2>
             <p>AI akan menganalisis nilai belajarmu dan memberikan saran untuk meningkatkan prestasi.</p>
             
-            <div id="nilaiRingkasan" style="margin: 20px 0;"></div>
+            <div id="nilaiRingkasan" style="margin: 20px 0; min-height: 100px;">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Memuat data nilai...</div>
+            </div>
+            
             <div id="aiResponse" class="loading">
                 <i class="fas fa-spinner fa-spin"></i> Sedang menganalisis data nilai...
             </div>
+            
             <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i> Analisis Ulang</button>
         </div>
     </div>
 
     <script src="navbar.js"></script>
     <script>
+        // Fungsi untuk memuat analisis
         function loadAnalisis(forceRefresh = false) {
-            const url = forceRefresh ? 'get_analisis_ai.php?refresh=1' : 'get_analisis_ai.php';
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        // Tampilkan ringkasan nilai
-                        let html = '<strong>📊 Rata-rata Nilai per Mapel:</strong><br>';
+            // Tampilkan loading
+            document.getElementById('nilaiRingkasan').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Memuat data nilai...</div>';
+            document.getElementById('aiResponse').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Sedang menganalisis data nilai...</div>';
+            
+            const url = forceRefresh ? 'get_analisis_ai.php?refresh=1&t=' + Date.now() : 'get_analisis_ai.php?t=' + Date.now();
+            
+            fetch(url, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log('Response:', data);
+                
+                if (data.success) {
+                    // Tampilkan ringkasan nilai
+                    if (data.data.semua_nilai && data.data.semua_nilai.length > 0) {
+                        let html = '<strong>📊 Rata-rata Nilai per Mapel:</strong><br><div style="margin-top: 10px;">';
                         data.data.semua_nilai.forEach(mapel => {
                             let cls = mapel.rata_rata < 75 ? 'lowest' : '';
                             html += `<span class="mapel-badge ${cls}">${mapel.nama_mapel}: ${mapel.rata_rata}</span>`;
                         });
+                        html += '</div>';
                         html += `<p style="margin-top: 15px;"><strong>⚠️ Mapel terendah:</strong> ${data.data.mapel_terendah} (${data.data.nilai_terendah})</p>`;
                         document.getElementById('nilaiRingkasan').innerHTML = html;
-                        
-                        // Tampilkan respons AI
-                        document.getElementById('aiResponse').innerHTML = `<div class="ai-response">${data.data.ai_response.replace(/\n/g, '<br>')}</div>`;
                     } else {
-                        document.getElementById('aiResponse').innerHTML = `<div class="ai-response" style="background:#fee2e2;">❌ ${data.message}</div>`;
+                        document.getElementById('nilaiRingkasan').innerHTML = '<p>Tidak ada data nilai</p>';
                     }
-                })
-                .catch(err => {
-                    document.getElementById('aiResponse').innerHTML = `<div class="ai-response" style="background:#fee2e2;">❌ Terjadi kesalahan: ${err.message}</div>`;
-                });
+                    
+                    // Tampilkan respons AI
+                    let aiHtml = (data.data.ai_response || 'Tidak ada respons AI').replace(/\n/g, '<br>');
+                    if (data.data.note) {
+                        aiHtml += `<div class="success-note">ℹ️ ${data.data.note}</div>`;
+                    }
+                    document.getElementById('aiResponse').innerHTML = `<div class="ai-response">${aiHtml}</div>`;
+                } else {
+                    document.getElementById('nilaiRingkasan').innerHTML = '<p>❌ Gagal memuat data</p>';
+                    document.getElementById('aiResponse').innerHTML = `<div class="error-box">❌ ${data.message || 'Terjadi kesalahan'}</div>`;
+                }
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                document.getElementById('nilaiRingkasan').innerHTML = '<p>❌ Gagal terhubung ke server</p>';
+                document.getElementById('aiResponse').innerHTML = `<div class="error-box">❌ Error koneksi: ${err.message}<br><br>Pastikan server berjalan dan file get_analisis_ai.php dapat diakses.</div>`;
+            });
         }
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            document.getElementById('aiResponse').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Memproses ulang...</div>';
-            loadAnalisis(true);
+        
+        // Jalankan saat halaman siap
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Halaman siap, memuat analisis...');
+            
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    loadAnalisis(true);
+                });
+            }
+            
+            loadAnalisis();
         });
-        loadAnalisis();
     </script>
 </body>
 </html>
