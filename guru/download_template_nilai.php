@@ -17,6 +17,10 @@ if ($role_id !== 2 || $id_guru <= 0) {
 |--------------------------------------------------------------------------
 */
 if ($mode === "mapel") {
+    if ($id_kelas <= 0) {
+        die("Pilih kelas terlebih dahulu.");
+    }
+
     $getGuru = $conn->prepare("
         SELECT 
             g.id_mapel,
@@ -44,11 +48,21 @@ if ($mode === "mapel") {
     $id_mapel = (int) $guru["id_mapel"];
     $nama_mapel = $guru["nama_mapel"] ?? "-";
 
+    // Ambil nama kelas
+    $queryKelas = $conn->prepare("SELECT nama_kelas FROM kelas WHERE id_kelas = ?");
+    $queryKelas->bind_param("i", $id_kelas);
+    $queryKelas->execute();
+    $resultKelas = $queryKelas->get_result();
+    $kelasData = $resultKelas->fetch_assoc();
+    $namaKelas = $kelasData ? preg_replace('/[^a-zA-Z0-9]/', '_', $kelasData["nama_kelas"]) : "kelas";
+
+    // Ambil siswa berdasarkan kelas
     $getSiswa = $conn->prepare("
         SELECT 
             s.id_siswa,
             s.nama AS nama_siswa
         FROM siswa s
+        WHERE s.id_kelas = ?
         ORDER BY s.nama ASC
     ");
 
@@ -56,10 +70,11 @@ if ($mode === "mapel") {
         die("Query siswa gagal: " . $conn->error);
     }
 
+    $getSiswa->bind_param("i", $id_kelas);
     $getSiswa->execute();
     $resultSiswa = $getSiswa->get_result();
 
-    $filename = "template_import_nilai_mapel.csv";
+    $filename = "template_import_nilai_{$namaKelas}.csv";
 
     header("Content-Type: text/csv; charset=utf-8");
     header("Content-Disposition: attachment; filename=\"$filename\"");
