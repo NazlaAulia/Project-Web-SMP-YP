@@ -2,8 +2,52 @@
 session_start();
 header('Content-Type: application/json');
 require_once '../koneksi.php';
-// Ambil konfigurasi API dari folder admin
-require_once '../admin/penjadwalan/config.php'; // file yang berisi define('GEMINI_API_KEY', ...)
+require_once '../admin/penjadwalan/config.php'; // pastikan file ini ada dan berisi define('GEMINI_API_KEY', '...')
+
+// Fungsi untuk memanggil Gemini API dengan debugging
+function callGeminiAPI($prompt) {
+    if (!defined('GEMINI_API_KEY') || GEMINI_API_KEY == '') {
+        return ['error' => 'API key tidak ditemukan atau kosong'];
+    }
+    
+    $apiKey = GEMINI_API_KEY;
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
+    
+    $data = [
+        'contents' => [
+            ['parts' => [['text' => $prompt]]]
+        ]
+    ];
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+    
+    // Debug: log ke file
+    error_log("Gemini API HTTP Code: " . $httpCode);
+    error_log("Gemini API Response: " . substr($response, 0, 500));
+    
+    if ($httpCode !== 200) {
+        return ['error' => "HTTP $httpCode: " . substr($response, 0, 200)];
+    }
+    
+    $result = json_decode($response, true);
+    $text = $result['candidates'][0]['content']['parts'][0]['text'] ?? null;
+    
+    if (!$text) {
+        return ['error' => 'Respons AI tidak valid'];
+    }
+    
+    return ['success' => true, 'text' => $text];
+}
 
 $id_siswa = $_SESSION['id_siswa'] ?? 0;
 if (!$id_siswa && isset($_GET['id_siswa'])) {
@@ -20,7 +64,7 @@ if (isset($_SESSION['ai_analisis'][$id_siswa]) && $_SESSION['ai_analisis'][$id_s
     exit;
 }
 
-// Ambil nilai rata-rata per mapel untuk siswa ini
+// Ambil nilai rata-rata per mapel
 $query = "
     SELECT m.nama_mapel, AVG(n.nilai_angka) as rata_rata
     FROM nilai n
@@ -47,7 +91,7 @@ if (empty($nilai_mapel)) {
     exit;
 }
 
-// Siapkan prompt untuk Gemini
+// Siapkan prompt
 $prompt = "Berikut adalah data nilai rata-rata siswa per mata pelajaran (KKM = 75):\n";
 foreach ($nilai_mapel as $nm) {
     $prompt .= "- {$nm['nama_mapel']}: {$nm['rata_rata']}\n";
@@ -56,37 +100,17 @@ $prompt .= "\nSiswa ini memiliki nilai terendah di mapel {$nilai_terendah_nama} 
 $prompt .= "Beri saran belajar yang spesifik, tips meningkatkan nilai, dan pesan motivasi untuk siswa. Tulis dalam bahasa Indonesia yang ramah dan tidak terlalu panjang (maksimal 200 kata).\n";
 $prompt .= "Gunakan format:\n📚 SARAN BELAJAR:\n...\n💡 TIPS:\n...\n🔥 MOTIVASI:\n...";
 
-// Panggil Gemini API menggunakan fungsi dari admin (jika sudah ada) atau buat sendiri
-function callGeminiAPI($prompt) {
-    $apiKey = GEMINI_API_KEY; // dari config.php
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
-    $data = [
-        'contents' => [
-            ['parts' => [['text' => $prompt]]]
-        ]
-    ];
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    if ($httpCode !== 200) {
-        return null;
-    }
-    $result = json_decode($response, true);
-    return $result['candidates'][0]['content']['parts'][0]['text'] ?? null;
-}
+// Panggil API
+$ai_result = callGeminiAPI($prompt);
 
-$ai_text = callGeminiAPI($prompt);
-if (!$ai_text) {
-    echo json_encode(['success' => false, 'message' => 'Gagal memanggil AI. Coba lagi nanti.']);
+if (isset($ai_result['error'])) {
+    echo json_encode(['success' => false, 'message' => 'Gagal memanggil AI: ' . $ai_result['error']]);
     exit;
 }
 
-// Simpan ke session (cache 10 menit)
+$ai_text = $ai_result['text'];
+
+// Simpan ke session
 $_SESSION['ai_analisis'][$id_siswa] = [
     'expires' => time() + 600,
     'data' => [
