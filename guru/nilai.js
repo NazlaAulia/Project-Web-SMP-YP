@@ -12,7 +12,7 @@ const messageBox = document.getElementById("messageBox");
 const nilaiTableBody = document.getElementById("nilaiTableBody");
 
 const modeNilai = document.getElementById("modeNilai");
-const filterKelasWali = document.getElementById("filterKelasWali");
+const filterKelasWali = document.getElementById("filterKelas");
 uploadSection = document.querySelector(".import-card");
 
 const filterWaliKelasBox = document.getElementById("filterWaliKelasBox");
