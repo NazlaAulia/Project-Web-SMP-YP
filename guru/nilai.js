@@ -381,7 +381,7 @@ function isiDropdownWaliKelas(waliKelas) {
 function isiDropdownKelasMapel(kelasMapel) {
   if (!filterKelasWali) return;
   const nilaiSebelumnya = filterKelasWali.value;
-  filterKelasWali.innerHTML = `<option value="">Semua Kelas Mapel Saya</option>`;
+  filterKelasWali.innerHTML = ""; // Kosongkan dulu
   kelasMapel.forEach(kelas => {
     filterKelasWali.innerHTML += `<option value="${kelas.id_kelas}">Kelas ${kelas.nama_kelas}</option>`;
   });

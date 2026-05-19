@@ -1308,3 +1308,30 @@ body {
 .nilai-table-wrapper td:last-child {
   text-align: center;
 }
+
+/* =====================================================
+   PERBAIKI LEBAR TABEL AGAR TIDAK MELEBAR KE TENGAH
+   ===================================================== */
+
+/* Buat wrapper tabel jadi flex dengan rata kiri */
+.nilai-table-wrapper {
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Opsional: batasi lebar maksimal tabel biar ga kegedean */
+.nilai-table-wrapper table {
+    max-width: 100%;
+    width: auto;
+    min-width: auto;
+}
+
+/* Tapi biar tetap responsif di layar kecil */
+@media (max-width: 992px) {
+    .nilai-table-wrapper {
+        justify-content: center;
+    }
+    .nilai-table-wrapper table {
+        min-width: 980px;
+    }
+}
