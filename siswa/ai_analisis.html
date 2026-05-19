@@ -2,11 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>AI Analisis Belajar</title>
+    <title>Catatan Guru - SMP YP 17 Surabaya</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background: #f0f7f5;
             margin: 0;
             padding: 20px;
@@ -21,6 +21,18 @@
         }
         h2 {
             color: #064e4b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2 i {
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #555;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
         .mapel-badge {
             display: inline-block;
@@ -40,24 +52,30 @@
             padding: 50px;
             color: #064e4b;
         }
-        .ai-response {
-            background: #f9fafb;
-            border-left: 5px solid #064e4b;
+        .guru-response {
+            background: #fefce8;
+            border-left: 5px solid #eab308;
             padding: 20px;
             border-radius: 16px;
             margin-top: 20px;
             white-space: pre-wrap;
-            line-height: 1.6;
+            line-height: 1.8;
+            font-size: 16px;
+            color: #333;
         }
         .refresh-btn {
             background: #064e4b;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 30px;
             cursor: pointer;
             margin-top: 20px;
             font-size: 14px;
+            transition: background 0.3s;
+        }
+        .refresh-btn:hover {
+            background: #0a7c78;
         }
         .error-box {
             background: #fee2e2;
@@ -67,37 +85,40 @@
             margin-top: 20px;
             color: #991b1b;
         }
-        .success-note {
-            background: #dcfce7;
-            border-left: 5px solid #16a34a;
-            padding: 10px 15px;
-            border-radius: 12px;
-            margin-top: 15px;
-            font-size: 12px;
-            color: #166534;
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #e0e0e0;
+        }
+        .ringkasan-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #064e4b;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>🤖 Analisis Belajar AI</h2>
-        <p>AI akan menganalisis nilai belajarmu dan memberikan saran untuk meningkatkan prestasi.</p>
+        <h2>
+            <span>📝</span> Catatan Guru
+        </h2>
+        <p class="subtitle">Guru memberikan masukan dan saran untuk membantumu meningkatkan prestasi.</p>
         
         <div id="nilaiRingkasan" style="margin: 20px 0; min-height: 100px;">
             <div class="loading">⏳ Memuat data nilai...</div>
         </div>
         
-        <div id="aiResponse" class="loading">
-            ⏳ Sedang menganalisis data nilai...
+        <div id="guruResponse" class="loading">
+            ⏳ Sedang menyiapkan catatan...
         </div>
         
-        <button class="refresh-btn" id="refreshBtn">🔄 Analisis Ulang</button>
+        <button class="refresh-btn" id="refreshBtn">🔄 Muat Ulang Catatan</button>
     </div>
 
     <script>
         function loadAnalisis(forceRefresh = false) {
             document.getElementById('nilaiRingkasan').innerHTML = '<div class="loading">⏳ Memuat data nilai...</div>';
-            document.getElementById('aiResponse').innerHTML = '<div class="loading">⏳ Sedang menganalisis data nilai...</div>';
+            document.getElementById('guruResponse').innerHTML = '<div class="loading">⏳ Sedang menyiapkan catatan...</div>';
             
             const url = forceRefresh ? 'get_analisis_ai.php?refresh=1&t=' + Date.now() : 'get_analisis_ai.php?t=' + Date.now();
             
@@ -112,32 +133,29 @@
                     if (data.success) {
                         // Ringkasan nilai
                         if (data.data.semua_nilai && data.data.semua_nilai.length > 0) {
-                            let html = '<strong>📊 Rata-rata Nilai per Mapel:</strong><br><div style="margin-top: 10px;">';
+                            let html = '<div class="ringkasan-title">📊 Rata-rata Nilai per Mapel</div><div style="margin-top: 10px;">';
                             data.data.semua_nilai.forEach(mapel => {
                                 let cls = mapel.rata_rata < 75 ? 'lowest' : '';
                                 html += `<span class="mapel-badge ${cls}">${mapel.nama_mapel}: ${mapel.rata_rata}</span>`;
                             });
                             html += '</div>';
-                            html += `<p style="margin-top: 15px;"><strong>⚠️ Mapel terendah:</strong> ${data.data.mapel_terendah} (${data.data.nilai_terendah})</p>`;
+                            html += `<p style="margin-top: 15px;"><span style="font-weight: 600;">⚠️ Perlu perhatian khusus:</span> ${data.data.mapel_terendah} (${data.data.nilai_terendah})</p>`;
                             document.getElementById('nilaiRingkasan').innerHTML = html;
                         } else {
-                            document.getElementById('nilaiRingkasan').innerHTML = '<p>❌ Tidak ada data nilai</p>';
+                            document.getElementById('nilaiRingkasan').innerHTML = '<p>Belum ada data nilai</p>';
                         }
                         
-                        // Response AI
-                        let aiHtml = (data.data.ai_response || 'Tidak ada respons').replace(/\n/g, '<br>');
-                        if (data.data.note) {
-                            aiHtml += `<div class="success-note">ℹ️ ${data.data.note}</div>`;
-                        }
-                        document.getElementById('aiResponse').innerHTML = `<div class="ai-response">${aiHtml}</div>`;
+                        // Response Guru (tanpa note AI)
+                        let guruHtml = (data.data.ai_response || 'Tidak ada catatan dari guru').replace(/\n/g, '<br>');
+                        document.getElementById('guruResponse').innerHTML = `<div class="guru-response">${guruHtml}</div>`;
                     } else {
-                        document.getElementById('nilaiRingkasan').innerHTML = '<p>❌ Gagal memuat data</p>';
-                        document.getElementById('aiResponse').innerHTML = `<div class="error-box">❌ ${data.message || 'Terjadi kesalahan'}</div>`;
+                        document.getElementById('nilaiRingkasan').innerHTML = '<p>Gagal memuat data</p>';
+                        document.getElementById('guruResponse').innerHTML = `<div class="error-box">❌ ${data.message || 'Terjadi kesalahan'}</div>`;
                     }
                 })
                 .catch(err => {
                     console.error('Error:', err);
-                    document.getElementById('aiResponse').innerHTML = `<div class="error-box">❌ Error: ${err.message}</div>`;
+                    document.getElementById('guruResponse').innerHTML = `<div class="error-box">❌ Gagal terhubung ke server. ${err.message}</div>`;
                 });
         }
         

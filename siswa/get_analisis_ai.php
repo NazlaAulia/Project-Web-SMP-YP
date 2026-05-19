@@ -160,10 +160,19 @@ if (empty($semua_nilai)) {
 
 $stmt->close();
 
-// 7. Siapkan prompt untuk Gemini API
-$prompt = "Kamu adalah asisten AI untuk siswa SMP YP 17 Surabaya. Berikan analisis belajar yang singkat, jelas, dan memotivasi.
+// 7. Siapkan prompt untuk Gemini API - GURU NETRAL
+$prompt = "Kamu adalah seorang GURU SMP YP 17 Surabaya yang sedang memberikan masukan pribadi ke muridmu. Kamu bisa laki-laki atau perempuan, jadi gunakan sapaan 'Saya' atau 'Guru' saja.
 
-Data siswa:
+PENTING: 
+- JANGAN sebut dirimu sebagai AI, chatbot, asisten, atau teknologi apapun
+- JANGAN gunakan kata 'AI', 'bot', 'asisten', 'saya sebagai AI'
+- JANGAN gunakan simbol seperti ✅, 📊, 💡, 🌟, atau emoji apapun
+- JANGAN sebut 'Ibu' atau 'Bapak' - cukup pakai 'Saya' atau 'Guru'
+
+Gunakan bahasa Indonesia yang hangat, penuh perhatian, seperti seorang guru yang peduli dengan muridnya.
+Bicaralah secara personal, seolah-olah sedang berbicara langsung dengan murid bernama $nama_siswa.
+
+Data nilai murid:
 Nama: $nama_siswa
 
 Nilai per mata pelajaran:\n";
@@ -177,19 +186,21 @@ $prompt .= "\nRata-rata keseluruhan: " . round($rata_keseluruhan, 1) . "\n";
 $prompt .= "Mapel terendah: $mapel_terendah (nilai: $nilai_terendah)\n\n";
 
 $prompt .= "Tugasmu:
-Buat analisis dalam 4 paragraf:
+Tulis pesan pribadi untuk murid ini dalam 4 paragraf:
 
-Paragraf 1: Apresiasi dan semangat untuk siswa (sesuaikan dengan prestasinya)
-Paragraf 2: Analisis spesifik untuk mapel terendah (kenapa mungkin sulit)
-Paragraf 3: Saran konkret yang bisa dilakukan siswa (minimal 3 poin)
-Paragraf 4: Kata-kata motivasi yang membangkitkan semangat
+Paragraf 1: Berikan apresiasi tulus atas prestasi yang sudah diraih (tunjukkan bahwa guru bangga)
+Paragraf 2: Bahas mata pelajaran yang terendah dengan nada sabar, jelaskan kemungkinan penyebabnya
+Paragraf 3: Berikan saran konkret yang bisa dilakukan (minimal 3 poin, seperti guru memberi arahan)
+Paragraf 4: Tutup dengan kata-kata motivasi dan harapan untuk masa depan murid
 
 Aturan:
-- Gunakan bahasa Indonesia yang ramah, hangat, dan tidak terlalu formal
-- Maksimal 400 kata
-- Jangan gunakan markdown atau format khusus
-- Jangan sebut \"Sebagai AI\" atau \"Berdasarkan data\"
-- Langsung berikan analisisnya tanpa kata pengantar";
+- Gunakan sapaan 'Nak' atau langsung panggil nama
+- JANGAN pakai 'Ibu Guru' atau 'Bapak Guru' - cukup 'Saya' atau 'Guru'
+- Tulis seperti guru sungguhan yang sedang berbicara dengan muridnya
+- Jangan pakai kata 'AI', 'bot', 'asisten', 'teknologi'
+- Jangan pakai emoji atau simbol aneh
+- Maksimal 500 kata
+- Langsung tulis pesannya tanpa kata pengantar";
 
 // 8. Fungsi untuk memanggil Gemini API dengan model tertentu
 function callGeminiAPI($api_key, $prompt, $model) {
@@ -205,7 +216,7 @@ function callGeminiAPI($api_key, $prompt, $model) {
         ],
         "generationConfig" => [
             "temperature" => 0.7,
-            "maxOutputTokens" => 2048,  // 🔥 DIUBAH dari 800 jadi 2048
+            "maxOutputTokens" => 2048,
             "topP" => 0.95,
             "topK" => 40
         ]
@@ -279,55 +290,47 @@ if ($ai_response === null) {
             'semua_nilai' => $semua_nilai,
             'mapel_terendah' => $mapel_terendah,
             'nilai_terendah' => $nilai_terendah,
-            'ai_response' => $fallback_response,
-            'note' => 'Mode offline (Semua model gagal: ' . $error_message . ')'
+            'ai_response' => $fallback_response
         ]
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-// Kirim respons sukses dengan AI online
+// Kirim respons sukses (TANPA note AI Online)
 echo json_encode([
     'success' => true,
     'data' => [
         'semua_nilai' => $semua_nilai,
         'mapel_terendah' => $mapel_terendah,
         'nilai_terendah' => $nilai_terendah,
-        'ai_response' => $ai_response,
-        'note' => '✅ AI Online - ditenagai ' . $model_used
+        'ai_response' => $ai_response
     ]
 ], JSON_UNESCAPED_UNICODE);
 
 $conn->close();
 
-// 11. Fungsi fallback
+// 11. Fungsi fallback (gaya guru netral)
 function generateFallbackResponse($nama, $nilaiList, $mapelTerendah, $nilaiTerendah) {
     $rataSemua = array_sum(array_column($nilaiList, 'rata_rata')) / count($nilaiList);
     
-    $response = "Halo $nama! 👋\n\n";
-    $response .= "Terima kasih sudah menggunakan fitur analisis belajar.\n\n";
-    $response .= "Berdasarkan data nilaimu:\n";
-    $response .= "📊 Rata-rata keseluruhan: " . round($rataSemua, 1) . "\n\n";
+    $response = "Nak $nama,\n\n";
+    $response .= "Saya sangat bangga melihat prestasi yang telah kamu raih. ";
+    $response .= "Rata-rata nilai " . round($rataSemua, 1) . " adalah pencapaian yang luar biasa.\n\n";
     
     if ($rataSemua >= 85) {
-        $response .= "✨ **Selamat!** Prestasimu sangat membanggakan. Kamu telah menunjukkan kerja keras yang luar biasa! ✨\n\n";
+        $response .= "Selamat ya, Nak! Kamu telah menunjukkan kerja keras yang membuahkan hasil membanggakan. Terus pertahankan semangat belajarmu!\n\n";
     } elseif ($rataSemua >= 70) {
-        $response .= "👍 **Bagus!** Kamu sudah berada di jalur yang tepat. Terus pertahankan dan tingkatkan lagi!\n\n";
+        $response .= "Bagus sekali, Nak! Kamu sudah berada di jalur yang tepat. Masih ada sedikit ruang untuk lebih baik lagi.\n\n";
     } else {
-        $response .= "💪 **Jangan menyerah!** Setiap orang punya proses belajarnya masing-masing. Kamu pasti bisa!\n\n";
+        $response .= "Jangan menyerah ya, Nak. Setiap orang punya proses belajarnya masing-masing. Saya yakin kamu pasti bisa!\n\n";
     }
     
-    $response .= "🎯 **Fokus perbaikan:** $mapelTerendah (nilai: $nilaiTerendah)\n\n";
-    $response .= "💡 **Tips untuk $mapelTerendah:**\n";
-    $response .= "• Luangkan waktu 30 menit setiap hari khusus untuk latihan soal\n";
-    $response .= "• Catat materi yang sulit dan tanyakan ke guru\n";
-    $response .= "• Tonton video pembelajaran di YouTube\n";
-    $response .= "• Belajar bersama teman yang lebih paham\n\n";
-    $response .= "📝 **Kebiasaan belajar yang baik:**\n";
-    $response .= "1. Buat jadwal belajar teratur\n";
-    $response .= "2. Istirahat 7-8 jam setiap hari\n";
-    $response .= "3. Kurangi main gadget saat belajar\n\n";
-    $response .= "🌟 **Motivasi untukmu:**\n\"Kesuksesan bukan tentang seberapa cepat kamu belajar, tapi seberapa kuat kamu bertahan. Teruslah berusaha, $nama! Masa depan cerah menantimu!\" 🌟";
+    $response .= "Untuk mata pelajaran $mapelTerendah yang nilainya $nilaiTerendah, coba beberapa tips ini:\n";
+    $response .= "1. Luangkan waktu 30 menit setiap hari khusus belajar $mapelTerendah\n";
+    $response .= "2. Catat materi yang terasa sulit, lalu tanyakan ke guru\n";
+    $response .= "3. Belajar bersama teman yang lebih paham\n\n";
+    
+    $response .= "Tetap semangat, Nak $nama! Masa depan cerah menantimu. Saya selalu mendukungmu.";
     
     return $response;
 }
