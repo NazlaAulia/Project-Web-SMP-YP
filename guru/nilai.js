@@ -174,7 +174,7 @@ function renderTable(filteredData = dataNilai) {
     const daftarSiswa = Object.values(siswaUnik);
     
     if (daftarSiswa.length === 0) {
-      nilaiTableBody.innerHTML = `<tr><td colspan="4" class="empty-state">Tidak ada siswa di kelas ini.</td></tr>`;
+      nilaiTableBody.innerHTML = `<td><td colspan="4" class="empty-state">Tidak ada siswa di kelas ini.</td></tr>`;
       return;
     }
     
@@ -464,7 +464,7 @@ function loadNilaiDatabase() {
 
   if (mode === "wali" && !idKelas) {
     if (nilaiTableBody) {
-      nilaiTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Pilih kelas wali terlebih dahulu.</td></tr>`;
+      nilaiTableBody.innerHTML = `<td><td colspan="5" class="empty-state">Pilih kelas wali terlebih dahulu.</td></tr>`;
     }
     return;
   }
@@ -477,6 +477,29 @@ function loadNilaiDatabase() {
     .then(result => {
       if (result.status === "success") {
         dataNilai = result.data || [];
+        
+        // ========== SEMBUNYIKAN OPTION WALI KELAS JIKA BUKAN WALI ==========
+        if (result.is_wali_kelas === false) {
+          const modeSelect = document.getElementById("modeNilai");
+          if (modeSelect) {
+            const waliOption = modeSelect.querySelector('option[value="wali"]');
+            if (waliOption) {
+              waliOption.style.display = "none";
+            }
+            modeSelect.value = "mapel";
+            modeSelect.dispatchEvent(new Event('change'));
+          }
+        } else {
+          const modeSelect = document.getElementById("modeNilai");
+          if (modeSelect) {
+            const waliOption = modeSelect.querySelector('option[value="wali"]');
+            if (waliOption) {
+              waliOption.style.display = "";
+            }
+          }
+        }
+        // ========== SAMPAI SINI ==========
+        
         aturTampilanWaliKelas();
         if (filterWaliKelasBox) {
           filterWaliKelasBox.style.display = "block";
