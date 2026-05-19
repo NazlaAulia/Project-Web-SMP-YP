@@ -390,12 +390,25 @@ function isiDropdownKelasMapel(kelasMapel) {
 
 function aturTampilanMode() {
   const mode = modeNilai ? modeNilai.value : "mapel";
-  if (!filterKelasWaliGroup || !filterKelasWali) return;
-  filterKelasWaliGroup.style.display = "flex";
-  filterKelasWali.disabled = false;
-  filterKelasWaliGroup.classList.remove("filter-disabled");
-  if (filterKelasWaliLabel) {
-    filterKelasWaliLabel.textContent = mode === "wali" ? "Kelas Wali" : "Kelas Mapel Saya";
+  
+  const filterKelasGroup = document.getElementById("filterKelasGroup");
+  const filterKelas = document.getElementById("filterKelas");
+  
+  if (mode === "wali") {
+    // Sembunyikan dropdown kelas
+    if (filterKelasGroup) filterKelasGroup.style.display = "none";
+    
+    // Set nilai kelas dari wali_kelas (biar dipake fetch)
+    if (window.waliKelasData && window.waliKelasData.length > 0) {
+      if (filterKelas) filterKelas.value = window.waliKelasData[0].id_kelas;
+    }
+    
+    // Ubah label filter
+    if (filterKelasWaliLabel) filterKelasWaliLabel.textContent = "Kelas Wali";
+  } else {
+    // Tampilkan dropdown kelas untuk guru mapel
+    if (filterKelasGroup) filterKelasGroup.style.display = "flex";
+    if (filterKelasWaliLabel) filterKelasWaliLabel.textContent = "Kelas Mapel Saya";
   }
 }
 
@@ -426,6 +439,10 @@ function loadNilaiDatabase() {
       if (result.status === "success") {
         dataNilai = result.data || [];
         
+        // Simpan data wali kelas ke variabel global
+if (result.wali_kelas && result.wali_kelas.length > 0) {
+  window.waliKelasData = result.wali_kelas;
+}
         // ========== SEMBUNYIKAN OPTION WALI KELAS JIKA BUKAN WALI ==========
         if (result.is_wali_kelas === false) {
           const modeSelect = document.getElementById("modeNilai");
@@ -566,8 +583,13 @@ if (downloadTemplateBtn) {
       window.location.href = "../login.html";
       return;
     }
-    const mode = modeNilai ? modeNilai.value : "mapel";
-    const idKelas = filterKelasWali ? filterKelasWali.value : "";
+  const mode = modeNilai ? modeNilai.value : "mapel";
+let idKelas = filterKelasWali ? filterKelasWali.value : "";
+
+// Jika mode wali, ambil id_kelas dari data wali (abaikan dropdown)
+if (mode === "wali" && window.waliKelasData && window.waliKelasData.length > 0) {
+  idKelas = window.waliKelasData[0].id_kelas;
+}
     let templateUrl = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${mode}`;
     if (mode === "wali" && idKelas) templateUrl += `&id_kelas=${idKelas}`;
     const link = document.createElement("a");
