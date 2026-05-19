@@ -2,7 +2,7 @@
 // Pastikan output file ini terbaca sebagai JSON
 header('Content-Type: application/json; charset=utf-8');
 
-// 1. Aktifkan error reporting untuk debugging (matiikan di production)
+// 1. Aktifkan error reporting untuk debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
@@ -28,58 +28,108 @@ if (!defined('GEMINI_API_KEY') && !isset($GEMINI_API_KEY)) {
     exit;
 }
 
-// Ambil nilai API key (baik berupa define atau variable biasa)
+// Ambil nilai API key
 $api_key = defined('GEMINI_API_KEY') ? GEMINI_API_KEY : $GEMINI_API_KEY;
 
-// 3. Hubungkan dengan file koneksi database
-require_once __DIR__ . '/koneksi.php';
+// 3. Koneksi database
+$host = "localhost";
+$dbname = "osbebslk_sekolahyp";
+$dbuser = "osbebslk_aliyahzz";
+$dbpass = "semangatgaes";
 
-// 4. Cek koneksi database (mendukung $conn dan $koneksi)
-// File koneksi.php menggunakan $conn, jadi kita pakai $conn
-if (!isset($conn) || !$conn) {
-    // Fallback: cek apakah ada $koneksi
-    if (isset($koneksi) && $koneksi) {
-        $conn = $koneksi;
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Koneksi database tidak ditemukan. Cek file koneksi.php'
-        ]);
-        exit;
-    }
-}
+$conn = new mysqli($host, $dbuser, $dbpass, $dbname);
 
-// 5. Ambil session login siswa
-session_start();
-$nisn = $_SESSION['nisn'] ?? null;
-
-if (!$nisn) {
+if ($conn->connect_error) {
     echo json_encode([
         'success' => false,
-        'message' => 'Silakan login terlebih dahulu.'
+        'message' => 'Koneksi database gagal: ' . $conn->connect_error
     ]);
     exit;
 }
 
-// 6. Ambil data nilai siswa dari database (gunakan $conn)
-$queryNilai = "SELECT m.nama_mapel, AVG(n.nilai) as rata_rata 
+$conn->set_charset("utf8mb4");
+
+// 4. Ambil session login siswa (sesuai dengan sistem yang sudah ada)
+session_start();
+
+$id_siswa = 0;
+
+// Ambil id_siswa dari session (sama seperti di get-profil-siswa.php)
+if (isset($_SESSION['id_siswa'])) {
+    $id_siswa = (int)$_SESSION['id_siswa'];
+}
+
+// Jika session id_siswa kosong, ambil dari session id_user
+if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
+    $id_user = (int)$_SESSION['id_user'];
+    
+    $sqlUser = "SELECT id_siswa FROM user WHERE id_user = ? LIMIT 1";
+    $stmtUser = $conn->prepare($sqlUser);
+    
+    if ($stmtUser) {
+        $stmtUser->bind_param("i", $id_user);
+        $stmtUser->execute();
+        $stmtUser->store_result();
+        
+        if ($stmtUser->num_rows > 0) {
+            $stmtUser->bind_result($hasil_id_siswa);
+            $stmtUser->fetch();
+            if (!empty($hasil_id_siswa)) {
+                $id_siswa = (int)$hasil_id_siswa;
+                $_SESSION['id_siswa'] = $id_siswa;
+            }
+        }
+        $stmtUser->close();
+    }
+}
+
+if ($id_siswa <= 0) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Silakan login terlebih dahulu. Session tidak ditemukan.'
+    ]);
+    $conn->close();
+    exit;
+}
+
+// 5. Ambil data siswa
+$sqlSiswa = "SELECT s.id_siswa, s.nama, s.nisn, s.id_kelas, k.nama_kelas
+             FROM siswa s
+             LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
+             WHERE s.id_siswa = ?
+             LIMIT 1";
+
+$stmt = $conn->prepare($sqlSiswa);
+$stmt->bind_param("i", $id_siswa);
+$stmt->execute();
+$result = $stmt->get_result();
+$siswa = $result->fetch_assoc();
+
+if (!$siswa) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Data siswa tidak ditemukan'
+    ]);
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
+$nama_siswa = $siswa['nama'];
+$nisn = $siswa['nisn']; // Untuk keperluan query nilai
+$id_kelas = $siswa['id_kelas'];
+$stmt->close();
+
+// 6. Ambil data nilai siswa (menggunakan id_siswa)
+$queryNilai = "SELECT m.nama_mapel, AVG(n.nilai_angka) as rata_rata 
                FROM nilai n 
-               JOIN mata_pelajaran m ON n.id_mapel = m.id_mapel 
-               WHERE n.nisn = ? 
+               JOIN mapel m ON n.id_mapel = m.id_mapel 
+               WHERE n.id_siswa = ? 
                GROUP BY m.id_mapel 
                ORDER BY rata_rata ASC";
 
 $stmt = $conn->prepare($queryNilai);
-if (!$stmt) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Gagal prepare query database.',
-        'db_error' => $conn->error
-    ]);
-    exit;
-}
-
-$stmt->bind_param("s", $nisn);
+$stmt->bind_param("i", $id_siswa);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -111,19 +161,9 @@ if (empty($semua_nilai)) {
     exit;
 }
 
-// 7. Ambil nama siswa (gunakan $conn)
-$querySiswa = "SELECT nama_lengkap FROM users WHERE nisn = ?";
-$stmt2 = $conn->prepare($querySiswa);
-$stmt2->bind_param("s", $nisn);
-$stmt2->execute();
-$result2 = $stmt2->get_result();
-$siswa = $result2->fetch_assoc();
-$nama_siswa = $siswa['nama_lengkap'] ?? 'Siswa';
-
 $stmt->close();
-$stmt2->close();
 
-// 8. Siapkan prompt untuk Gemini API
+// 7. Siapkan prompt untuk Gemini API
 $prompt = "Kamu adalah asisten AI untuk siswa SMP YP 17 Surabaya. Berikan analisis belajar yang singkat, jelas, dan memotivasi.
 
 Data siswa:
@@ -154,7 +194,7 @@ Aturan:
 - Jangan sebut \"Sebagai AI\" atau \"Berdasarkan data\"
 - Langsung berikan analisisnya tanpa kata pengantar";
 
-// 9. Panggil Gemini API
+// 8. Panggil Gemini API
 $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 $data = [
@@ -191,7 +231,7 @@ $curl_error = curl_error($ch);
 
 curl_close($ch);
 
-// 10. Proteksi jika koneksi ke Google gagal
+// 9. Proteksi jika koneksi ke Google gagal
 if ($response === false || $http_code < 200 || $http_code >= 300) {
     $fallback_response = generateFallbackResponse($nama_siswa, $semua_nilai, $mapel_terendah, $nilai_terendah);
     
@@ -202,18 +242,15 @@ if ($response === false || $http_code < 200 || $http_code >= 300) {
             'mapel_terendah' => $mapel_terendah,
             'nilai_terendah' => $nilai_terendah,
             'ai_response' => $fallback_response,
-            'note' => 'Mode offline (AI tidak dapat dihubungi)',
-            'http_code' => $http_code,
-            'curl_error' => $curl_error
+            'note' => 'Mode offline (AI tidak dapat dihubungi)'
         ]
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-// 11. Olah balasan dari AI
+// 10. Olah balasan dari AI
 $gemini_data = json_decode($response, true);
 
-// Cek apakah response dari Gemini valid
 if (!isset($gemini_data['candidates'][0]['content']['parts'][0]['text'])) {
     $fallback_response = generateFallbackResponse($nama_siswa, $semua_nilai, $mapel_terendah, $nilai_terendah);
     
@@ -247,10 +284,9 @@ echo json_encode([
     ]
 ], JSON_UNESCAPED_UNICODE);
 
-// Tutup koneksi database
 $conn->close();
 
-// 12. Fungsi fallback jika AI gagal
+// 11. Fungsi fallback
 function generateFallbackResponse($nama, $nilaiList, $mapelTerendah, $nilaiTerendah) {
     $rataSemua = array_sum(array_column($nilaiList, 'rata_rata')) / count($nilaiList);
     
