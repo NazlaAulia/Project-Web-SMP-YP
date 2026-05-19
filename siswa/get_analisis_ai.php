@@ -6,9 +6,7 @@ header('Content-Type: application/json; charset=utf-8');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
-// 2. Ambil config API key dari folder admin (GANTI DENGAN PATH YANG BENAR)
-// Karena file ini di: siswa/get_analisis_ai.php
-// Dan config di: admin/penjadwalan/config.php
+// 2. Ambil config API key dari folder admin
 $configPath = __DIR__ . '/../admin/penjadwalan/config.php';
 
 if (!file_exists($configPath)) {
@@ -36,13 +34,19 @@ $api_key = defined('GEMINI_API_KEY') ? GEMINI_API_KEY : $GEMINI_API_KEY;
 // 3. Hubungkan dengan file koneksi database
 require_once __DIR__ . '/koneksi.php';
 
-// 4. Cek koneksi database
-if (!isset($koneksi) || !$koneksi) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Koneksi database tidak ditemukan. Cek file koneksi.php.'
-    ]);
-    exit;
+// 4. Cek koneksi database (mendukung $conn dan $koneksi)
+// File koneksi.php menggunakan $conn, jadi kita pakai $conn
+if (!isset($conn) || !$conn) {
+    // Fallback: cek apakah ada $koneksi
+    if (isset($koneksi) && $koneksi) {
+        $conn = $koneksi;
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Koneksi database tidak ditemukan. Cek file koneksi.php'
+        ]);
+        exit;
+    }
 }
 
 // 5. Ambil session login siswa
@@ -57,7 +61,7 @@ if (!$nisn) {
     exit;
 }
 
-// 6. Ambil data nilai siswa dari database
+// 6. Ambil data nilai siswa dari database (gunakan $conn)
 $queryNilai = "SELECT m.nama_mapel, AVG(n.nilai) as rata_rata 
                FROM nilai n 
                JOIN mata_pelajaran m ON n.id_mapel = m.id_mapel 
@@ -65,12 +69,12 @@ $queryNilai = "SELECT m.nama_mapel, AVG(n.nilai) as rata_rata
                GROUP BY m.id_mapel 
                ORDER BY rata_rata ASC";
 
-$stmt = $koneksi->prepare($queryNilai);
+$stmt = $conn->prepare($queryNilai);
 if (!$stmt) {
     echo json_encode([
         'success' => false,
         'message' => 'Gagal prepare query database.',
-        'db_error' => $koneksi->error
+        'db_error' => $conn->error
     ]);
     exit;
 }
@@ -103,13 +107,13 @@ if (empty($semua_nilai)) {
         'message' => 'Belum ada data nilai untuk siswa ini.'
     ]);
     $stmt->close();
-    $koneksi->close();
+    $conn->close();
     exit;
 }
 
-// 7. Ambil nama siswa
+// 7. Ambil nama siswa (gunakan $conn)
 $querySiswa = "SELECT nama_lengkap FROM users WHERE nisn = ?";
-$stmt2 = $koneksi->prepare($querySiswa);
+$stmt2 = $conn->prepare($querySiswa);
 $stmt2->bind_param("s", $nisn);
 $stmt2->execute();
 $result2 = $stmt2->get_result();
@@ -220,8 +224,7 @@ if (!isset($gemini_data['candidates'][0]['content']['parts'][0]['text'])) {
             'mapel_terendah' => $mapel_terendah,
             'nilai_terendah' => $nilai_terendah,
             'ai_response' => $fallback_response,
-            'note' => 'Format response AI tidak sesuai',
-            'debug_response' => $gemini_data
+            'note' => 'Format response AI tidak sesuai'
         ]
     ], JSON_UNESCAPED_UNICODE);
     exit;
@@ -245,7 +248,7 @@ echo json_encode([
 ], JSON_UNESCAPED_UNICODE);
 
 // Tutup koneksi database
-$koneksi->close();
+$conn->close();
 
 // 12. Fungsi fallback jika AI gagal
 function generateFallbackResponse($nama, $nilaiList, $mapelTerendah, $nilaiTerendah) {
