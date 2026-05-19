@@ -1335,3 +1335,12 @@ body {
         min-width: 980px;
     }
 }
+
+/* Geser tombol Cetak Semua Rapor ke kanan */
+#btnCetakSemuaRapor {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
