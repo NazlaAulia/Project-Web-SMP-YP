@@ -49,17 +49,15 @@ if ($conn->connect_error) {
 
 $conn->set_charset("utf8mb4");
 
-// 4. Ambil session login siswa (sesuai dengan sistem yang sudah ada)
+// 4. Ambil session login siswa
 session_start();
 
 $id_siswa = 0;
 
-// Ambil id_siswa dari session (sama seperti di get-profil-siswa.php)
 if (isset($_SESSION['id_siswa'])) {
     $id_siswa = (int)$_SESSION['id_siswa'];
 }
 
-// Jika session id_siswa kosong, ambil dari session id_user
 if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
     $id_user = (int)$_SESSION['id_user'];
     
@@ -120,7 +118,7 @@ $nisn = $siswa['nisn'];
 $id_kelas = $siswa['id_kelas'];
 $stmt->close();
 
-// 6. Ambil data nilai siswa (menggunakan id_siswa)
+// 6. Ambil data nilai siswa
 $queryNilai = "SELECT m.nama_mapel, AVG(n.nilai_angka) as rata_rata 
                FROM nilai n 
                JOIN mapel m ON n.id_mapel = m.id_mapel 
@@ -150,7 +148,6 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 
-// Jika tidak ada data nilai
 if (empty($semua_nilai)) {
     echo json_encode([
         'success' => false,
@@ -194,55 +191,87 @@ Aturan:
 - Jangan sebut \"Sebagai AI\" atau \"Berdasarkan data\"
 - Langsung berikan analisisnya tanpa kata pengantar";
 
-// 8. Panggil Gemini API - PAKAI MODEL YANG VALID DARI LIST
-// Ganti dengan model yang tersedia: gemini-2.5-flash atau gemini-2.0-flash
-$url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-
-$data = [
-    "contents" => [
-        [
-            "parts" => [
-                ["text" => $prompt]
+// 8. Fungsi untuk memanggil Gemini API dengan model tertentu
+function callGeminiAPI($api_key, $prompt, $model) {
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
+    
+    $data = [
+        "contents" => [
+            [
+                "parts" => [
+                    ["text" => $prompt]
+                ]
             ]
+        ],
+        "generationConfig" => [
+            "temperature" => 0.7,
+            "maxOutputTokens" => 800,
+            "topP" => 0.95,
+            "topK" => 40
         ]
-    ],
-    "generationConfig" => [
-        "temperature" => 0.7,
-        "maxOutputTokens" => 800,
-        "topP" => 0.95,
-        "topK" => 40
-    ]
+    ];
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'x-goog-api-key: ' . $api_key
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; GeminiBot/1.0)');
+    
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_error = curl_error($ch);
+    curl_close($ch);
+    
+    if ($response === false || $http_code < 200 || $http_code >= 300) {
+        $error_body = json_decode($response, true);
+        $error_message = isset($error_body['error']['message']) ? $error_body['error']['message'] : ($curl_error ?: 'HTTP ' . $http_code);
+        return ['success' => false, 'error' => $error_message];
+    }
+    
+    $gemini_data = json_decode($response, true);
+    if (!isset($gemini_data['candidates'][0]['content']['parts'][0]['text'])) {
+        return ['success' => false, 'error' => 'Format response tidak sesuai'];
+    }
+    
+    return ['success' => true, 'response' => $gemini_data['candidates'][0]['content']['parts'][0]['text']];
+}
+
+// 9. Daftar model yang akan dicoba secara berurutan
+$models = [
+    'gemini-2.0-flash',
+    'gemini-2.0-flash-lite',
+    'gemini-1.5-flash',
+    'gemini-flash-latest',
+    'gemini-2.5-flash-lite'
 ];
 
-// Setup cURL dengan opsi yang lebih lengkap
-$ch = curl_init($url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'x-goog-api-key: ' . $api_key
-]);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_TIMEOUT, 60); // Tambah timeout jadi 60 detik
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // Ikuti redirect jika ada
+$ai_response = null;
+$model_used = null;
+$error_message = null;
 
-// Tambahkan user agent agar tidak ditolak
-curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; GeminiBot/1.0)');
+foreach ($models as $model) {
+    $result = callGeminiAPI($api_key, $prompt, $model);
+    if ($result['success']) {
+        $ai_response = $result['response'];
+        $model_used = $model;
+        break;
+    } else {
+        $error_message = $result['error'];
+        // Lanjut ke model berikutnya
+        continue;
+    }
+}
 
-// Eksekusi API
-$response = curl_exec($ch);
-$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curl_error = curl_error($ch);
-
-// Ambil informasi lebih detail untuk debug
-$curl_info = curl_getinfo($ch);
-curl_close($ch);
-
-// 9. Proteksi jika koneksi ke Google gagal
-if ($response === false) {
-    // Kirim response dengan debug info
+// 10. Jika semua model gagal, pakai fallback
+if ($ai_response === null) {
     $fallback_response = generateFallbackResponse($nama_siswa, $semua_nilai, $mapel_terendah, $nilai_terendah);
     
     echo json_encode([
@@ -252,57 +281,10 @@ if ($response === false) {
             'mapel_terendah' => $mapel_terendah,
             'nilai_terendah' => $nilai_terendah,
             'ai_response' => $fallback_response,
-            'note' => 'Mode offline (Curl error: ' . $curl_error . ')'
+            'note' => 'Mode offline (Semua model gagal: ' . $error_message . ')'
         ]
     ], JSON_UNESCAPED_UNICODE);
     exit;
-}
-
-// Cek HTTP status code
-if ($http_code < 200 || $http_code >= 300) {
-    $fallback_response = generateFallbackResponse($nama_siswa, $semua_nilai, $mapel_terendah, $nilai_terendah);
-    
-    // Ambil pesan error dari response jika ada
-    $error_body = json_decode($response, true);
-    $error_message = isset($error_body['error']['message']) ? $error_body['error']['message'] : 'HTTP ' . $http_code;
-    
-    echo json_encode([
-        'success' => true,
-        'data' => [
-            'semua_nilai' => $semua_nilai,
-            'mapel_terendah' => $mapel_terendah,
-            'nilai_terendah' => $nilai_terendah,
-            'ai_response' => $fallback_response,
-            'note' => 'Mode offline (API Error: ' . $error_message . ')'
-        ]
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-// 10. Olah balasan dari AI
-$gemini_data = json_decode($response, true);
-
-if (!isset($gemini_data['candidates'][0]['content']['parts'][0]['text'])) {
-    $fallback_response = generateFallbackResponse($nama_siswa, $semua_nilai, $mapel_terendah, $nilai_terendah);
-    
-    echo json_encode([
-        'success' => true,
-        'data' => [
-            'semua_nilai' => $semua_nilai,
-            'mapel_terendah' => $mapel_terendah,
-            'nilai_terendah' => $nilai_terendah,
-            'ai_response' => $fallback_response,
-            'note' => 'Format response AI tidak sesuai',
-            'debug_response' => $gemini_data
-        ]
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-$ai_response = $gemini_data['candidates'][0]['content']['parts'][0]['text'];
-
-if (empty(trim($ai_response))) {
-    $ai_response = generateFallbackResponse($nama_siswa, $semua_nilai, $mapel_terendah, $nilai_terendah);
 }
 
 // Kirim respons sukses dengan AI online
@@ -313,7 +295,7 @@ echo json_encode([
         'mapel_terendah' => $mapel_terendah,
         'nilai_terendah' => $nilai_terendah,
         'ai_response' => $ai_response,
-        'note' => '✅ AI Online - ditenagai Gemini 2.5 Flash'
+        'note' => '✅ AI Online - ditenagai ' . $model_used
     ]
 ], JSON_UNESCAPED_UNICODE);
 
