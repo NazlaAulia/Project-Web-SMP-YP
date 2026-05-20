@@ -91,7 +91,8 @@ function loadPeringkatDatabase() {
 
     const semester = filterSemester ? filterSemester.value : "Semua";
 
-    fetch(`get_peringkat.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&semester=${encodeURIComponent(semester)}`)
+const angkatan = document.getElementById("filterAngkatan")?.value || 0;
+fetch(`get_peringkat.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&semester=${encodeURIComponent(semester)}&angkatan=${angkatan}`)
         .then(res => res.json())
         .then(result => {
             console.log("Data peringkat database:", result);
@@ -119,3 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setupSearchPeringkat();
     loadPeringkatDatabase();
 });
+
+if (document.getElementById("filterAngkatan")) {
+    document.getElementById("filterAngkatan").addEventListener("change", loadPeringkatDatabase);
+}
