@@ -5,64 +5,242 @@
     <title>Catatan Guru - SMP YP 17 Surabaya</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             background: #f0f7f5;
             margin: 0;
             padding: 20px;
         }
+
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 24px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
+
         h2 {
             color: #064e4b;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 24px;
         }
-        h2 i {
-            font-size: 28px;
-        }
+
         .subtitle {
             color: #555;
-            margin-top: -10px;
-            margin-bottom: 20px;
+            margin-top: -5px;
+            margin-bottom: 25px;
             font-size: 14px;
+            border-left: 3px solid #eab308;
+            padding-left: 12px;
         }
+
+        /* Ringkasan Nilai */
+        .ringkasan-section {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .ringkasan-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #064e4b;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .mapel-badge {
             display: inline-block;
             background: #e8f3f2;
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: 40px;
-            margin: 5px;
-            font-size: 13px;
+            margin: 4px;
+            font-size: 12px;
         }
-        .lowest {
+
+        .mapel-badge.lowest {
             background: #fee2e2;
             color: #991b1b;
             font-weight: bold;
         }
+
+        .info-siswa {
+            background: #e8f3f2;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Analisis per Mapel */
+        .mapel-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .mapel-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .mapel-header {
+            background: #f8fafc;
+            padding: 14px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .mapel-name {
+            font-weight: 700;
+            font-size: 18px;
+            color: #064e4b;
+        }
+
+        .nilai-box {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nilai-item {
+            text-align: center;
+        }
+
+        .nilai-label {
+            font-size: 11px;
+            color: #777;
+        }
+
+        .nilai-angka {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .nilai-angka.naik {
+            color: #16a34a;
+        }
+
+        .nilai-angka.turun {
+            color: #dc2626;
+        }
+
+        .growth-badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: #f0f0f0;
+        }
+
+        .growth-badge.naik {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .growth-badge.turun {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .cp-section {
+            padding: 16px 20px;
+            background: #fefce8;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .cp-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #854d0e;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cp-list {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .cp-item {
+            margin-bottom: 6px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .cp-item::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #eab308;
+        }
+
+        .analisis-section {
+            padding: 16px 20px;
+            background: white;
+        }
+
+        .analisis-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #333;
+            white-space: pre-wrap;
+        }
+
+        /* Kesimpulan */
+        .kesimpulan-section {
+            background: #064e4b;
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .kesimpulan-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kesimpulan-text {
+            font-size: 15px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
         .loading {
             text-align: center;
             padding: 50px;
             color: #064e4b;
         }
-        .guru-response {
-            background: #fefce8;
-            border-left: 5px solid #eab308;
-            padding: 20px;
-            border-radius: 16px;
-            margin-top: 20px;
-            white-space: pre-wrap;
-            line-height: 1.8;
-            font-size: 16px;
-            color: #333;
-        }
+
         .refresh-btn {
             background: #064e4b;
             color: white;
@@ -73,10 +251,13 @@
             margin-top: 20px;
             font-size: 14px;
             transition: background 0.3s;
+            width: 100%;
         }
+
         .refresh-btn:hover {
             background: #0a7c78;
         }
+
         .error-box {
             background: #fee2e2;
             border-left: 5px solid #dc2626;
@@ -85,15 +266,24 @@
             margin-top: 20px;
             color: #991b1b;
         }
+
         hr {
             margin: 20px 0;
             border: none;
             border-top: 1px solid #e0e0e0;
         }
-        .ringkasan-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #064e4b;
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            .mapel-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .info-siswa {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -104,59 +294,174 @@
         </h2>
         <p class="subtitle">Guru memberikan masukan dan saran untuk membantumu meningkatkan prestasi.</p>
         
-        <div id="nilaiRingkasan" style="margin: 20px 0; min-height: 100px;">
-            <div class="loading">⏳ Memuat data nilai...</div>
+        <!-- Info Siswa akan ditampilkan di sini -->
+        <div id="infoSiswa" class="info-siswa" style="display: none;"></div>
+        
+        <!-- Ringkasan Nilai -->
+        <div id="ringkasanContainer" class="ringkasan-section" style="display: none;">
+            <div class="ringkasan-title">📊 Ringkasan Nilai</div>
+            <div id="ringkasanBadges"></div>
+            <div id="catatanRingkasan" style="margin-top: 12px; font-size: 13px; color: #666;"></div>
         </div>
         
-        <div id="guruResponse" class="loading">
-            ⏳ Sedang menyiapkan catatan...
-        </div>
+        <!-- Kontainer Analisis per Mapel -->
+        <div id="analisisContainer"></div>
+        
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">⏳ Sedang menyiapkan catatan dari guru...</div>
+        
+        <!-- Kesimpulan akan ditampilkan di sini -->
+        <div id="kesimpulanContainer" style="display: none;"></div>
         
         <button class="refresh-btn" id="refreshBtn">🔄 Muat Ulang Catatan</button>
     </div>
 
     <script>
         function loadAnalisis(forceRefresh = false) {
-            document.getElementById('nilaiRingkasan').innerHTML = '<div class="loading">⏳ Memuat data nilai...</div>';
-            document.getElementById('guruResponse').innerHTML = '<div class="loading">⏳ Sedang menyiapkan catatan...</div>';
+            // Tampilkan loading
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('analisisContainer').innerHTML = '';
+            document.getElementById('ringkasanContainer').style.display = 'none';
+            document.getElementById('kesimpulanContainer').style.display = 'none';
+            document.getElementById('infoSiswa').style.display = 'none';
             
             const url = forceRefresh ? 'get_analisis_ai.php?refresh=1&t=' + Date.now() : 'get_analisis_ai.php?t=' + Date.now();
             
-            fetch(url)
-                .then(res => {
-                    if (!res.ok) throw new Error('HTTP ' + res.status);
-                    return res.json();
-                })
-                .then(data => {
-                    console.log('Response:', data);
+            fetch(url, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(data => {
+                console.log('Response:', data);
+                document.getElementById('loadingState').style.display = 'none';
+                
+                if (data.success) {
+                    // Tampilkan info siswa
+                    if (data.data.siswa || data.data.kelas || data.data.tahun_ajaran) {
+                        let infoHtml = '';
+                        if (data.data.siswa) infoHtml += `<span>👤 ${data.data.siswa}</span>`;
+                        if (data.data.kelas) infoHtml += `<span>📚 Kelas: ${data.data.kelas}</span>`;
+                        if (data.data.tahun_ajaran) infoHtml += `<span>📅 Tahun Ajaran: ${data.data.tahun_ajaran}</span>`;
+                        if (data.data.rata_keseluruhan) infoHtml += `<span>⭐ Rata-rata: ${data.data.rata_keseluruhan}</span>`;
+                        document.getElementById('infoSiswa').innerHTML = infoHtml;
+                        document.getElementById('infoSiswa').style.display = 'flex';
+                    }
                     
-                    if (data.success) {
-                        // Ringkasan nilai
-                        if (data.data.semua_nilai && data.data.semua_nilai.length > 0) {
-                            let html = '<div class="ringkasan-title">📊 Rata-rata Nilai per Mapel</div><div style="margin-top: 10px;">';
-                            data.data.semua_nilai.forEach(mapel => {
-                                let cls = mapel.rata_rata < 75 ? 'lowest' : '';
-                                html += `<span class="mapel-badge ${cls}">${mapel.nama_mapel}: ${mapel.rata_rata}</span>`;
-                            });
-                            html += '</div>';
-                            html += `<p style="margin-top: 15px;"><span style="font-weight: 600;">⚠️ Perlu perhatian khusus:</span> ${data.data.mapel_terendah} (${data.data.nilai_terendah})</p>`;
-                            document.getElementById('nilaiRingkasan').innerHTML = html;
-                        } else {
-                            document.getElementById('nilaiRingkasan').innerHTML = '<p>Belum ada data nilai</p>';
+                    // Tampilkan ringkasan nilai per mapel
+                    if (data.data.data_analisis && data.data.data_analisis.length > 0) {
+                        let badgesHtml = '';
+                        let mapelTerendah = '';
+                        let nilaiTerendah = 100;
+                        
+                        data.data.data_analisis.forEach(mapel => {
+                            let nilaiAkhir = mapel.nilai_akhir || mapel.nilai_semester_2 || mapel.nilai_semester_1 || 0;
+                            let cls = nilaiAkhir < 75 ? 'lowest' : '';
+                            badgesHtml += `<span class="mapel-badge ${cls}">${mapel.nama_mapel}: ${nilaiAkhir}</span>`;
+                            
+                            if (nilaiAkhir < nilaiTerendah && nilaiAkhir > 0) {
+                                nilaiTerendah = nilaiAkhir;
+                                mapelTerendah = mapel.nama_mapel;
+                            }
+                        });
+                        
+                        document.getElementById('ringkasanBadges').innerHTML = badgesHtml;
+                        if (mapelTerendah) {
+                            document.getElementById('catatanRingkasan').innerHTML = `<span style="background:#fee2e2; padding:4px 12px; border-radius:20px;">⚠️ Perlu perhatian khusus: ${mapelTerendah} (${nilaiTerendah})</span>`;
+                        }
+                        document.getElementById('ringkasanContainer').style.display = 'block';
+                    }
+                    
+                    // Tampilkan analisis per mapel (dari AI)
+                    if (data.data.ai_response) {
+                        // Pisahkan analisis per mapel dan kesimpulan
+                        let responseText = data.data.ai_response;
+                        let lines = responseText.split('\n');
+                        let currentMapel = '';
+                        let mapelHtml = '';
+                        let kesimpulanHtml = '';
+                        let isKesimpulan = false;
+                        
+                        // Regex untuk mendeteksi awal mapel (format: [MAPEL]: atau MAPEL:)
+                        const mapelRegex = /^\[?([A-Z\s\/]+)\]?\s*:/i;
+                        
+                        for (let i = 0; i < lines.length; i++) {
+                            let line = lines[i];
+                            let match = line.match(mapelRegex);
+                            
+                            if (match && !isKesimpulan) {
+                                // Deteksi awal mapel baru
+                                if (currentMapel) {
+                                    mapelHtml += `</div></div>`;
+                                }
+                                currentMapel = match[1].trim();
+                                mapelHtml += `
+                                    <div class="mapel-card">
+                                        <div class="mapel-header">
+                                            <span class="mapel-name">📖 ${currentMapel}</span>
+                                        </div>
+                                        <div class="analisis-section">
+                                            <div class="analisis-text">
+                                `;
+                            } else if (line.toLowerCase().includes('kesimpulan') || line.toLowerCase().includes('rangkuman')) {
+                                isKesimpulan = true;
+                                if (currentMapel) {
+                                    mapelHtml += `</div></div>`;
+                                    currentMapel = '';
+                                }
+                            } else if (isKesimpulan) {
+                                kesimpulanHtml += line + '<br>';
+                            } else if (currentMapel) {
+                                // Tambahkan konten analisis
+                                if (line.trim()) {
+                                    mapelHtml += line + '<br>';
+                                }
+                            }
                         }
                         
-                        // Response Guru (tanpa note AI)
-                        let guruHtml = (data.data.ai_response || 'Tidak ada catatan dari guru').replace(/\n/g, '<br>');
-                        document.getElementById('guruResponse').innerHTML = `<div class="guru-response">${guruHtml}</div>`;
+                        if (currentMapel) {
+                            mapelHtml += `</div></div>`;
+                        }
+                        
+                        if (mapelHtml) {
+                            document.getElementById('analisisContainer').innerHTML = mapelHtml;
+                        }
+                        
+                        if (kesimpulanHtml) {
+                            document.getElementById('kesimpulanContainer').innerHTML = `
+                                <div class="kesimpulan-section">
+                                    <div class="kesimpulan-title">🎯 Kesimpulan & Motivasi</div>
+                                    <div class="kesimpulan-text">${kesimpulanHtml}</div>
+                                </div>
+                            `;
+                            document.getElementById('kesimpulanContainer').style.display = 'block';
+                        } else if (!mapelHtml) {
+                            // Fallback: tampilkan semua response
+                            let guruHtml = responseText.replace(/\n/g, '<br>');
+                            document.getElementById('analisisContainer').innerHTML = `
+                                <div class="guru-response" style="background:#fefce8; border-left:5px solid #eab308; padding:20px; border-radius:16px;">
+                                    ${guruHtml}
+                                </div>
+                            `;
+                        }
                     } else {
-                        document.getElementById('nilaiRingkasan').innerHTML = '<p>Gagal memuat data</p>';
-                        document.getElementById('guruResponse').innerHTML = `<div class="error-box">❌ ${data.message || 'Terjadi kesalahan'}</div>`;
+                        document.getElementById('analisisContainer').innerHTML = '<div class="error-box">❌ Belum ada catatan dari guru</div>';
                     }
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    document.getElementById('guruResponse').innerHTML = `<div class="error-box">❌ Gagal terhubung ke server. ${err.message}</div>`;
-                });
+                } else {
+                    document.getElementById('analisisContainer').innerHTML = `<div class="error-box">❌ ${data.message || 'Terjadi kesalahan'}</div>`;
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('analisisContainer').innerHTML = `<div class="error-box">❌ Gagal terhubung ke server. ${err.message}</div>`;
+            });
         }
         
         document.getElementById('refreshBtn').addEventListener('click', () => loadAnalisis(true));
