@@ -53,6 +53,7 @@ if (!$guru) {
     kirim_json("error", "Data guru tidak ditemukan.");
 }
 
+// Query jadwal HANYA untuk tahun ajaran aktif
 $stmt = $conn->prepare("
     SELECT 
         j.id_jadwal,
@@ -70,7 +71,7 @@ $stmt = $conn->prepare("
         m.nama_mapel
     FROM jadwal j
     LEFT JOIN guru g ON j.id_guru = g.id_guru
-    LEFT JOIN kelas k ON j.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
+    LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
     LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
     WHERE j.id_guru = ? AND j.id_tahun_ajaran = ?
     ORDER BY 
@@ -83,7 +84,7 @@ if (!$stmt) {
     kirim_json("error", "Query jadwal gagal: " . $conn->error);
 }
 
-$stmt->bind_param("iii", $id_tahun_aktif, $id_guru, $id_tahun_aktif);
+$stmt->bind_param("ii", $id_guru, $id_tahun_aktif);
 
 if (!$stmt->execute()) {
     kirim_json("error", "Jadwal guru gagal diproses.");
