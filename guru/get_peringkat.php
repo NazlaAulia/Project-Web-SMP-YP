@@ -14,6 +14,7 @@ function kirim_json($status, $message, $extra = []) {
 $id_guru = isset($_GET["id_guru"]) ? (int) $_GET["id_guru"] : 0;
 $role_id = isset($_GET["role_id"]) ? (int) $_GET["role_id"] : 0;
 $semester = $_GET["semester"] ?? "Semua";
+$angkatan = isset($_GET["angkatan"]) ? (int) $_GET["angkatan"] : 0;
 
 if ($role_id !== 2) {
     kirim_json("error", "Akses ditolak. Akun ini bukan guru.");
@@ -32,6 +33,7 @@ if ($id_tahun_aktif == 0) {
     kirim_json("error", "Tidak ada tahun ajaran aktif.");
 }
 
+// Filter semester
 $whereSemester = "";
 $semesterValue = 0;
 
@@ -43,19 +45,28 @@ if ($semester === "Ganjil") {
     $semesterValue = 2;
 }
 
+// Filter angkatan (kelas 7,8,9)
+$whereAngkatan = "";
+if ($angkatan > 0) {
+    $whereAngkatan = "AND k.tingkat = ?";
+}
+
 $sql = "
     SELECT
         s.id_siswa,
         s.nama,
         k.nama_kelas,
-        ROUND(AVG(n.nilai_angka), 2) AS rata_rata
-    FROM nilai n
-    LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
-    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-    WHERE n.id_tahun_ajaran = ?
-      $whereSemester
+        ROUND(COALESCE(AVG(n.nilai_angka), 0), 2) AS rata_rata
+    FROM siswa s
+    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
+    LEFT JOIN nilai n ON n.id_siswa = s.id_siswa 
+        AND n.id_tahun_ajaran = ?
+        $whereSemester
+    WHERE k.id_tahun_ajaran = ?
+      $whereAngkatan
     GROUP BY s.id_siswa, s.nama, k.nama_kelas
     ORDER BY rata_rata DESC, s.nama ASC
+    LIMIT 10
 ";
 
 $stmt = $conn->prepare($sql);
@@ -64,10 +75,15 @@ if (!$stmt) {
     kirim_json("error", "Query peringkat gagal: " . $conn->error);
 }
 
-if ($whereSemester !== "") {
-    $stmt->bind_param("ii", $id_tahun_aktif, $semesterValue);
+// Bind parameter sesuai filter
+if ($whereSemester !== "" && $whereAngkatan !== "") {
+    $stmt->bind_param("iiiiii", $id_tahun_aktif, $id_tahun_aktif, $semesterValue, $id_tahun_aktif, $angkatan);
+} elseif ($whereSemester !== "") {
+    $stmt->bind_param("iiiii", $id_tahun_aktif, $id_tahun_aktif, $semesterValue, $id_tahun_aktif);
+} elseif ($whereAngkatan !== "") {
+    $stmt->bind_param("iiii", $id_tahun_aktif, $id_tahun_aktif, $id_tahun_aktif, $angkatan);
 } else {
-    $stmt->bind_param("i", $id_tahun_aktif);
+    $stmt->bind_param("iii", $id_tahun_aktif, $id_tahun_aktif, $id_tahun_aktif);
 }
 
 $stmt->execute();
@@ -105,8 +121,16 @@ while ($row = $result->fetch_assoc()) {
     $rank++;
 }
 
+// Ambil daftar angkatan untuk dropdown
+$angkatanOptions = [];
+$queryAngkatan = $conn->query("SELECT DISTINCT tingkat FROM kelas ORDER BY tingkat ASC");
+while ($row = $queryAngkatan->fetch_assoc()) {
+    $angkatanOptions[] = $row["tingkat"];
+}
+
 kirim_json("success", "Data peringkat berhasil dimuat.", [
     "data" => $data,
+    "angkatan_options" => $angkatanOptions,
     "summary" => [
         "unggul" => $jumlahUnggul,
         "baik" => $jumlahBaik,
