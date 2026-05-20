@@ -13,7 +13,6 @@ function kirim_json($status, $message, $extra = []) {
 
 $id_guru = isset($_GET["id_guru"]) ? (int) $_GET["id_guru"] : 0;
 $role_id = isset($_GET["role_id"]) ? (int) $_GET["role_id"] : 0;
-$semester = isset($_GET["semester"]) ? (int) $_GET["semester"] : 1; // 1 atau 2
 
 if ($role_id !== 2) {
     kirim_json("error", "Akses ditolak. Akun ini bukan guru.");
@@ -32,19 +31,27 @@ if ($id_tahun_aktif == 0) {
     kirim_json("error", "Tidak ada tahun ajaran aktif.");
 }
 
-// Ambil mapel yang diajar guru
+/* AMBIL MAPEL SESUAI GURU LOGIN */
 $getMapel = $conn->prepare("
-    SELECT DISTINCT m.id_mapel, m.nama_mapel
+    SELECT DISTINCT
+        m.id_mapel,
+        m.nama_mapel
     FROM guru g
     JOIN mapel m ON g.id_mapel = m.id_mapel
     WHERE g.id_guru = ?
 ");
+
+if (!$getMapel) {
+    kirim_json("error", "Query mapel gagal: " . $conn->error);
+}
+
 $getMapel->bind_param("i", $id_guru);
 $getMapel->execute();
 $resultMapel = $getMapel->get_result();
 
 $mapelOptions = [];
 $id_mapel_guru = 0;
+
 while ($mapel = $resultMapel->fetch_assoc()) {
     $mapelOptions[] = $mapel["nama_mapel"];
     $id_mapel_guru = $mapel["id_mapel"];
@@ -58,36 +65,61 @@ if (empty($mapelOptions)) {
     ]);
 }
 
-// Ambil daftar siswa yang diajar guru (berdasarkan jadwal)
-// TETAP MUNCUL meskipun belum ada data kehadiran
+/* AMBIL DATA SISWA + PAKSA MUNCUL 2 SEMESTER (GANJIL & GENAP) */
 $stmt = $conn->prepare("
-    SELECT DISTINCT
+    SELECT
         s.id_siswa,
         s.nama AS nama_siswa,
         k.nama_kelas,
         ? AS nama_mapel,
-        ? AS semester,
-        COALESCE(n.hadir, 0) AS hadir,
-        COALESCE(n.izin, 0) AS izin,
-        COALESCE(n.sakit, 0) AS sakit,
-        COALESCE(n.alfa, 0) AS alfa
+        1 AS semester,
+        COALESCE(n1.hadir, 0) AS hadir,
+        COALESCE(n1.izin, 0) AS izin,
+        COALESCE(n1.sakit, 0) AS sakit,
+        COALESCE(n1.alfa, 0) AS alfa
     FROM siswa s
     JOIN kelas k ON s.id_kelas = k.id_kelas
     JOIN jadwal j ON j.id_kelas = k.id_kelas
-    LEFT JOIN nilai n ON n.id_siswa = s.id_siswa 
-        AND n.id_mapel = j.id_mapel 
-        AND n.id_tahun_ajaran = ?
-        AND n.semester = ?
+    LEFT JOIN nilai n1 ON n1.id_siswa = s.id_siswa 
+        AND n1.id_mapel = j.id_mapel 
+        AND n1.id_tahun_ajaran = ?
+        AND n1.semester = 1
     WHERE j.id_guru = ?
       AND j.id_mapel = ?
-    ORDER BY k.nama_kelas ASC, s.nama ASC
+    
+    UNION ALL
+    
+    SELECT
+        s.id_siswa,
+        s.nama AS nama_siswa,
+        k.nama_kelas,
+        ? AS nama_mapel,
+        2 AS semester,
+        COALESCE(n2.hadir, 0) AS hadir,
+        COALESCE(n2.izin, 0) AS izin,
+        COALESCE(n2.sakit, 0) AS sakit,
+        COALESCE(n2.alfa, 0) AS alfa
+    FROM siswa s
+    JOIN kelas k ON s.id_kelas = k.id_kelas
+    JOIN jadwal j ON j.id_kelas = k.id_kelas
+    LEFT JOIN nilai n2 ON n2.id_siswa = s.id_siswa 
+        AND n2.id_mapel = j.id_mapel 
+        AND n2.id_tahun_ajaran = ?
+        AND n2.semester = 2
+    WHERE j.id_guru = ?
+      AND j.id_mapel = ?
+    
+    ORDER BY nama_kelas ASC, nama_siswa ASC, semester ASC
 ");
 
 if (!$stmt) {
     kirim_json("error", "Query kehadiran gagal: " . $conn->error);
 }
 
-$stmt->bind_param("siiii", $mapelOptions[0], $semester, $id_tahun_aktif, $semester, $id_guru, $id_mapel_guru);
+$stmt->bind_param("siiisiii", 
+    $mapelOptions[0], $id_tahun_aktif, $id_guru, $id_mapel_guru,
+    $mapelOptions[0], $id_tahun_aktif, $id_guru, $id_mapel_guru
+);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -95,14 +127,17 @@ $data = [];
 $kelasOptions = [];
 
 while ($row = $result->fetch_assoc()) {
+    $semesterAngka = (int) $row["semester"];
+    $semesterText = ($semesterAngka === 1) ? "Ganjil" : "Genap";
+
     $kelasOptions[] = $row["nama_kelas"];
-    
+
     $data[] = [
         "id_siswa" => (int) $row["id_siswa"],
         "nama" => $row["nama_siswa"] ?? "-",
         "kelas" => $row["nama_kelas"] ?? "-",
         "mapel" => $row["nama_mapel"] ?? "-",
-        "semester" => $semester == 1 ? "Ganjil" : "Genap",
+        "semester" => $semesterText,
         "hadir" => (int) $row["hadir"],
         "izin" => (int) $row["izin"],
         "sakit" => (int) $row["sakit"],
