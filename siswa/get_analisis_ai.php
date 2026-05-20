@@ -1,4 +1,9 @@
 <?php
+// ==============================================
+// INI YANG PALING PENTING - SESSION DI PALING ATAS
+// ==============================================
+session_start();
+
 // Pastikan output file ini terbaca sebagai JSON
 header('Content-Type: application/json; charset=utf-8');
 
@@ -52,8 +57,6 @@ $conn->set_charset("utf8mb4");
 // ==============================================
 // 4. Ambil session login siswa (SAMA PERSIS SEPERTI get-profil-siswa.php)
 // ==============================================
-session_start();
-
 $id_siswa = 0;
 
 /*
@@ -116,7 +119,13 @@ if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
 if ($id_siswa <= 0) {
     echo json_encode([
         'success' => false,
-        'message' => 'Silakan login terlebih dahulu. Session tidak ditemukan.'
+        'message' => 'Silakan login terlebih dahulu. Session tidak ditemukan.',
+        'debug' => [
+            'session_id' => session_id(),
+            'session_data_keys' => array_keys($_SESSION),
+            'id_siswa_in_session' => isset($_SESSION['id_siswa']),
+            'id_user_in_session' => isset($_SESSION['id_user'])
+        ]
     ]);
     $conn->close();
     exit;
@@ -352,7 +361,7 @@ Aturan:
 
 // 10. Fungsi untuk memanggil Gemini API dengan model tertentu
 function callGeminiAPI($api_key, $prompt, $model) {
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$api_key}";
     
     $data = [
         "contents" => [
@@ -373,10 +382,7 @@ function callGeminiAPI($api_key, $prompt, $model) {
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'x-goog-api-key: ' . $api_key
-    ]);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
     curl_setopt($ch, CURLOPT_TIMEOUT, 60);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -408,8 +414,7 @@ $models = [
     'gemini-2.0-flash',
     'gemini-2.0-flash-lite',
     'gemini-1.5-flash',
-    'gemini-flash-latest',
-    'gemini-2.5-flash-lite'
+    'gemini-flash-latest'
 ];
 
 $ai_response = null;
