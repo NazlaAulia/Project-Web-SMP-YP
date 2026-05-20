@@ -148,9 +148,9 @@ if ($mode === "wali") {
     }
 }
 
-/* QUERY DATA NILAI */
+/* QUERY DATA NILAI - HANYA TAHUN AJARAN AKTIF */
 if ($mode === "wali") {
-    // MODE WALI KELAS - ambil nilai semua mapel untuk setiap siswa
+    // MODE WALI KELAS
     $stmt = $conn->prepare("
         SELECT 
             s.id_siswa,
@@ -168,7 +168,9 @@ if ($mode === "wali") {
         FROM siswa s
         INNER JOIN kelas k ON s.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
         CROSS JOIN mapel m
-        LEFT JOIN nilai n ON n.id_siswa = s.id_siswa AND n.id_mapel = m.id_mapel
+        LEFT JOIN nilai n ON n.id_siswa = s.id_siswa 
+            AND n.id_mapel = m.id_mapel 
+            AND n.id_tahun_ajaran = ?
         WHERE s.id_kelas = ?
         ORDER BY s.nama ASC, m.id_mapel ASC
     ");
@@ -177,9 +179,9 @@ if ($mode === "wali") {
         kirim_json("error", "Query wali kelas gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("ii", $id_tahun_aktif, $id_kelas);
+    $stmt->bind_param("iii", $id_tahun_aktif, $id_tahun_aktif, $id_kelas);
 } else {
-    // MODE GURU MAPEL - ambil SEMUA siswa di kelas
+    // MODE GURU MAPEL
     $stmt = $conn->prepare("
         SELECT 
             s.id_siswa,
@@ -196,7 +198,9 @@ if ($mode === "wali") {
             COALESCE(n.alfa, 0) AS alfa
         FROM siswa s
         INNER JOIN kelas k ON s.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
-        LEFT JOIN nilai n ON n.id_siswa = s.id_siswa AND n.id_mapel = ?
+        LEFT JOIN nilai n ON n.id_siswa = s.id_siswa 
+            AND n.id_mapel = ? 
+            AND n.id_tahun_ajaran = ?
         WHERE s.id_kelas = ?
         ORDER BY s.nama ASC
     ");
@@ -205,7 +209,7 @@ if ($mode === "wali") {
         kirim_json("error", "Query nilai mapel gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("isiii", $id_mapel_guru, $nama_mapel_guru, $id_tahun_aktif, $id_mapel_guru, $id_kelas);
+    $stmt->bind_param("isiiii", $id_mapel_guru, $nama_mapel_guru, $id_tahun_aktif, $id_mapel_guru, $id_tahun_aktif, $id_kelas);
 }
 
 $stmt->execute();
