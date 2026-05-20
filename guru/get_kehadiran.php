@@ -22,6 +22,15 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
+// ========== AMBIL TAHUN AJARAN AKTIF ==========
+$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+$tahunAktif = $queryTahun->fetch_assoc();
+$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+
+if ($id_tahun_aktif == 0) {
+    kirim_json("error", "Tidak ada tahun ajaran aktif.");
+}
+
 /* AMBIL MAPEL SESUAI GURU LOGIN */
 $getMapel = $conn->prepare("
     SELECT DISTINCT
@@ -54,7 +63,7 @@ if (empty($mapelOptions)) {
     ]);
 }
 
-/* AMBIL DATA KEHADIRAN SESUAI GURU LOGIN, MAPEL GURU, DAN KELAS YANG DIAJAR */
+/* AMBIL DATA KEHADIRAN SESUAI GURU LOGIN, MAPEL GURU, DAN KELAS YANG DIAJAR (HANYA TAHUN AKTIF) */
 $stmt = $conn->prepare("
     SELECT DISTINCT
         s.nama AS nama_siswa,
@@ -72,6 +81,7 @@ $stmt = $conn->prepare("
     JOIN kelas k ON s.id_kelas = k.id_kelas
     JOIN nilai n ON n.id_siswa = s.id_siswa
                 AND n.id_mapel = j.id_mapel
+                AND n.id_tahun_ajaran = ?
     WHERE j.id_guru = ?
       AND g.id_guru = ?
       AND g.id_mapel = j.id_mapel
@@ -82,7 +92,7 @@ if (!$stmt) {
     kirim_json("error", "Query kehadiran gagal: " . $conn->error);
 }
 
-$stmt->bind_param("ii", $id_guru, $id_guru);
+$stmt->bind_param("iii", $id_tahun_aktif, $id_guru, $id_guru);
 $stmt->execute();
 $result = $stmt->get_result();
 
