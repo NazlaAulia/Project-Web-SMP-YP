@@ -26,9 +26,17 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
+// ========== AMBIL TAHUN AJARAN AKTIF ==========
+$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+$tahunAktif = $queryTahun->fetch_assoc();
+$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+
+if ($id_tahun_aktif == 0) {
+    kirim_json("error", "Tidak ada tahun ajaran aktif.");
+}
+
 /* =========================
    MAPEL SESUAI GURU
-   FIX: ambil dari guru.id_mapel + jadwal.id_mapel + request_jadwal
 ========================= */
 $mapel = [];
 
@@ -46,6 +54,7 @@ $qMapel = $conn->prepare("
         FROM jadwal
         WHERE id_guru = ?
           AND id_mapel IS NOT NULL
+          AND id_tahun_ajaran = ?
 
         UNION
 
@@ -54,6 +63,7 @@ $qMapel = $conn->prepare("
         JOIN jadwal j ON r.id_jadwal = j.id_jadwal
         WHERE r.id_guru = ?
           AND j.id_mapel IS NOT NULL
+          AND j.id_tahun_ajaran = ?
     ) AS data_mapel
     JOIN mapel m ON data_mapel.id_mapel = m.id_mapel
     ORDER BY m.id_mapel ASC
@@ -63,7 +73,7 @@ if (!$qMapel) {
     kirim_json("error", "Query mapel gagal: " . $conn->error);
 }
 
-$qMapel->bind_param("iii", $id_guru, $id_guru, $id_guru);
+$qMapel->bind_param("iiiii", $id_guru, $id_guru, $id_tahun_aktif, $id_guru, $id_tahun_aktif);
 $qMapel->execute();
 $resultMapel = $qMapel->get_result();
 
@@ -91,22 +101,25 @@ while ($row = $resultMapel->fetch_assoc()) {
 }
 
 /* =========================
-   KEHADIRAN
+   KEHADIRAN (HANYA TAHUN AKTIF)
 ========================= */
-$qKehadiran = $conn->query("
+$qKehadiran = $conn->prepare("
     SELECT
         COALESCE(SUM(hadir), 0) AS total_hadir,
         COALESCE(SUM(izin), 0) AS total_izin,
         COALESCE(SUM(sakit), 0) AS total_sakit,
         COALESCE(SUM(alfa), 0) AS total_alfa
     FROM nilai
+    WHERE id_tahun_ajaran = ?
 ");
 
 if (!$qKehadiran) {
     kirim_json("error", "Query kehadiran gagal: " . $conn->error);
 }
 
-$rekapKehadiran = $qKehadiran->fetch_assoc();
+$qKehadiran->bind_param("i", $id_tahun_aktif);
+$qKehadiran->execute();
+$rekapKehadiran = $qKehadiran->get_result()->fetch_assoc();
 
 $totalHadir = (int) $rekapKehadiran["total_hadir"];
 $totalIzin = (int) $rekapKehadiran["total_izin"];
@@ -117,71 +130,83 @@ $totalSemua = $totalHadir + $totalIzin + $totalSakit + $totalAlfa;
 $persenHadir = $totalSemua > 0 ? round(($totalHadir / $totalSemua) * 100) : 0;
 
 /* =========================
-   KELAS TERISI
+   KELAS TERISI (HANYA TAHUN AKTIF)
 ========================= */
-$qKelasTerisi = $conn->query("
+$qKelasTerisi = $conn->prepare("
     SELECT COUNT(DISTINCT s.id_kelas) AS total_kelas_terisi
     FROM nilai n
     LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
-    WHERE s.id_kelas IS NOT NULL
+    WHERE n.id_tahun_ajaran = ?
+      AND s.id_kelas IS NOT NULL
 ");
 
 if (!$qKelasTerisi) {
     kirim_json("error", "Query kelas terisi gagal: " . $conn->error);
 }
 
-$kelasTerisi = $qKelasTerisi->fetch_assoc();
+$qKelasTerisi->bind_param("i", $id_tahun_aktif);
+$qKelasTerisi->execute();
+$kelasTerisi = $qKelasTerisi->get_result()->fetch_assoc();
 
 /* =========================
-   TOTAL KELAS
+   TOTAL KELAS (HANYA TAHUN AKTIF)
 ========================= */
-$qTotalKelas = $conn->query("
+$qTotalKelas = $conn->prepare("
     SELECT COUNT(*) AS total_kelas
     FROM kelas
+    WHERE id_tahun_ajaran = ?
 ");
 
 if (!$qTotalKelas) {
     kirim_json("error", "Query total kelas gagal: " . $conn->error);
 }
 
-$totalKelas = $qTotalKelas->fetch_assoc();
+$qTotalKelas->bind_param("i", $id_tahun_aktif);
+$qTotalKelas->execute();
+$totalKelas = $qTotalKelas->get_result()->fetch_assoc();
 
 /* =========================
-   PERINGKAT
+   PERINGKAT 5 BESAR (HANYA TAHUN AKTIF)
 ========================= */
 $peringkat = [];
 
-$qPeringkat = $conn->query("
+$qPeringkat = $conn->prepare("
     SELECT
         s.id_siswa,
         s.nama,
         k.nama_kelas,
-        ROUND(AVG(n.nilai_angka), 2) AS rata_rata
-    FROM nilai n
-    LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
-    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-    WHERE n.nilai_angka IS NOT NULL
+        ROUND(COALESCE(AVG(n.nilai_angka), 0), 2) AS rata_rata
+    FROM siswa s
+    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
+    LEFT JOIN nilai n ON n.id_siswa = s.id_siswa AND n.id_tahun_ajaran = ?
+    WHERE k.id_tahun_ajaran = ?
     GROUP BY s.id_siswa, s.nama, k.nama_kelas
-    ORDER BY rata_rata DESC
+    ORDER BY rata_rata DESC, s.nama ASC
     LIMIT 2
 ");
 
-if ($qPeringkat) {
-    while ($row = $qPeringkat->fetch_assoc()) {
-        $namaSiswa = $row["nama"] ?? "-";
+if (!$qPeringkat) {
+    kirim_json("error", "Query peringkat gagal: " . $conn->error);
+}
 
-        $peringkat[] = [
-            "id_siswa" => $row["id_siswa"],
-            "nama" => $namaSiswa,
-            "inisial" => strtoupper(substr($namaSiswa, 0, 1)),
-            "kelas" => $row["nama_kelas"] ?? "-",
-            "rata_rata" => $row["rata_rata"] ?? 0
-        ];
-    }
+$qPeringkat->bind_param("iii", $id_tahun_aktif, $id_tahun_aktif, $id_tahun_aktif);
+$qPeringkat->execute();
+$resultPeringkat = $qPeringkat->get_result();
+
+while ($row = $resultPeringkat->fetch_assoc()) {
+    $namaSiswa = $row["nama"] ?? "-";
+
+    $peringkat[] = [
+        "id_siswa" => $row["id_siswa"],
+        "nama" => $namaSiswa,
+        "inisial" => strtoupper(substr($namaSiswa, 0, 1)),
+        "kelas" => $row["nama_kelas"] ?? "-",
+        "rata_rata" => (float) $row["rata_rata"]
+    ];
 }
 
 /* =========================
-   REQUEST JADWAL GURU LOGIN
+   REQUEST JADWAL (HANYA TAHUN AKTIF)
 ========================= */
 $requestJadwal = [];
 
@@ -194,13 +219,10 @@ $qRequest = $conn->prepare("
         r.status,
         r.tanggal_request,
         j.hari,
-        jp.jam_mulai,
-        jp.jam_selesai,
         k.nama_kelas,
         m.nama_mapel
     FROM request_jadwal r
-    LEFT JOIN jadwal j ON r.id_jadwal = j.id_jadwal
-    LEFT JOIN jam_pelajaran jp ON j.id_jam = jp.id_jam
+    LEFT JOIN jadwal j ON r.id_jadwal = j.id_jadwal AND j.id_tahun_ajaran = ?
     LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
     LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
     WHERE r.id_guru = ?
@@ -209,7 +231,7 @@ $qRequest = $conn->prepare("
 ");
 
 if ($qRequest) {
-    $qRequest->bind_param("i", $id_guru);
+    $qRequest->bind_param("ii", $id_tahun_aktif, $id_guru);
     $qRequest->execute();
     $resultRequest = $qRequest->get_result();
 
