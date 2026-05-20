@@ -23,14 +23,23 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid.");
 }
 
+// ========== AMBIL TAHUN AJARAN AKTIF ==========
+$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+$tahunAktif = $queryTahun->fetch_assoc();
+$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+
+if ($id_tahun_aktif == 0) {
+    kirim_json("error", "Tidak ada tahun ajaran aktif.");
+}
+
 $whereSemester = "";
 $semesterValue = 0;
 
 if ($semester === "Ganjil") {
-    $whereSemester = "WHERE n.semester = ?";
+    $whereSemester = "AND n.semester = ?";
     $semesterValue = 1;
 } elseif ($semester === "Genap") {
-    $whereSemester = "WHERE n.semester = ?";
+    $whereSemester = "AND n.semester = ?";
     $semesterValue = 2;
 }
 
@@ -43,7 +52,8 @@ $sql = "
     FROM nilai n
     LEFT JOIN siswa s ON n.id_siswa = s.id_siswa
     LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-    $whereSemester
+    WHERE n.id_tahun_ajaran = ?
+      $whereSemester
     GROUP BY s.id_siswa, s.nama, k.nama_kelas
     ORDER BY rata_rata DESC, s.nama ASC
 ";
@@ -55,7 +65,9 @@ if (!$stmt) {
 }
 
 if ($whereSemester !== "") {
-    $stmt->bind_param("i", $semesterValue);
+    $stmt->bind_param("ii", $id_tahun_aktif, $semesterValue);
+} else {
+    $stmt->bind_param("i", $id_tahun_aktif);
 }
 
 $stmt->execute();
