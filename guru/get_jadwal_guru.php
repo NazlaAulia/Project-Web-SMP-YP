@@ -23,6 +23,15 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid. Silakan login ulang.");
 }
 
+// ========== AMBIL TAHUN AJARAN AKTIF ==========
+$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+$tahunAktif = $queryTahun->fetch_assoc();
+$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+
+if ($id_tahun_aktif == 0) {
+    kirim_json("error", "Tidak ada tahun ajaran aktif.");
+}
+
 $stmtGuru = $conn->prepare("
     SELECT id_guru, nama
     FROM guru
@@ -61,9 +70,9 @@ $stmt = $conn->prepare("
         m.nama_mapel
     FROM jadwal j
     LEFT JOIN guru g ON j.id_guru = g.id_guru
-    LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
+    LEFT JOIN kelas k ON j.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
     LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
-    WHERE j.id_guru = ?
+    WHERE j.id_guru = ? AND j.id_tahun_ajaran = ?
     ORDER BY 
         FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'),
         COALESCE(j.jp_mulai, 0),
@@ -74,7 +83,7 @@ if (!$stmt) {
     kirim_json("error", "Query jadwal gagal: " . $conn->error);
 }
 
-$stmt->bind_param("i", $id_guru);
+$stmt->bind_param("iii", $id_tahun_aktif, $id_guru, $id_tahun_aktif);
 
 if (!$stmt->execute()) {
     kirim_json("error", "Jadwal guru gagal diproses.");
