@@ -74,18 +74,30 @@
                         </div>
                     </div>
 
-                    <div class="rank-table-toolbar">
-                        <div class="search-container-elegant">
-                            <i class="bi bi-search search-icon"></i>
-                            <input type="text" id="searchRanking" placeholder="Cari nama siswa..." class="search-input">
-                        </div>
+                   <div class="rank-table-toolbar">
+    <div class="search-container-elegant">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" id="searchRanking" placeholder="Cari nama siswa..." class="search-input">
+    </div>
 
-                        <select id="filterSemester" class="filter-select">
-                            <option value="Semua">Semua Semester</option>
-                            <option value="Ganjil">Semester Ganjil</option>
-                            <option value="Genap">Semester Genap</option>
-                        </select>
-                    </div>
+    <div class="filter-group">
+        <select id="filterSemester" class="filter-select">
+            <option value="Semua">Semua Semester</option>
+            <option value="Ganjil">Semester Ganjil</option>
+            <option value="Genap">Semester Genap</option>
+        </select>
+    </div>
+
+    <!-- TAMBAHKAN INI: DROPDOWN KELAS -->
+    <div class="filter-group">
+        <select id="filterAngkatan" class="filter-select">
+            <option value="0">Semua Kelas</option>
+            <option value="7">Kelas 7</option>
+            <option value="8">Kelas 8</option>
+            <option value="9">Kelas 9</option>
+        </select>
+    </div>
+</div>
 
                     <div class="table-wrapper">
                         <table class="rank-table">
