@@ -577,34 +577,34 @@ if (filterKelasWali) {
 }
 
 if (downloadTemplateBtn) {
+
   downloadTemplateBtn.addEventListener("click", () => {
+
     if (!idGuruLogin || roleIdLogin !== "2") {
       alert("Silakan login sebagai guru terlebih dahulu.");
       window.location.href = "../login.html";
       return;
     }
-  const mode = modeNilai ? modeNilai.value : "mapel";
-let idKelas = filterKelasWali ? filterKelasWali.value : "";
 
-// Jika mode wali, ambil id_kelas dari data wali (abaikan dropdown)
-if (mode === "wali" && window.waliKelasData && window.waliKelasData.length > 0) {
-  idKelas = window.waliKelasData[0].id_kelas;
-}
-    let templateUrl = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${mode}`;
-    if (mode === "wali" && idKelas) templateUrl += `&id_kelas=${idKelas}`;
-    const link = document.createElement("a");
-    link.href = templateUrl;
-    link.download = "template_import_nilai_siswa.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  });
-}
+    const idKelas = filterKelasWali
+      ? filterKelasWali.value
+      : "";
 
-if (printBtn) {
-  printBtn.addEventListener("click", function() {
-    alert("Gunakan tombol Cetak Nilai pada baris siswa yang ingin dicetak.");
+    if (!idKelas) {
+      alert("Pilih kelas terlebih dahulu.");
+      return;
+    }
+
+    const templateUrl =
+      `download_template_nilai.php?id_guru=${idGuruLogin}` +
+      `&role_id=${roleIdLogin}` +
+      `&mode=mapel` +
+      `&id_kelas=${idKelas}`;
+
+    window.location.href = templateUrl;
+
   });
+
 }
 
 loadNilaiDatabase();

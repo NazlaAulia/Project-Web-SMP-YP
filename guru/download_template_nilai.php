@@ -17,60 +17,84 @@ if ($role_id !== 2 || $id_guru <= 0) {
 |--------------------------------------------------------------------------
 */
 if ($mode === "mapel") {
-    if ($id_kelas <= 0) {
-        die("Pilih kelas terlebih dahulu.");
-    }
-
-    // Ambil data guru
     $getGuru = $conn->prepare("
-        SELECT g.id_mapel, m.nama_mapel
+        SELECT 
+            g.id_mapel,
+            m.nama_mapel
         FROM guru g
         LEFT JOIN mapel m ON g.id_mapel = m.id_mapel
-        WHERE g.id_guru = ? LIMIT 1
+        WHERE g.id_guru = ?
+        LIMIT 1
     ");
+
+    if (!$getGuru) {
+        die("Query guru gagal: " . $conn->error);
+    }
+
     $getGuru->bind_param("i", $id_guru);
     $getGuru->execute();
     $resultGuru = $getGuru->get_result();
-    if ($resultGuru->num_rows === 0) die("Data guru tidak ditemukan.");
+
+    if ($resultGuru->num_rows === 0) {
+        die("Data guru tidak ditemukan.");
+    }
+
     $guru = $resultGuru->fetch_assoc();
 
     $id_mapel = (int) $guru["id_mapel"];
     $nama_mapel = $guru["nama_mapel"] ?? "-";
 
-    // Ambil nama kelas
-    $queryKelas = $conn->prepare("SELECT nama_kelas FROM kelas WHERE id_kelas = ?");
-    $queryKelas->bind_param("i", $id_kelas);
-    $queryKelas->execute();
-    $kelasData = $queryKelas->get_result()->fetch_assoc();
-    $namaKelas = $kelasData ? $kelasData["nama_kelas"] : "kelas";
+    $getKelas = $conn->prepare("
+    SELECT nama_kelas
+    FROM kelas
+    WHERE id_kelas = ?
+    LIMIT 1
+");
 
-    // Ambil siswa berdasarkan KELAS YANG DIPILIH
+$getKelas->bind_param("i", $id_kelas);
+$getKelas->execute();
+
+$resultKelas = $getKelas->get_result();
+$kelas = $resultKelas->fetch_assoc();
+
+$namaKelas = $kelas["nama_kelas"] ?? "kelas";
+
     $getSiswa = $conn->prepare("
-        SELECT id_siswa, nama AS nama_siswa
-        FROM siswa
-        WHERE id_kelas = ?
-        ORDER BY nama ASC
+        SELECT 
+            s.id_siswa,
+            s.nama AS nama_siswa
+        FROM siswa s
+        ORDER BY s.nama ASC
     ");
-    $getSiswa->bind_param("i", $id_kelas);
+
+    if (!$getSiswa) {
+        die("Query siswa gagal: " . $conn->error);
+    }
+
     $getSiswa->execute();
     $resultSiswa = $getSiswa->get_result();
 
-    $filename = "template_import_nilai_{$namaKelas}.csv";
+$filename = "template_import_nilai_" . preg_replace('/[^a-zA-Z0-9]/', '_', $namaKelas) . ".csv";
 
     header("Content-Type: text/csv; charset=utf-8");
     header("Content-Disposition: attachment; filename=\"$filename\"");
 
     $output = fopen("php://output", "w");
+
     fwrite($output, "\xEF\xBB\xBF");
     fputcsv($output, ["sep=,"]);
 
-    // HEADER KELAS
-    fputcsv($output, ["# KELAS: " . $namaKelas]);
-    fputcsv($output, []); // baris kosong
-
     fputcsv($output, [
-        "id_siswa", "nama_siswa", "id_mapel", "nama_mapel",
-        "semester", "nilai_angka", "hadir", "izin", "sakit", "alfa"
+        "id_siswa",
+        "nama_siswa",
+        "id_mapel",
+        "nama_mapel",
+        "semester",
+        "nilai_angka",
+        "hadir",
+        "izin",
+        "sakit",
+        "alfa"
     ]);
 
     while ($siswa = $resultSiswa->fetch_assoc()) {
@@ -80,7 +104,11 @@ if ($mode === "mapel") {
             $id_mapel,
             $nama_mapel,
             1,
-            "", "", "", "", ""
+            "",
+            "",
+            "",
+            "",
+            ""
         ]);
     }
 
@@ -96,10 +124,13 @@ if ($mode === "mapel") {
 | - hanya untuk kelas wali yang sesuai guru login
 |--------------------------------------------------------------------------
 */
-if ($mode === "wali") {
+if ($mode === "mapel") {
+
     if ($id_kelas <= 0) {
-        die("ID kelas tidak valid.");
+        die("Pilih kelas terlebih dahulu.");
     }
+
+   
 
     $cekWali = $conn->prepare("
         SELECT 
@@ -147,14 +178,14 @@ if ($mode === "wali") {
         ];
     }
 
-    $getSiswa = $conn->prepare("
-        SELECT 
-            s.id_siswa,
-            s.nama AS nama_siswa
-        FROM siswa s
-        WHERE s.id_kelas = ?
-        ORDER BY s.nama ASC
-    ");
+   $getSiswa = $conn->prepare("
+    SELECT 
+        s.id_siswa,
+        s.nama AS nama_siswa
+    FROM siswa s
+    WHERE s.id_kelas = ?
+    ORDER BY s.nama ASC
+");
 
     if (!$getSiswa) {
         die("Query siswa kelas gagal: " . $conn->error);
@@ -162,6 +193,7 @@ if ($mode === "wali") {
 
     $getSiswa->bind_param("i", $id_kelas);
     $getSiswa->execute();
+
     $resultSiswa = $getSiswa->get_result();
 
     $filename = "template_import_nilai_wali_" . preg_replace('/[^a-zA-Z0-9]/', '_', $kelas["nama_kelas"]) . ".csv";
