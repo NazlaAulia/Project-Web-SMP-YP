@@ -62,9 +62,9 @@ $sql = "
     LEFT JOIN nilai n ON n.id_siswa = s.id_siswa 
         AND n.id_tahun_ajaran = ?
         $whereSemester
-    WHERE k.id_tahun_ajaran = ?
-      $whereAngkatan
     GROUP BY s.id_siswa, s.nama, k.nama_kelas
+    HAVING (k.id_tahun_ajaran = ? OR k.id_tahun_ajaran IS NULL)
+      $whereAngkatan
     ORDER BY rata_rata DESC, s.nama ASC
     LIMIT 10
 ";
