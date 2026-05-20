@@ -121,7 +121,3 @@ document.addEventListener("DOMContentLoaded", function () {
     loadPeringkatDatabase();
 });
 
-// Tambah event listener untuk dropdown kelas (angkatan)
-if (document.getElementById("filterAngkatan")) {
-    document.getElementById("filterAngkatan").addEventListener("change", loadPeringkatDatabase);
-}
