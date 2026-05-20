@@ -27,6 +27,15 @@ if ($data_nilai_json === "") {
     kirim_json("error", "Data nilai kosong.");
 }
 
+// ========== AMBIL TAHUN AJARAN AKTIF ==========
+$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+$tahunAktif = $queryTahun->fetch_assoc();
+$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+
+if ($id_tahun_aktif == 0) {
+    kirim_json("error", "Tidak ada tahun ajaran aktif.");
+}
+
 $data_nilai = json_decode($data_nilai_json, true);
 
 if (!is_array($data_nilai)) {
@@ -104,10 +113,14 @@ try {
             continue;
         }
 
+        // CEK NILAI BERDASARKAN SISWA, MAPEL, SEMESTER, DAN TAHUN AJARAN
         $cekNilai = $conn->prepare("
             SELECT id_nilai
             FROM nilai
-            WHERE id_siswa = ? AND id_mapel = ? AND semester = ?
+            WHERE id_siswa = ? 
+              AND id_mapel = ? 
+              AND semester = ?
+              AND id_tahun_ajaran = ?
             LIMIT 1
         ");
 
@@ -115,11 +128,12 @@ try {
             throw new Exception("Query cek nilai gagal: " . $conn->error);
         }
 
-        $cekNilai->bind_param("iii", $id_siswa, $id_mapel, $semester);
+        $cekNilai->bind_param("iiii", $id_siswa, $id_mapel, $semester, $id_tahun_aktif);
         $cekNilai->execute();
         $resultNilai = $cekNilai->get_result();
 
         if ($resultNilai->num_rows > 0) {
+            // UPDATE nilai yang sudah ada
             $nilaiLama = $resultNilai->fetch_assoc();
             $id_nilai = (int) $nilaiLama["id_nilai"];
 
@@ -153,11 +167,12 @@ try {
 
             $updated++;
         } else {
+            // INSERT nilai baru dengan id_tahun_ajaran
             $insert = $conn->prepare("
                 INSERT INTO nilai
-                    (id_siswa, id_mapel, semester, nilai_angka, hadir, izin, sakit, alfa)
+                    (id_siswa, id_mapel, semester, nilai_angka, hadir, izin, sakit, alfa, id_tahun_ajaran)
                 VALUES
-                    (?, ?, ?, ?, ?, ?, ?, ?)
+                    (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
 
             if (!$insert) {
@@ -165,7 +180,7 @@ try {
             }
 
             $insert->bind_param(
-                "iiiiiiii",
+                "iiiiiiiii",
                 $id_siswa,
                 $id_mapel,
                 $semester,
@@ -173,7 +188,8 @@ try {
                 $hadir,
                 $izin,
                 $sakit,
-                $alfa
+                $alfa,
+                $id_tahun_aktif
             );
 
             if (!$insert->execute()) {
