@@ -13,6 +13,7 @@ if ($role_id !== 2 || $id_guru <= 0) {
 /*
 |--------------------------------------------------------------------------
 | MODE 1 = GURU MAPEL BIASA
+| - hanya 1 mapel sesuai guru login
 |--------------------------------------------------------------------------
 */
 if ($mode === "mapel") {
@@ -20,29 +21,17 @@ if ($mode === "mapel") {
         die("Pilih kelas terlebih dahulu.");
     }
 
-    // Ambil data guru (mapel yang diajar)
+    // Ambil data guru
     $getGuru = $conn->prepare("
-        SELECT 
-            g.id_mapel,
-            m.nama_mapel
+        SELECT g.id_mapel, m.nama_mapel
         FROM guru g
         LEFT JOIN mapel m ON g.id_mapel = m.id_mapel
-        WHERE g.id_guru = ?
-        LIMIT 1
+        WHERE g.id_guru = ? LIMIT 1
     ");
-
-    if (!$getGuru) {
-        die("Query guru gagal: " . $conn->error);
-    }
-
     $getGuru->bind_param("i", $id_guru);
     $getGuru->execute();
     $resultGuru = $getGuru->get_result();
-
-    if ($resultGuru->num_rows === 0) {
-        die("Data guru tidak ditemukan.");
-    }
-
+    if ($resultGuru->num_rows === 0) die("Data guru tidak ditemukan.");
     $guru = $resultGuru->fetch_assoc();
 
     $id_mapel = (int) $guru["id_mapel"];
@@ -52,24 +41,16 @@ if ($mode === "mapel") {
     $queryKelas = $conn->prepare("SELECT nama_kelas FROM kelas WHERE id_kelas = ?");
     $queryKelas->bind_param("i", $id_kelas);
     $queryKelas->execute();
-    $resultKelas = $queryKelas->get_result();
-    $kelasData = $resultKelas->fetch_assoc();
+    $kelasData = $queryKelas->get_result()->fetch_assoc();
     $namaKelas = $kelasData ? preg_replace('/[^a-zA-Z0-9]/', '_', $kelasData["nama_kelas"]) : "kelas";
 
-    // Ambil siswa berdasarkan KELAS yang dipilih
+    // Ambil siswa berdasarkan KELAS YANG DIPILIH
     $getSiswa = $conn->prepare("
-        SELECT 
-            s.id_siswa,
-            s.nama AS nama_siswa
-        FROM siswa s
-        WHERE s.id_kelas = ?
-        ORDER BY s.nama ASC
+        SELECT id_siswa, nama AS nama_siswa
+        FROM siswa
+        WHERE id_kelas = ?
+        ORDER BY nama ASC
     ");
-
-    if (!$getSiswa) {
-        die("Query siswa gagal: " . $conn->error);
-    }
-
     $getSiswa->bind_param("i", $id_kelas);
     $getSiswa->execute();
     $resultSiswa = $getSiswa->get_result();
@@ -80,21 +61,12 @@ if ($mode === "mapel") {
     header("Content-Disposition: attachment; filename=\"$filename\"");
 
     $output = fopen("php://output", "w");
-
     fwrite($output, "\xEF\xBB\xBF");
     fputcsv($output, ["sep=,"]);
 
     fputcsv($output, [
-        "id_siswa",
-        "nama_siswa",
-        "id_mapel",
-        "nama_mapel",
-        "semester",
-        "nilai_angka",
-        "hadir",
-        "izin",
-        "sakit",
-        "alfa"
+        "id_siswa", "nama_siswa", "id_mapel", "nama_mapel",
+        "semester", "nilai_angka", "hadir", "izin", "sakit", "alfa"
     ]);
 
     while ($siswa = $resultSiswa->fetch_assoc()) {
@@ -104,11 +76,7 @@ if ($mode === "mapel") {
             $id_mapel,
             $nama_mapel,
             1,
-            "",
-            "",
-            "",
-            "",
-            ""
+            "", "", "", "", ""
         ]);
     }
 
@@ -119,6 +87,9 @@ if ($mode === "mapel") {
 /*
 |--------------------------------------------------------------------------
 | MODE 2 = WALI KELAS
+| - mapel dibuat MENYAMPING
+| - 1 siswa = 1 baris
+| - hanya untuk kelas wali yang sesuai guru login
 |--------------------------------------------------------------------------
 */
 if ($mode === "wali") {
@@ -149,7 +120,6 @@ if ($mode === "wali") {
 
     $kelas = $resultWali->fetch_assoc();
 
-    // Ambil semua mapel
     $getMapel = $conn->prepare("
         SELECT 
             id_mapel,
@@ -173,7 +143,6 @@ if ($mode === "wali") {
         ];
     }
 
-    // Ambil siswa berdasarkan KELAS yang dipilih
     $getSiswa = $conn->prepare("
         SELECT 
             s.id_siswa,
