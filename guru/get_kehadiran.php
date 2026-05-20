@@ -13,6 +13,7 @@ function kirim_json($status, $message, $extra = []) {
 
 $id_guru = isset($_GET["id_guru"]) ? (int) $_GET["id_guru"] : 0;
 $role_id = isset($_GET["role_id"]) ? (int) $_GET["role_id"] : 0;
+$semester = isset($_GET["semester"]) ? (int) $_GET["semester"] : 1; // 1 atau 2
 
 if ($role_id !== 2) {
     kirim_json("error", "Akses ditolak. Akun ini bukan guru.");
@@ -31,27 +32,19 @@ if ($id_tahun_aktif == 0) {
     kirim_json("error", "Tidak ada tahun ajaran aktif.");
 }
 
-/* AMBIL MAPEL SESUAI GURU LOGIN */
+// Ambil mapel yang diajar guru
 $getMapel = $conn->prepare("
-    SELECT DISTINCT
-        m.id_mapel,
-        m.nama_mapel
+    SELECT DISTINCT m.id_mapel, m.nama_mapel
     FROM guru g
     JOIN mapel m ON g.id_mapel = m.id_mapel
     WHERE g.id_guru = ?
 ");
-
-if (!$getMapel) {
-    kirim_json("error", "Query mapel gagal: " . $conn->error);
-}
-
 $getMapel->bind_param("i", $id_guru);
 $getMapel->execute();
 $resultMapel = $getMapel->get_result();
 
 $mapelOptions = [];
 $id_mapel_guru = 0;
-
 while ($mapel = $resultMapel->fetch_assoc()) {
     $mapelOptions[] = $mapel["nama_mapel"];
     $id_mapel_guru = $mapel["id_mapel"];
@@ -65,14 +58,15 @@ if (empty($mapelOptions)) {
     ]);
 }
 
-/* AMBIL DATA KEHADIRAN - TETAP MUNCULKAN SISWA MESKIPUN BELUM ADA DATA */
+// Ambil daftar siswa yang diajar guru (berdasarkan jadwal)
+// TETAP MUNCUL meskipun belum ada data kehadiran
 $stmt = $conn->prepare("
     SELECT DISTINCT
         s.id_siswa,
         s.nama AS nama_siswa,
         k.nama_kelas,
         ? AS nama_mapel,
-        COALESCE(n.semester, 1) AS semester,
+        ? AS semester,
         COALESCE(n.hadir, 0) AS hadir,
         COALESCE(n.izin, 0) AS izin,
         COALESCE(n.sakit, 0) AS sakit,
@@ -83,6 +77,7 @@ $stmt = $conn->prepare("
     LEFT JOIN nilai n ON n.id_siswa = s.id_siswa 
         AND n.id_mapel = j.id_mapel 
         AND n.id_tahun_ajaran = ?
+        AND n.semester = ?
     WHERE j.id_guru = ?
       AND j.id_mapel = ?
     ORDER BY k.nama_kelas ASC, s.nama ASC
@@ -92,7 +87,7 @@ if (!$stmt) {
     kirim_json("error", "Query kehadiran gagal: " . $conn->error);
 }
 
-$stmt->bind_param("siii", $mapelOptions[0], $id_tahun_aktif, $id_guru, $id_mapel_guru);
+$stmt->bind_param("siiii", $mapelOptions[0], $semester, $id_tahun_aktif, $semester, $id_guru, $id_mapel_guru);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -100,24 +95,14 @@ $data = [];
 $kelasOptions = [];
 
 while ($row = $result->fetch_assoc()) {
-    $semesterAngka = (int) $row["semester"];
-
-    if ($semesterAngka === 1) {
-        $semesterText = "Ganjil";
-    } elseif ($semesterAngka === 2) {
-        $semesterText = "Genap";
-    } else {
-        $semesterText = (string) $semesterAngka;
-    }
-
     $kelasOptions[] = $row["nama_kelas"];
-
+    
     $data[] = [
         "id_siswa" => (int) $row["id_siswa"],
         "nama" => $row["nama_siswa"] ?? "-",
         "kelas" => $row["nama_kelas"] ?? "-",
         "mapel" => $row["nama_mapel"] ?? "-",
-        "semester" => $semesterText,
+        "semester" => $semester == 1 ? "Ganjil" : "Genap",
         "hadir" => (int) $row["hadir"],
         "izin" => (int) $row["izin"],
         "sakit" => (int) $row["sakit"],
