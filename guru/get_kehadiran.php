@@ -65,61 +65,37 @@ if (empty($mapelOptions)) {
     ]);
 }
 
-/* AMBIL DATA SISWA + PAKSA MUNCUL 2 SEMESTER (GANJIL & GENAP) */
+/* AMBIL DATA KEHADIRAN - PAKSA MUNCUL 2 SEMESTER TANPA DUPLIKASI */
 $stmt = $conn->prepare("
     SELECT
         s.id_siswa,
         s.nama AS nama_siswa,
         k.nama_kelas,
         ? AS nama_mapel,
-        1 AS semester,
-        COALESCE(n1.hadir, 0) AS hadir,
-        COALESCE(n1.izin, 0) AS izin,
-        COALESCE(n1.sakit, 0) AS sakit,
-        COALESCE(n1.alfa, 0) AS alfa
+        sem.semester,
+        COALESCE(MAX(n.hadir), 0) AS hadir,
+        COALESCE(MAX(n.izin), 0) AS izin,
+        COALESCE(MAX(n.sakit), 0) AS sakit,
+        COALESCE(MAX(n.alfa), 0) AS alfa
     FROM siswa s
     JOIN kelas k ON s.id_kelas = k.id_kelas
     JOIN jadwal j ON j.id_kelas = k.id_kelas
-    LEFT JOIN nilai n1 ON n1.id_siswa = s.id_siswa 
-        AND n1.id_mapel = j.id_mapel 
-        AND n1.id_tahun_ajaran = ?
-        AND n1.semester = 1
+    CROSS JOIN (SELECT 1 AS semester UNION SELECT 2) AS sem
+    LEFT JOIN nilai n ON n.id_siswa = s.id_siswa 
+        AND n.id_mapel = j.id_mapel 
+        AND n.id_tahun_ajaran = ?
+        AND n.semester = sem.semester
     WHERE j.id_guru = ?
       AND j.id_mapel = ?
-    
-    UNION ALL
-    
-    SELECT
-        s.id_siswa,
-        s.nama AS nama_siswa,
-        k.nama_kelas,
-        ? AS nama_mapel,
-        2 AS semester,
-        COALESCE(n2.hadir, 0) AS hadir,
-        COALESCE(n2.izin, 0) AS izin,
-        COALESCE(n2.sakit, 0) AS sakit,
-        COALESCE(n2.alfa, 0) AS alfa
-    FROM siswa s
-    JOIN kelas k ON s.id_kelas = k.id_kelas
-    JOIN jadwal j ON j.id_kelas = k.id_kelas
-    LEFT JOIN nilai n2 ON n2.id_siswa = s.id_siswa 
-        AND n2.id_mapel = j.id_mapel 
-        AND n2.id_tahun_ajaran = ?
-        AND n2.semester = 2
-    WHERE j.id_guru = ?
-      AND j.id_mapel = ?
-    
-    ORDER BY nama_kelas ASC, nama_siswa ASC, semester ASC
+    GROUP BY s.id_siswa, s.nama, k.nama_kelas, sem.semester
+    ORDER BY k.nama_kelas ASC, s.nama ASC, sem.semester ASC
 ");
 
 if (!$stmt) {
     kirim_json("error", "Query kehadiran gagal: " . $conn->error);
 }
 
-$stmt->bind_param("siiisiii", 
-    $mapelOptions[0], $id_tahun_aktif, $id_guru, $id_mapel_guru,
-    $mapelOptions[0], $id_tahun_aktif, $id_guru, $id_mapel_guru
-);
+$stmt->bind_param("siii", $mapelOptions[0], $id_tahun_aktif, $id_guru, $id_mapel_guru);
 $stmt->execute();
 $result = $stmt->get_result();
 
