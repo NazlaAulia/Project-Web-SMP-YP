@@ -1,252 +1,271 @@
 <?php
-header("Content-Type: application/json; charset=utf-8");
-
 require_once "koneksi.php";
-
-function kirim_json($status, $message, $extra = []) {
-    echo json_encode(array_merge([
-        "status" => $status,
-        "message" => $message
-    ], $extra));
-    exit;
-}
 
 $id_guru = isset($_GET["id_guru"]) ? (int) $_GET["id_guru"] : 0;
 $role_id = isset($_GET["role_id"]) ? (int) $_GET["role_id"] : 0;
-
-$mode = $_GET["mode"] ?? "mapel";
+$mode = isset($_GET["mode"]) ? trim($_GET["mode"]) : "mapel";
 $id_kelas = isset($_GET["id_kelas"]) ? (int) $_GET["id_kelas"] : 0;
 
-if ($role_id !== 2) {
-    kirim_json("error", "Akses ditolak. Akun ini bukan guru.");
+if ($role_id !== 2 || $id_guru <= 0) {
+    die("Akses tidak valid.");
 }
 
-if ($id_guru <= 0) {
-    kirim_json("error", "ID guru tidak valid.");
-}
-
-// ========== AMBIL TAHUN AJARAN AKTIF ==========
-$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
-$tahunAktif = $queryTahun->fetch_assoc();
-$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
-
-if ($id_tahun_aktif == 0) {
-    kirim_json("error", "Tidak ada tahun ajaran aktif.");
-}
-
-/* AMBIL DATA GURU */
-$getGuru = $conn->prepare("
-    SELECT 
-        g.id_guru,
-        g.nama,
-        g.id_mapel,
-        m.nama_mapel
-    FROM guru g
-    LEFT JOIN mapel m ON g.id_mapel = m.id_mapel
-    WHERE g.id_guru = ?
-    LIMIT 1
-");
-
-if (!$getGuru) {
-    kirim_json("error", "Query guru gagal: " . $conn->error);
-}
-
-$getGuru->bind_param("i", $id_guru);
-$getGuru->execute();
-$resultGuru = $getGuru->get_result();
-
-if ($resultGuru->num_rows === 0) {
-    kirim_json("error", "Data guru tidak ditemukan.");
-}
-
-$guru = $resultGuru->fetch_assoc();
-$id_mapel_guru = (int) $guru["id_mapel"];
-$nama_mapel_guru = $guru["nama_mapel"] ?? "-";
-
-/* AMBIL KELAS WALI (HANYA TAHUN AJARAN AKTIF) */
-$getWali = $conn->prepare("
-    SELECT 
-        id_kelas,
-        nama_kelas,
-        tingkat
-    FROM kelas
-    WHERE id_wali_kelas = ? AND id_tahun_ajaran = ?
-    ORDER BY tingkat ASC, nama_kelas ASC
-");
-
-if (!$getWali) {
-    kirim_json("error", "Query wali kelas gagal: " . $conn->error);
-}
-
-$getWali->bind_param("ii", $id_guru, $id_tahun_aktif);
-$getWali->execute();
-$resultWali = $getWali->get_result();
-
-$wali_kelas = [];
-while ($row = $resultWali->fetch_assoc()) {
-    $wali_kelas[] = [
-        "id_kelas" => (int) $row["id_kelas"],
-        "nama_kelas" => $row["nama_kelas"],
-        "tingkat" => (int) $row["tingkat"]
-    ];
-}
-
-$is_wali_kelas = count($wali_kelas) > 0;
-
-/* AMBIL KELAS MAPEL YANG DIAJAR GURU (HANYA TAHUN AJARAN AKTIF) */
-$kelas_mapel = [];
-
-$getKelasMapel = $conn->prepare("
-    SELECT DISTINCT
-        k.id_kelas,
-        k.nama_kelas,
-        k.tingkat
-    FROM jadwal j
-    INNER JOIN kelas k ON j.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
-    INNER JOIN guru g ON j.id_guru = g.id_guru
-    WHERE j.id_guru = ?
-      AND j.id_mapel = g.id_mapel
-    ORDER BY k.tingkat ASC, k.nama_kelas ASC
-");
-
-if (!$getKelasMapel) {
-    kirim_json("error", "Query kelas mapel gagal: " . $conn->error);
-}
-
-$getKelasMapel->bind_param("ii", $id_tahun_aktif, $id_guru);
-$getKelasMapel->execute();
-$resultKelasMapel = $getKelasMapel->get_result();
-
-while ($row = $resultKelasMapel->fetch_assoc()) {
-    $kelas_mapel[] = [
-        "id_kelas" => (int) $row["id_kelas"],
-        "nama_kelas" => $row["nama_kelas"],
-        "tingkat" => (int) $row["tingkat"]
-    ];
-}
-
-/* VALIDASI MODE WALI */
-if ($mode === "wali") {
-    if (!$is_wali_kelas) {
-        kirim_json("error", "Guru ini bukan wali kelas.");
-    }
+/*
+|--------------------------------------------------------------------------
+| MODE 1 = GURU MAPEL BIASA
+| - hanya 1 mapel sesuai guru login
+|--------------------------------------------------------------------------
+*/
+if ($mode === "mapel") {
 
     if ($id_kelas <= 0) {
-        $id_kelas = $wali_kelas[0]["id_kelas"];
+        die("Pilih kelas terlebih dahulu.");
     }
 
-    $bolehAksesKelas = false;
-    foreach ($wali_kelas as $kelas) {
-        if ((int) $kelas["id_kelas"] === $id_kelas) {
-            $bolehAksesKelas = true;
-            break;
-        }
-    }
-
-    if (!$bolehAksesKelas) {
-        kirim_json("error", "Anda tidak memiliki akses ke kelas ini.");
-    }
-}
-
-/* QUERY DATA NILAI - HANYA TAHUN AJARAN AKTIF */
-if ($mode === "wali") {
-    // MODE WALI KELAS
-    $stmt = $conn->prepare("
+    $getGuru = $conn->prepare("
         SELECT 
-            s.id_siswa,
-            s.nama AS nama_siswa,
-            s.id_kelas,
-            k.nama_kelas,
-            m.id_mapel,
-            m.nama_mapel,
-            COALESCE(n.semester, 1) AS semester,
-            COALESCE(n.nilai_angka, 0) AS nilai_angka,
-            COALESCE(n.hadir, 0) AS hadir,
-            COALESCE(n.izin, 0) AS izin,
-            COALESCE(n.sakit, 0) AS sakit,
-            COALESCE(n.alfa, 0) AS alfa
-        FROM siswa s
-        INNER JOIN kelas k ON s.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
-        CROSS JOIN mapel m
-        LEFT JOIN nilai n ON n.id_siswa = s.id_siswa 
-            AND n.id_mapel = m.id_mapel 
-            AND n.id_tahun_ajaran = ?
-        WHERE s.id_kelas = ?
-        ORDER BY s.nama ASC, m.id_mapel ASC
+            g.id_mapel,
+            m.nama_mapel
+        FROM guru g
+        LEFT JOIN mapel m ON g.id_mapel = m.id_mapel
+        WHERE g.id_guru = ?
+        LIMIT 1
     ");
 
-    if (!$stmt) {
-        kirim_json("error", "Query wali kelas gagal: " . $conn->error);
+    if (!$getGuru) {
+        die("Query guru gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("iii", $id_tahun_aktif, $id_tahun_aktif, $id_kelas);
-} else {
-    // MODE GURU MAPEL
-    $stmt = $conn->prepare("
+    $getGuru->bind_param("i", $id_guru);
+    $getGuru->execute();
+
+    $resultGuru = $getGuru->get_result();
+
+    if ($resultGuru->num_rows === 0) {
+        die("Data guru tidak ditemukan.");
+    }
+
+    $guru = $resultGuru->fetch_assoc();
+
+    $id_mapel = (int) $guru["id_mapel"];
+    $nama_mapel = $guru["nama_mapel"] ?? "-";
+
+    // ambil nama kelas
+    $getKelas = $conn->prepare("
+        SELECT nama_kelas
+        FROM kelas
+        WHERE id_kelas = ?
+        LIMIT 1
+    ");
+
+    if (!$getKelas) {
+        die("Query kelas gagal: " . $conn->error);
+    }
+
+    $getKelas->bind_param("i", $id_kelas);
+    $getKelas->execute();
+
+    $resultKelas = $getKelas->get_result();
+    $kelas = $resultKelas->fetch_assoc();
+
+    $namaKelas = $kelas["nama_kelas"] ?? "kelas";
+
+    // AMBIL SISWA BERDASARKAN KELAS YANG DIPILIH
+    $getSiswa = $conn->prepare("
         SELECT 
             s.id_siswa,
-            s.nama AS nama_siswa,
-            s.id_kelas,
-            k.nama_kelas,
-            ? AS id_mapel,
-            ? AS nama_mapel,
-            COALESCE(n.semester, 1) AS semester,
-            COALESCE(n.nilai_angka, 0) AS nilai_angka,
-            COALESCE(n.hadir, 0) AS hadir,
-            COALESCE(n.izin, 0) AS izin,
-            COALESCE(n.sakit, 0) AS sakit,
-            COALESCE(n.alfa, 0) AS alfa
+            s.nama AS nama_siswa
         FROM siswa s
-        INNER JOIN kelas k ON s.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
-        LEFT JOIN nilai n ON n.id_siswa = s.id_siswa 
-            AND n.id_mapel = ? 
-            AND n.id_tahun_ajaran = ?
         WHERE s.id_kelas = ?
         ORDER BY s.nama ASC
     ");
 
-    if (!$stmt) {
-        kirim_json("error", "Query nilai mapel gagal: " . $conn->error);
+    if (!$getSiswa) {
+        die("Query siswa gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("isiiii", $id_mapel_guru, $nama_mapel_guru, $id_tahun_aktif, $id_mapel_guru, $id_tahun_aktif, $id_kelas);
+    $getSiswa->bind_param("i", $id_kelas);
+    $getSiswa->execute();
+
+    $resultSiswa = $getSiswa->get_result();
+
+    $filename = "template_import_nilai_" . preg_replace('/[^a-zA-Z0-9]/', '_', $namaKelas) . ".csv";
+
+    header("Content-Type: text/csv; charset=utf-8");
+    header("Content-Disposition: attachment; filename=\"$filename\"");
+
+    $output = fopen("php://output", "w");
+
+    fwrite($output, "\xEF\xBB\xBF");
+
+    fputcsv($output, ["sep=,"]);
+
+    fputcsv($output, [
+        "id_siswa",
+        "nama_siswa",
+        "id_mapel",
+        "nama_mapel",
+        "semester",
+        "nilai_angka",
+        "hadir",
+        "izin",
+        "sakit",
+        "alfa"
+    ]);
+
+    while ($siswa = $resultSiswa->fetch_assoc()) {
+
+        fputcsv($output, [
+            $siswa["id_siswa"],
+            $siswa["nama_siswa"],
+            $id_mapel,
+            $nama_mapel,
+            1,
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]);
+
+    }
+
+    fclose($output);
+    exit;
 }
 
-$stmt->execute();
-$result = $stmt->get_result();
+/*
+|--------------------------------------------------------------------------
+| MODE 2 = WALI KELAS
+| - biarkan seperti sebelumnya
+|--------------------------------------------------------------------------
+*/
+if ($mode === "wali") {
 
-$data = [];
-while ($row = $result->fetch_assoc()) {
-    $semesterAngka = (int) $row["semester"];
-    
-    $data[] = [
-        "id_siswa" => (int) $row["id_siswa"],
-        "nama_siswa" => $row["nama_siswa"] ?? "-",
-        "id_kelas" => (int) ($row["id_kelas"] ?? 0),
-        "nama_kelas" => $row["nama_kelas"] ?? "-",
-        "id_mapel" => (int) $row["id_mapel"],
-        "nama_mapel" => $row["nama_mapel"] ?? "-",
-        "semester" => $semesterAngka,
-        "semester_text" => $semesterAngka === 1 ? "Ganjil" : "Genap",
-        "nilai_angka" => (int) ($row["nilai_angka"] ?? 0),
-        "hadir" => (int) ($row["hadir"] ?? 0),
-        "izin" => (int) ($row["izin"] ?? 0),
-        "sakit" => (int) ($row["sakit"] ?? 0),
-        "alfa" => (int) ($row["alfa"] ?? 0)
+    if ($id_kelas <= 0) {
+        die("ID kelas tidak valid.");
+    }
+
+    $cekWali = $conn->prepare("
+        SELECT 
+            k.id_kelas,
+            k.nama_kelas
+        FROM kelas k
+        WHERE k.id_kelas = ? AND k.id_wali_kelas = ?
+        LIMIT 1
+    ");
+
+    if (!$cekWali) {
+        die("Query wali kelas gagal: " . $conn->error);
+    }
+
+    $cekWali->bind_param("ii", $id_kelas, $id_guru);
+    $cekWali->execute();
+
+    $resultWali = $cekWali->get_result();
+
+    if ($resultWali->num_rows === 0) {
+        die("Anda bukan wali kelas untuk kelas ini.");
+    }
+
+    $kelas = $resultWali->fetch_assoc();
+
+    $getMapel = $conn->prepare("
+        SELECT 
+            id_mapel,
+            nama_mapel
+        FROM mapel
+        ORDER BY id_mapel ASC
+    ");
+
+    if (!$getMapel) {
+        die("Query mapel gagal: " . $conn->error);
+    }
+
+    $getMapel->execute();
+
+    $resultMapel = $getMapel->get_result();
+
+    $daftarMapel = [];
+
+    while ($mapel = $resultMapel->fetch_assoc()) {
+
+        $daftarMapel[] = [
+            "id_mapel" => (int) $mapel["id_mapel"],
+            "nama_mapel" => $mapel["nama_mapel"]
+        ];
+
+    }
+
+    $getSiswa = $conn->prepare("
+        SELECT 
+            s.id_siswa,
+            s.nama AS nama_siswa
+        FROM siswa s
+        WHERE s.id_kelas = ?
+        ORDER BY s.nama ASC
+    ");
+
+    if (!$getSiswa) {
+        die("Query siswa kelas gagal: " . $conn->error);
+    }
+
+    $getSiswa->bind_param("i", $id_kelas);
+    $getSiswa->execute();
+
+    $resultSiswa = $getSiswa->get_result();
+
+    $filename = "template_import_nilai_wali_" . preg_replace('/[^a-zA-Z0-9]/', '_', $kelas["nama_kelas"]) . ".csv";
+
+    header("Content-Type: text/csv; charset=utf-8");
+    header("Content-Disposition: attachment; filename=\"$filename\"");
+
+    $output = fopen("php://output", "w");
+
+    fwrite($output, "\xEF\xBB\xBF");
+
+    fputcsv($output, ["sep=,"]);
+
+    $header = [
+        "id_siswa",
+        "nama_siswa",
+        "semester"
     ];
+
+    foreach ($daftarMapel as $mapel) {
+        $header[] = $mapel["nama_mapel"];
+    }
+
+    $header[] = "hadir";
+    $header[] = "izin";
+    $header[] = "sakit";
+    $header[] = "alfa";
+
+    fputcsv($output, $header);
+
+    while ($siswa = $resultSiswa->fetch_assoc()) {
+
+        $row = [
+            $siswa["id_siswa"],
+            $siswa["nama_siswa"],
+            1
+        ];
+
+        foreach ($daftarMapel as $mapel) {
+            $row[] = "";
+        }
+
+        $row[] = "";
+        $row[] = "";
+        $row[] = "";
+        $row[] = "";
+
+        fputcsv($output, $row);
+    }
+
+    fclose($output);
+    exit;
 }
 
-kirim_json("success", "Data nilai berhasil dimuat.", [
-    "mode" => $mode,
-    "guru" => [
-        "id_guru" => (int) $guru["id_guru"],
-        "nama" => $guru["nama"],
-        "id_mapel" => $id_mapel_guru,
-        "nama_mapel" => $nama_mapel_guru
-    ],
-    "is_wali_kelas" => $is_wali_kelas,
-    "wali_kelas" => $wali_kelas,
-    "kelas_mapel" => $kelas_mapel,
-    "data" => $data
-]);
+die("Mode template tidak dikenali.");
 ?>
