@@ -49,26 +49,27 @@ if ($conn->connect_error) {
 
 $conn->set_charset("utf8mb4");
 
-// 4. Ambil session login siswa
-session_start();
+// 4. Ambil session login siswa (FLEKSIBEL)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $id_siswa = 0;
 
-if (isset($_SESSION['id_siswa'])) {
+// Cek dari session id_siswa
+if (isset($_SESSION['id_siswa']) && $_SESSION['id_siswa'] > 0) {
     $id_siswa = (int)$_SESSION['id_siswa'];
 }
-
-if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
+// Cek dari session id_user
+elseif (isset($_SESSION['id_user']) && $_SESSION['id_user'] > 0) {
     $id_user = (int)$_SESSION['id_user'];
     
     $sqlUser = "SELECT id_siswa FROM user WHERE id_user = ? LIMIT 1";
     $stmtUser = $conn->prepare($sqlUser);
-    
     if ($stmtUser) {
         $stmtUser->bind_param("i", $id_user);
         $stmtUser->execute();
         $stmtUser->store_result();
-        
         if ($stmtUser->num_rows > 0) {
             $stmtUser->bind_result($hasil_id_siswa);
             $stmtUser->fetch();
@@ -80,11 +81,56 @@ if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
         $stmtUser->close();
     }
 }
+// Cek dari session nisn
+elseif (isset($_SESSION['nisn']) && !empty($_SESSION['nisn'])) {
+    $nisn = $_SESSION['nisn'];
+    
+    $sqlSiswaByNisn = "SELECT id_siswa FROM siswa WHERE nisn = ? LIMIT 1";
+    $stmtSiswa = $conn->prepare($sqlSiswaByNisn);
+    if ($stmtSiswa) {
+        $stmtSiswa->bind_param("s", $nisn);
+        $stmtSiswa->execute();
+        $stmtSiswa->store_result();
+        if ($stmtSiswa->num_rows > 0) {
+            $stmtSiswa->bind_result($hasil_id_siswa);
+            $stmtSiswa->fetch();
+            if (!empty($hasil_id_siswa)) {
+                $id_siswa = (int)$hasil_id_siswa;
+                $_SESSION['id_siswa'] = $id_siswa;
+            }
+        }
+        $stmtSiswa->close();
+    }
+}
+// Cek dari session username
+elseif (isset($_SESSION['username']) && !empty($_SESSION['username'])) {
+    $username = $_SESSION['username'];
+    
+    $sqlUserByUsername = "SELECT u.id_user, u.id_siswa 
+                          FROM user u 
+                          WHERE u.username = ? LIMIT 1";
+    $stmtUser = $conn->prepare($sqlUserByUsername);
+    if ($stmtUser) {
+        $stmtUser->bind_param("s", $username);
+        $stmtUser->execute();
+        $stmtUser->store_result();
+        if ($stmtUser->num_rows > 0) {
+            $stmtUser->bind_result($id_user, $id_siswa_direct);
+            $stmtUser->fetch();
+            if (!empty($id_siswa_direct)) {
+                $id_siswa = (int)$id_siswa_direct;
+                $_SESSION['id_siswa'] = $id_siswa;
+            }
+        }
+        $stmtUser->close();
+    }
+}
 
 if ($id_siswa <= 0) {
     echo json_encode([
         'success' => false,
-        'message' => 'Silakan login terlebih dahulu. Session tidak ditemukan.'
+        'message' => 'Silakan login terlebih dahulu. Session tidak ditemukan.',
+        'debug_session_keys' => array_keys($_SESSION)
     ]);
     $conn->close();
     exit;
