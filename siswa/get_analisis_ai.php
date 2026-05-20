@@ -91,7 +91,7 @@ if ($id_siswa <= 0) {
 }
 
 // 5. Ambil data siswa
-$sqlSiswa = "SELECT s.id_siswa, s.nama, s.nisn, s.id_kelas, k.nama_kelas
+$sqlSiswa = "SELECT s.id_siswa, s.nama, s.nisn, s.id_kelas, k.nama_kelas, s.id_tahun_ajaran
              FROM siswa s
              LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
              WHERE s.id_siswa = ?
@@ -116,51 +116,127 @@ if (!$siswa) {
 $nama_siswa = $siswa['nama'];
 $nisn = $siswa['nisn'];
 $id_kelas = $siswa['id_kelas'];
+$kelas_siswa = $siswa['nama_kelas'] ?? 'SMP';
+$id_tahun_ajaran = $siswa['id_tahun_ajaran'];
 $stmt->close();
 
-// 6. Ambil data nilai siswa
-$queryNilai = "SELECT m.nama_mapel, AVG(n.nilai_angka) as rata_rata 
+// 5.5 Ambil tahun ajaran
+$sqlTahun = "SELECT tahun_ajaran FROM tahun_ajaran WHERE id_tahun_ajaran = ?";
+$stmtTahun = $conn->prepare($sqlTahun);
+$stmtTahun->bind_param("i", $id_tahun_ajaran);
+$stmtTahun->execute();
+$resultTahun = $stmtTahun->get_result();
+$tahun_ajaran_data = $resultTahun->fetch_assoc();
+$tahun_ajaran = $tahun_ajaran_data['tahun_ajaran'] ?? '2024/2025';
+$stmtTahun->close();
+
+// 6. Ambil data nilai siswa per semester (untuk analisis growth)
+$queryNilai = "SELECT 
+                    m.id_mapel,
+                    m.nama_mapel,
+                    n.semester,
+                    AVG(n.nilai_angka) as rata_rata
                FROM nilai n 
                JOIN mapel m ON n.id_mapel = m.id_mapel 
                WHERE n.id_siswa = ? 
-               GROUP BY m.id_mapel 
-               ORDER BY rata_rata ASC";
+               GROUP BY m.id_mapel, n.semester
+               ORDER BY m.id_mapel, n.semester ASC";
 
 $stmt = $conn->prepare($queryNilai);
 $stmt->bind_param("i", $id_siswa);
 $stmt->execute();
-$result = $stmt->get_result();
+$resultNilai = $stmt->get_result();
 
-$semua_nilai = [];
+// Susun data nilai per mapel per semester
+$nilai_per_mapel = [];
+while ($row = $resultNilai->fetch_assoc()) {
+    $id_mapel = $row['id_mapel'];
+    $semester = $row['semester'];
+    $rata = round($row['rata_rata'], 2);
+    
+    if (!isset($nilai_per_mapel[$id_mapel])) {
+        $nilai_per_mapel[$id_mapel] = [
+            'nama_mapel' => $row['nama_mapel'],
+            'semester_1' => null,
+            'semester_2' => null
+        ];
+    }
+    
+    if ($semester == 1) {
+        $nilai_per_mapel[$id_mapel]['semester_1'] = $rata;
+    } else {
+        $nilai_per_mapel[$id_mapel]['semester_2'] = $rata;
+    }
+}
+$stmt->close();
+
+// 7. Ambil CP dari database
+$queryCP = "SELECT cp.id_mapel, m.nama_mapel, cp.elemen, cp.deskripsi_cp, cp.level_kognitif
+            FROM capaian_pembelajaran cp
+            JOIN mapel m ON cp.id_mapel = m.id_mapel
+            WHERE cp.fase = 'D'
+            ORDER BY cp.id_mapel, cp.id_cp";
+
+$resultCP = $conn->query($queryCP);
+$cp_per_mapel = [];
+while ($row = $resultCP->fetch_assoc()) {
+    $id = $row['id_mapel'];
+    if (!isset($cp_per_mapel[$id])) {
+        $cp_per_mapel[$id] = [
+            'nama_mapel' => $row['nama_mapel'],
+            'cp_list' => []
+        ];
+    }
+    $cp_per_mapel[$id]['cp_list'][] = [
+        'elemen' => $row['elemen'],
+        'deskripsi' => $row['deskripsi_cp'],
+        'level' => $row['level_kognitif']
+    ];
+}
+
+// 8. Gabungkan data untuk AI
+$data_analisis = [];
 $mapel_terendah = '';
 $nilai_terendah = 100;
 
-while ($row = $result->fetch_assoc()) {
-    $rata = round($row['rata_rata'], 2);
-    $semua_nilai[] = [
-        'nama_mapel' => $row['nama_mapel'],
-        'rata_rata' => $rata
-    ];
+foreach ($nilai_per_mapel as $id_mapel => $nilai) {
+    $nilai_s1 = $nilai['semester_1'];
+    $nilai_s2 = $nilai['semester_2'];
+    $nilai_akhir = $nilai_s2 ?? $nilai_s1 ?? 0;
     
-    if ($rata < $nilai_terendah) {
-        $nilai_terendah = $rata;
-        $mapel_terendah = $row['nama_mapel'];
+    // Hitung growth
+    $growth = null;
+    $trend_text = '';
+    if ($nilai_s1 !== null && $nilai_s2 !== null) {
+        $growth = $nilai_s2 - $nilai_s1;
+        if ($growth > 0) {
+            $trend_text = "naik " . abs($growth) . " poin";
+        } elseif ($growth < 0) {
+            $trend_text = "turun " . abs($growth) . " poin";
+        } else {
+            $trend_text = "stabil";
+        }
     }
+    
+    // Cari mapel terendah (berdasarkan nilai semester terbaru)
+    if ($nilai_akhir < $nilai_terendah && $nilai_akhir > 0) {
+        $nilai_terendah = $nilai_akhir;
+        $mapel_terendah = $nilai['nama_mapel'];
+    }
+    
+    $data_analisis[] = [
+        'id_mapel' => $id_mapel,
+        'nama_mapel' => $nilai['nama_mapel'],
+        'nilai_semester_1' => $nilai_s1,
+        'nilai_semester_2' => $nilai_s2,
+        'nilai_akhir' => $nilai_akhir,
+        'growth' => $growth,
+        'trend_text' => $trend_text,
+        'cp_daftar' => $cp_per_mapel[$id_mapel]['cp_list'] ?? []
+    ];
 }
 
-if (empty($semua_nilai)) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Belum ada data nilai untuk siswa ini.'
-    ]);
-    $stmt->close();
-    $conn->close();
-    exit;
-}
-
-$stmt->close();
-
-// 7. Siapkan prompt untuk Gemini API - GURU NETRAL
+// 9. Siapkan prompt untuk Gemini API
 $prompt = "Kamu adalah seorang GURU SMP YP 17 Surabaya yang sedang memberikan masukan pribadi ke muridmu. Kamu bisa laki-laki atau perempuan, jadi gunakan sapaan 'Saya' atau 'Guru' saja.
 
 PENTING: 
@@ -170,39 +246,78 @@ PENTING:
 - JANGAN sebut 'Ibu' atau 'Bapak' - cukup pakai 'Saya' atau 'Guru'
 
 Gunakan bahasa Indonesia yang hangat, penuh perhatian, seperti seorang guru yang peduli dengan muridnya.
-Bicaralah secara personal, seolah-olah sedang berbicara langsung dengan murid bernama $nama_siswa.
 
-Data nilai murid:
+Data siswa:
 Nama: $nama_siswa
+Kelas: $kelas_siswa
+Tahun Ajaran: $tahun_ajaran
 
-Nilai per mata pelajaran:\n";
+Berikut adalah nilai dan perkembangan siswa per mata pelajaran:\n\n";
 
-foreach ($semua_nilai as $mapel) {
-    $prompt .= "- {$mapel['nama_mapel']}: {$mapel['rata_rata']}\n";
+foreach ($data_analisis as $mapel) {
+    $prompt .= "=== {$mapel['nama_mapel']} ===\n";
+    
+    if ($mapel['nilai_semester_1'] !== null) {
+        $prompt .= "Nilai Semester 1: {$mapel['nilai_semester_1']}\n";
+    }
+    if ($mapel['nilai_semester_2'] !== null) {
+        $prompt .= "Nilai Semester 2: {$mapel['nilai_semester_2']}\n";
+    }
+    if ($mapel['growth'] !== null) {
+        $prompt .= "Perkembangan: {$mapel['trend_text']}\n";
+    }
+    
+    $prompt .= "\nCapaian Pembelajaran (CP) yang harus dikuasai di kelas ini:\n";
+    if (!empty($mapel['cp_daftar'])) {
+        foreach ($mapel['cp_daftar'] as $cp) {
+            $prompt .= "  - {$cp['elemen']}: {$cp['deskripsi']}\n";
+        }
+    } else {
+        $prompt .= "  - (Belum ada data CP untuk mapel ini)\n";
+    }
+    $prompt .= "\n";
 }
 
-$rata_keseluruhan = array_sum(array_column($semua_nilai, 'rata_rata')) / count($semua_nilai);
-$prompt .= "\nRata-rata keseluruhan: " . round($rata_keseluruhan, 1) . "\n";
-$prompt .= "Mapel terendah: $mapel_terendah (nilai: $nilai_terendah)\n\n";
+$rata_keseluruhan = 0;
+$total_nilai = 0;
+$jumlah_mapel = 0;
+foreach ($data_analisis as $mapel) {
+    if ($mapel['nilai_akhir'] > 0) {
+        $total_nilai += $mapel['nilai_akhir'];
+        $jumlah_mapel++;
+    }
+}
+if ($jumlah_mapel > 0) {
+    $rata_keseluruhan = round($total_nilai / $jumlah_mapel, 1);
+}
 
-$prompt .= "Tugasmu:
-Tulis pesan pribadi untuk murid ini dalam 4 paragraf:
+$prompt .= "=== RINGKASAN ===\n";
+$prompt .= "Rata-rata keseluruhan: $rata_keseluruhan\n";
+$prompt .= "Mapel dengan nilai terendah: $mapel_terendah ($nilai_terendah)\n\n";
 
-Paragraf 1: Berikan apresiasi tulus atas prestasi yang sudah diraih (tunjukkan bahwa guru bangga)
-Paragraf 2: Bahas mata pelajaran yang terendah dengan nada sabar, jelaskan kemungkinan penyebabnya
-Paragraf 3: Berikan saran konkret yang bisa dilakukan (minimal 3 poin, seperti guru memberi arahan)
-Paragraf 4: Tutup dengan kata-kata motivasi dan harapan untuk masa depan murid
+$prompt .= "TUGASMU:
+Buat analisis untuk siswa ini dengan memperhatikan PERKEMBANGAN (growth) dari semester 1 ke semester 2.
+
+Untuk SETIAP mata pelajaran, berikan analisis singkat dengan format:
+
+[MAPEL]: [analisis]
+
+Dalam analisis per mapel, sebutkan:
+1. Apresiasi jika nilai naik/membaik, atau semangat jika nilai turun
+2. CP mana yang sudah dikuasai dengan baik (jika nilai bagus)
+3. CP mana yang perlu ditingkatkan (jika nilai masih kurang atau turun)
+
+Setelah semua mapel, berikan 1 paragraf kesimpulan dan motivasi.
 
 Aturan:
-- Gunakan sapaan 'Nak' atau langsung panggil nama
+- Gunakan sapaan 'Nak $nama_siswa' di awal
 - JANGAN pakai 'Ibu Guru' atau 'Bapak Guru' - cukup 'Saya' atau 'Guru'
 - Tulis seperti guru sungguhan yang sedang berbicara dengan muridnya
 - Jangan pakai kata 'AI', 'bot', 'asisten', 'teknologi'
 - Jangan pakai emoji atau simbol aneh
-- Maksimal 500 kata
 - Langsung tulis pesannya tanpa kata pengantar";
 
-// 8. Fungsi untuk memanggil Gemini API dengan model tertentu
+// 10. Fungsi untuk memanggil Gemini API dengan model tertentu
 function callGeminiAPI($api_key, $prompt, $model) {
     $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
     
@@ -216,7 +331,7 @@ function callGeminiAPI($api_key, $prompt, $model) {
         ],
         "generationConfig" => [
             "temperature" => 0.7,
-            "maxOutputTokens" => 2048,
+            "maxOutputTokens" => 4096,
             "topP" => 0.95,
             "topK" => 40
         ]
@@ -255,7 +370,7 @@ function callGeminiAPI($api_key, $prompt, $model) {
     return ['success' => true, 'response' => $gemini_data['candidates'][0]['content']['parts'][0]['text']];
 }
 
-// 9. Daftar model yang akan dicoba secara berurutan
+// 11. Daftar model yang akan dicoba secara berurutan
 $models = [
     'gemini-2.0-flash',
     'gemini-2.0-flash-lite',
@@ -280,55 +395,78 @@ foreach ($models as $model) {
     }
 }
 
-// 10. Jika semua model gagal, pakai fallback
+// 12. Jika semua model gagal, pakai fallback
 if ($ai_response === null) {
-    $fallback_response = generateFallbackResponse($nama_siswa, $semua_nilai, $mapel_terendah, $nilai_terendah);
+    $fallback_response = generateFallbackResponse($nama_siswa, $data_analisis, $mapel_terendah, $nilai_terendah, $rata_keseluruhan);
     
     echo json_encode([
         'success' => true,
         'data' => [
-            'semua_nilai' => $semua_nilai,
-            'mapel_terendah' => $mapel_terendah,
-            'nilai_terendah' => $nilai_terendah,
-            'ai_response' => $fallback_response
+            'siswa' => $nama_siswa,
+            'kelas' => $kelas_siswa,
+            'tahun_ajaran' => $tahun_ajaran,
+            'rata_keseluruhan' => $rata_keseluruhan,
+            'data_analisis' => $data_analisis,
+            'ai_response' => $fallback_response,
+            'note' => 'Mode offline (AI tidak dapat dihubungi)'
         ]
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-// Kirim respons sukses (TANPA note AI Online)
+// Kirim respons sukses
 echo json_encode([
     'success' => true,
     'data' => [
-        'semua_nilai' => $semua_nilai,
-        'mapel_terendah' => $mapel_terendah,
-        'nilai_terendah' => $nilai_terendah,
+        'siswa' => $nama_siswa,
+        'kelas' => $kelas_siswa,
+        'tahun_ajaran' => $tahun_ajaran,
+        'rata_keseluruhan' => $rata_keseluruhan,
+        'data_analisis' => $data_analisis,
         'ai_response' => $ai_response
     ]
 ], JSON_UNESCAPED_UNICODE);
 
 $conn->close();
 
-// 11. Fungsi fallback (gaya guru netral)
-function generateFallbackResponse($nama, $nilaiList, $mapelTerendah, $nilaiTerendah) {
-    $rataSemua = array_sum(array_column($nilaiList, 'rata_rata')) / count($nilaiList);
-    
+// 13. Fungsi fallback (gaya guru netral)
+function generateFallbackResponse($nama, $dataAnalisis, $mapelTerendah, $nilaiTerendah, $rataKeseluruhan) {
     $response = "Nak $nama,\n\n";
-    $response .= "Saya sangat bangga melihat prestasi yang telah kamu raih. ";
-    $response .= "Rata-rata nilai " . round($rataSemua, 1) . " adalah pencapaian yang luar biasa.\n\n";
+    $response .= "Saya sudah melihat perkembangan belajarmu di Tahun Ajaran ini.\n\n";
+    $response .= "Rata-rata nilai keseluruhanmu adalah $rataKeseluruhan. ";
     
-    if ($rataSemua >= 85) {
-        $response .= "Selamat ya, Nak! Kamu telah menunjukkan kerja keras yang membuahkan hasil membanggakan. Terus pertahankan semangat belajarmu!\n\n";
-    } elseif ($rataSemua >= 70) {
-        $response .= "Bagus sekali, Nak! Kamu sudah berada di jalur yang tepat. Masih ada sedikit ruang untuk lebih baik lagi.\n\n";
+    if ($rataKeseluruhan >= 85) {
+        $response .= "Prestasi yang sangat membanggakan! Saya bangga dengan kerja kerasmu.\n\n";
+    } elseif ($rataKeseluruhan >= 70) {
+        $response .= "Hasil yang cukup baik. Masih ada ruang untuk lebih baik lagi.\n\n";
     } else {
-        $response .= "Jangan menyerah ya, Nak. Setiap orang punya proses belajarnya masing-masing. Saya yakin kamu pasti bisa!\n\n";
+        $response .= "Jangan menyerah ya, Nak. Saya yakin kamu bisa lebih baik.\n\n";
     }
     
-    $response .= "Untuk mata pelajaran $mapelTerendah yang nilainya $nilaiTerendah, coba beberapa tips ini:\n";
-    $response .= "1. Luangkan waktu 30 menit setiap hari khusus belajar $mapelTerendah\n";
-    $response .= "2. Catat materi yang terasa sulit, lalu tanyakan ke guru\n";
-    $response .= "3. Belajar bersama teman yang lebih paham\n\n";
+    $response .= "Berdasarkan nilai dan Capaian Pembelajaran (CP), berikut catatan saya:\n\n";
+    
+    foreach ($dataAnalisis as $mapel) {
+        $response .= "📖 {$mapel['nama_mapel']}\n";
+        if ($mapel['nilai_semester_1'] !== null && $mapel['nilai_semester_2'] !== null) {
+            $response .= "   Perkembangan: {$mapel['trend_text']} (S1: {$mapel['nilai_semester_1']} → S2: {$mapel['nilai_semester_2']})\n";
+        } elseif ($mapel['nilai_akhir'] > 0) {
+            $response .= "   Nilai: {$mapel['nilai_akhir']}\n";
+        }
+        
+        if (!empty($mapel['cp_daftar'])) {
+            $response .= "   CP yang perlu diperhatikan:\n";
+            foreach ($mapel['cp_daftar'] as $cp) {
+                $response .= "      - {$cp['elemen']}\n";
+            }
+        }
+        $response .= "\n";
+    }
+    
+    $response .= "🎯 Fokus utama: $mapelTerendah (nilai: $nilaiTerendah)\n\n";
+    $response .= "💡 Saran untuk $mapelTerendah:\n";
+    $response .= "   - Luangkan waktu 30 menit setiap hari khusus belajar mapel ini\n";
+    $response .= "   - Catat materi yang terasa sulit, lalu tanyakan ke guru\n";
+    $response .= "   - Belajar bersama teman yang lebih paham\n\n";
     
     $response .= "Tetap semangat, Nak $nama! Masa depan cerah menantimu. Saya selalu mendukungmu.";
     
