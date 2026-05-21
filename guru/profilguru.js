@@ -19,7 +19,7 @@ const roleIdLogin = localStorage.getItem("role_id");
 
 let fileFotoDipilih = null;
 
-// ========== FUNGSI MODAL SEDERHANA ==========
+// ========== FUNGSI MODAL ==========
 function showMessage(title, message, type) {
     return Swal.fire({
         title: title,
@@ -31,9 +31,7 @@ function showMessage(title, message, type) {
 }
 
 // ========== LOADING ==========
-let swalLoading = null;
-
-function showLoading(show, text = "Menyimpan data...") {
+function showLoading(show, text = "Mengupload foto...") {
     if (show) {
         Swal.fire({
             title: text,
@@ -71,8 +69,12 @@ function isiProfilGuru(guru) {
     if (jenisKelaminGuruInput) jenisKelaminGuruInput.value = jenisKelamin;
     if (usernameGuruInput) usernameGuruInput.value = username;
 
+    // Tambahkan cache buster pada foto
     if (previewFoto && guru.foto_profil) {
-        previewFoto.src = guru.foto_profil;
+        const fotoUrl = guru.foto_profil;
+        // Tambahkan timestamp agar tidak cache
+        const cacheBuster = "?t=" + new Date().getTime();
+        previewFoto.src = fotoUrl + cacheBuster;
     }
 }
 
@@ -84,7 +86,7 @@ if (!idGuruLogin || roleIdLogin !== "2") {
 } else {
     showLoading(true, "Memuat data profil...");
     
-    fetch(`get_guru.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
+    fetch(`get_guru.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&t=${new Date().getTime()}`)
         .then(res => res.json())
         .then(result => {
             showLoading(false);
@@ -118,13 +120,15 @@ if (uploadFoto && previewFoto) {
         }
 
         if (file.size > 1 * 1024 * 1024) {
-            showMessage("Error", "Ukuran foto maksimal 1 MB. Silakan kompres foto Anda terlebih dahulu.", "error");
+            showMessage("Error", "Ukuran foto maksimal 1 MB.", "error");
             this.value = "";
             return;
         }
 
         fileFotoDipilih = file;
-        previewFoto.src = URL.createObjectURL(file);
+        // Preview dengan cache buster
+        const previewUrl = URL.createObjectURL(file);
+        previewFoto.src = previewUrl;
         showMessage("Berhasil", "Foto berhasil dipilih. Klik Simpan Perubahan.", "success");
     });
 }
@@ -133,7 +137,7 @@ if (uploadFoto && previewFoto) {
 if (btnSimpanProfil) {
     btnSimpanProfil.addEventListener("click", async function () {
         if (!fileFotoDipilih) {
-            showMessage("Peringatan", "Silakan pilih foto terlebih dahulu dengan mengklik 'Ubah Foto'.", "warning");
+            showMessage("Peringatan", "Silakan pilih foto terlebih dahulu.", "warning");
             return;
         }
 
@@ -145,9 +149,8 @@ if (btnSimpanProfil) {
             formDataFoto.append("role_id", roleIdLogin);
             formDataFoto.append("foto", fileFotoDipilih);
 
-            // Set timeout 15 detik
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000);
+            const timeoutId = setTimeout(() => controller.abort(), 20000);
 
             const fotoResponse = await fetch("update_foto_guru.php", {
                 method: "POST",
@@ -163,8 +166,19 @@ if (btnSimpanProfil) {
 
             if (fotoResult.status === "success") {
                 fileFotoDipilih = null;
+                
+                // Reset input file
+                uploadFoto.value = "";
+                
+                // Update foto dengan cache buster
+                if (fotoResult.foto_url) {
+                    previewFoto.src = fotoResult.foto_url;
+                }
+                
                 await showMessage("Berhasil!", "Foto profil berhasil diubah!", "success");
-                location.reload();
+                
+                // Reload paksa dengan cache buster
+                window.location.href = window.location.href.split('?')[0] + "?t=" + new Date().getTime();
             } else {
                 await showMessage("Gagal", fotoResult.message, "error");
             }
@@ -172,7 +186,7 @@ if (btnSimpanProfil) {
             showLoading(false);
             
             if (err.name === "AbortError") {
-                await showMessage("Timeout", "Proses terlalu lama. Silakan coba lagi dengan foto yang lebih kecil (max 1MB).", "error");
+                await showMessage("Timeout", "Proses terlalu lama. Silakan coba lagi.", "error");
             } else {
                 console.error("Error:", err);
                 await showMessage("Error", "Terjadi kesalahan saat menyimpan foto.", "error");
