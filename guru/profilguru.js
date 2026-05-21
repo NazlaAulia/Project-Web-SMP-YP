@@ -164,13 +164,24 @@ if (btnSimpanProfil) {
             formDataFoto.append("role_id", roleIdLogin);
             formDataFoto.append("foto", fileFotoDipilih);
 
+            // Set timeout 10 detik
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+
             const fotoResponse = await fetch("update_foto_guru.php", {
                 method: "POST",
-                body: formDataFoto
+                body: formDataFoto,
+                signal: controller.signal
             });
+            
+            clearTimeout(timeoutId);
+            
             const fotoResult = await fotoResponse.json();
 
             console.log("Response update_foto_guru:", fotoResult);
+
+            // TUTUP LOADING DULU sebelum show modal
+            showLoading(false);
 
             if (fotoResult.status === "success") {
                 fileFotoDipilih = null;
@@ -180,10 +191,15 @@ if (btnSimpanProfil) {
                 await showModal(fotoResult.message, "error");
             }
         } catch (err) {
-            console.error("Error:", err);
-            await showModal("Terjadi kesalahan saat menyimpan foto.", "error");
-        } finally {
+            // TUTUP LOADING jika error
             showLoading(false);
+            
+            if (err.name === "AbortError") {
+                await showModal("Proses terlalu lama. Silakan coba lagi.", "error");
+            } else {
+                console.error("Error:", err);
+                await showModal("Terjadi kesalahan saat menyimpan foto.", "error");
+            }
         }
     });
 }
