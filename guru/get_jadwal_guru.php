@@ -29,11 +29,9 @@ $stmtGuru = $conn->prepare("
     WHERE id_guru = ?
     LIMIT 1
 ");
-
 if (!$stmtGuru) {
     kirim_json("error", "Query guru gagal: " . $conn->error);
 }
-
 $stmtGuru->bind_param("i", $id_guru);
 $stmtGuru->execute();
 $resultGuru = $stmtGuru->get_result();
@@ -44,6 +42,16 @@ if (!$guru) {
     kirim_json("error", "Data guru tidak ditemukan.");
 }
 
+// Ambil tahun ajaran aktif
+$tahunAktifQuery = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+$tahunAktif = $tahunAktifQuery->fetch_assoc();
+$id_tahun_ajaran_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+
+if ($id_tahun_ajaran_aktif == 0) {
+    kirim_json("error", "Tahun ajaran aktif tidak ditemukan.");
+}
+
+// Query dengan filter tahun ajaran aktif dan hanya status 'fix' (opsional)
 $stmt = $conn->prepare("
     SELECT 
         j.id_jadwal,
@@ -64,6 +72,8 @@ $stmt = $conn->prepare("
     LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
     LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
     WHERE j.id_guru = ?
+      AND j.id_tahun_ajaran = ?
+      AND j.status = 'fix'   -- jika hanya ingin jadwal tetap; hapus baris ini jika ingin draft juga
     ORDER BY 
         FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'),
         COALESCE(j.jp_mulai, 0),
@@ -74,16 +84,11 @@ if (!$stmt) {
     kirim_json("error", "Query jadwal gagal: " . $conn->error);
 }
 
-$stmt->bind_param("i", $id_guru);
-
-if (!$stmt->execute()) {
-    kirim_json("error", "Jadwal guru gagal diproses.");
-}
-
+$stmt->bind_param("ii", $id_guru, $id_tahun_ajaran_aktif);
+$stmt->execute();
 $result = $stmt->get_result();
 
 $jadwal = [];
-
 while ($row = $result->fetch_assoc()) {
     $jadwal[] = [
         "id_jadwal" => (int)$row["id_jadwal"],
@@ -109,4 +114,3 @@ kirim_json("success", "Jadwal guru berhasil diambil.", [
     "guru" => $guru,
     "data" => $jadwal
 ]);
-?>
