@@ -49,17 +49,12 @@ $conn->set_charset("utf8mb4");
 // ==============================================
 $id_siswa = 0;
 
-// 1. Dari GET (dikirim JavaScript dari localStorage)
 if (isset($_GET['id_siswa'])) {
     $id_siswa = (int)$_GET['id_siswa'];
 }
-
-// 2. Dari session id_siswa
 if ($id_siswa <= 0 && isset($_SESSION['id_siswa'])) {
     $id_siswa = (int)$_SESSION['id_siswa'];
 }
-
-// 3. Dari session id_user (cari ke tabel user)
 if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
     $id_user = (int)$_SESSION['id_user'];
     $sqlUser = "SELECT id_siswa FROM user WHERE id_user = ? LIMIT 1";
@@ -76,7 +71,6 @@ if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
     }
 }
 
-// Fallback: jika masih 0, coba dari GET lagi (memungkinkan testing via URL)
 if ($id_siswa <= 0 && isset($_GET['id_siswa'])) {
     $id_siswa = (int)$_GET['id_siswa'];
 }
@@ -94,9 +88,7 @@ if ($id_siswa <= 0) {
     exit;
 }
 
-// ==============================================
 // 5. Ambil data siswa
-// ==============================================
 $sqlSiswa = "SELECT s.id_siswa, s.nama, s.nisn, s.id_kelas, k.nama_kelas, s.id_tahun_ajaran
              FROM siswa s
              LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
@@ -232,7 +224,9 @@ foreach ($data_analisis as $mapel) {
 }
 if ($jumlah_mapel > 0) $rata_keseluruhan = round($total_nilai / $jumlah_mapel, 1);
 
-// 9. Siapkan prompt untuk Gemini
+// ==============================================
+// 9. Siapkan prompt untuk Gemini (DIPERBAIKI - Kesimpulan Singkat)
+// ==============================================
 $prompt = "Kamu adalah seorang GURU SMP YP 17 Surabaya yang sedang memberikan masukan pribadi ke muridmu. Kamu bisa laki-laki atau perempuan, jadi gunakan sapaan 'Saya' atau 'Guru' saja.
 
 PENTING: 
@@ -240,6 +234,7 @@ PENTING:
 - JANGAN gunakan kata 'AI', 'bot', 'asisten', 'saya sebagai AI'
 - JANGAN gunakan simbol seperti ✅, 📊, 💡, 🌟, atau emoji apapun
 - JANGAN sebut 'Ibu' atau 'Bapak' - cukup pakai 'Saya' atau 'Guru'
+- JANGAN tulis 'Kesimpulan:' sebagai judul terpisah
 
 Gunakan bahasa Indonesia yang hangat, penuh perhatian, seperti seorang guru yang peduli dengan muridnya.
 
@@ -266,6 +261,19 @@ foreach ($data_analisis as $mapel) {
     $prompt .= "\n";
 }
 
+$rata_keseluruhan = 0;
+$total_nilai = 0;
+$jumlah_mapel = 0;
+foreach ($data_analisis as $mapel) {
+    if ($mapel['nilai_akhir'] > 0) {
+        $total_nilai += $mapel['nilai_akhir'];
+        $jumlah_mapel++;
+    }
+}
+if ($jumlah_mapel > 0) {
+    $rata_keseluruhan = round($total_nilai / $jumlah_mapel, 1);
+}
+
 $prompt .= "=== RINGKASAN ===\n";
 $prompt .= "Rata-rata keseluruhan: $rata_keseluruhan\n";
 $prompt .= "Mapel dengan nilai terendah: $mapel_terendah ($nilai_terendah)\n\n";
@@ -282,7 +290,13 @@ Dalam analisis per mapel, sebutkan:
 2. CP mana yang sudah dikuasai dengan baik (jika nilai bagus)
 3. CP mana yang perlu ditingkatkan (jika nilai masih kurang atau turun)
 
-Setelah semua mapel, berikan 1 paragraf kesimpulan dan motivasi.
+Setelah semua mapel, berikan KESIMPULAN yang SANGAT SINGKAT (maksimal 3 kalimat). 
+**JANGAN ulang analisis per mapel di kesimpulan.** Kesimpulan hanya berisi:
+- Apresiasi umum (contoh: 'Kamu sudah berusaha keras, Nak.')
+- 1 saran perbaikan (jika ada nilai rendah)
+- Motivasi singkat (contoh: 'Tetap semangat dan terus belajar.')
+
+JANGAN tulis kata 'Kesimpulan:' sebagai judul. Langsung tulis isi kesimpulan setelah selesai semua mapel.
 
 Aturan:
 - Gunakan sapaan 'Nak $nama_siswa' di awal
