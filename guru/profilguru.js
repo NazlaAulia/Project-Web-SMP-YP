@@ -1,3 +1,6 @@
+const displayNamaGuru = document.getElementById("displayNamaGuru");
+const displayMapelGuru = document.getElementById("displayMapelGuru");
+const displayNipGuru = document.getElementById("displayNipGuru");
 const displayEmailGuru = document.getElementById("displayEmailGuru");
 
 const namaGuruInput = document.getElementById("nama");
@@ -16,57 +19,35 @@ const roleIdLogin = localStorage.getItem("role_id");
 
 let fileFotoDipilih = null;
 
-// ========== FUNGSI MODAL ==========
-function showModal(message, type = "info") {
-  return new Promise((resolve) => {
-    const modal = document.getElementById("customModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalMessage = document.getElementById("modalMessage");
-    const modalHeader = document.getElementById("modalHeader");
-    const modalOkBtn = document.getElementById("modalOkBtn");
-
-    if (!modal) {
-      alert(message);
-      resolve();
-      return;
-    }
-
-    modalHeader.setAttribute("data-type", type);
-    
-    let iconHtml = '<i class="bi bi-info-circle-fill"></i>';
-    let titleText = "Informasi";
-    
-    if (type === "success") {
-      iconHtml = '<i class="bi bi-check-circle-fill"></i>';
-      titleText = "Berhasil";
-    } else if (type === "error") {
-      iconHtml = '<i class="bi bi-x-circle-fill"></i>';
-      titleText = "Gagal";
-    } else if (type === "warning") {
-      iconHtml = '<i class="bi bi-exclamation-triangle-fill"></i>';
-      titleText = "Peringatan";
-    }
-
-    modalHeader.innerHTML = `${iconHtml}<span id="modalTitle">${titleText}</span>`;
-    modalMessage.textContent = message;
-
-    modal.style.display = "flex";
-
-    const handleOk = () => {
-      modal.style.display = "none";
-      modalOkBtn.removeEventListener("click", handleOk);
-      resolve();
-    };
-
-    modalOkBtn.addEventListener("click", handleOk);
-  });
+// ========== FUNGSI MODAL SEDERHANA ==========
+function showMessage(title, message, type) {
+    return Swal.fire({
+        title: title,
+        text: message,
+        icon: type,
+        confirmButtonColor: "#07484a",
+        confirmButtonText: "OK"
+    });
 }
 
-function showLoading(show) {
-  const loading = document.getElementById("loadingOverlay");
-  if (loading) {
-    loading.style.display = show ? "flex" : "none";
-  }
+// ========== LOADING ==========
+let swalLoading = null;
+
+function showLoading(show, text = "Menyimpan data...") {
+    if (show) {
+        Swal.fire({
+            title: text,
+            text: "Mohon tunggu sebentar",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            showConfirmButton: false
+        });
+    } else {
+        Swal.close();
+    }
 }
 
 // ========== ISI PROFIL ==========
@@ -97,27 +78,29 @@ function isiProfilGuru(guru) {
 
 // ========== LOAD DATA ==========
 if (!idGuruLogin || roleIdLogin !== "2") {
-    showModal("Silakan login sebagai guru terlebih dahulu.", "warning").then(() => {
+    showMessage("Peringatan", "Silakan login sebagai guru terlebih dahulu.", "warning").then(() => {
         window.location.href = "../login.html";
     });
 } else {
+    showLoading(true, "Memuat data profil...");
+    
     fetch(`get_guru.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
         .then(res => res.json())
         .then(result => {
-            console.log("Data profil guru:", result);
-
+            showLoading(false);
+            
             if (result.status === "success") {
                 isiProfilGuru(result.data);
             } else {
-                showModal(result.message, "error").then(() => {
+                showMessage("Gagal", result.message, "error").then(() => {
                     localStorage.clear();
                     window.location.href = "../login.html";
                 });
             }
         })
         .catch(err => {
-            console.error(err);
-            showModal("Gagal load profil guru.", "error");
+            showLoading(false);
+            showMessage("Error", "Gagal load profil guru.", "error");
         });
 }
 
@@ -129,44 +112,42 @@ if (uploadFoto && previewFoto) {
 
         const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
         if (!allowedTypes.includes(file.type)) {
-            showModal("Format foto harus JPG, JPEG, PNG, atau WEBP.", "error");
+            showMessage("Error", "Format foto harus JPG, JPEG, PNG, atau WEBP.", "error");
             this.value = "";
             return;
         }
 
-        if (file.size > 2 * 1024 * 1024) {
-            showModal("Ukuran foto maksimal 2 MB.", "error");
+        if (file.size > 1 * 1024 * 1024) {
+            showMessage("Error", "Ukuran foto maksimal 1 MB. Silakan kompres foto Anda terlebih dahulu.", "error");
             this.value = "";
             return;
         }
 
         fileFotoDipilih = file;
         previewFoto.src = URL.createObjectURL(file);
-        showModal("Foto berhasil dipilih. Klik Simpan Perubahan untuk menyimpan.", "success");
+        showMessage("Berhasil", "Foto berhasil dipilih. Klik Simpan Perubahan.", "success");
     });
 }
 
-// ========== SIMPAN FOTO SAJA (TANPA UPDATE GURU) ==========
+// ========== SIMPAN FOTO ==========
 if (btnSimpanProfil) {
     btnSimpanProfil.addEventListener("click", async function () {
-        // Cek apakah ada perubahan foto
         if (!fileFotoDipilih) {
-            showModal("Silakan pilih foto terlebih dahulu dengan mengklik 'Ubah Foto'.", "warning");
+            showMessage("Peringatan", "Silakan pilih foto terlebih dahulu dengan mengklik 'Ubah Foto'.", "warning");
             return;
         }
 
-        showLoading(true);
+        showLoading(true, "Mengupload foto...");
 
         try {
-            // LANGSUNG UPLOAD FOTO SAJA
             const formDataFoto = new FormData();
             formDataFoto.append("id_guru", idGuruLogin);
             formDataFoto.append("role_id", roleIdLogin);
             formDataFoto.append("foto", fileFotoDipilih);
 
-            // Set timeout 10 detik
+            // Set timeout 15 detik
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
 
             const fotoResponse = await fetch("update_foto_guru.php", {
                 method: "POST",
@@ -178,27 +159,23 @@ if (btnSimpanProfil) {
             
             const fotoResult = await fotoResponse.json();
 
-            console.log("Response update_foto_guru:", fotoResult);
-
-            // TUTUP LOADING DULU sebelum show modal
             showLoading(false);
 
             if (fotoResult.status === "success") {
                 fileFotoDipilih = null;
-                await showModal("Foto profil berhasil diubah!", "success");
+                await showMessage("Berhasil!", "Foto profil berhasil diubah!", "success");
                 location.reload();
             } else {
-                await showModal(fotoResult.message, "error");
+                await showMessage("Gagal", fotoResult.message, "error");
             }
         } catch (err) {
-            // TUTUP LOADING jika error
             showLoading(false);
             
             if (err.name === "AbortError") {
-                await showModal("Proses terlalu lama. Silakan coba lagi.", "error");
+                await showMessage("Timeout", "Proses terlalu lama. Silakan coba lagi dengan foto yang lebih kecil (max 1MB).", "error");
             } else {
                 console.error("Error:", err);
-                await showModal("Terjadi kesalahan saat menyimpan foto.", "error");
+                await showMessage("Error", "Terjadi kesalahan saat menyimpan foto.", "error");
             }
         }
     });
