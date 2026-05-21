@@ -103,9 +103,8 @@ $getKelasMapel = $conn->prepare("
         k.tingkat
     FROM jadwal j
     INNER JOIN kelas k ON j.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
-    INNER JOIN guru g ON j.id_guru = g.id_guru
     WHERE j.id_guru = ?
-      AND j.id_mapel = g.id_mapel
+      AND j.id_mapel = ?
     ORDER BY k.tingkat ASC, k.nama_kelas ASC
 ");
 
@@ -113,7 +112,7 @@ if (!$getKelasMapel) {
     kirim_json("error", "Query kelas mapel gagal: " . $conn->error);
 }
 
-$getKelasMapel->bind_param("ii", $id_tahun_aktif, $id_guru);
+$getKelasMapel->bind_param("iii", $id_tahun_aktif, $id_guru, $id_mapel_guru);
 $getKelasMapel->execute();
 $resultKelasMapel = $getKelasMapel->get_result();
 
@@ -150,7 +149,7 @@ if ($mode === "wali") {
 
 /* QUERY DATA NILAI - HANYA TAHUN AJARAN AKTIF */
 if ($mode === "wali") {
-    // MODE WALI KELAS
+    // MODE WALI KELAS - tetap dengan CROSS JOIN karena wali lihat semua mapel
     $stmt = $conn->prepare("
         SELECT 
             s.id_siswa,
@@ -181,7 +180,7 @@ if ($mode === "wali") {
 
     $stmt->bind_param("iii", $id_tahun_aktif, $id_tahun_aktif, $id_kelas);
 } else {
-    // MODE GURU MAPEL
+    // MODE GURU MAPEL - TANPA CROSS JOIN, LANGSUNG JOIN KE NILAI
     $stmt = $conn->prepare("
         SELECT 
             s.id_siswa,
@@ -209,7 +208,7 @@ if ($mode === "wali") {
         kirim_json("error", "Query nilai mapel gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("isiiii", $id_mapel_guru, $nama_mapel_guru, $id_tahun_aktif, $id_mapel_guru, $id_tahun_aktif, $id_kelas);
+    $stmt->bind_param("ssiiii", $id_mapel_guru, $nama_mapel_guru, $id_tahun_aktif, $id_mapel_guru, $id_tahun_aktif, $id_kelas);
 }
 
 $stmt->execute();
