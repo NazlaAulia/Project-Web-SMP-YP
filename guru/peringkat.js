@@ -118,22 +118,22 @@ function updatePaginationControls(totalPages, totalItems) {
 function generatePageNumbers(totalPages) {
     if (!paginationNumbers) return;
     
+    console.log("generatePageNumbers - totalPages:", totalPages, "currentPage:", currentPage);
+    
     if (totalPages <= 1) {
         paginationNumbers.innerHTML = '';
         return;
     }
     
     let html = '';
-    const maxVisible = 5; // Maksimal 5 nomor halaman yang terlihat
+    const maxVisible = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
     let endPage = Math.min(totalPages, startPage + maxVisible - 1);
     
-    // Adjust startPage jika endPage terlalu dekat dengan akhir
     if (endPage - startPage + 1 < maxVisible) {
         startPage = Math.max(1, endPage - maxVisible + 1);
     }
     
-    // Tombol ke halaman pertama (jika tidak di awal)
     if (startPage > 1) {
         html += `<div class="page-number" data-page="1">1</div>`;
         if (startPage > 2) {
@@ -141,13 +141,11 @@ function generatePageNumbers(totalPages) {
         }
     }
     
-    // Nomor halaman utama
     for (let i = startPage; i <= endPage; i++) {
         const activeClass = i === currentPage ? 'active' : '';
         html += `<div class="page-number ${activeClass}" data-page="${i}">${i}</div>`;
     }
     
-    // Tombol ke halaman terakhir (jika tidak di akhir)
     if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
             html += `<div class="page-number-dots">...</div>`;
@@ -159,8 +157,10 @@ function generatePageNumbers(totalPages) {
     
     // Tambahkan event listener untuk setiap nomor halaman
     document.querySelectorAll('.page-number').forEach(el => {
-        el.addEventListener('click', () => {
-            const page = parseInt(el.dataset.page);
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = parseInt(this.dataset.page);
+            console.log("Nomor halaman diklik:", page);
             if (page && page !== currentPage) {
                 currentPage = page;
                 filterSearchPeringkat();
@@ -202,8 +202,45 @@ function getCurrentFilteredData() {
 }
 
 function filterSearchPeringkat() {
-    const filteredData = getCurrentFilteredData();
+    const searchInput = document.getElementById("searchRanking");
+    const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    
+    const filteredData = dataSiswa.filter(siswa => {
+        return `
+            ${siswa.rank || ''}
+            ${siswa.nama || ''}
+            ${siswa.kelas || ''}
+            ${siswa.nilai || ''}
+            ${siswa.status || ''}
+        `.toLowerCase().includes(keyword);
+    });
+    
+    console.log("filterSearchPeringkat - data length:", filteredData.length, "currentPage:", currentPage);
+    
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
+    }
+    
     renderPeringkatPaginated(filteredData);
+}
+
+function getCurrentFilteredData() {
+    const searchInput = document.getElementById("searchRanking");
+    const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    
+    return dataSiswa.filter(siswa => {
+        return `
+            ${siswa.rank || ''}
+            ${siswa.nama || ''}
+            ${siswa.kelas || ''}
+            ${siswa.nilai || ''}
+            ${siswa.status || ''}
+        `.toLowerCase().includes(keyword);
+    });
 }
 
 function setupSearchPeringkat() {
@@ -218,10 +255,38 @@ function setupSearchPeringkat() {
 
 function setupPaginationButtons() {
     if (prevPageBtn) {
-        prevPageBtn.addEventListener("click", goToPrevPage);
+        // Hapus event listener lama jika ada
+        const newPrevBtn = prevPageBtn.cloneNode(true);
+        prevPageBtn.parentNode.replaceChild(newPrevBtn, prevPageBtn);
+        window.prevPageBtn = newPrevBtn;
+        
+        newPrevBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            console.log("Tombol Sebelumnya diklik, currentPage:", currentPage);
+            if (currentPage > 1) {
+                currentPage--;
+                filterSearchPeringkat();
+            }
+        });
     }
+    
     if (nextPageBtn) {
-        nextPageBtn.addEventListener("click", goToNextPage);
+        // Hapus event listener lama jika ada
+        const newNextBtn = nextPageBtn.cloneNode(true);
+        nextPageBtn.parentNode.replaceChild(newNextBtn, nextPageBtn);
+        window.nextPageBtn = newNextBtn;
+        
+        newNextBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            const filteredData = getCurrentFilteredData();
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            console.log("Tombol Selanjutnya diklik, currentPage:", currentPage, "totalPages:", totalPages);
+            
+            if (currentPage < totalPages) {
+                currentPage++;
+                filterSearchPeringkat();
+            }
+        });
     }
 }
 

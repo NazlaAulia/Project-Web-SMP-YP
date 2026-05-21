@@ -680,3 +680,8 @@ body {
         font-size: 0.8rem;
     }
 }
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
