@@ -276,98 +276,224 @@ function parseCSVLine(line, delimiter = ",") {
   return result;
 }
 
-// ========== PARSE CSV UTAMA ==========
 function parseCSV(text) {
   console.log("=== START PARSE CSV ===");
   
   let lines = text.trim().split(/\r?\n/);
   if (lines.length < 2) throw new Error("File CSV kosong atau tidak valid.");
   
+  // Hapus BOM jika ada
   lines[0] = lines[0].replace(/^\uFEFF/, "");
+  
+  // Hapus baris SEP= jika ada
   if (lines[0].trim().toLowerCase().startsWith("sep=")) lines = lines.slice(1);
   
-  const delimiter = deteksiDelimiter(lines[0]);
+  // Deteksi delimiter
+  const delimiter = lines[0].includes(';') ? ';' : ',';
   console.log("Delimiter:", delimiter);
   
-  let headers = parseCSVLine(lines[0], delimiter);
-  headers = headers.map(h => bersihkanHeader(h));
-  console.log("Headers:", headers);
+  // Fungsi parse baris CSV (handle quotes)
+  function parseRow(row) {
+    const result = [];
+    let current = "";
+    let inQuotes = false;
+    for (let i = 0; i < row.length; i++) {
+      const char = row[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === delimiter && !inQuotes) {
+        result.push(current.trim());
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    return result.map(v => v.replace(/^"|"$/g, ''));
+  }
+  
+  // Baca header ASLI (biarkan apa adanya, jangan diubah)
+  let rawHeaders = parseRow(lines[0]);
+  console.log("Raw Headers:", rawHeaders);
+  
+  // Buat mapping header ke index (case insensitive, support underscore)
+  const headerMap = {};
+  for (let i = 0; i < rawHeaders.length; i++) {
+    const h = rawHeaders[i].toLowerCase().trim();
+    headerMap[h] = i;
+  }
+  
+  console.log("Header Map:", headerMap);
+  
+  // Cari index kolom dengan berbagai kemungkinan nama
+  let idxIdSiswa = -1, idxNama = -1, idxSemester = -1;
+  let idxHadir = -1, idxIzin = -1, idxSakit = -1, idxAlfa = -1;
+  let idxIdMapel = -1, idxNilai = -1;
+  
+  // Mapping untuk ID Siswa (bisa 'id_siswa', 'idsiswa', 'nis', 'id siswa')
+  const idSiswaKeys = ['id_siswa', 'idsiswa', 'id siswa', 'nis', 'no induk', 'id'];
+  for (const key of idSiswaKeys) {
+    if (headerMap[key] !== undefined) {
+      idxIdSiswa = headerMap[key];
+      break;
+    }
+  }
+  
+  // Mapping untuk Nama (bisa 'nama_siswa', 'namasiswa', 'nama siswa', 'nama')
+  const namaKeys = ['nama_siswa', 'namasiswa', 'nama siswa', 'nama', 'name'];
+  for (const key of namaKeys) {
+    if (headerMap[key] !== undefined) {
+      idxNama = headerMap[key];
+      break;
+    }
+  }
+  
+  // Mapping untuk Semester
+  const semesterKeys = ['semester', 'smt', 'sem'];
+  for (const key of semesterKeys) {
+    if (headerMap[key] !== undefined) {
+      idxSemester = headerMap[key];
+      break;
+    }
+  }
+  
+  // Mapping untuk ID Mapel
+  const idMapelKeys = ['id_mapel', 'idmapel', 'id mapel', 'kode mapel', 'mapel_id'];
+  for (const key of idMapelKeys) {
+    if (headerMap[key] !== undefined) {
+      idxIdMapel = headerMap[key];
+      break;
+    }
+  }
+  
+  // Mapping untuk Nilai
+  const nilaiKeys = ['nilai_angka', 'nilaiangka', 'nilai angka', 'nilai', 'score'];
+  for (const key of nilaiKeys) {
+    if (headerMap[key] !== undefined) {
+      idxNilai = headerMap[key];
+      break;
+    }
+  }
+  
+  // Mapping untuk Hadir (opsional)
+  const hadirKeys = ['hadir', 'hadir_siswa', 'kehadiran'];
+  for (const key of hadirKeys) {
+    if (headerMap[key] !== undefined) {
+      idxHadir = headerMap[key];
+      break;
+    }
+  }
+  
+  // Mapping untuk Izin (opsional)
+  const izinKeys = ['izin', 'ijin'];
+  for (const key of izinKeys) {
+    if (headerMap[key] !== undefined) {
+      idxIzin = headerMap[key];
+      break;
+    }
+  }
+  
+  // Mapping untuk Sakit (opsional)
+  const sakitKeys = ['sakit'];
+  for (const key of sakitKeys) {
+    if (headerMap[key] !== undefined) {
+      idxSakit = headerMap[key];
+      break;
+    }
+  }
+  
+  // Mapping untuk Alfa (opsional)
+  const alfaKeys = ['alfa', 'alpha', 'alpa', 'tanpa keterangan'];
+  for (const key of alfaKeys) {
+    if (headerMap[key] !== undefined) {
+      idxAlfa = headerMap[key];
+      break;
+    }
+  }
+  
+  // Validasi kolom wajib
+  if (idxIdSiswa === -1) {
+    throw new Error("Kolom ID Siswa tidak ditemukan. Pastikan header berisi: id_siswa, idsiswa, NIS, atau ID");
+  }
+  if (idxNama === -1) {
+    throw new Error("Kolom Nama tidak ditemukan. Pastikan header berisi: nama_siswa, nama, atau nama siswa");
+  }
+  if (idxSemester === -1) {
+    throw new Error("Kolom Semester tidak ditemukan. Pastikan header berisi: semester, smt, atau sem");
+  }
+  if (idxIdMapel === -1) {
+    throw new Error("Kolom ID Mapel tidak ditemukan. Pastikan header berisi: id_mapel, idmapel, atau id mapel");
+  }
+  if (idxNilai === -1) {
+    throw new Error("Kolom Nilai tidak ditemukan. Pastikan header berisi: nilai_angka, nilai, atau nilai angka");
+  }
+  
+  console.log(`Index mapping: id_siswa=${idxIdSiswa}, nama=${idxNama}, semester=${idxSemester}, id_mapel=${idxIdMapel}, nilai=${idxNilai}`);
   
   const result = [];
   
   for (let i = 1; i < lines.length; i++) {
-    if (!lines[i].trim()) continue;
+    const line = lines[i].trim();
+    if (line === "") continue;
     
-    const row = parseCSVLine(lines[i], delimiter);
-    if (row.length < 3) continue;
-    
-    // Ambil kolom dasar (asumsi format: id_siswa, nama_siswa, semester, ...)
-    const id_siswa = Number(row[0] || 0);
-    const nama_siswa = row[1] || "";
-    const semester = normalisasiSemester(row[2] || 1);
-    const hadir = ambilAngka(row[3], 0);
-    const izin = ambilAngka(row[4], 0);
-    const sakit = ambilAngka(row[5], 0);
-    const alfa = ambilAngka(row[6], 0);
-    
-    if (!id_siswa) {
-      console.log(`Skipping row ${i}: no valid student ID`);
+    const row = parseRow(line);
+    const maxIdx = Math.max(idxIdSiswa, idxNama, idxSemester, idxIdMapel, idxNilai, idxHadir, idxIzin, idxSakit, idxAlfa);
+    if (row.length <= maxIdx) {
+      console.log(`Row ${i+1}: kolom tidak cukup (${row.length} kolom, perlu ${maxIdx+1})`);
       continue;
     }
     
-    // Cek apakah ini format wali (ada kolom mapel di header)
-    const mapelHeaders = daftarMapelCsv.map(m => m.nama_mapel.toLowerCase());
-    const hasMapelColumns = mapelHeaders.some(mh => headers.includes(mh));
+    const id_siswa = parseInt(row[idxIdSiswa]);
+    const nama_siswa = row[idxNama];
+    const semester = parseInt(row[idxSemester]);
+    const hadir = idxHadir !== -1 ? parseInt(row[idxHadir] || 0) : 0;
+    const izin = idxIzin !== -1 ? parseInt(row[idxIzin] || 0) : 0;
+    const sakit = idxSakit !== -1 ? parseInt(row[idxSakit] || 0) : 0;
+    const alfa = idxAlfa !== -1 ? parseInt(row[idxAlfa] || 0) : 0;
+    const id_mapel = parseInt(row[idxIdMapel]);
+    const nilai_angka = parseFloat(row[idxNilai]);
     
-    if (hasMapelColumns) {
-      // Format wali kelas: setiap baris = satu siswa dengan nilai semua mapel
-      for (let j = 0; j < daftarMapelCsv.length; j++) {
-        const mapel = daftarMapelCsv[j];
-        const mapelHeader = mapel.nama_mapel.toLowerCase();
-        const colIndex = headers.indexOf(mapelHeader);
-        
-        if (colIndex >= 0 && colIndex < row.length) {
-          const nilai_angka = ambilAngka(row[colIndex], NaN);
-          if (!isNaN(nilai_angka) && nilai_angka >= 0 && nilai_angka <= 100) {
-            result.push({
-              id_siswa, nama_siswa,
-              id_mapel: mapel.id_mapel,
-              nama_mapel: mapel.nama_mapel,
-              semester,
-              nilai_angka,
-              hadir, izin, sakit, alfa
-            });
-          }
-        }
-      }
-    } else {
-      // Format biasa: setiap baris = satu mapel
-      const id_mapel = Number(row[7] || 0);
-      let nilai_angka = ambilAngka(row[8], NaN);
-      
-      // Jika kolom 8 tidak ada, coba kolom lain
-      if (isNaN(nilai_angka) && row.length > 9) {
-        nilai_angka = ambilAngka(row[9], NaN);
-      }
-      
-      if (id_mapel && !isNaN(nilai_angka) && nilai_angka >= 0 && nilai_angka <= 100) {
-        const mapel = daftarMapelCsv.find(m => m.id_mapel === id_mapel);
-        result.push({
-          id_siswa, nama_siswa,
-          id_mapel: id_mapel,
-          nama_mapel: mapel ? mapel.nama_mapel : "Mapel " + id_mapel,
-          semester,
-          nilai_angka,
-          hadir, izin, sakit, alfa
-        });
-      }
+    // Validasi data
+    if (isNaN(id_siswa) || id_siswa <= 0) {
+      console.log(`Row ${i+1}: ID Siswa tidak valid (${row[idxIdSiswa]})`);
+      continue;
     }
+    
+    if (isNaN(semester) || (semester !== 1 && semester !== 2)) {
+      console.log(`Row ${i+1}: Semester harus 1 atau 2 (${row[idxSemester]})`);
+      continue;
+    }
+    
+    if (isNaN(id_mapel) || id_mapel < 1 || id_mapel > 12) {
+      console.log(`Row ${i+1}: ID Mapel harus 1-12 (${row[idxIdMapel]})`);
+      continue;
+    }
+    
+    if (isNaN(nilai_angka) || nilai_angka < 0 || nilai_angka > 100) {
+      console.log(`Row ${i+1}: Nilai harus 0-100 (${row[idxNilai]})`);
+      continue;
+    }
+    
+    const mapel = daftarMapelCsv.find(m => m.id_mapel === id_mapel);
+    
+    result.push({
+      id_siswa: id_siswa,
+      nama_siswa: nama_siswa,
+      semester: semester,
+      hadir: hadir,
+      izin: izin,
+      sakit: sakit,
+      alfa: alfa,
+      id_mapel: id_mapel,
+      nama_mapel: mapel ? mapel.nama_mapel : "Mapel " + id_mapel,
+      nilai_angka: nilai_angka
+    });
   }
   
-  console.log(`Parsed ${result.length} nilai records`);
+  console.log(`Parsed ${result.length} data valid`);
   
   if (result.length === 0) {
-    throw new Error("Tidak ada data nilai yang valid. Periksa format CSV Anda. Pastikan file berisi ID Siswa, Nama, Semester, dan Nilai.");
+    throw new Error("Tidak ada data nilai yang valid. Periksa format CSV Anda.");
   }
   
   return result;
