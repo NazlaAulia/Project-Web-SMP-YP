@@ -1,6 +1,3 @@
-const displayNamaGuru = document.getElementById("displayNamaGuru");
-const displayMapelGuru = document.getElementById("displayMapelGuru");
-const displayNipGuru = document.getElementById("displayNipGuru");
 const displayEmailGuru = document.getElementById("displayEmailGuru");
 
 const namaGuruInput = document.getElementById("nama");
@@ -34,7 +31,6 @@ function showModal(message, type = "info") {
       return;
     }
 
-    // Set header
     modalHeader.setAttribute("data-type", type);
     
     let iconHtml = '<i class="bi bi-info-circle-fill"></i>';
@@ -150,60 +146,42 @@ if (uploadFoto && previewFoto) {
     });
 }
 
-// ========== SIMPAN PROFIL ==========
+// ========== SIMPAN FOTO SAJA (TANPA UPDATE GURU) ==========
 if (btnSimpanProfil) {
     btnSimpanProfil.addEventListener("click", async function () {
+        // Cek apakah ada perubahan foto
+        if (!fileFotoDipilih) {
+            showModal("Silakan pilih foto terlebih dahulu dengan mengklik 'Ubah Foto'.", "warning");
+            return;
+        }
+
         showLoading(true);
 
         try {
-            // Update data profil dulu
-            const formDataProfil = new FormData();
-            formDataProfil.append("id_guru", idGuruLogin);
-            formDataProfil.append("role_id", roleIdLogin);
-            formDataProfil.append("nama", namaGuruInput ? namaGuruInput.value : "");
-            formDataProfil.append("nip", nipGuruInput ? nipGuruInput.value : "");
-            formDataProfil.append("email", emailGuruInput ? emailGuruInput.value : "");
-            formDataProfil.append("jenis_kelamin", jenisKelaminGuruInput ? jenisKelaminGuruInput.value : "");
+            // LANGSUNG UPLOAD FOTO SAJA
+            const formDataFoto = new FormData();
+            formDataFoto.append("id_guru", idGuruLogin);
+            formDataFoto.append("role_id", roleIdLogin);
+            formDataFoto.append("foto", fileFotoDipilih);
 
-            const profilResponse = await fetch("update_guru.php", {
+            const fotoResponse = await fetch("update_foto_guru.php", {
                 method: "POST",
-                body: formDataProfil
+                body: formDataFoto
             });
-            const profilResult = await profilResponse.json();
+            const fotoResult = await fotoResponse.json();
 
-            if (profilResult.status !== "success") {
-                showLoading(false);
-                await showModal(profilResult.message, "error");
-                return;
-            }
+            console.log("Response update_foto_guru:", fotoResult);
 
-            // Upload foto jika ada
-            if (fileFotoDipilih) {
-                const formDataFoto = new FormData();
-                formDataFoto.append("id_guru", idGuruLogin);
-                formDataFoto.append("role_id", roleIdLogin);
-                formDataFoto.append("foto", fileFotoDipilih);
-
-                const fotoResponse = await fetch("update_foto_guru.php", {
-                    method: "POST",
-                    body: formDataFoto
-                });
-                const fotoResult = await fotoResponse.json();
-
-                if (fotoResult.status === "success") {
-                    fileFotoDipilih = null;
-                    await showModal("Profil dan foto berhasil disimpan!", "success");
-                    location.reload();
-                } else {
-                    await showModal(fotoResult.message, "error");
-                }
-            } else {
-                await showModal("Profil berhasil disimpan!", "success");
+            if (fotoResult.status === "success") {
+                fileFotoDipilih = null;
+                await showModal("Foto profil berhasil diubah!", "success");
                 location.reload();
+            } else {
+                await showModal(fotoResult.message, "error");
             }
         } catch (err) {
             console.error("Error:", err);
-            await showModal("Terjadi kesalahan saat menyimpan.", "error");
+            await showModal("Terjadi kesalahan saat menyimpan foto.", "error");
         } finally {
             showLoading(false);
         }
