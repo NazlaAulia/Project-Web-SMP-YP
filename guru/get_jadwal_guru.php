@@ -51,7 +51,7 @@ if ($id_tahun_ajaran_aktif == 0) {
     kirim_json("error", "Tahun ajaran aktif tidak ditemukan.");
 }
 
-// Query dengan filter tahun ajaran aktif dan hanya status 'fix' (opsional)
+// Query ambil semua jadwal (draft & fix) untuk tahun ajaran aktif
 $stmt = $conn->prepare("
     SELECT 
         j.id_jadwal,
@@ -73,7 +73,6 @@ $stmt = $conn->prepare("
     LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
     WHERE j.id_guru = ?
       AND j.id_tahun_ajaran = ?
-      AND j.status = 'fix'   -- jika hanya ingin jadwal tetap; hapus baris ini jika ingin draft juga
     ORDER BY 
         FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'),
         COALESCE(j.jp_mulai, 0),
@@ -114,3 +113,4 @@ kirim_json("success", "Jadwal guru berhasil diambil.", [
     "guru" => $guru,
     "data" => $jadwal
 ]);
+?>
