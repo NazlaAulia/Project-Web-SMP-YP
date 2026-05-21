@@ -95,7 +95,7 @@
 
                     </div>
 
-                    <div class="table-wrapper">
+                     <div class="table-wrapper">
                         <table class="rank-table">
                             <thead>
                                 <tr>
@@ -109,6 +109,22 @@
                             <tbody id="rankingBody"></tbody>
                         </table>
                     </div>
+
+                    <!-- PAGINATION START -->
+                    <div class="pagination-container" id="paginationContainer">
+                        <button class="pagination-btn" id="prevPageBtn" disabled>
+                            <i class="bi bi-chevron-left"></i> Sebelumnya
+                        </button>
+                        
+                        <div class="pagination-numbers" id="paginationNumbers">
+                            <!-- Nomor halaman akan diisi oleh JS -->
+                        </div>
+                        
+                        <button class="pagination-btn" id="nextPageBtn">
+                            Selanjutnya <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                    <!-- PAGINATION END -->
                 </section>
             </div>
         </main>
