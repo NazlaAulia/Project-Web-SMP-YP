@@ -231,19 +231,24 @@ function cetakNilaiSiswa(idSiswa) {
   window.open(url, "_blank");
 }
 
-// ========== PARSE CSV - SESUAI FORMAT EXCEL (id_siswa, nama_siswa, dll) ==========
+// ========== PARSE CSV - FIX DELIMITER DAN SEMESTER KOSONG ==========
 function parseCSV(text) {
   console.log("=== START PARSE CSV ===");
   
   let lines = text.trim().split(/\r?\n/);
   if (lines.length < 2) throw new Error("File CSV kosong atau tidak valid.");
   
+  // Hapus BOM jika ada
   lines[0] = lines[0].replace(/^\uFEFF/, "");
+  
+  // Hapus baris SEP= jika ada
   if (lines[0].trim().toLowerCase().startsWith("sep=")) lines = lines.slice(1);
   
+  // Deteksi delimiter (koma atau titik koma)
   const delimiter = lines[0].includes(';') ? ';' : ',';
-  console.log("Delimiter:", delimiter);
+  console.log("Delimiter terdeteksi:", delimiter === ';' ? 'TITIK KOMA (;) ⚠️' : 'KOMA (,) ✅');
   
+  // Fungsi parse baris CSV (handle quotes)
   function parseRow(row) {
     const result = [];
     let current = "";
@@ -263,12 +268,12 @@ function parseCSV(text) {
     return result.map(v => v.replace(/^"|"$/g, ''));
   }
   
+  // Baca header
   let headers = parseRow(lines[0]);
   let headerLower = headers.map(h => h.toLowerCase().trim());
   console.log("Headers:", headers);
-  console.log("Headers Lower:", headerLower);
   
-  // Cari index kolom (case insensitive, support underscore)
+  // Cari index kolom (case insensitive)
   let idxIdSiswa = -1, idxNama = -1, idxSemester = -1;
   let idxHadir = -1, idxIzin = -1, idxSakit = -1, idxAlfa = -1;
   let idxIdMapel = -1, idxNilai = -1;
@@ -286,52 +291,69 @@ function parseCSV(text) {
     if (h === 'nilai_angka' || h === 'nilaiangka' || h === 'nilai angka' || h === 'nilai' || h === 'score') idxNilai = i;
   }
   
-  // Validasi
-  if (idxIdSiswa === -1) throw new Error("Kolom ID Siswa tidak ditemukan. Gunakan: id_siswa, idsiswa, NIS, atau ID");
-  if (idxNama === -1) throw new Error("Kolom Nama tidak ditemukan. Gunakan: nama_siswa, nama, atau nama siswa");
-  if (idxSemester === -1) throw new Error("Kolom Semester tidak ditemukan. Gunakan: semester, smt, atau sem");
-  if (idxIdMapel === -1) throw new Error("Kolom ID Mapel tidak ditemukan. Gunakan: id_mapel, idmapel, atau id mapel");
-  if (idxNilai === -1) throw new Error("Kolom Nilai tidak ditemukan. Gunakan: nilai_angka, nilai, atau nilai angka");
+  // Validasi kolom wajib
+  if (idxIdSiswa === -1) throw new Error("Kolom ID Siswa tidak ditemukan");
+  if (idxNama === -1) throw new Error("Kolom Nama tidak ditemukan");
+  if (idxIdMapel === -1) throw new Error("Kolom ID Mapel tidak ditemukan");
+  if (idxNilai === -1) throw new Error("Kolom Nilai tidak ditemukan");
+  
+  // Kolom semester opsional, jika tidak ada default ke 1
+  const hasSemesterColumn = idxSemester !== -1;
+  console.log("Kolom semester ditemukan:", hasSemesterColumn ? "YA" : "TIDAK (akan default ke 1)");
   
   console.log(`Mapping: id_siswa=${idxIdSiswa}, nama=${idxNama}, semester=${idxSemester}, id_mapel=${idxIdMapel}, nilai=${idxNilai}`);
   
   const result = [];
+  let rowNumber = 1;
   
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (line === "") continue;
     
+    rowNumber = i + 1;
     const row = parseRow(line);
-    if (row.length <= Math.max(idxIdSiswa, idxNama, idxSemester, idxIdMapel, idxNilai)) {
-      console.log(`Row ${i+1}: kolom tidak cukup`);
+    
+    if (row.length <= Math.max(idxIdSiswa, idxNama, idxIdMapel, idxNilai)) {
+      console.log(`Row ${rowNumber}: kolom tidak cukup (${row.length} kolom), skip`);
       continue;
     }
     
     const id_siswa = parseInt(row[idxIdSiswa]);
     const nama_siswa = row[idxNama];
-    const semester = parseInt(row[idxSemester]);
-    const hadir = idxHadir !== -1 ? parseInt(row[idxHadir] || 0) : 0;
-    const izin = idxIzin !== -1 ? parseInt(row[idxIzin] || 0) : 0;
-    const sakit = idxSakit !== -1 ? parseInt(row[idxSakit] || 0) : 0;
-    const alfa = idxAlfa !== -1 ? parseInt(row[idxAlfa] || 0) : 0;
+    
+    // Semester: jika kolom ada tapi kosong/null, default ke 1
+    let semester = 1;
+    if (hasSemesterColumn && idxSemester < row.length && row[idxSemester] && row[idxSemester].trim() !== "") {
+      semester = parseInt(row[idxSemester]);
+    } else if (!hasSemesterColumn) {
+      semester = 1; // default semester 1
+    }
+    
+    const hadir = idxHadir !== -1 && idxHadir < row.length ? parseInt(row[idxHadir] || 0) : 0;
+    const izin = idxIzin !== -1 && idxIzin < row.length ? parseInt(row[idxIzin] || 0) : 0;
+    const sakit = idxSakit !== -1 && idxSakit < row.length ? parseInt(row[idxSakit] || 0) : 0;
+    const alfa = idxAlfa !== -1 && idxAlfa < row.length ? parseInt(row[idxAlfa] || 0) : 0;
     const id_mapel = parseInt(row[idxIdMapel]);
     const nilai_angka = parseFloat(row[idxNilai]);
     
-    // Validasi
+    // Validasi data
     if (isNaN(id_siswa) || id_siswa <= 0) {
-      console.log(`Row ${i+1}: ID Siswa tidak valid (${row[idxIdSiswa]})`);
+      console.log(`Row ${rowNumber}: ID Siswa tidak valid (${row[idxIdSiswa]})`);
       continue;
     }
+    
     if (isNaN(semester) || (semester !== 1 && semester !== 2)) {
-      console.log(`Row ${i+1}: Semester harus 1 atau 2 (${row[idxSemester]})`);
-      continue;
+      console.log(`Row ${rowNumber}: Semester tidak valid (${row[idxSemester] || 'kosong'}), default ke 1`);
+      semester = 1;
     }
+    
     if (isNaN(id_mapel) || id_mapel < 1 || id_mapel > 12) {
-      console.log(`Row ${i+1}: ID Mapel harus 1-12 (${row[idxIdMapel]})`);
+      console.log(`Row ${rowNumber}: ID Mapel harus 1-12 (${row[idxIdMapel]})`);
       continue;
     }
+    
     if (isNaN(nilai_angka) || nilai_angka < 0 || nilai_angka > 100) {
-      console.log(`Row ${i+1}: Nilai harus 0-100 (${row[idxNilai]})`);
+      console.log(`Row ${rowNumber}: Nilai harus 0-100 (${row[idxNilai]})`);
       continue;
     }
     
