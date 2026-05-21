@@ -1,8 +1,21 @@
 <?php
 // ==============================================
-// INI YANG PALING PENTING - SESSION DI PALING ATAS
+// PERBAIKAN SESSION AGAR TERBACA DI SELURUH APLIKASI
 // ==============================================
-session_start();
+
+// Atur parameter cookie session agar konsisten untuk semua path
+if (session_status() === PHP_SESSION_NONE) {
+    // Konfigurasi cookie: path root, httponly, samesite Lax (agar bisa dipanggil dari halaman lain)
+    session_set_cookie_params([
+        'lifetime' => 0,          // sampai browser ditutup
+        'path'     => '/',        // berlaku untuk seluruh domain
+        'domain'   => '',         // otomatis domain saat ini
+        'secure'   => false,      // jika pakai HTTPS, ubah jadi true
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+    session_start();
+}
 
 // Pastikan output file ini terbaca sebagai JSON
 header('Content-Type: application/json; charset=utf-8');
