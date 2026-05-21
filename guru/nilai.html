@@ -34,41 +34,41 @@
           <button id="tabWaliBtn" class="tab-btn">📄 Cetak Rapor (Wali Kelas)</button>
         </div>
       </div>
+<!-- SECTION UPLOAD CSV (HANYA UNTUK GURU MAPEL) -->
+<section class="card import-card" id="uploadSection">
+  <div class="card-heading">
+    <div>
+      <h3>Masukan Nilai</h3>
+      <p>Upload file CSV berisi nilai angka dan rekap kehadiran siswa.</p>
+    </div>
+  </div>
 
-      <!-- SECTION UPLOAD CSV (HANYA UNTUK GURU MAPEL) -->
-      <section class="card import-card" id="uploadSection">
-        <div class="card-heading">
-          <div>
-            <h3>Masukan Nilai</h3>
-            <p>Upload file CSV berisi nilai angka dan rekap kehadiran siswa.</p>
-          </div>
-        </div>
+  <div class="upload-area">
+    <!-- TAMPILAN FILE UPLOAD YANG JELAS -->
+    <div class="custom-file-upload">
+      <label for="fileInput" class="custom-file-label">
+        <i class="bi bi-folder2-open"></i>
+        Pilih File CSV
+      </label>
+      <input type="file" id="fileInput" accept=".csv" />
+      <span id="selectedFileName" class="custom-file-name">Belum ada file dipilih</span>
+    </div>
+        
+    <div class="upload-actions">
+      <button id="downloadTemplateBtn" class="btn btn-outline" type="button">
+        <i class="bi bi-file-earmark-arrow-down"></i>
+        Unduh Templat CSV
+      </button>
 
-        <div class="upload-area">
-          <label class="file-drop" for="fileInput">
-            <i class="bi bi-file-earmark-spreadsheet"></i>
-            <div>
-              <strong>Pilih Dokumen CSV</strong>
-              <span>Gunakan template agar format data sesuai.</span>
-            </div>
-            <input type="file" id="fileInput" accept=".csv" />
-          </label>
-              
-          <div class="upload-actions">
-            <button id="downloadTemplateBtn" class="btn btn-outline" type="button">
-              <i class="bi bi-file-earmark-arrow-down"></i>
-              Unduh Templat CSV
-            </button>
+      <button id="uploadBtn" class="btn btn-primary" type="button">
+        <i class="bi bi-save"></i>
+        Simpan Nilai
+      </button>
+    </div>
+  </div>
 
-            <button id="uploadBtn" class="btn btn-primary" type="button">
-              <i class="bi bi-save"></i>
-              Simpan Nilai
-            </button>
-          </div>
-        </div>
-
-        <div id="messageBox" class="message-box"></div>
-      </section>
+  <div id="messageBox" class="message-box"></div>
+</section>
 
       <!-- SECTION FILTER -->
       <section class="card filter-card nilai-filter-card" id="filterWaliKelasBox">

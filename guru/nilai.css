@@ -1441,15 +1441,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* Sembunyikan input file asli */
-#fileInput {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  visibility: hidden;
-}
-
 .custom-file-name {
   color: #6b7a7a;
   font-size: 0.9rem;
