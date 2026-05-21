@@ -70,7 +70,6 @@ if ($id_siswa <= 0 && isset($_SESSION['id_user'])) {
         }
     }
 }
-
 if ($id_siswa <= 0 && isset($_GET['id_siswa'])) {
     $id_siswa = (int)$_GET['id_siswa'];
 }
@@ -88,7 +87,9 @@ if ($id_siswa <= 0) {
     exit;
 }
 
+// ==============================================
 // 5. Ambil data siswa
+// ==============================================
 $sqlSiswa = "SELECT s.id_siswa, s.nama, s.nisn, s.id_kelas, k.nama_kelas, s.id_tahun_ajaran
              FROM siswa s
              LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
@@ -227,81 +228,64 @@ if ($jumlah_mapel > 0) $rata_keseluruhan = round($total_nilai / $jumlah_mapel, 1
 // ==============================================
 // 9. Siapkan prompt untuk Gemini (DIPERBAIKI - Kesimpulan Singkat)
 // ==============================================
-$prompt = "Kamu adalah seorang GURU SMP YP 17 Surabaya yang sedang memberikan masukan pribadi ke muridmu. Kamu bisa laki-laki atau perempuan, jadi gunakan sapaan 'Saya' atau 'Guru' saja.
+$prompt = "Kamu adalah seorang GURU SMP YP 17 Surabaya. Gunakan sapaan 'Saya' atau 'Guru'.
 
-PENTING: 
-- JANGAN sebut dirimu sebagai AI, chatbot, asisten, atau teknologi apapun
-- JANGAN gunakan kata 'AI', 'bot', 'asisten', 'saya sebagai AI'
-- JANGAN gunakan simbol seperti ✅, 📊, 💡, 🌟, atau emoji apapun
-- JANGAN sebut 'Ibu' atau 'Bapak' - cukup pakai 'Saya' atau 'Guru'
-- JANGAN tulis 'Kesimpulan:' sebagai judul terpisah
-
-Gunakan bahasa Indonesia yang hangat, penuh perhatian, seperti seorang guru yang peduli dengan muridnya.
+LARANGAN KERAS:
+- JANGAN sebut AI, bot, asisten, teknologi apapun
+- JANGAN pakai emoji atau simbol aneh
+- JANGAN sebut 'Ibu' atau 'Bapak'
+- JANGAN tulis 'Kesimpulan:' atau 'Kesimpulan & Motivasi' sebagai judul
+- **JANGAN ulang analisis per mapel di bagian kesimpulan**
 
 Data siswa:
 Nama: $nama_siswa
 Kelas: $kelas_siswa
 Tahun Ajaran: $tahun_ajaran
 
-Berikut adalah nilai dan perkembangan siswa per mata pelajaran:\n\n";
+Berikut nilai dan perkembangan per mapel:
+
+";
 
 foreach ($data_analisis as $mapel) {
     $prompt .= "=== {$mapel['nama_mapel']} ===\n";
-    if ($mapel['nilai_semester_1'] !== null) $prompt .= "Nilai Semester 1: {$mapel['nilai_semester_1']}\n";
-    if ($mapel['nilai_semester_2'] !== null) $prompt .= "Nilai Semester 2: {$mapel['nilai_semester_2']}\n";
+    if ($mapel['nilai_semester_1'] !== null) $prompt .= "Nilai S1: {$mapel['nilai_semester_1']}\n";
+    if ($mapel['nilai_semester_2'] !== null) $prompt .= "Nilai S2: {$mapel['nilai_semester_2']}\n";
     if ($mapel['growth'] !== null) $prompt .= "Perkembangan: {$mapel['trend_text']}\n";
-    $prompt .= "\nCapaian Pembelajaran (CP) yang harus dikuasai di kelas ini:\n";
+    $prompt .= "CP: ";
     if (!empty($mapel['cp_daftar'])) {
-        foreach ($mapel['cp_daftar'] as $cp) {
-            $prompt .= "  - {$cp['elemen']}: {$cp['deskripsi']}\n";
-        }
+        foreach ($mapel['cp_daftar'] as $cp) $prompt .= "{$cp['elemen']}, ";
     } else {
-        $prompt .= "  - (Belum ada data CP untuk mapel ini)\n";
+        $prompt .= "(belum ada data CP)";
     }
-    $prompt .= "\n";
+    $prompt .= "\n\n";
 }
 
-$rata_keseluruhan = 0;
-$total_nilai = 0;
-$jumlah_mapel = 0;
-foreach ($data_analisis as $mapel) {
-    if ($mapel['nilai_akhir'] > 0) {
-        $total_nilai += $mapel['nilai_akhir'];
-        $jumlah_mapel++;
-    }
-}
-if ($jumlah_mapel > 0) {
-    $rata_keseluruhan = round($total_nilai / $jumlah_mapel, 1);
-}
-
-$prompt .= "=== RINGKASAN ===\n";
 $prompt .= "Rata-rata keseluruhan: $rata_keseluruhan\n";
-$prompt .= "Mapel dengan nilai terendah: $mapel_terendah ($nilai_terendah)\n\n";
+$prompt .= "Mapel terendah: $mapel_terendah ($nilai_terendah)\n\n";
 
-$prompt .= "TUGASMU:
-Buat analisis untuk siswa ini dengan memperhatikan PERKEMBANGAN (growth) dari semester 1 ke semester 2.
+$prompt .= "TUGAS:
+1. Untuk setiap mapel, tulis analisis 1-2 kalimat dengan format [NAMA MAPEL]: isi analisis.
+   - Apresiasi jika nilai naik/tinggi
+   - Semangat jika nilai turun
+   - Sebutkan CP yang dikuasai atau perlu ditingkatkan
 
-Untuk SETIAP mata pelajaran, berikan analisis singkat dengan format:
+2. **SETELAH SEMUA MAPEL**, tulis KESIMPULAN yang SANGAT SINGKAT (maksimal 3 kalimat). 
+   Kesimpulan hanya berisi:
+   - Apresiasi umum (contoh: \"Nak Sandi, secara umum kamu sudah berprestasi sangat baik.\")
+   - Saran perbaikan (hanya untuk mapel terendah, jika ada)
+   - Motivasi singkat (contoh: \"Pertahankan semangat belajarmu!\")
 
-[MAPEL]: [analisis]
+CONTOH KESIMPULAN YANG BENAR (pendek, tidak mengulang mapel):
+\"Nak Sandi, nilai rata-ratamu 96.3 sangat membanggakan. Coba lebih giat lagi untuk PKN agar semakin seimbang. Teruslah belajar dengan tekun!\"
 
-Dalam analisis per mapel, sebutkan:
-1. Apresiasi jika nilai naik/membaik, atau semangat jika nilai turun
-2. CP mana yang sudah dikuasai dengan baik (jika nilai bagus)
-3. CP mana yang perlu ditingkatkan (jika nilai masih kurang atau turun)
-
-Setelah semua mapel, berikan KESIMPULAN yang SANGAT SINGKAT (maksimal 3 kalimat). 
-**JANGAN ulang analisis per mapel di kesimpulan.** Kesimpulan hanya berisi:
-- Apresiasi umum (contoh: 'Kamu sudah berusaha keras, Nak.')
-- 1 saran perbaikan (jika ada nilai rendah)
-- Motivasi singkat (contoh: 'Tetap semangat dan terus belajar.')
+CONTOH KESIMPULAN YANG SALAH (JANGAN DITULIS, karena terlalu panjang):
+( Tidak perlu menulis ulang analisis PKN, Matematika, IPA, dll. )
 
 JANGAN tulis kata 'Kesimpulan:' sebagai judul. Langsung tulis isi kesimpulan setelah selesai semua mapel.
 
-Aturan:
-- Gunakan sapaan 'Nak $nama_siswa' di awal
+Aturan tambahan:
+- Gunakan sapaan 'Nak $nama_siswa' di awal kesimpulan
 - JANGAN pakai 'Ibu Guru' atau 'Bapak Guru' - cukup 'Saya' atau 'Guru'
-- Tulis seperti guru sungguhan yang sedang berbicara dengan muridnya
 - Jangan pakai kata 'AI', 'bot', 'asisten', 'teknologi'
 - Jangan pakai emoji atau simbol aneh
 - Langsung tulis pesannya tanpa kata pengantar";
