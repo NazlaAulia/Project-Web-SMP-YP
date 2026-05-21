@@ -117,19 +117,26 @@ function aturTampilanWaliKelas() {
     uploadSection = document.querySelector(".import-card");
   }
   
+  const btnCetakGroup = document.getElementById("btnCetakSemuaRaporGroup");
+  
   if (mode === "wali") {
+    // Sembunyikan upload section
     if (uploadSection) {
       uploadSection.style.display = "none";
     }
     
-    const filterGrid = document.querySelector(".nilai-filter-grid");
-    if (filterGrid && !document.getElementById("btnCetakSemuaRapor")) {
-      const btn = document.createElement("button");
-      btn.id = "btnCetakSemuaRapor";
-      btn.className = "btn btn-primary";
-      btn.innerHTML = '<i class="bi bi-printer"></i> Cetak Semua Rapor Kelas';
-      btn.style.marginLeft = "auto";
-      btn.onclick = function() {
+    // Tampilkan tombol cetak di sebelah kanan filter
+    if (btnCetakGroup) {
+      btnCetakGroup.style.display = "flex";
+    }
+    
+    // Setup event listener untuk tombol cetak
+    const btnCetak = document.getElementById("btnCetakSemuaRapor");
+    if (btnCetak) {
+      // Hapus event lama biar tidak double
+      const newBtn = btnCetak.cloneNode(true);
+      btnCetak.parentNode.replaceChild(newBtn, btnCetak);
+      newBtn.onclick = function() {
         const idKelas = filterKelasWali ? filterKelasWali.value : "";
         if (!idKelas) {
           alert("Pilih kelas wali terlebih dahulu.");
@@ -138,15 +145,16 @@ function aturTampilanWaliKelas() {
         const url = `cetak_nilai_wali.html?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&id_kelas=${idKelas}`;
         window.open(url, "_blank");
       };
-      filterGrid.appendChild(btn);
     }
   } else {
+    // Mode mapel - tampilkan upload section
     if (uploadSection) {
       uploadSection.style.display = "block";
     }
-    const btnExist = document.getElementById("btnCetakSemuaRapor");
-    if (btnExist) {
-      btnExist.remove();
+    
+    // Sembunyikan tombol cetak
+    if (btnCetakGroup) {
+      btnCetakGroup.style.display = "none";
     }
   }
 }
