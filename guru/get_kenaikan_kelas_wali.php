@@ -22,6 +22,15 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid. Silakan login ulang.");
 }
 
+// ========== AMBIL TAHUN AJARAN AKTIF ==========
+$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+$tahunAktif = $queryTahun->fetch_assoc();
+$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+
+if ($id_tahun_aktif == 0) {
+    kirim_json("error", "Tidak ada tahun ajaran aktif.");
+}
+
 $kkm = 75;
 $maksMapelTidakLulus = 2;
 $maksAlfa = 10;
@@ -31,7 +40,7 @@ try {
     $cekWali = $conn->prepare("
         SELECT id_kelas, nama_kelas, tingkat
         FROM kelas
-        WHERE id_wali_kelas = ?
+        WHERE id_wali_kelas = ? AND id_tahun_ajaran = ?
         ORDER BY tingkat ASC, nama_kelas ASC
     ");
 
@@ -39,7 +48,7 @@ try {
         kirim_json("error", "Query wali kelas gagal: " . $conn->error);
     }
 
-    $cekWali->bind_param("i", $id_guru);
+    $cekWali->bind_param("ii", $id_guru, $id_tahun_aktif);
     $cekWali->execute();
     $resultWali = $cekWali->get_result();
 
@@ -78,8 +87,8 @@ try {
             COALESCE(SUM(n.alfa), 0) AS total_alfa,
             COUNT(n.id_siswa) AS jumlah_nilai
         FROM siswa s
-        JOIN kelas k ON s.id_kelas = k.id_kelas
-        LEFT JOIN nilai n ON s.id_siswa = n.id_siswa
+        JOIN kelas k ON s.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
+        LEFT JOIN nilai n ON s.id_siswa = n.id_siswa AND n.id_tahun_ajaran = ?
         WHERE s.status = 'aktif'
           AND k.id_wali_kelas = ?
         GROUP BY s.id_siswa, s.nama, s.status, k.nama_kelas, k.tingkat
@@ -92,7 +101,7 @@ try {
         kirim_json("error", "Query kenaikan kelas gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("ii", $kkm, $id_guru);
+    $stmt->bind_param("iiii", $kkm, $id_tahun_aktif, $id_tahun_aktif, $id_guru);
     $stmt->execute();
 
     $result = $stmt->get_result();

@@ -1,156 +1,115 @@
 <?php
-/*header("Content-Type: application/json");
+header("Content-Type: application/json; charset=utf-8");
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+
 require_once "koneksi.php";
 
-$id_guru = isset($_POST['id_guru']) ? (int) $_POST['id_guru'] : 0;
+function kirim_json($status, $message, $extra = []) {
+    echo json_encode(array_merge([
+        "status" => $status,
+        "message" => $message
+    ], $extra));
+    exit;
+}
+
+$id_guru = isset($_POST["id_guru"]) ? (int) $_POST["id_guru"] : 0;
+$role_id = isset($_POST["role_id"]) ? (int) $_POST["role_id"] : 0;
+
+if ($role_id !== 2) {
+    kirim_json("error", "Akses ditolak.");
+}
 
 if ($id_guru <= 0) {
-    echo json_encode([
-        "success" => false,
-        "message" => "ID guru tidak valid."
-    ]);
-    exit;
+    kirim_json("error", "ID guru tidak valid.");
 }
 
-if (!isset($_FILES['foto'])) {
-    echo json_encode([
-        "success" => false,
-        "message" => "File foto tidak ditemukan."
-    ]);
-    exit;
+if (!isset($_FILES["foto"])) {
+    kirim_json("error", "File foto tidak ditemukan.");
 }
 
-$file = $_FILES['foto'];
+$file = $_FILES["foto"];
 
-if ($file['error'] !== 0) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Upload file gagal. Kode error: " . $file['error']
-    ]);
-    exit;
+if ($file["error"] !== 0) {
+    kirim_json("error", "Upload file gagal.");
 }
 
-$allowedExt = ['jpg', 'jpeg', 'png', 'webp'];
-$allowedMime = ['image/jpeg', 'image/png', 'image/webp'];
-$maxSize = 2 * 1024 * 1024;
+$allowedExt = ["jpg", "jpeg", "png", "webp"];
+$maxSize = 1 * 1024 * 1024;
 
-$namaFile = $file['name'];
-$tmpFile = $file['tmp_name'];
-$fileSize = $file['size'];
-
-$ext = strtolower(pathinfo($namaFile, PATHINFO_EXTENSION));
+$ext = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
 
 if (!in_array($ext, $allowedExt)) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Format file harus jpg, jpeg, png, atau webp."
-    ]);
-    exit;
+    kirim_json("error", "Format foto harus JPG, JPEG, PNG, atau WEBP.");
 }
 
-if ($fileSize > $maxSize) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Ukuran file maksimal 2 MB."
-    ]);
-    exit;
+if ($file["size"] > $maxSize) {
+    kirim_json("error", "Ukuran foto maksimal 1 MB.");
 }
 
-$mime = mime_content_type($tmpFile);
-
-if (!in_array($mime, $allowedMime)) {
-    echo json_encode([
-        "success" => false,
-        "message" => "File bukan gambar yang valid."
-    ]);
-    exit;
+// Kompres gambar
+function compressImage($source, $destination, $quality = 75) {
+    $info = getimagesize($source);
+    if ($info['mime'] == 'image/jpeg') {
+        $image = imagecreatefromjpeg($source);
+        imagejpeg($image, $destination, $quality);
+    } elseif ($info['mime'] == 'image/png') {
+        $image = imagecreatefrompng($source);
+        imagepng($image, $destination, 8);
+    } elseif ($info['mime'] == 'image/webp') {
+        $image = imagecreatefromwebp($source);
+        imagewebp($image, $destination, $quality);
+    } else {
+        return false;
+    }
+    imagedestroy($image);
+    return true;
 }
 
-/*
-  File ini ada di folder guru.
-  Jadi path ini menyimpan foto ke:
-  guru/uploads/profile/
-*/
 $folderUpload = "uploads/profile/";
-
 if (!is_dir($folderUpload)) {
     mkdir($folderUpload, 0777, true);
 }
 
-$queryOld = "SELECT foto_profil FROM user WHERE id_guru = $id_guru LIMIT 1";
+// Ambil foto lama
+$queryOld = "SELECT foto_profil FROM user WHERE id_guru = $id_guru AND role_id = 2 LIMIT 1";
 $resultOld = mysqli_query($conn, $queryOld);
 
-if (!$resultOld) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Gagal mengambil foto lama: " . mysqli_error($conn)
-    ]);
-    exit;
+if (!$resultOld || mysqli_num_rows($resultOld) === 0) {
+    kirim_json("error", "User guru tidak ditemukan.");
 }
 
 $dataOld = mysqli_fetch_assoc($resultOld);
-$fotoLama = $dataOld['foto_profil'] ?? null;
+$fotoLama = $dataOld["foto_profil"] ?? "";
 
-$namaBaru = "guru_" . $id_guru . "_" . time() . "." . $ext;
+// Buat nama file baru dengan timestamp
+$timestamp = time();
+$namaBaru = "guru_" . $id_guru . "_" . $timestamp . ".webp";
 $pathSimpan = $folderUpload . $namaBaru;
 
-if (!move_uploaded_file($tmpFile, $pathSimpan)) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Gagal menyimpan file ke folder upload."
-    ]);
-    exit;
-}
-
-$pathDb = mysqli_real_escape_string($conn, $pathSimpan);
-
-$queryCekUser = "SELECT id_user FROM user WHERE id_guru = $id_guru LIMIT 1";
-$resultCekUser = mysqli_query($conn, $queryCekUser);
-
-if (!$resultCekUser) {
-    if (file_exists($pathSimpan)) {
-        @unlink($pathSimpan);
+// Kompres dan simpan
+$tempFile = $file["tmp_name"];
+if (compressImage($tempFile, $pathSimpan, 75)) {
+    // Update database
+    $queryUpdate = "UPDATE user SET foto_profil = '$pathSimpan' WHERE id_guru = $id_guru AND role_id = 2";
+    
+    if (mysqli_query($conn, $queryUpdate)) {
+        // Hapus foto lama
+        if (!empty($fotoLama) && file_exists($fotoLama) && $fotoLama !== $pathSimpan) {
+            @unlink($fotoLama);
+        }
+        
+        // Kirim URL dengan timestamp untuk cache buster
+        kirim_json("success", "Foto profil berhasil disimpan.", [
+            "foto_url" => $pathSimpan . "?t=" . $timestamp
+        ]);
+    } else {
+        if (file_exists($pathSimpan)) {
+            @unlink($pathSimpan);
+        }
+        kirim_json("error", "Gagal menyimpan ke database.");
     }
-
-    echo json_encode([
-        "success" => false,
-        "message" => "Gagal mengecek user: " . mysqli_error($conn)
-    ]);
-    exit;
-}
-
-if (mysqli_num_rows($resultCekUser) > 0) {
-    $queryUpdate = "UPDATE user SET foto_profil = '$pathDb' WHERE id_guru = $id_guru";
 } else {
-    if (file_exists($pathSimpan)) {
-        @unlink($pathSimpan);
-    }
-
-    echo json_encode([
-        "success" => false,
-        "message" => "User untuk guru ini tidak ditemukan."
-    ]);
-    exit;
-}
-
-if (mysqli_query($conn, $queryUpdate)) {
-    if (!empty($fotoLama) && file_exists($fotoLama)) {
-        @unlink($fotoLama);
-    }
-
-    echo json_encode([
-        "success" => true,
-        "message" => "Foto profil guru berhasil disimpan.",
-        "foto_url" => $pathSimpan
-    ]);
-} else {
-    if (file_exists($pathSimpan)) {
-        @unlink($pathSimpan);
-    }
-
-    echo json_encode([
-        "success" => false,
-        "message" => "Gagal update database: " . mysqli_error($conn)
-    ]);
+    kirim_json("error", "Gagal memproses gambar.");
 }
 ?>

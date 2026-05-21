@@ -110,7 +110,6 @@ function updateRekap() {
   totalAlfaEl.textContent = totalAlfa;
 }
 
-// ========== FUNGSI UNTUK MODE WALI KELAS ==========
 function aturTampilanWaliKelas() {
   const mode = modeNilai ? modeNilai.value : "mapel";
   
@@ -118,19 +117,26 @@ function aturTampilanWaliKelas() {
     uploadSection = document.querySelector(".import-card");
   }
   
+  const btnCetakGroup = document.getElementById("btnCetakSemuaRaporGroup");
+  
   if (mode === "wali") {
+    // Sembunyikan upload section
     if (uploadSection) {
       uploadSection.style.display = "none";
     }
     
-    const filterGrid = document.querySelector(".nilai-filter-grid");
-    if (filterGrid && !document.getElementById("btnCetakSemuaRapor")) {
-      const btn = document.createElement("button");
-      btn.id = "btnCetakSemuaRapor";
-      btn.className = "btn btn-primary";
-      btn.innerHTML = '<i class="bi bi-printer"></i> Cetak Semua Rapor Kelas';
-      btn.style.marginLeft = "auto";
-      btn.onclick = function() {
+    // Tampilkan tombol cetak di sebelah kanan filter
+    if (btnCetakGroup) {
+      btnCetakGroup.style.display = "flex";
+    }
+    
+    // Setup event listener untuk tombol cetak
+    const btnCetak = document.getElementById("btnCetakSemuaRapor");
+    if (btnCetak) {
+      // Hapus event lama biar tidak double
+      const newBtn = btnCetak.cloneNode(true);
+      btnCetak.parentNode.replaceChild(newBtn, btnCetak);
+      newBtn.onclick = function() {
         const idKelas = filterKelasWali ? filterKelasWali.value : "";
         if (!idKelas) {
           alert("Pilih kelas wali terlebih dahulu.");
@@ -139,20 +145,20 @@ function aturTampilanWaliKelas() {
         const url = `cetak_nilai_wali.html?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&id_kelas=${idKelas}`;
         window.open(url, "_blank");
       };
-      filterGrid.appendChild(btn);
     }
   } else {
+    // Mode mapel - tampilkan upload section
     if (uploadSection) {
       uploadSection.style.display = "block";
     }
-    const btnExist = document.getElementById("btnCetakSemuaRapor");
-    if (btnExist) {
-      btnExist.remove();
+    
+    // Sembunyikan tombol cetak
+    if (btnCetakGroup) {
+      btnCetakGroup.style.display = "none";
     }
   }
 }
 
-// ========== RENDER TABLE (LENGKAP DENGAN MODE WALI) ==========
 function renderTable(filteredData = dataNilai) {
   if (!nilaiTableBody) return;
   
@@ -208,7 +214,6 @@ function renderTable(filteredData = dataNilai) {
   }).join("");
 }
   
-// CETAK RAPOR PER SISWA (WALI KELAS)
 window.cetakRaporPerSiswa = function(idSiswa) {
   const idKelas = filterKelasWali ? filterKelasWali.value : "";
   if (!idKelas) {
@@ -219,7 +224,6 @@ window.cetakRaporPerSiswa = function(idSiswa) {
   window.open(url, "_blank");
 };
 
-// CETAK NILAI SISWA (GURU MAPEL)
 function cetakNilaiSiswa(idSiswa) {
   const idKelas = filterKelasWali ? filterKelasWali.value : "";
   if (!idGuruLogin || roleIdLogin !== "2") {
@@ -235,136 +239,155 @@ function cetakNilaiSiswa(idSiswa) {
   window.open(url, "_blank");
 }
 
-// ========== PARSE CSV (SAMA KAYAK SEBELUMNYA) ==========
-function bersihkanHeader(value) {
-  return String(value || "").replace(/^\uFEFF/, "").trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-function ambilAngka(value, defaultValue = 0) {
-  const text = String(value ?? "").trim();
-  if (text === "") return defaultValue;
-  const angka = Number(text.replace(",", "."));
-  return isNaN(angka) ? defaultValue : angka;
-}
-
-function deteksiDelimiter(line) {
-  const jumlahKoma = (line.match(/,/g) || []).length;
-  const jumlahTitikKoma = (line.match(/;/g) || []).length;
-  return jumlahTitikKoma > jumlahKoma ? ";" : ",";
-}
-
-function parseCSVLine(line, delimiter = ",") {
-  const result = [];
-  let current = "";
-  let insideQuote = false;
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    const nextChar = line[i + 1];
-    if (char === '"' && nextChar === '"') {
-      current += '"';
-      i++;
-      continue;
-    }
-    if (char === '"') {
-      insideQuote = !insideQuote;
-      continue;
-    }
-    if (char === delimiter && !insideQuote) {
-      result.push(current.trim());
-      current = "";
-      continue;
-    }
-    current += char;
-  }
-  result.push(current.trim());
-  return result;
-}
-
-function parseCSVFormatBiasa(lines, headers, delimiter) {
-  const requiredHeaders = ["id_siswa", "id_mapel", "semester", "nilai_angka", "hadir", "izin", "sakit", "alfa"];
-  const valid = requiredHeaders.every(header => headers.includes(header));
-  if (!valid) return null;
-
-  const idSiswaIndex = headers.indexOf("id_siswa");
-  const namaSiswaIndex = headers.indexOf("nama_siswa");
-  const idMapelIndex = headers.indexOf("id_mapel");
-  const namaMapelIndex = headers.indexOf("nama_mapel");
-  const semesterIndex = headers.indexOf("semester");
-  const nilaiAngkaIndex = headers.indexOf("nilai_angka");
-  const hadirIndex = headers.indexOf("hadir");
-  const izinIndex = headers.indexOf("izin");
-  const sakitIndex = headers.indexOf("sakit");
-  const alfaIndex = headers.indexOf("alfa");
-
-  const result = [];
-  for (let i = 1; i < lines.length; i++) {
-    if (!lines[i].trim()) continue;
-    const row = parseCSVLine(lines[i], delimiter);
-    const id_siswa = Number(row[idSiswaIndex]);
-    const nama_siswa = namaSiswaIndex >= 0 ? row[namaSiswaIndex] : "";
-    const id_mapel = Number(row[idMapelIndex]);
-    const nama_mapel = namaMapelIndex >= 0 ? row[namaMapelIndex] : "";
-    const semester = normalisasiSemester(row[semesterIndex]);
-    const nilai_angka = ambilAngka(row[nilaiAngkaIndex], NaN);
-    const hadir = ambilAngka(row[hadirIndex], 0);
-    const izin = ambilAngka(row[izinIndex], 0);
-    const sakit = ambilAngka(row[sakitIndex], 0);
-    const alfa = ambilAngka(row[alfaIndex], 0);
-    if (!id_siswa || !id_mapel || !semester || isNaN(nilai_angka)) continue;
-    result.push({ id_siswa, nama_siswa, id_mapel, nama_mapel, semester, nilai_angka, hadir, izin, sakit, alfa });
-  }
-  return result;
-}
-
-function parseCSVFormatWali(lines, headers, delimiter) {
-  const idSiswaIndex = headers.indexOf("id_siswa");
-  const namaSiswaIndex = headers.indexOf("nama_siswa");
-  const semesterIndex = headers.indexOf("semester");
-  const hadirIndex = headers.indexOf("hadir");
-  const izinIndex = headers.indexOf("izin");
-  const sakitIndex = headers.indexOf("sakit");
-  const alfaIndex = headers.indexOf("alfa");
-  if (idSiswaIndex < 0 || namaSiswaIndex < 0 || semesterIndex < 0 || hadirIndex < 0 || izinIndex < 0 || sakitIndex < 0 || alfaIndex < 0) return null;
-
-  const result = [];
-  for (let i = 1; i < lines.length; i++) {
-    if (!lines[i].trim()) continue;
-    const row = parseCSVLine(lines[i], delimiter);
-    const id_siswa = Number(row[idSiswaIndex]);
-    const nama_siswa = row[namaSiswaIndex] || "";
-    const semester = normalisasiSemester(row[semesterIndex]);
-    const hadir = ambilAngka(row[hadirIndex], 0);
-    const izin = ambilAngka(row[izinIndex], 0);
-    const sakit = ambilAngka(row[sakitIndex], 0);
-    const alfa = ambilAngka(row[alfaIndex], 0);
-    if (!id_siswa || !semester) continue;
-    daftarMapelCsv.forEach(mapel => {
-      const namaMapelHeader = bersihkanHeader(mapel.nama_mapel);
-      const mapelIndex = headers.indexOf(namaMapelHeader);
-      if (mapelIndex < 0) return;
-      const nilaiText = String(row[mapelIndex] ?? "").trim();
-      if (nilaiText === "") return;
-      const nilai_angka = ambilAngka(nilaiText, NaN);
-      if (isNaN(nilai_angka)) return;
-      result.push({ id_siswa, nama_siswa, id_mapel: mapel.id_mapel, nama_mapel: mapel.nama_mapel, semester, nilai_angka, hadir, izin, sakit, alfa });
-    });
-  }
-  return result;
-}
-
+// ========== PARSE CSV - FIX DELIMITER DAN SEMESTER KOSONG ==========
 function parseCSV(text) {
+  console.log("=== START PARSE CSV ===");
+  
   let lines = text.trim().split(/\r?\n/);
   if (lines.length < 2) throw new Error("File CSV kosong atau tidak valid.");
+  
+  // Hapus BOM jika ada
   lines[0] = lines[0].replace(/^\uFEFF/, "");
-  if (lines[0].trim().toLowerCase() === "sep=,") lines = lines.slice(1);
-  if (lines[0].trim().toLowerCase() === "sep=;") lines = lines.slice(1);
-  const delimiter = deteksiDelimiter(lines[0]);
-  const headers = parseCSVLine(lines[0], delimiter).map(header => bersihkanHeader(header));
-  const formatBiasa = parseCSVFormatBiasa(lines, headers, delimiter);
-  if (formatBiasa !== null && formatBiasa.length > 0) return formatBiasa;
-  const formatWali = parseCSVFormatWali(lines, headers, delimiter);
-  if (formatWali !== null && formatWali.length > 0) return formatWali;
-  throw new Error("Belum ada nilai yang bisa disimpan. Isi dulu kolom nilai mapel di file CSV, lalu simpan ulang sebagai CSV.");
+  
+  // Hapus baris SEP= jika ada
+  if (lines[0].trim().toLowerCase().startsWith("sep=")) lines = lines.slice(1);
+  
+  // Deteksi delimiter (koma atau titik koma)
+  const delimiter = lines[0].includes(';') ? ';' : ',';
+  console.log("Delimiter terdeteksi:", delimiter === ';' ? 'TITIK KOMA (;) ⚠️' : 'KOMA (,) ✅');
+  
+  // Fungsi parse baris CSV (handle quotes)
+  function parseRow(row) {
+    const result = [];
+    let current = "";
+    let inQuotes = false;
+    for (let i = 0; i < row.length; i++) {
+      const char = row[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === delimiter && !inQuotes) {
+        result.push(current.trim());
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    return result.map(v => v.replace(/^"|"$/g, ''));
+  }
+  
+  // Baca header
+  let headers = parseRow(lines[0]);
+  let headerLower = headers.map(h => h.toLowerCase().trim());
+  console.log("Headers:", headers);
+  
+  // Cari index kolom (case insensitive)
+  let idxIdSiswa = -1, idxNama = -1, idxSemester = -1;
+  let idxHadir = -1, idxIzin = -1, idxSakit = -1, idxAlfa = -1;
+  let idxIdMapel = -1, idxNilai = -1;
+  
+  for (let i = 0; i < headerLower.length; i++) {
+    const h = headerLower[i];
+    if (h === 'id_siswa' || h === 'idsiswa' || h === 'id siswa' || h === 'nis' || h === 'id') idxIdSiswa = i;
+    if (h === 'nama_siswa' || h === 'namasiswa' || h === 'nama siswa' || h === 'nama' || h === 'name') idxNama = i;
+    if (h === 'semester' || h === 'smt' || h === 'sem') idxSemester = i;
+    if (h === 'hadir' || h === 'kehadiran') idxHadir = i;
+    if (h === 'izin' || h === 'ijin') idxIzin = i;
+    if (h === 'sakit') idxSakit = i;
+    if (h === 'alfa' || h === 'alpha' || h === 'alpa') idxAlfa = i;
+    if (h === 'id_mapel' || h === 'idmapel' || h === 'id mapel' || h === 'kode mapel') idxIdMapel = i;
+    if (h === 'nilai_angka' || h === 'nilaiangka' || h === 'nilai angka' || h === 'nilai' || h === 'score') idxNilai = i;
+  }
+  
+  // Validasi kolom wajib
+  if (idxIdSiswa === -1) throw new Error("Kolom ID Siswa tidak ditemukan");
+  if (idxNama === -1) throw new Error("Kolom Nama tidak ditemukan");
+  if (idxIdMapel === -1) throw new Error("Kolom ID Mapel tidak ditemukan");
+  if (idxNilai === -1) throw new Error("Kolom Nilai tidak ditemukan");
+  
+  // Kolom semester opsional, jika tidak ada default ke 1
+  const hasSemesterColumn = idxSemester !== -1;
+  console.log("Kolom semester ditemukan:", hasSemesterColumn ? "YA" : "TIDAK (akan default ke 1)");
+  
+  console.log(`Mapping: id_siswa=${idxIdSiswa}, nama=${idxNama}, semester=${idxSemester}, id_mapel=${idxIdMapel}, nilai=${idxNilai}`);
+  
+  const result = [];
+  let rowNumber = 1;
+  
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line === "") continue;
+    
+    rowNumber = i + 1;
+    const row = parseRow(line);
+    
+    if (row.length <= Math.max(idxIdSiswa, idxNama, idxIdMapel, idxNilai)) {
+      console.log(`Row ${rowNumber}: kolom tidak cukup (${row.length} kolom), skip`);
+      continue;
+    }
+    
+    const id_siswa = parseInt(row[idxIdSiswa]);
+    const nama_siswa = row[idxNama];
+    
+    // Semester: jika kolom ada tapi kosong/null, default ke 1
+    let semester = 1;
+    if (hasSemesterColumn && idxSemester < row.length && row[idxSemester] && row[idxSemester].trim() !== "") {
+      semester = parseInt(row[idxSemester]);
+    } else if (!hasSemesterColumn) {
+      semester = 1; // default semester 1
+    }
+    
+    const hadir = idxHadir !== -1 && idxHadir < row.length ? parseInt(row[idxHadir] || 0) : 0;
+    const izin = idxIzin !== -1 && idxIzin < row.length ? parseInt(row[idxIzin] || 0) : 0;
+    const sakit = idxSakit !== -1 && idxSakit < row.length ? parseInt(row[idxSakit] || 0) : 0;
+    const alfa = idxAlfa !== -1 && idxAlfa < row.length ? parseInt(row[idxAlfa] || 0) : 0;
+    const id_mapel = parseInt(row[idxIdMapel]);
+    const nilai_angka = parseFloat(row[idxNilai]);
+    
+    // Validasi data
+    if (isNaN(id_siswa) || id_siswa <= 0) {
+      console.log(`Row ${rowNumber}: ID Siswa tidak valid (${row[idxIdSiswa]})`);
+      continue;
+    }
+    
+    if (isNaN(semester) || (semester !== 1 && semester !== 2)) {
+      console.log(`Row ${rowNumber}: Semester tidak valid (${row[idxSemester] || 'kosong'}), default ke 1`);
+      semester = 1;
+    }
+    
+    if (isNaN(id_mapel) || id_mapel < 1 || id_mapel > 12) {
+      console.log(`Row ${rowNumber}: ID Mapel harus 1-12 (${row[idxIdMapel]})`);
+      continue;
+    }
+    
+    if (isNaN(nilai_angka) || nilai_angka < 0 || nilai_angka > 100) {
+      console.log(`Row ${rowNumber}: Nilai harus 0-100 (${row[idxNilai]})`);
+      continue;
+    }
+    
+    const mapel = daftarMapelCsv.find(m => m.id_mapel === id_mapel);
+    
+    result.push({
+      id_siswa: id_siswa,
+      nama_siswa: nama_siswa,
+      semester: semester,
+      hadir: hadir,
+      izin: izin,
+      sakit: sakit,
+      alfa: alfa,
+      id_mapel: id_mapel,
+      nama_mapel: mapel ? mapel.nama_mapel : "Mapel " + id_mapel,
+      nilai_angka: nilai_angka
+    });
+  }
+  
+  console.log(`Parsed ${result.length} data valid`);
+  
+  if (result.length === 0) {
+    throw new Error("Tidak ada data nilai yang valid. Periksa format CSV Anda.");
+  }
+  
+  return result;
 }
 
 // ========== DROPDOWN ==========
@@ -381,7 +404,7 @@ function isiDropdownWaliKelas(waliKelas) {
 function isiDropdownKelasMapel(kelasMapel) {
   if (!filterKelasWali) return;
   const nilaiSebelumnya = filterKelasWali.value;
-  filterKelasWali.innerHTML = ""; // Kosongkan dulu
+  filterKelasWali.innerHTML = "";
   kelasMapel.forEach(kelas => {
     filterKelasWali.innerHTML += `<option value="${kelas.id_kelas}">Kelas ${kelas.nama_kelas}</option>`;
   });
@@ -395,21 +418,29 @@ function aturTampilanMode() {
   const filterKelas = document.getElementById("filterKelas");
   
   if (mode === "wali") {
-    // Sembunyikan dropdown kelas
     if (filterKelasGroup) filterKelasGroup.style.display = "none";
-    
-    // Set nilai kelas dari wali_kelas (biar dipake fetch)
     if (window.waliKelasData && window.waliKelasData.length > 0) {
       if (filterKelas) filterKelas.value = window.waliKelasData[0].id_kelas;
     }
-    
-    // Ubah label filter
     if (filterKelasWaliLabel) filterKelasWaliLabel.textContent = "Kelas Wali";
   } else {
-    // Tampilkan dropdown kelas untuk guru mapel
     if (filterKelasGroup) filterKelasGroup.style.display = "flex";
     if (filterKelasWaliLabel) filterKelasWaliLabel.textContent = "Kelas Mapel Saya";
   }
+}
+
+// ========== TAMPILKAN NAMA FILE ==========
+const fileInputElem = document.getElementById("fileInput");
+const selectedFileNameSpan = document.getElementById("selectedFileName");
+
+if (fileInputElem && selectedFileNameSpan) {
+  fileInputElem.addEventListener("change", function(e) {
+    if (fileInputElem.files.length > 0) {
+      selectedFileNameSpan.textContent = fileInputElem.files[0].name;
+    } else {
+      selectedFileNameSpan.textContent = "Belum ada file dipilih";
+    }
+  });
 }
 
 // ========== LOAD DATA ==========
@@ -425,7 +456,7 @@ function loadNilaiDatabase() {
 
   if (mode === "wali" && !idKelas) {
     if (nilaiTableBody) {
-      nilaiTableBody.innerHTML = `<td><td colspan="5" class="empty-state">Pilih kelas wali terlebih dahulu.</td></tr>`;
+      nilaiTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Pilih kelas wali terlebih dahulu.</td></tr>`;
     }
     return;
   }
@@ -439,11 +470,10 @@ function loadNilaiDatabase() {
       if (result.status === "success") {
         dataNilai = result.data || [];
         
-        // Simpan data wali kelas ke variabel global
-if (result.wali_kelas && result.wali_kelas.length > 0) {
-  window.waliKelasData = result.wali_kelas;
-}
-        // ========== SEMBUNYIKAN OPTION WALI KELAS JIKA BUKAN WALI ==========
+        if (result.wali_kelas && result.wali_kelas.length > 0) {
+          window.waliKelasData = result.wali_kelas;
+        }
+        
         if (result.is_wali_kelas === false) {
           const modeSelect = document.getElementById("modeNilai");
           if (modeSelect) {
@@ -463,7 +493,6 @@ if (result.wali_kelas && result.wali_kelas.length > 0) {
             }
           }
         }
-        // ========== SAMPAI SINI ==========
         
         aturTampilanWaliKelas();
         if (filterWaliKelasBox) {
@@ -512,33 +541,41 @@ function filterSearchNilai() {
 // ========== EVENT LISTENERS ==========
 if (uploadBtn) {
   uploadBtn.addEventListener("click", () => {
+    console.log("=== UPLOAD BUTTON CLICKED ===");
     clearMessage();
+    
     if (!idGuruLogin || roleIdLogin !== "2") {
       alert("Silakan login sebagai guru terlebih dahulu.");
       window.location.href = "../login.html";
       return;
     }
+    
     const file = fileInput.files[0];
     if (!file) {
       showMessage("Pilih file CSV terlebih dahulu.", "error");
       return;
     }
+    
     if (!file.name.toLowerCase().endsWith(".csv")) {
       showMessage("File harus berformat .csv", "error");
       return;
     }
+    
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
         const text = e.target.result;
         dataNilai = parseCSV(text);
+        
         if (dataNilai.length === 0) {
           showMessage("Tidak ada data valid yang bisa diimport.", "error");
           return;
         }
+        
         renderTable();
         updateRekap();
         showMessage("Sedang menyimpan data nilai ke database...", "success");
+        
         simpanNilaiKeDatabase()
           .then(result => {
             if (result.status === "success") {
@@ -553,10 +590,11 @@ if (uploadBtn) {
             showMessage("Gagal menyimpan nilai ke database.", "error");
           });
       } catch (error) {
+        console.error("Parse error:", error);
         showMessage(error.message, "error");
       }
     };
-    reader.readAsText(file);
+    reader.readAsText(file, "UTF-8");
   });
 }
 
@@ -583,27 +621,16 @@ if (downloadTemplateBtn) {
       window.location.href = "../login.html";
       return;
     }
-  const mode = modeNilai ? modeNilai.value : "mapel";
-let idKelas = filterKelasWali ? filterKelasWali.value : "";
 
-// Jika mode wali, ambil id_kelas dari data wali (abaikan dropdown)
-if (mode === "wali" && window.waliKelasData && window.waliKelasData.length > 0) {
-  idKelas = window.waliKelasData[0].id_kelas;
-}
-    let templateUrl = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=${mode}`;
-    if (mode === "wali" && idKelas) templateUrl += `&id_kelas=${idKelas}`;
-    const link = document.createElement("a");
-    link.href = templateUrl;
-    link.download = "template_import_nilai_siswa.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  });
-}
+    const idKelas = filterKelasWali ? filterKelasWali.value : "";
 
-if (printBtn) {
-  printBtn.addEventListener("click", function() {
-    alert("Gunakan tombol Cetak Nilai pada baris siswa yang ingin dicetak.");
+    if (!idKelas) {
+      alert("Pilih kelas terlebih dahulu.");
+      return;
+    }
+
+    const templateUrl = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=mapel&id_kelas=${idKelas}`;
+    window.location.href = templateUrl;
   });
 }
 

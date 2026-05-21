@@ -10,13 +10,21 @@ if ($role_id !== 2 || $id_guru <= 0) {
     die("Akses tidak valid.");
 }
 
+// Ambil tahun ajaran aktif
+$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+$tahunAktif = $queryTahun->fetch_assoc();
+$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+
 /*
 |--------------------------------------------------------------------------
 | MODE 1 = GURU MAPEL BIASA
-| - hanya 1 mapel sesuai guru login
 |--------------------------------------------------------------------------
 */
 if ($mode === "mapel") {
+    if ($id_kelas <= 0) {
+        die("Pilih kelas terlebih dahulu.");
+    }
+
     $getGuru = $conn->prepare("
         SELECT 
             g.id_mapel,
@@ -44,11 +52,26 @@ if ($mode === "mapel") {
     $id_mapel = (int) $guru["id_mapel"];
     $nama_mapel = $guru["nama_mapel"] ?? "-";
 
+    // Ambil nama kelas untuk nama file
+    $getNamaKelas = $conn->prepare("
+        SELECT nama_kelas 
+        FROM kelas 
+        WHERE id_kelas = ? AND id_tahun_ajaran = ?
+        LIMIT 1
+    ");
+    $getNamaKelas->bind_param("ii", $id_kelas, $id_tahun_aktif);
+    $getNamaKelas->execute();
+    $resultNamaKelas = $getNamaKelas->get_result();
+    $kelasData = $resultNamaKelas->fetch_assoc();
+    $namaKelas = $kelasData["nama_kelas"] ?? "kelas";
+
+    // PERBAIKAN: Ambil siswa hanya dari kelas yang dipilih DAN tahun ajaran aktif
     $getSiswa = $conn->prepare("
         SELECT 
             s.id_siswa,
             s.nama AS nama_siswa
         FROM siswa s
+        WHERE s.id_kelas = ? AND s.id_tahun_ajaran = ?
         ORDER BY s.nama ASC
     ");
 
@@ -56,13 +79,15 @@ if ($mode === "mapel") {
         die("Query siswa gagal: " . $conn->error);
     }
 
+    $getSiswa->bind_param("ii", $id_kelas, $id_tahun_aktif);
     $getSiswa->execute();
     $resultSiswa = $getSiswa->get_result();
 
-    $filename = "template_import_nilai_mapel.csv";
+    $filename = "template_import_nilai_" . preg_replace('/[^a-zA-Z0-9]/', '_', $namaKelas) . ".csv";
 
     header("Content-Type: text/csv; charset=utf-8");
     header("Content-Disposition: attachment; filename=\"$filename\"");
+    header("Cache-Control: no-cache, must-revalidate");
 
     $output = fopen("php://output", "w");
 
@@ -88,12 +113,12 @@ if ($mode === "mapel") {
             $siswa["nama_siswa"],
             $id_mapel,
             $nama_mapel,
-            1,
-            "",
-            "",
-            "",
-            "",
-            ""
+            "",  // semester dikosongkan
+            "",  // nilai_angka
+            "",  // hadir
+            "",  // izin
+            "",  // sakit
+            ""   // alfa
         ]);
     }
 
@@ -104,14 +129,11 @@ if ($mode === "mapel") {
 /*
 |--------------------------------------------------------------------------
 | MODE 2 = WALI KELAS
-| - mapel dibuat MENYAMPING
-| - 1 siswa = 1 baris
-| - hanya untuk kelas wali yang sesuai guru login
 |--------------------------------------------------------------------------
 */
 if ($mode === "wali") {
     if ($id_kelas <= 0) {
-        die("ID kelas tidak valid.");
+        die("Pilih kelas terlebih dahulu.");
     }
 
     $cekWali = $conn->prepare("
@@ -119,7 +141,7 @@ if ($mode === "wali") {
             k.id_kelas,
             k.nama_kelas
         FROM kelas k
-        WHERE k.id_kelas = ? AND k.id_wali_kelas = ?
+        WHERE k.id_kelas = ? AND k.id_wali_kelas = ? AND k.id_tahun_ajaran = ?
         LIMIT 1
     ");
 
@@ -127,7 +149,7 @@ if ($mode === "wali") {
         die("Query wali kelas gagal: " . $conn->error);
     }
 
-    $cekWali->bind_param("ii", $id_kelas, $id_guru);
+    $cekWali->bind_param("iii", $id_kelas, $id_guru, $id_tahun_aktif);
     $cekWali->execute();
     $resultWali = $cekWali->get_result();
 
@@ -160,12 +182,13 @@ if ($mode === "wali") {
         ];
     }
 
+    // Ambil siswa hanya dari kelas wali dan tahun ajaran aktif
     $getSiswa = $conn->prepare("
         SELECT 
             s.id_siswa,
             s.nama AS nama_siswa
         FROM siswa s
-        WHERE s.id_kelas = ?
+        WHERE s.id_kelas = ? AND s.id_tahun_ajaran = ?
         ORDER BY s.nama ASC
     ");
 
@@ -173,7 +196,7 @@ if ($mode === "wali") {
         die("Query siswa kelas gagal: " . $conn->error);
     }
 
-    $getSiswa->bind_param("i", $id_kelas);
+    $getSiswa->bind_param("ii", $id_kelas, $id_tahun_aktif);
     $getSiswa->execute();
     $resultSiswa = $getSiswa->get_result();
 
@@ -181,6 +204,7 @@ if ($mode === "wali") {
 
     header("Content-Type: text/csv; charset=utf-8");
     header("Content-Disposition: attachment; filename=\"$filename\"");
+    header("Cache-Control: no-cache, must-revalidate");
 
     $output = fopen("php://output", "w");
 
@@ -208,17 +232,17 @@ if ($mode === "wali") {
         $row = [
             $siswa["id_siswa"],
             $siswa["nama_siswa"],
-            1
+            ""  // semester dikosongkan
         ];
 
         foreach ($daftarMapel as $mapel) {
             $row[] = "";
         }
 
-        $row[] = "";
-        $row[] = "";
-        $row[] = "";
-        $row[] = "";
+        $row[] = ""; // hadir
+        $row[] = ""; // izin
+        $row[] = ""; // sakit
+        $row[] = ""; // alfa
 
         fputcsv($output, $row);
     }

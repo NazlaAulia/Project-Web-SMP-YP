@@ -3,7 +3,6 @@ const displayMapelGuru = document.getElementById("displayMapelGuru");
 const displayNipGuru = document.getElementById("displayNipGuru");
 const displayEmailGuru = document.getElementById("displayEmailGuru");
 
-/* Sesuai ID yang ada di profilguru.html */
 const namaGuruInput = document.getElementById("nama");
 const nipGuruInput = document.getElementById("nip");
 const emailGuruInput = document.getElementById("email");
@@ -20,6 +19,36 @@ const roleIdLogin = localStorage.getItem("role_id");
 
 let fileFotoDipilih = null;
 
+// ========== FUNGSI MODAL ==========
+function showMessage(title, message, type) {
+    return Swal.fire({
+        title: title,
+        text: message,
+        icon: type,
+        confirmButtonColor: "#07484a",
+        confirmButtonText: "OK"
+    });
+}
+
+// ========== LOADING ==========
+function showLoading(show, text = "Mengupload foto...") {
+    if (show) {
+        Swal.fire({
+            title: text,
+            text: "Mohon tunggu sebentar",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            showConfirmButton: false
+        });
+    } else {
+        Swal.close();
+    }
+}
+
+// ========== ISI PROFIL ==========
 function isiProfilGuru(guru) {
     const nama = guru.nama || "-";
     const nip = guru.nip || "-";
@@ -40,106 +69,128 @@ function isiProfilGuru(guru) {
     if (jenisKelaminGuruInput) jenisKelaminGuruInput.value = jenisKelamin;
     if (usernameGuruInput) usernameGuruInput.value = username;
 
+    // Tambahkan cache buster pada foto
     if (previewFoto && guru.foto_profil) {
-        previewFoto.src = guru.foto_profil;
+        const fotoUrl = guru.foto_profil;
+        // Tambahkan timestamp agar tidak cache
+        const cacheBuster = "?t=" + new Date().getTime();
+        previewFoto.src = fotoUrl + cacheBuster;
     }
 }
 
+// ========== LOAD DATA ==========
 if (!idGuruLogin || roleIdLogin !== "2") {
-    alert("Silakan login sebagai guru terlebih dahulu.");
-    window.location.href = "../login.html";
+    showMessage("Peringatan", "Silakan login sebagai guru terlebih dahulu.", "warning").then(() => {
+        window.location.href = "../login.html";
+    });
 } else {
-    fetch(`get_guru.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}`)
+    showLoading(true, "Memuat data profil...");
+    
+    fetch(`get_guru.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&t=${new Date().getTime()}`)
         .then(res => res.json())
         .then(result => {
-            console.log("Data profil guru:", result);
-
+            showLoading(false);
+            
             if (result.status === "success") {
                 isiProfilGuru(result.data);
             } else {
-                alert(result.message);
-                localStorage.clear();
-                window.location.href = "../login.html";
+                showMessage("Gagal", result.message, "error").then(() => {
+                    localStorage.clear();
+                    window.location.href = "../login.html";
+                });
             }
         })
         .catch(err => {
-            console.error(err);
-            alert("Gagal load profil guru.");
+            showLoading(false);
+            showMessage("Error", "Gagal load profil guru.", "error");
         });
 }
 
-/* Preview foto saat dipilih */
+// ========== PREVIEW FOTO ==========
 if (uploadFoto && previewFoto) {
     uploadFoto.addEventListener("change", function () {
         const file = this.files[0];
-
         if (!file) return;
 
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+        if (!allowedTypes.includes(file.type)) {
+            showMessage("Error", "Format foto harus JPG, JPEG, PNG, atau WEBP.", "error");
+            this.value = "";
+            return;
+        }
+
+        if (file.size > 1 * 1024 * 1024) {
+            showMessage("Error", "Ukuran foto maksimal 1 MB.", "error");
+            this.value = "";
+            return;
+        }
+
         fileFotoDipilih = file;
-        previewFoto.src = URL.createObjectURL(file);
+        // Preview dengan cache buster
+        const previewUrl = URL.createObjectURL(file);
+        previewFoto.src = previewUrl;
+        showMessage("Berhasil", "Foto berhasil dipilih. Klik Simpan Perubahan.", "success");
     });
 }
 
-/* Simpan profil + foto profil ke database */
+// ========== SIMPAN FOTO ==========
 if (btnSimpanProfil) {
-    btnSimpanProfil.addEventListener("click", function () {
-        const formDataProfil = new FormData();
+    btnSimpanProfil.addEventListener("click", async function () {
+        if (!fileFotoDipilih) {
+            showMessage("Peringatan", "Silakan pilih foto terlebih dahulu.", "warning");
+            return;
+        }
 
-        formDataProfil.append("id_guru", idGuruLogin);
-        formDataProfil.append("role_id", roleIdLogin);
-        formDataProfil.append("nama", namaGuruInput ? namaGuruInput.value : "");
-        formDataProfil.append("nip", nipGuruInput ? nipGuruInput.value : "");
-        formDataProfil.append("email", emailGuruInput ? emailGuruInput.value : "");
-        formDataProfil.append("jenis_kelamin", jenisKelaminGuruInput ? jenisKelaminGuruInput.value : "");
+        showLoading(true, "Mengupload foto...");
 
-        fetch("update_guru.php", {
-            method: "POST",
-            body: formDataProfil
-        })
-            .then(res => res.json())
-            .then(result => {
-                if (result.status !== "success") {
-                    alert(result.message);
-                    return;
-                }
+        try {
+            const formDataFoto = new FormData();
+            formDataFoto.append("id_guru", idGuruLogin);
+            formDataFoto.append("role_id", roleIdLogin);
+            formDataFoto.append("foto", fileFotoDipilih);
 
-                if (!fileFotoDipilih) {
-                    alert(result.message);
-                    location.reload();
-                    return;
-                }
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-                const formDataFoto = new FormData();
-                formDataFoto.append("id_guru", idGuruLogin);
-                formDataFoto.append("role_id", roleIdLogin);
-                formDataFoto.append("foto", fileFotoDipilih);
-
-                return fetch("update_foto_guru.php", {
-                    method: "POST",
-                    body: formDataFoto
-                })
-                    .then(res => res.json())
-                    .then(fotoResult => {
-                        alert(fotoResult.message);
-
-                        if (fotoResult.status === "success") {
-                            fileFotoDipilih = null;
-                            location.reload();
-                        }
-                    });
-            })
-            .catch(err => {
-                console.error("Gagal menyimpan profil:", err);
-                alert("Gagal menyimpan profil guru.");
+            const fotoResponse = await fetch("update_foto_guru.php", {
+                method: "POST",
+                body: formDataFoto,
+                signal: controller.signal
             });
+            
+            clearTimeout(timeoutId);
+            
+            const fotoResult = await fotoResponse.json();
+
+            showLoading(false);
+
+            if (fotoResult.status === "success") {
+                fileFotoDipilih = null;
+                
+                // Reset input file
+                uploadFoto.value = "";
+                
+                // Update foto dengan cache buster
+                if (fotoResult.foto_url) {
+                    previewFoto.src = fotoResult.foto_url;
+                }
+                
+                await showMessage("Berhasil!", "Foto profil berhasil diubah!", "success");
+                
+                // Reload paksa dengan cache buster
+                window.location.href = window.location.href.split('?')[0] + "?t=" + new Date().getTime();
+            } else {
+                await showMessage("Gagal", fotoResult.message, "error");
+            }
+        } catch (err) {
+            showLoading(false);
+            
+            if (err.name === "AbortError") {
+                await showMessage("Timeout", "Proses terlalu lama. Silakan coba lagi.", "error");
+            } else {
+                console.error("Error:", err);
+                await showMessage("Error", "Terjadi kesalahan saat menyimpan foto.", "error");
+            }
+        }
     });
 }
-
-/* Animasi klik dikurangi agar profil akademik lebih formal */
-const animatedItems = document.querySelectorAll(".click-animate");
-
-animatedItems.forEach((item) => {
-    item.addEventListener("click", function () {
-        item.classList.remove("profile-active");
-    });
-});
