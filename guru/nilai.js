@@ -235,7 +235,7 @@ function cetakNilaiSiswa(idSiswa) {
   window.open(url, "_blank");
 }
 
-// ========== PARSE CSV (SAMA KAYAK SEBELUMNYA) ==========
+// ========== PARSE CSV ==========
 function bersihkanHeader(value) {
   return String(value || "").replace(/^\uFEFF/, "").trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -281,9 +281,17 @@ function parseCSVLine(line, delimiter = ",") {
 }
 
 function parseCSVFormatBiasa(lines, headers, delimiter) {
+  console.log("--- Checking format biasa ---");
+  
   const requiredHeaders = ["id_siswa", "id_mapel", "semester", "nilai_angka", "hadir", "izin", "sakit", "alfa"];
   const valid = requiredHeaders.every(header => headers.includes(header));
-  if (!valid) return null;
+  console.log("Required headers present:", valid);
+  
+  if (!valid) {
+    console.log("Missing headers. Required:", requiredHeaders);
+    console.log("Actual headers:", headers);
+    return null;
+  }
 
   const idSiswaIndex = headers.indexOf("id_siswa");
   const namaSiswaIndex = headers.indexOf("nama_siswa");
@@ -300,6 +308,7 @@ function parseCSVFormatBiasa(lines, headers, delimiter) {
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
     const row = parseCSVLine(lines[i], delimiter);
+    
     const id_siswa = Number(row[idSiswaIndex]);
     const nama_siswa = namaSiswaIndex >= 0 ? row[namaSiswaIndex] : "";
     const id_mapel = Number(row[idMapelIndex]);
@@ -310,9 +319,12 @@ function parseCSVFormatBiasa(lines, headers, delimiter) {
     const izin = ambilAngka(row[izinIndex], 0);
     const sakit = ambilAngka(row[sakitIndex], 0);
     const alfa = ambilAngka(row[alfaIndex], 0);
+    
     if (!id_siswa || !id_mapel || !semester || isNaN(nilai_angka)) continue;
     result.push({ id_siswa, nama_siswa, id_mapel, nama_mapel, semester, nilai_angka, hadir, izin, sakit, alfa });
   }
+  
+  console.log(`Format biasa result: ${result.length} valid rows`);
   return result;
 }
 
@@ -353,17 +365,37 @@ function parseCSVFormatWali(lines, headers, delimiter) {
 }
 
 function parseCSV(text) {
+  console.log("=== START PARSE CSV ===");
+  console.log("Text length:", text.length);
+  
   let lines = text.trim().split(/\r?\n/);
+  console.log("Total lines:", lines.length);
+  console.log("First line:", lines[0]);
+  
   if (lines.length < 2) throw new Error("File CSV kosong atau tidak valid.");
   lines[0] = lines[0].replace(/^\uFEFF/, "");
   if (lines[0].trim().toLowerCase() === "sep=,") lines = lines.slice(1);
   if (lines[0].trim().toLowerCase() === "sep=;") lines = lines.slice(1);
+  
   const delimiter = deteksiDelimiter(lines[0]);
+  console.log("Detected delimiter:", delimiter);
+  
   const headers = parseCSVLine(lines[0], delimiter).map(header => bersihkanHeader(header));
+  console.log("Headers:", headers);
+  
   const formatBiasa = parseCSVFormatBiasa(lines, headers, delimiter);
-  if (formatBiasa !== null && formatBiasa.length > 0) return formatBiasa;
+  if (formatBiasa !== null && formatBiasa.length > 0) {
+    console.log("Using format biasa, rows:", formatBiasa.length);
+    return formatBiasa;
+  }
+  
   const formatWali = parseCSVFormatWali(lines, headers, delimiter);
-  if (formatWali !== null && formatWali.length > 0) return formatWali;
+  if (formatWali !== null && formatWali.length > 0) {
+    console.log("Using format wali, rows:", formatWali.length);
+    return formatWali;
+  }
+  
+  console.log("No valid format detected!");
   throw new Error("Belum ada nilai yang bisa disimpan. Isi dulu kolom nilai mapel di file CSV, lalu simpan ulang sebagai CSV.");
 }
 
@@ -381,7 +413,7 @@ function isiDropdownWaliKelas(waliKelas) {
 function isiDropdownKelasMapel(kelasMapel) {
   if (!filterKelasWali) return;
   const nilaiSebelumnya = filterKelasWali.value;
-  filterKelasWali.innerHTML = ""; // Kosongkan dulu
+  filterKelasWali.innerHTML = "";
   kelasMapel.forEach(kelas => {
     filterKelasWali.innerHTML += `<option value="${kelas.id_kelas}">Kelas ${kelas.nama_kelas}</option>`;
   });
@@ -395,18 +427,12 @@ function aturTampilanMode() {
   const filterKelas = document.getElementById("filterKelas");
   
   if (mode === "wali") {
-    // Sembunyikan dropdown kelas
     if (filterKelasGroup) filterKelasGroup.style.display = "none";
-    
-    // Set nilai kelas dari wali_kelas (biar dipake fetch)
     if (window.waliKelasData && window.waliKelasData.length > 0) {
       if (filterKelas) filterKelas.value = window.waliKelasData[0].id_kelas;
     }
-    
-    // Ubah label filter
     if (filterKelasWaliLabel) filterKelasWaliLabel.textContent = "Kelas Wali";
   } else {
-    // Tampilkan dropdown kelas untuk guru mapel
     if (filterKelasGroup) filterKelasGroup.style.display = "flex";
     if (filterKelasWaliLabel) filterKelasWaliLabel.textContent = "Kelas Mapel Saya";
   }
@@ -439,7 +465,7 @@ function loadNilaiDatabase() {
 
   if (mode === "wali" && !idKelas) {
     if (nilaiTableBody) {
-      nilaiTableBody.innerHTML = `<td><td colspan="5" class="empty-state">Pilih kelas wali terlebih dahulu.</td></tr>`;
+      nilaiTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Pilih kelas wali terlebih dahulu.</td></tr>`;
     }
     return;
   }
@@ -453,11 +479,10 @@ function loadNilaiDatabase() {
       if (result.status === "success") {
         dataNilai = result.data || [];
         
-        // Simpan data wali kelas ke variabel global
-if (result.wali_kelas && result.wali_kelas.length > 0) {
-  window.waliKelasData = result.wali_kelas;
-}
-        // ========== SEMBUNYIKAN OPTION WALI KELAS JIKA BUKAN WALI ==========
+        if (result.wali_kelas && result.wali_kelas.length > 0) {
+          window.waliKelasData = result.wali_kelas;
+        }
+        
         if (result.is_wali_kelas === false) {
           const modeSelect = document.getElementById("modeNilai");
           if (modeSelect) {
@@ -477,7 +502,6 @@ if (result.wali_kelas && result.wali_kelas.length > 0) {
             }
           }
         }
-        // ========== SAMPAI SINI ==========
         
         aturTampilanWaliKelas();
         if (filterWaliKelasBox) {
@@ -526,37 +550,56 @@ function filterSearchNilai() {
 // ========== EVENT LISTENERS ==========
 if (uploadBtn) {
   uploadBtn.addEventListener("click", () => {
+    console.log("=== UPLOAD BUTTON CLICKED ===");
     clearMessage();
+    
     if (!idGuruLogin || roleIdLogin !== "2") {
       alert("Silakan login sebagai guru terlebih dahulu.");
       window.location.href = "../login.html";
       return;
     }
+    
     const file = fileInput.files[0];
+    console.log("Selected file:", file ? file.name : "No file");
+    
     if (!file) {
       showMessage("Pilih file CSV terlebih dahulu.", "error");
       return;
     }
+    
     if (!file.name.toLowerCase().endsWith(".csv")) {
       showMessage("File harus berformat .csv", "error");
       return;
     }
+    
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
         const text = e.target.result;
+        console.log("File loaded, length:", text.length);
+        console.log("First 300 chars:", text.substring(0, 300));
+        
         dataNilai = parseCSV(text);
+        console.log("Parsed dataNilai length:", dataNilai.length);
+        console.log("Sample parsed data:", dataNilai[0]);
+        
         if (dataNilai.length === 0) {
-          showMessage("Tidak ada data valid yang bisa diimport.", "error");
+          showMessage("Tidak ada data valid yang bisa diimport. Periksa format CSV Anda.", "error");
           return;
         }
+        
         renderTable();
         updateRekap();
         showMessage("Sedang menyimpan data nilai ke database...", "success");
+        
         simpanNilaiKeDatabase()
           .then(result => {
+            console.log("Save result:", result);
             if (result.status === "success") {
               showMessage(`Simpan nilai berhasil. Data baru: ${result.inserted || 0}, diperbarui: ${result.updated || 0}, dilewati: ${result.skipped || 0}.`, "success");
+              if (result.errors && result.errors.length > 0) {
+                console.warn("Errors:", result.errors);
+              }
               loadNilaiDatabase();
             } else {
               showMessage(result.message, "error");
@@ -567,8 +610,13 @@ if (uploadBtn) {
             showMessage("Gagal menyimpan nilai ke database.", "error");
           });
       } catch (error) {
+        console.error("Parse error:", error);
         showMessage(error.message, "error");
       }
+    };
+    reader.onerror = function(err) {
+      console.error("File read error:", err);
+      showMessage("Gagal membaca file.", "error");
     };
     reader.readAsText(file);
   });
@@ -591,34 +639,23 @@ if (filterKelasWali) {
 }
 
 if (downloadTemplateBtn) {
-
   downloadTemplateBtn.addEventListener("click", () => {
-
     if (!idGuruLogin || roleIdLogin !== "2") {
       alert("Silakan login sebagai guru terlebih dahulu.");
       window.location.href = "../login.html";
       return;
     }
 
-    const idKelas = filterKelasWali
-      ? filterKelasWali.value
-      : "";
+    const idKelas = filterKelasWali ? filterKelasWali.value : "";
 
     if (!idKelas) {
       alert("Pilih kelas terlebih dahulu.");
       return;
     }
 
-    const templateUrl =
-      `download_template_nilai.php?id_guru=${idGuruLogin}` +
-      `&role_id=${roleIdLogin}` +
-      `&mode=mapel` +
-      `&id_kelas=${idKelas}`;
-
+    const templateUrl = `download_template_nilai.php?id_guru=${idGuruLogin}&role_id=${roleIdLogin}&mode=mapel&id_kelas=${idKelas}`;
     window.location.href = templateUrl;
-
   });
-
 }
 
 loadNilaiDatabase();
