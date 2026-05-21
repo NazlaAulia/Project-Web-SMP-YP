@@ -1556,3 +1556,115 @@ body {
     justify-content: center;
   }
 }
+/* =====================================================
+   FILTER ROW - TOMBOL CETAK DI KANAN
+   ===================================================== */
+
+/* Layout filter dalam satu baris */
+.filter-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.filter-row .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 180px;
+}
+
+.filter-row .filter-group label {
+    color: #07484a;
+    font-size: 0.9rem;
+    font-weight: 800;
+    margin-bottom: 0;
+}
+
+/* Tombol cetak di paling kanan */
+.filter-row .filter-action-group {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-row .filter-action-group label {
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+#btnCetakSemuaRapor {
+    background: #07484a;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0 28px;
+    height: 56px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+#btnCetakSemuaRapor:hover {
+    background: #05393a;
+    transform: translateY(-1px);
+}
+
+#btnCetakSemuaRapor i {
+    font-size: 1.1rem;
+}
+
+/* Sembunyikan tombol print yang tidak perlu */
+.btn-print-clean {
+    display: none !important;
+}
+
+/* Responsive: layar kecil, tombol turun ke bawah */
+@media (max-width: 900px) {
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+    
+    .filter-row .filter-group {
+        width: 100%;
+    }
+    
+    .filter-row .filter-action-group {
+        margin-left: 0;
+        margin-top: 8px;
+    }
+    
+    .filter-row .filter-action-group label {
+        display: none;
+    }
+    
+    #btnCetakSemuaRapor {
+        width: 100%;
+        justify-content: center;
+        height: 52px;
+    }
+}
+
+/* Hilangkan transform animasi yang tidak perlu */
+#btnCetakSemuaRapor,
+.filter-row .filter-group select,
+.filter-row .filter-group .select-clean select {
+    animation: none !important;
+}
+
+#btnCetakSemuaRapor:active,
+.filter-row .filter-group select:active {
+    transform: none !important;
+}
