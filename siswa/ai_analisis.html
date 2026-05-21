@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Catatan Guru - SMP YP 17 Surabaya</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Font Awesome untuk icon navbar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -16,6 +18,156 @@
             background: #f0f7f5;
             margin: 0;
             padding: 20px;
+        }
+
+        /* ========== STYLE UNTUK SIDEBAR/NAVBAR ========== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: #064e4b;
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .hamburger {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar-menu li a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-menu li a i {
+            width: 20px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Modal logout */
+        .logout-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logout-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .logout-modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-batal, .btn-keluar {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        .btn-batal {
+            background: #e0e0e0;
+        }
+
+        .btn-keluar {
+            background: #dc2626;
+            color: white;
+        }
+
+        /* ========== STYLE MAIN CONTENT ========== */
+        .main-content {
+            margin-left: 260px;
+            transition: margin-left 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .hamburger {
+                display: block;
+            }
         }
 
         .container {
@@ -118,86 +270,6 @@
             color: #064e4b;
         }
 
-        .nilai-box {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .nilai-item {
-            text-align: center;
-        }
-
-        .nilai-label {
-            font-size: 11px;
-            color: #777;
-        }
-
-        .nilai-angka {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .nilai-angka.naik {
-            color: #16a34a;
-        }
-
-        .nilai-angka.turun {
-            color: #dc2626;
-        }
-
-        .growth-badge {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 20px;
-            background: #f0f0f0;
-        }
-
-        .growth-badge.naik {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-
-        .growth-badge.turun {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .cp-section {
-            padding: 16px 20px;
-            background: #fefce8;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .cp-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #854d0e;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .cp-list {
-            font-size: 13px;
-            color: #555;
-            line-height: 1.6;
-        }
-
-        .cp-item {
-            margin-bottom: 6px;
-            padding-left: 16px;
-            position: relative;
-        }
-
-        .cp-item::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #eab308;
-        }
-
         .analisis-section {
             padding: 16px 20px;
             background: white;
@@ -208,8 +280,7 @@
             line-height: 1.7;
             color: #333;
             white-space: pre-wrap;
-            text-align: justify;  /* Rata kiri-kanan */
-            text-justify: inter-word;
+            text-align: justify;
         }
 
         .kesimpulan-section {
@@ -232,8 +303,7 @@
             font-size: 15px;
             line-height: 1.7;
             white-space: pre-wrap;
-            text-align: justify;  /* Rata kiri-kanan */
-            text-justify: inter-word;
+            text-align: justify;
         }
 
         .loading {
@@ -268,12 +338,6 @@
             color: #991b1b;
         }
 
-        hr {
-            margin: 20px 0;
-            border: none;
-            border-top: 1px solid #e0e0e0;
-        }
-
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -289,30 +353,95 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>
-            <span>📝</span> Catatan Guru
-        </h2>
-        <p class="subtitle">Guru memberikan masukan dan saran untuk membantumu meningkatkan prestasi.</p>
-        
-        <div id="infoSiswa" class="info-siswa" style="display: none;"></div>
-        
-        <div id="ringkasanContainer" class="ringkasan-section" style="display: none;">
-            <div class="ringkasan-title">📊 Ringkasan Nilai</div>
-            <div id="ringkasanBadges"></div>
-            <div id="catatanRingkasan" style="margin-top: 12px; font-size: 13px; color: #666;"></div>
+    <!-- Tempat navbar akan di-load -->
+    <div id="navbarContainer"></div>
+
+    <!-- Konten utama catatan guru -->
+    <div class="main-content">
+        <div class="container">
+            <h2>
+                <span>📝</span> Catatan Guru
+            </h2>
+            <p class="subtitle">Guru memberikan masukan dan saran untuk membantumu meningkatkan prestasi.</p>
+            
+            <div id="infoSiswa" class="info-siswa" style="display: none;"></div>
+            
+            <div id="ringkasanContainer" class="ringkasan-section" style="display: none;">
+                <div class="ringkasan-title">📊 Ringkasan Nilai</div>
+                <div id="ringkasanBadges"></div>
+                <div id="catatanRingkasan" style="margin-top: 12px; font-size: 13px; color: #666;"></div>
+            </div>
+            
+            <div id="analisisContainer"></div>
+            
+            <div id="loadingState" class="loading">⏳ Sedang menyiapkan catatan dari guru...</div>
+            
+            <div id="kesimpulanContainer" style="display: none;"></div>
+            
+            <button class="refresh-btn" id="refreshBtn">🔄 Muat Ulang Catatan</button>
         </div>
-        
-        <div id="analisisContainer"></div>
-        
-        <div id="loadingState" class="loading">⏳ Sedang menyiapkan catatan dari guru...</div>
-        
-        <div id="kesimpulanContainer" style="display: none;"></div>
-        
-        <button class="refresh-btn" id="refreshBtn">🔄 Muat Ulang Catatan</button>
     </div>
 
     <script>
+        // ========== LOAD NAVBAR ==========
+        fetch('navbar.html')
+            .then(response => {
+                if (!response.ok) throw new Error('Navbar tidak ditemukan');
+                return response.text();
+            })
+            .then(html => {
+                document.getElementById('navbarContainer').innerHTML = html;
+                initNavbar();
+            })
+            .catch(error => {
+                console.warn('Gagal load navbar:', error);
+            });
+        
+        function initNavbar() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (hamburgerBtn && sidebar) {
+                hamburgerBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            const logoutModal = document.getElementById('logoutModal');
+            const cancelLogout = document.getElementById('cancelLogout');
+            const confirmLogout = document.getElementById('confirmLogout');
+            
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (logoutModal) logoutModal.style.display = 'flex';
+                });
+            }
+            
+            if (cancelLogout) {
+                cancelLogout.addEventListener('click', () => {
+                    if (logoutModal) logoutModal.style.display = 'none';
+                });
+            }
+            
+            if (confirmLogout) {
+                confirmLogout.addEventListener('click', () => {
+                    localStorage.removeItem('id_siswa');
+                    window.location.href = 'login.html';
+                });
+            }
+            
+            if (logoutModal) {
+                window.addEventListener('click', (e) => {
+                    if (e.target === logoutModal) {
+                        logoutModal.style.display = 'none';
+                    }
+                });
+            }
+        }
+        
+        // ========== FUNGSI LOAD ANALISIS YANG LENGKAP ==========
         function loadAnalisis(forceRefresh = false) {
             const idSiswa = localStorage.getItem("id_siswa");
             if (!idSiswa) {
@@ -380,74 +509,55 @@
                         document.getElementById('ringkasanContainer').style.display = 'block';
                     }
                     
-                    // ========== PARSING RESPONS AI YANG LEBIH CERDAS ==========
+                    // Tampilkan AI response dengan parsing yang lebih baik
                     if (data.data.ai_response) {
                         let responseText = data.data.ai_response;
                         let lines = responseText.split('\n');
                         
-                        // Deteksi apakah suatu baris adalah judul mapel (format: ### NAMA MAPEL atau --- atau [NAMA MAPEL])
                         function isMapelTitle(line) {
                             let trimmed = line.trim();
-                            // Cek format ### NAMA
                             if (trimmed.startsWith('###')) return true;
-                            // Cek format --- (pemisah)
                             if (trimmed === '---') return true;
-                            // Cek format [NAMA MAPEL]:
                             if (trimmed.match(/^\[[A-Z\s\/\.]+\]\s*:?/i)) return true;
-                            // Cek format NAMA MAPEL: (tanpa kurung, huruf besar semua)
                             if (trimmed.match(/^[A-Z\s\/\.]+\s*:/i) && !trimmed.startsWith('#')) return true;
                             return false;
                         }
                         
-                        // Ekstrak nama mapel dari baris judul
                         function extractMapelName(line) {
                             let trimmed = line.trim();
-                            // Hapus ###
                             let afterSharp = trimmed.replace(/^###\s*/, '');
-                            // Hapus [ ] dan :
                             let match = afterSharp.match(/^\[?([A-Z\s\/\.]+)\]?\s*:?\s*/i);
                             if (match) return match[1].trim();
-                            // Jika masih ada, ambil kata pertama sebelum :
                             let colonMatch = afterSharp.match(/^([A-Z\s\/\.]+)\s*:/i);
                             if (colonMatch) return colonMatch[1].trim();
-                            // Fallback
                             return afterSharp.split(' ')[0].trim();
                         }
                         
-                        let mapelItems = []; // { name, contentLines }
+                        let mapelItems = [];
                         let currentMapel = null;
                         let isInConclusion = false;
                         let conclusionLines = [];
-                        let pendingLines = []; // baris yang belum termasuk mapel (pembuka)
                         
-                        for (let i = 0; i < lines.length; i++) {
-                            let line = lines[i];
+                        for (let line of lines) {
                             let trimmed = line.trim();
                             if (trimmed === "") continue;
                             
-                            // Deteksi awal kesimpulan (kata kunci atau pola kalimat panjang setelah mapel terakhir)
                             let lowerLine = trimmed.toLowerCase();
                             let isConclusionKeyword = lowerLine.includes('kesimpulan') || lowerLine.includes('rangkuman') || 
-                                                    lowerLine.includes('secara keseluruhan') || lowerLine.includes('rata-rata nilai') ||
-                                                    lowerLine.includes('guru sangat bangga') || lowerLine.includes('guru selalu mendukung') ||
-                                                    (lowerLine.includes('semangat') && lowerLine.length > 50);
+                                                    lowerLine.includes('secara keseluruhan') || lowerLine.includes('guru sangat bangga');
                             
-                            // Jika sudah dalam mode kesimpulan, kumpulkan
                             if (isInConclusion) {
                                 conclusionLines.push(trimmed);
                                 continue;
                             }
                             
-                            // Jika menemukan kata kunci kesimpulan dan sebelumnya sudah ada mapel, pindah ke mode kesimpulan
                             if (isConclusionKeyword && currentMapel !== null) {
                                 isInConclusion = true;
                                 conclusionLines.push(trimmed);
                                 continue;
                             }
                             
-                            // Cek apakah baris ini adalah judul mapel baru
                             if (isMapelTitle(line)) {
-                                // Simpan mapel sebelumnya
                                 if (currentMapel !== null && currentMapel.contentLines.length > 0) {
                                     mapelItems.push({ name: currentMapel.name, content: currentMapel.contentLines.join(' ') });
                                 }
@@ -460,33 +570,19 @@
                                 continue;
                             }
                             
-                            // Jika tidak ada mapel aktif, simpan sebagai pending (mungkin teks pembuka)
-                            if (currentMapel === null) {
-                                pendingLines.push(trimmed);
-                                continue;
-                            }
-                            
-                            // Baris deskripsi mapel
                             if (currentMapel !== null) {
-                                // Hapus awalan seperti "Untuk mata pelajaran BIN:" jika tersisa
-                                let content = trimmed;
-                                if (content.match(/^untuk mata pelajaran/i)) {
-                                    content = content.replace(/^untuk mata pelajaran\s+[A-Z\s\/\.]+:\s*/i, '');
-                                }
-                                currentMapel.contentLines.push(content);
+                                currentMapel.contentLines.push(trimmed);
                             }
                         }
-                        // Simpan mapel terakhir
+                        
                         if (currentMapel !== null && currentMapel.contentLines.length > 0) {
                             mapelItems.push({ name: currentMapel.name, content: currentMapel.contentLines.join(' ') });
                         }
                         
-                        // Bangun HTML untuk setiap mapel
                         let mapelHtml = '';
                         if (mapelItems.length > 0) {
                             for (let item of mapelItems) {
-                                let konten = item.content.trim();
-                                if (!konten) konten = 'Tidak ada analisis khusus untuk mata pelajaran ini.';
+                                let konten = item.content.trim() || 'Tidak ada analisis khusus untuk mata pelajaran ini.';
                                 mapelHtml += `
                                     <div class="mapel-card">
                                         <div class="mapel-header">
@@ -499,32 +595,16 @@
                                 `;
                             }
                         } else {
-                            // Fallback: tampilkan seluruh response
-                            mapelHtml = `
-                                <div class="guru-response" style="background:#fefce8; border-left:5px solid #eab308; padding:20px; border-radius:16px;">
-                                    ${responseText.replace(/\n/g, '<br>')}
-                                </div>
-                            `;
+                            mapelHtml = `<div class="analisis-text" style="background:#fefce8; padding:20px; border-radius:16px;">${responseText.replace(/\n/g, '<br>')}</div>`;
                         }
                         document.getElementById('analisisContainer').innerHTML = mapelHtml;
                         
-                        // Tampilkan kesimpulan
                         if (conclusionLines.length > 0) {
                             let kesimpulanText = conclusionLines.join(' ').replace(/\n/g, '<br>');
                             document.getElementById('kesimpulanContainer').innerHTML = `
                                 <div class="kesimpulan-section">
                                     <div class="kesimpulan-title">🎯 Kesimpulan & Motivasi</div>
                                     <div class="kesimpulan-text">${kesimpulanText}</div>
-                                </div>
-                            `;
-                            document.getElementById('kesimpulanContainer').style.display = 'block';
-                        } else if (pendingLines.length > 0 && mapelItems.length === 0) {
-                            // Tidak ada mapel dan tidak ada kesimpulan, tampilkan pending sebagai teks biasa
-                            let fallbackHtml = pendingLines.join(' ').replace(/\n/g, '<br>');
-                            document.getElementById('kesimpulanContainer').innerHTML = `
-                                <div class="kesimpulan-section">
-                                    <div class="kesimpulan-title">📌 Catatan Guru</div>
-                                    <div class="kesimpulan-text">${fallbackHtml}</div>
                                 </div>
                             `;
                             document.getElementById('kesimpulanContainer').style.display = 'block';
