@@ -412,6 +412,20 @@ function aturTampilanMode() {
   }
 }
 
+// ========== TAMPILKAN NAMA FILE YANG DIPILIH ==========
+const fileInputElem = document.getElementById("fileInput");
+const selectedFileNameSpan = document.getElementById("selectedFileName");
+
+if (fileInputElem && selectedFileNameSpan) {
+  fileInputElem.addEventListener("change", function(e) {
+    if (fileInputElem.files.length > 0) {
+      selectedFileNameSpan.textContent = fileInputElem.files[0].name;
+    } else {
+      selectedFileNameSpan.textContent = "Belum ada file dipilih";
+    }
+  });
+}
+
 // ========== LOAD DATA ==========
 function loadNilaiDatabase() {
   if (!idGuruLogin || roleIdLogin !== "2") {
