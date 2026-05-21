@@ -23,15 +23,6 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid. Silakan login ulang.");
 }
 
-// ========== AMBIL TAHUN AJARAN AKTIF ==========
-$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
-$tahunAktif = $queryTahun->fetch_assoc();
-$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
-
-if ($id_tahun_aktif == 0) {
-    kirim_json("error", "Tidak ada tahun ajaran aktif.");
-}
-
 $stmtGuru = $conn->prepare("
     SELECT id_guru, nama
     FROM guru
