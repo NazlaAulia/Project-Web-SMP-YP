@@ -93,7 +93,7 @@ while ($row = $resultWali->fetch_assoc()) {
 
 $is_wali_kelas = count($wali_kelas) > 0;
 
-/* AMBIL KELAS MAPEL YANG DIAJAR GURU (HANYA TAHUN AJARAN AKTIF) */
+/* AMBIL KELAS MAPEL YANG DIAJAR GURU */
 $kelas_mapel = [];
 
 $getKelasMapel = $conn->prepare("
@@ -103,9 +103,8 @@ $getKelasMapel = $conn->prepare("
         k.tingkat
     FROM jadwal j
     INNER JOIN kelas k ON j.id_kelas = k.id_kelas AND k.id_tahun_ajaran = ?
-    INNER JOIN guru g ON j.id_guru = g.id_guru
     WHERE j.id_guru = ?
-      AND j.id_mapel = g.id_mapel
+      AND j.id_mapel = ?
     ORDER BY k.tingkat ASC, k.nama_kelas ASC
 ");
 
@@ -113,7 +112,7 @@ if (!$getKelasMapel) {
     kirim_json("error", "Query kelas mapel gagal: " . $conn->error);
 }
 
-$getKelasMapel->bind_param("ii", $id_tahun_aktif, $id_guru);
+$getKelasMapel->bind_param("iii", $id_tahun_aktif, $id_guru, $id_mapel_guru);
 $getKelasMapel->execute();
 $resultKelasMapel = $getKelasMapel->get_result();
 
@@ -148,9 +147,9 @@ if ($mode === "wali") {
     }
 }
 
-/* QUERY DATA NILAI - HANYA TAHUN AJARAN AKTIF */
+/* QUERY DATA NILAI */
 if ($mode === "wali") {
-    // MODE WALI KELAS
+    // MODE WALI KELAS - lihat semua mapel untuk satu kelas
     $stmt = $conn->prepare("
         SELECT 
             s.id_siswa,
@@ -181,7 +180,28 @@ if ($mode === "wali") {
 
     $stmt->bind_param("iii", $id_tahun_aktif, $id_tahun_aktif, $id_kelas);
 } else {
-    // MODE GURU MAPEL
+    // MODE GURU MAPEL - hanya mapel yang diajarkan
+    if ($id_kelas <= 0 && count($kelas_mapel) > 0) {
+        $id_kelas = $kelas_mapel[0]["id_kelas"];
+    }
+    
+    if ($id_kelas <= 0) {
+        kirim_json("success", "Data nilai berhasil dimuat.", [
+            "mode" => $mode,
+            "guru" => [
+                "id_guru" => (int) $guru["id_guru"],
+                "nama" => $guru["nama"],
+                "id_mapel" => $id_mapel_guru,
+                "nama_mapel" => $nama_mapel_guru
+            ],
+            "is_wali_kelas" => $is_wali_kelas,
+            "wali_kelas" => $wali_kelas,
+            "kelas_mapel" => $kelas_mapel,
+            "data" => []
+        ]);
+        exit;
+    }
+    
     $stmt = $conn->prepare("
         SELECT 
             s.id_siswa,
@@ -209,7 +229,7 @@ if ($mode === "wali") {
         kirim_json("error", "Query nilai mapel gagal: " . $conn->error);
     }
 
-    $stmt->bind_param("isiiii", $id_mapel_guru, $nama_mapel_guru, $id_tahun_aktif, $id_mapel_guru, $id_tahun_aktif, $id_kelas);
+    $stmt->bind_param("ssiiii", $id_mapel_guru, $nama_mapel_guru, $id_tahun_aktif, $id_mapel_guru, $id_tahun_aktif, $id_kelas);
 }
 
 $stmt->execute();
