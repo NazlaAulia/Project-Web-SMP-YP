@@ -157,8 +157,10 @@ function renderTablePaginated(filteredData) {
     return;
   }
 
+  // MENAMPILKAN DATA DENGAN NOMOR URUT YANG BENAR
   detailTableBody.innerHTML = paginatedData.map((item, index) => {
-    const globalIndex = startIndex + index + 1;
+    // NOMOR URUT = (halaman - 1) * jumlah per halaman + index + 1
+    const globalIndex = (currentPage - 1) * rowsPerPage + index + 1;
     const status = getStatus(item);
     const statusClass = formatStatusClass(status);
 
@@ -309,7 +311,7 @@ function loadKehadiranDatabase() {
         mapelOptions = result.mapel_options || [];
 
         isiFilterDariDatabase();
-        currentPage = 1; // Reset to first page
+        currentPage = 1;
         renderSemua();
       } else {
         alert(result.message || "Gagal memuat data kehadiran.");
