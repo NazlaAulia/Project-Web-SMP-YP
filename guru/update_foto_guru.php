@@ -63,20 +63,14 @@ if (!is_dir($folderUpload)) {
 }
 
 // Ambil foto lama
-$stmtOld = $conn->prepare("SELECT foto_profil FROM user WHERE id_guru = ? AND role_id = 2 LIMIT 1");
-if (!$stmtOld) {
-    kirim_json("error", "Query foto lama gagal: " . $conn->error);
-}
+$queryOld = "SELECT foto_profil FROM user WHERE id_guru = $id_guru AND role_id = 2 LIMIT 1";
+$resultOld = mysqli_query($conn, $queryOld);
 
-$stmtOld->bind_param("i", $id_guru);
-$stmtOld->execute();
-$resultOld = $stmtOld->get_result();
-
-if ($resultOld->num_rows === 0) {
+if (!$resultOld || mysqli_num_rows($resultOld) === 0) {
     kirim_json("error", "User guru tidak ditemukan.");
 }
 
-$dataOld = $resultOld->fetch_assoc();
+$dataOld = mysqli_fetch_assoc($resultOld);
 $fotoLama = $dataOld["foto_profil"] ?? "";
 
 $namaBaru = "guru_" . $id_guru . "_" . time() . "." . $ext;
@@ -86,29 +80,17 @@ if (!move_uploaded_file($tmpFile, $pathSimpan)) {
     kirim_json("error", "Gagal menyimpan foto ke folder upload.");
 }
 
-$stmtUpdate = $conn->prepare("UPDATE user SET foto_profil = ? WHERE id_guru = ? AND role_id = 2");
-if (!$stmtUpdate) {
-    if (file_exists($pathSimpan)) {
-        @unlink($pathSimpan);
-    }
-    kirim_json("error", "Query update foto gagal: " . $conn->error);
-}
+$queryUpdate = "UPDATE user SET foto_profil = '$pathSimpan' WHERE id_guru = $id_guru AND role_id = 2";
 
-$stmtUpdate->bind_param("si", $pathSimpan, $id_guru);
-
-if ($stmtUpdate->execute()) {
-    // Hapus foto lama jika ada dan berbeda
+if (mysqli_query($conn, $queryUpdate)) {
     if (!empty($fotoLama) && file_exists($fotoLama) && $fotoLama !== $pathSimpan) {
         @unlink($fotoLama);
     }
-
-    kirim_json("success", "Foto profil berhasil disimpan.", [
-        "foto_url" => $pathSimpan
-    ]);
+    kirim_json("success", "Foto profil berhasil disimpan.", ["foto_url" => $pathSimpan]);
 } else {
     if (file_exists($pathSimpan)) {
         @unlink($pathSimpan);
     }
-    kirim_json("error", "Gagal menyimpan foto ke database: " . $stmtUpdate->error);
+    kirim_json("error", "Gagal menyimpan foto ke database: " . mysqli_error($conn));
 }
 ?>

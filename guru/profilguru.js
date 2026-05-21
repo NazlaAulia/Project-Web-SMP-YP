@@ -19,13 +19,13 @@ const roleIdLogin = localStorage.getItem("role_id");
 
 let fileFotoDipilih = null;
 
-// ========== FUNGSI MODAL CUSTOM ==========
+// ========== FUNGSI MODAL ==========
 function showModal(message, type = "info") {
   return new Promise((resolve) => {
     const modal = document.getElementById("customModal");
     const modalTitle = document.getElementById("modalTitle");
     const modalMessage = document.getElementById("modalMessage");
-    const modalHeader = document.querySelector(".custom-modal-header");
+    const modalHeader = document.getElementById("modalHeader");
     const modalOkBtn = document.getElementById("modalOkBtn");
 
     if (!modal) {
@@ -34,28 +34,21 @@ function showModal(message, type = "info") {
       return;
     }
 
-    // Set header class berdasarkan type
-    modalHeader.classList.remove("success", "error", "info", "warning");
+    // Set header
+    modalHeader.setAttribute("data-type", type);
     
     let iconHtml = '<i class="bi bi-info-circle-fill"></i>';
     let titleText = "Informasi";
     
     if (type === "success") {
-      modalHeader.classList.add("success");
       iconHtml = '<i class="bi bi-check-circle-fill"></i>';
       titleText = "Berhasil";
     } else if (type === "error") {
-      modalHeader.classList.add("error");
       iconHtml = '<i class="bi bi-x-circle-fill"></i>';
       titleText = "Gagal";
     } else if (type === "warning") {
-      modalHeader.classList.add("warning");
       iconHtml = '<i class="bi bi-exclamation-triangle-fill"></i>';
       titleText = "Peringatan";
-    } else {
-      modalHeader.classList.add("info");
-      iconHtml = '<i class="bi bi-info-circle-fill"></i>';
-      titleText = "Informasi";
     }
 
     modalHeader.innerHTML = `${iconHtml}<span id="modalTitle">${titleText}</span>`;
@@ -106,7 +99,7 @@ function isiProfilGuru(guru) {
     }
 }
 
-// ========== LOAD DATA GURU ==========
+// ========== LOAD DATA ==========
 if (!idGuruLogin || roleIdLogin !== "2") {
     showModal("Silakan login sebagai guru terlebih dahulu.", "warning").then(() => {
         window.location.href = "../login.html";
@@ -138,7 +131,6 @@ if (uploadFoto && previewFoto) {
         const file = this.files[0];
         if (!file) return;
 
-        // Validasi file sebelum upload
         const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
         if (!allowedTypes.includes(file.type)) {
             showModal("Format foto harus JPG, JPEG, PNG, atau WEBP.", "error");
@@ -154,16 +146,17 @@ if (uploadFoto && previewFoto) {
 
         fileFotoDipilih = file;
         previewFoto.src = URL.createObjectURL(file);
+        showModal("Foto berhasil dipilih. Klik Simpan Perubahan untuk menyimpan.", "success");
     });
 }
 
-// ========== SIMPAN PROFIL + FOTO ==========
+// ========== SIMPAN PROFIL ==========
 if (btnSimpanProfil) {
     btnSimpanProfil.addEventListener("click", async function () {
         showLoading(true);
 
         try {
-            // Langkah 1: Update data profil (nama, nip, email, jenis_kelamin)
+            // Update data profil dulu
             const formDataProfil = new FormData();
             formDataProfil.append("id_guru", idGuruLogin);
             formDataProfil.append("role_id", roleIdLogin);
@@ -184,7 +177,7 @@ if (btnSimpanProfil) {
                 return;
             }
 
-            // Langkah 2: Upload foto jika ada perubahan
+            // Upload foto jika ada
             if (fileFotoDipilih) {
                 const formDataFoto = new FormData();
                 formDataFoto.append("id_guru", idGuruLogin);
@@ -209,19 +202,10 @@ if (btnSimpanProfil) {
                 location.reload();
             }
         } catch (err) {
-            console.error("Gagal menyimpan profil:", err);
-            await showModal("Gagal menyimpan profil guru.", "error");
+            console.error("Error:", err);
+            await showModal("Terjadi kesalahan saat menyimpan.", "error");
         } finally {
             showLoading(false);
         }
     });
 }
-
-// ========== ANIMASI KLIK (DIKURANGI) ==========
-const animatedItems = document.querySelectorAll(".click-animate");
-
-animatedItems.forEach((item) => {
-    item.addEventListener("click", function () {
-        item.classList.remove("profile-active");
-    });
-});
