@@ -80,15 +80,6 @@
           </label>
           <select id="filterKelas">
             <option value="Semua">Semua Kelas</option>
-            <option value="7A">Kelas 7A</option>
-            <option value="7B">Kelas 7B</option>
-            <option value="7C">Kelas 7C</option>
-            <option value="8A">Kelas 8A</option>
-            <option value="8B">Kelas 8B</option>
-            <option value="8C">Kelas 8C</option>
-            <option value="9A">Kelas 9A</option>
-            <option value="9B">Kelas 9B</option>
-            <option value="9C">Kelas 9C</option>
           </select>
         </div>
 
@@ -98,18 +89,6 @@
           </label>
           <select id="filterMapel">
             <option value="Semua">Semua Mapel</option>
-            <option value="BIN">BIN</option>
-            <option value="B. JAWA">B. JAWA</option>
-            <option value="PKN">PKN</option>
-            <option value="INFOR">INFOR</option>
-            <option value="MAT">MAT</option>
-            <option value="BIG">BIG</option>
-            <option value="IPA">IPA</option>
-            <option value="IPS">IPS</option>
-            <option value="BK">BK</option>
-            <option value="INFO/BK">INFO/BK</option>
-            <option value="PAI/BHQ">PAI/BHQ</option>
-            <option value="PJOK">PJOK</option>
           </select>
         </div>
       </section>
@@ -166,21 +145,21 @@
       </section>
 
       <section class="table-card click-animate">
-      <div class="table-header">
-        <div>
-          <h2>Detail Rekap Kehadiran Siswa</h2>
-          <p>Data rekap berdasarkan nilai, mapel, kelas, dan semester</p>
-        </div>
+        <div class="table-header">
+          <div>
+            <h2>Detail Rekap Kehadiran Siswa</h2>
+            <p>Data rekap berdasarkan nilai, mapel, kelas, dan semester</p>
+          </div>
 
-        <div class="search-box">
-          <i class="bi bi-search"></i>
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Cari nama, kelas, mapel, status..."
-          />
+          <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Cari nama, kelas, mapel, status..."
+            />
+          </div>
         </div>
-      </div>
 
         <div class="table-wrapper">
           <table>
@@ -201,11 +180,23 @@
             <tbody id="detailTableBody"></tbody>
           </table>
         </div>
+
+        <!-- PAGINATION START -->
+        <div class="pagination-container" id="paginationContainer">
+          <button class="pagination-btn" id="prevPageBtn" disabled>
+            <i class="bi bi-chevron-left"></i> Sebelumnya
+          </button>
+          <span class="pagination-info" id="paginationInfo">Halaman 1 dari 1</span>
+          <button class="pagination-btn" id="nextPageBtn">
+            Selanjutnya <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+        <!-- PAGINATION END -->
       </section>
     </main>
   </div>
 
   <script src="components/sidebar-guru.js"></script>
-  <script src="kehadiran.js?v=999"></script>
+  <script src="kehadiran.js?v=1001"></script>
 </body>
 </html>

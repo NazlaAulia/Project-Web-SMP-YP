@@ -2,12 +2,14 @@ let dataKehadiran = [];
 let kelasOptions = [];
 let mapelOptions = [];
 
+// Pagination state
+let currentPage = 1;
+const rowsPerPage = 10;
+
 const filterSemester = document.getElementById("filterSemester");
 const filterKelas = document.getElementById("filterKelas");
 const filterMapel = document.getElementById("filterMapel");
-const filterMapelGroup = filterMapel ? filterMapel.closest(".filter-group") : null;
 
-const kelasContainer = document.getElementById("kelasContainer");
 const detailTableBody = document.getElementById("detailTableBody");
 const searchInput = document.getElementById("searchInput");
 
@@ -25,6 +27,11 @@ const chartHadirBar = document.getElementById("chartHadirBar");
 const chartIzinBar = document.getElementById("chartIzinBar");
 const chartSakitBar = document.getElementById("chartSakitBar");
 const chartAlfaBar = document.getElementById("chartAlfaBar");
+
+// Pagination Elements
+const prevPageBtn = document.getElementById("prevPageBtn");
+const nextPageBtn = document.getElementById("nextPageBtn");
+const paginationInfo = document.getElementById("paginationInfo");
 
 const idGuruLogin = localStorage.getItem("id_guru");
 const roleIdLogin = localStorage.getItem("role_id");
@@ -116,72 +123,49 @@ function updateChart(total) {
   if (chartAlfaBar) chartAlfaBar.style.width = `${(total.alfa / maxValue) * 100}%`;
 }
 
-function renderKelasCards(data) {
-  if (!kelasContainer) return;
-
-  if (data.length === 0) {
-    kelasContainer.innerHTML = `
-      <div class="empty-kelas-card">
-        <i class="bi bi-inbox"></i>
-        <h3>Belum Ada Data Rekap</h3>
-        <p>Data kehadiran belum tersedia untuk filter yang dipilih.</p>
-      </div>
-    `;
-    return;
-  }
-
-  const daftarKelas = [...new Set(data.map(item => item.kelas))];
-
-  kelasContainer.innerHTML = daftarKelas.map(kelas => {
-    const dataKelas = data.filter(item => item.kelas === kelas);
-    const total = hitungTotal(dataKelas);
-
-    const totalSemua = total.hadir + total.izin + total.sakit + total.alfa;
-    const persenHadir = totalSemua > 0 ? Math.round((total.hadir / totalSemua) * 100) : 0;
-
-    return `
-      <div class="kelas-card kelas-card-compact click-animate">
-        <div class="kelas-card-head">
-          <div>
-            <h3>Kelas ${kelas}</h3>
-            <p>Rekap data nilai siswa</p>
-          </div>
-          <span class="percent-badge">${persenHadir}% Hadir</span>
-        </div>
-
-        <div class="compact-stat">
-          <span><strong>${total.hadir}</strong> Hadir</span>
-          <span><strong>${total.izin}</strong> Izin</span>
-          <span><strong>${total.sakit}</strong> Sakit</span>
-          <span><strong>${total.alfa}</strong> Alfa</span>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  setupCardAnimation();
-}
-
-function renderTable(data) {
+function renderTablePaginated(filteredData) {
   if (!detailTableBody) return;
 
-  if (data.length === 0) {
-    detailTableBody.innerHTML = `
-      <tr>
-        <td colspan="10">Tidak ada data kehadiran.</td>
-      </tr>
-    `;
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / rowsPerPage);
+  
+  // Validate current page
+  if (currentPage > totalPages && totalPages > 0) {
+    currentPage = totalPages;
+  }
+  if (currentPage < 1) {
+    currentPage = 1;
+  }
+  
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
+  if (paginatedData.length === 0 && filteredData.length > 0) {
+    currentPage = 1;
+    renderTablePaginated(filteredData);
     return;
   }
 
-  detailTableBody.innerHTML = data.map((item, index) => {
+  if (paginatedData.length === 0) {
+    detailTableBody.innerHTML = `
+      <tr>
+        <td colspan="10" style="text-align: center;">Tidak ada data kehadiran.</td>
+      </tr>
+    `;
+    updatePaginationControls(totalPages, totalItems);
+    return;
+  }
+
+  detailTableBody.innerHTML = paginatedData.map((item, index) => {
+    const globalIndex = startIndex + index + 1;
     const status = getStatus(item);
     const statusClass = formatStatusClass(status);
 
     return `
       <tr>
-        <td>${index + 1}</td>
-        <td>${item.nama}</td>
+        <td>${globalIndex}</td>
+        <td>${escapeHtml(item.nama)}</td>
         <td>${item.kelas}</td>
         <td>${item.mapel}</td>
         <td>${item.semester}</td>
@@ -197,6 +181,50 @@ function renderTable(data) {
       </tr>
     `;
   }).join("");
+  
+  updatePaginationControls(totalPages, totalItems);
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function updatePaginationControls(totalPages, totalItems) {
+  if (paginationInfo) {
+    const displayTotalPages = totalPages === 0 ? 1 : totalPages;
+    paginationInfo.textContent = `Halaman ${currentPage} dari ${displayTotalPages} (${totalItems} data)`;
+  }
+  
+  if (prevPageBtn) {
+    prevPageBtn.disabled = currentPage === 1 || totalItems === 0;
+  }
+  
+  if (nextPageBtn) {
+    nextPageBtn.disabled = currentPage === totalPages || totalItems === 0 || totalPages === 0;
+  }
+}
+
+function goToPrevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    renderSemua();
+  }
+}
+
+function goToNextPage() {
+  const filteredData = getFilteredData();
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderSemua();
+  }
 }
 
 function isiFilterDariDatabase() {
@@ -205,29 +233,32 @@ function isiFilterDariDatabase() {
   }
 
   if (filterKelas) {
-    filterKelas.innerHTML = `<option value="Semua">Semua Kelas</option>`;
-
-    kelasOptions.forEach(kelas => {
-      filterKelas.innerHTML += `<option value="${kelas}">Kelas ${kelas}</option>`;
-    });
+    filterKelas.innerHTML = '<option value="Semua">Semua Kelas</option>';
+    
+    if (kelasOptions && kelasOptions.length > 0) {
+      kelasOptions.forEach(kelas => {
+        filterKelas.innerHTML += `<option value="${kelas}">Kelas ${kelas}</option>`;
+      });
+    }
 
     filterKelas.value = "Semua";
   }
 
   if (filterMapel) {
-    if (mapelOptions.length === 1) {
+    if (mapelOptions && mapelOptions.length === 1) {
       const mapelGuru = mapelOptions[0];
-
       filterMapel.innerHTML = `<option value="${mapelGuru}">${mapelGuru}</option>`;
       filterMapel.value = mapelGuru;
       filterMapel.disabled = true;
       filterMapel.classList.add("readonly-mapel");
     } else {
-      filterMapel.innerHTML = `<option value="Semua">Semua Mapel</option>`;
-
-      mapelOptions.forEach(mapel => {
-        filterMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
-      });
+      filterMapel.innerHTML = '<option value="Semua">Semua Mapel</option>';
+      
+      if (mapelOptions && mapelOptions.length > 0) {
+        mapelOptions.forEach(mapel => {
+          filterMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
+        });
+      }
 
       filterMapel.value = "Semua";
       filterMapel.disabled = false;
@@ -238,20 +269,26 @@ function isiFilterDariDatabase() {
 
 function renderSemua() {
   const filteredData = getFilteredData();
-
+  
   updateSummary(filteredData);
-  renderTable(filteredData);
+  renderTablePaginated(filteredData);
   setupCardAnimation();
 }
 
 function setupCardAnimation() {
   const cards = document.querySelectorAll(".click-animate");
-
+  
   cards.forEach(card => {
-    card.addEventListener("click", function () {
-      card.classList.remove("card-active");
-    });
+    card.removeEventListener("click", handleCardClick);
+    card.addEventListener("click", handleCardClick);
   });
+}
+
+function handleCardClick() {
+  this.classList.add("card-active");
+  setTimeout(() => {
+    this.classList.remove("card-active");
+  }, 550);
 }
 
 function loadKehadiranDatabase() {
@@ -272,31 +309,54 @@ function loadKehadiranDatabase() {
         mapelOptions = result.mapel_options || [];
 
         isiFilterDariDatabase();
+        currentPage = 1; // Reset to first page
         renderSemua();
       } else {
-        alert(result.message);
+        alert(result.message || "Gagal memuat data kehadiran.");
       }
     })
     .catch(err => {
       console.error("Gagal load kehadiran:", err);
-      alert("Gagal memuat data kehadiran.");
+      alert("Gagal memuat data kehadiran. Periksa koneksi atau file get_kehadiran.php");
     });
 }
 
+// Event Listeners
 if (filterSemester) {
-  filterSemester.addEventListener("change", renderSemua);
+  filterSemester.addEventListener("change", () => {
+    currentPage = 1;
+    renderSemua();
+  });
 }
 
 if (filterKelas) {
-  filterKelas.addEventListener("change", renderSemua);
+  filterKelas.addEventListener("change", () => {
+    currentPage = 1;
+    renderSemua();
+  });
 }
 
 if (filterMapel) {
-  filterMapel.addEventListener("change", renderSemua);
+  filterMapel.addEventListener("change", () => {
+    currentPage = 1;
+    renderSemua();
+  });
 }
 
 if (searchInput) {
-  searchInput.addEventListener("input", renderSemua);
+  searchInput.addEventListener("input", () => {
+    currentPage = 1;
+    renderSemua();
+  });
 }
 
+if (prevPageBtn) {
+  prevPageBtn.addEventListener("click", goToPrevPage);
+}
+
+if (nextPageBtn) {
+  nextPageBtn.addEventListener("click", goToNextPage);
+}
+
+// Load data when page loads
 loadKehadiranDatabase();
