@@ -1882,3 +1882,65 @@ body {
   color: #07484a;
   font-weight: 600;
 }
+/* =========================
+   MATIKAN SEMUA ANIMASI YANG MENGGANJEL
+========================= */
+.click-animate,
+.click-animate:hover,
+.click-animate.profile-active,
+.summary-card,
+.filter-card,
+.chart-card,
+.table-card,
+.kelas-card,
+tbody tr,
+button,
+select,
+input,
+.profile-card-main,
+.stat-card,
+.side-card {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    cursor: default !important;
+}
+
+/* Matikan efek hover yang bikin glitch */
+.click-animate:hover,
+.summary-card:hover,
+.filter-card:hover,
+.chart-card:hover,
+.table-card:hover,
+.kelas-card:hover,
+button:hover,
+.profile-card-main:hover,
+.stat-card:hover,
+.side-card:hover {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Matikan semua efek focus yang berkedip */
+input:focus,
+select:focus,
+button:focus,
+.btn-primary:focus,
+.btn-upload:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
+/* Matikan efek loading berkedip */
+.spin-icon {
+    animation: none !important;
+}
+
+/* Matikan efek skeleton loader jika ada */
+.skeleton,
+.skeleton-loader,
+.shimmer-effect {
+    animation: none !important;
+}
