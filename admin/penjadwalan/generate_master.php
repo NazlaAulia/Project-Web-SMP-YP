@@ -504,11 +504,16 @@ try {
     // ===============================
     $kelas = [];
 
-    $qKelas = $conn->query("
-        SELECT id_kelas, nama_kelas
-        FROM kelas
-        ORDER BY tingkat ASC, nama_kelas ASC
-    ");
+// Hanya ambil kelas untuk tahun ajaran aktif
+$qKelas = $conn->prepare("
+    SELECT id_kelas, nama_kelas
+    FROM kelas
+    WHERE id_tahun_ajaran = ?
+    ORDER BY tingkat ASC, nama_kelas ASC
+");
+$qKelas->bind_param("i", $id_tahun_aktif);
+$qKelas->execute();
+$qKelas = $qKelas->get_result();  // $qKelas jadi result set, bukan statement
 
     if (!$qKelas) {
         throw new Exception('Gagal mengambil data kelas: ' . $conn->error);
