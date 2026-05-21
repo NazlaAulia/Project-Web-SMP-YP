@@ -23,15 +23,6 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid. Silakan login ulang.");
 }
 
-// ========== AMBIL TAHUN AJARAN AKTIF ==========
-$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
-$tahunAktif = $queryTahun->fetch_assoc();
-$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
-
-if ($id_tahun_aktif == 0) {
-    kirim_json("error", "Tidak ada tahun ajaran aktif.");
-}
-
 $stmtGuru = $conn->prepare("
     SELECT id_guru, nama
     FROM guru
@@ -60,7 +51,7 @@ if ($id_tahun_ajaran_aktif == 0) {
     kirim_json("error", "Tahun ajaran aktif tidak ditemukan.");
 }
 
-// Query dengan filter tahun ajaran aktif dan hanya status 'fix' (opsional)
+// Query ambil semua jadwal (draft & fix) untuk tahun ajaran aktif
 $stmt = $conn->prepare("
     SELECT 
         j.id_jadwal,
@@ -82,7 +73,6 @@ $stmt = $conn->prepare("
     LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
     WHERE j.id_guru = ?
       AND j.id_tahun_ajaran = ?
-      AND j.status = 'fix'   -- jika hanya ingin jadwal tetap; hapus baris ini jika ingin draft juga
     ORDER BY 
         FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'),
         COALESCE(j.jp_mulai, 0),
@@ -123,3 +113,4 @@ kirim_json("success", "Jadwal guru berhasil diambil.", [
     "guru" => $guru,
     "data" => $jadwal
 ]);
+?>
