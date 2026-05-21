@@ -3,19 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profil Guru</title>
+  <title>Profil Guru - SMP YP 17</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="components/sidebar.css">
-  <link rel="stylesheet" href="profilguru.css?v=10">
-  <link rel="stylesheet" href="components/fix-mobile.css">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profil Guru</title>
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="components/sidebar.css">
-  <link rel="stylesheet" href="profilguru.css?v=10">
+  <link rel="stylesheet" href="profilguru.css?v=20">
   <link rel="stylesheet" href="components/fix-mobile.css">
   
   <!-- SweetAlert -->
@@ -25,7 +17,6 @@
 <body>
   <div class="app-container">
     <div id="sidebar-container"></div>
-
 
     <main class="main-content">
       <header class="page-header">
@@ -44,7 +35,7 @@
         </button>
       </header>
 
-      <section class="profile-card-main click-animate">
+      <section class="profile-card-main">
         <div class="profile-photo-section">
           <div class="photo-wrap">
             <img id="previewFoto" src="https://i.pravatar.cc/300?img=12" alt="Foto Guru">
@@ -84,72 +75,70 @@
       </section>
 
       <section class="stats-grid">
-        <div class="stat-card click-animate">
+        <div class="stat-card">
           <i class="bi bi-book-half"></i>
           <div>
-            <strong>4</strong>
+            <strong id="totalKelas">0</strong>
             <span>Kelas Diampu</span>
           </div>
         </div>
 
-        <div class="stat-card click-animate">
+        <div class="stat-card">
           <i class="bi bi-people-fill"></i>
           <div>
-            <strong>128</strong>
+            <strong id="totalSiswa">0</strong>
             <span>Total Siswa</span>
           </div>
         </div>
 
-        <div class="stat-card click-animate">
+        <div class="stat-card">
           <i class="bi bi-calendar-week"></i>
           <div>
-            <strong>18</strong>
+            <strong id="totalJam">0</strong>
             <span>Jam Mengajar</span>
           </div>
         </div>
       </section>
 
       <section class="profil-layout">
-      <div class="profil-main-card">
-        <div class="card-header">
-          <h2>Informasi Pribadi</h2>
-          <p>Data utama guru yang nantinya dapat disinkronkan dari database.</p>
+        <div class="profil-main-card">
+          <div class="card-header">
+            <h2>Informasi Pribadi</h2>
+            <p>Data utama guru yang dapat disinkronkan dari database.</p>
+          </div>
+
+          <div class="profil-form-grid">
+            <div class="form-group">
+              <label>Nama Lengkap</label>
+              <input type="text" id="nama" readonly>
+            </div>
+
+            <div class="form-group">
+              <label>NIP</label>
+              <input type="text" id="nip" readonly>
+            </div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="email" readonly>
+            </div>
+
+            <div class="form-group">
+              <label>Mata Pelajaran</label>
+              <input type="text" id="namaMapel" readonly>
+            </div>
+
+            <div class="form-group">
+              <label>Jenis Kelamin</label>
+              <input type="text" id="jenisKelamin" readonly>
+            </div>
+          </div>
         </div>
 
-        <div class="profil-form-grid">
-          <div class="form-group">
-            <label>Nama Lengkap</label>
-            <input type="text" id="nama" readonly>
-          </div>
-
-          <div class="form-group">
-            <label>NIP</label>
-            <input type="text" id="nip" readonly>
-          </div>
-
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="email" readonly>
-          </div>
-
-          <div class="form-group">
-            <label>Mata Pelajaran</label>
-            <input type="text" id="namaMapel" readonly>
-          </div>
-
-          <div class="form-group">
-            <label>Jenis Kelamin</label>
-            <input type="text" id="jenisKelamin" readonly>
-          </div>
-        </div>
-      </div>
-
-      <aside class="profil-side-column">
+        <aside class="profil-side-column">
           <div class="side-card keamanan-card">
             <h2>Keamanan Akun</h2>
-
             <p>Nama Pengguna hanya sebagai informasi. Perubahan akun dilakukan melalui menu Pengaturan.</p>
-
 
             <div class="form-group">
               <label>Nama Pengguna</label>
@@ -170,7 +159,7 @@
     </main>
   </div>
 
-    <!-- MODAL SEDERHANA -->
+  <!-- MODAL SEDERHANA -->
   <div id="customModal" class="custom-modal" style="display: none;">
     <div class="custom-modal-content">
       <div class="custom-modal-header" id="modalHeader">
@@ -195,16 +184,6 @@
   </div>
 
   <script src="components/sidebar-guru.js"></script>
-  <script src="profilguru.js?v=6"></script>
-</body>
-</html>
-
-  <script src="components/sidebar-guru.js"></script>
-  <script src="profilguru.js?v=5"></script>
-</body>
-</html>
-
-  <script src="components/sidebar-guru.js"></script>
-  <script src="profilguru.js?v=4"></script>
+  <script src="profilguru.js?v=20"></script>
 </body>
 </html>
