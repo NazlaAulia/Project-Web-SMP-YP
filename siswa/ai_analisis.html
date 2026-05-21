@@ -294,7 +294,7 @@
         </h2>
         <p class="subtitle">Guru memberikan masukan dan saran untuk membantumu meningkatkan prestasi.</p>
         
-        <!-- Info Siswa akan ditampilkan di sini -->
+        <!-- Info Siswa -->
         <div id="infoSiswa" class="info-siswa" style="display: none;"></div>
         
         <!-- Ringkasan Nilai -->
@@ -310,7 +310,7 @@
         <!-- Loading State -->
         <div id="loadingState" class="loading">⏳ Sedang menyiapkan catatan dari guru...</div>
         
-        <!-- Kesimpulan akan ditampilkan di sini -->
+        <!-- Kesimpulan -->
         <div id="kesimpulanContainer" style="display: none;"></div>
         
         <button class="refresh-btn" id="refreshBtn">🔄 Muat Ulang Catatan</button>
@@ -318,6 +318,14 @@
 
     <script>
         function loadAnalisis(forceRefresh = false) {
+            // Ambil id_siswa dari localStorage (disimpan saat login di siswa.js)
+            const idSiswa = localStorage.getItem("id_siswa");
+            if (!idSiswa) {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('analisisContainer').innerHTML = '<div class="error-box">❌ Anda belum login. Silakan login terlebih dahulu.</div>';
+                return;
+            }
+
             // Tampilkan loading
             document.getElementById('loadingState').style.display = 'block';
             document.getElementById('analisisContainer').innerHTML = '';
@@ -325,7 +333,13 @@
             document.getElementById('kesimpulanContainer').style.display = 'none';
             document.getElementById('infoSiswa').style.display = 'none';
             
-            const url = forceRefresh ? 'get_analisis_ai.php?refresh=1&t=' + Date.now() : 'get_analisis_ai.php?t=' + Date.now();
+            // Buat URL dengan parameter id_siswa dari localStorage
+            const baseUrl = 'get_analisis_ai.php';
+            const params = new URLSearchParams();
+            params.append('id_siswa', idSiswa);
+            params.append('t', Date.now());
+            if (forceRefresh) params.append('refresh', '1');
+            const url = baseUrl + '?' + params.toString();
             
             fetch(url, {
                 method: 'GET',
@@ -380,7 +394,6 @@
                     
                     // Tampilkan analisis per mapel (dari AI)
                     if (data.data.ai_response) {
-                        // Pisahkan analisis per mapel dan kesimpulan
                         let responseText = data.data.ai_response;
                         let lines = responseText.split('\n');
                         let currentMapel = '';
@@ -388,7 +401,6 @@
                         let kesimpulanHtml = '';
                         let isKesimpulan = false;
                         
-                        // Regex untuk mendeteksi awal mapel (format: [MAPEL]: atau MAPEL:)
                         const mapelRegex = /^\[?([A-Z\s\/]+)\]?\s*:/i;
                         
                         for (let i = 0; i < lines.length; i++) {
@@ -396,7 +408,6 @@
                             let match = line.match(mapelRegex);
                             
                             if (match && !isKesimpulan) {
-                                // Deteksi awal mapel baru
                                 if (currentMapel) {
                                     mapelHtml += `</div></div>`;
                                 }
@@ -418,7 +429,6 @@
                             } else if (isKesimpulan) {
                                 kesimpulanHtml += line + '<br>';
                             } else if (currentMapel) {
-                                // Tambahkan konten analisis
                                 if (line.trim()) {
                                     mapelHtml += line + '<br>';
                                 }
@@ -442,7 +452,6 @@
                             `;
                             document.getElementById('kesimpulanContainer').style.display = 'block';
                         } else if (!mapelHtml) {
-                            // Fallback: tampilkan semua response
                             let guruHtml = responseText.replace(/\n/g, '<br>');
                             document.getElementById('analisisContainer').innerHTML = `
                                 <div class="guru-response" style="background:#fefce8; border-left:5px solid #eab308; padding:20px; border-radius:16px;">
