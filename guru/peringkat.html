@@ -85,9 +85,17 @@
                             <option value="Ganjil">Semester Ganjil</option>
                             <option value="Genap">Semester Genap</option>
                         </select>
+
+                        <select id="filterAngkatan" class="filter-select">
+    <option value="0">Semua Kelas</option>
+    <option value="7">Kelas 7</option>
+    <option value="8">Kelas 8</option>
+    <option value="9">Kelas 9</option>
+</select>
+
                     </div>
 
-                    <div class="table-wrapper">
+                     <div class="table-wrapper">
                         <table class="rank-table">
                             <thead>
                                 <tr>
@@ -101,6 +109,22 @@
                             <tbody id="rankingBody"></tbody>
                         </table>
                     </div>
+
+                    <!-- PAGINATION START -->
+                    <div class="pagination-container" id="paginationContainer">
+                        <button class="pagination-btn" id="prevPageBtn" disabled>
+                            <i class="bi bi-chevron-left"></i> Sebelumnya
+                        </button>
+                        
+                        <div class="pagination-numbers" id="paginationNumbers">
+                            <!-- Nomor halaman akan diisi oleh JS -->
+                        </div>
+                        
+                        <button class="pagination-btn" id="nextPageBtn">
+                            Selanjutnya <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                    <!-- PAGINATION END -->
                 </section>
             </div>
         </main>

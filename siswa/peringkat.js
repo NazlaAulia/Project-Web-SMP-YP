@@ -11,6 +11,10 @@ let data = [];
 let namaLogin = "";
 let idLogin = "";
 
+// Variabel untuk pagination
+let currentPage = 1;
+const itemsPerPage = 5; // Jumlah baris per halaman
+
 function isiHeaderDariLocalStorage() {
   const nama = localStorage.getItem("nama_siswa") || "Siswa";
   const kelas = localStorage.getItem("kelas_siswa") || "-";
@@ -39,7 +43,10 @@ async function loadTahunAjaran() {
           </option>`
         ).join("");
         
-        tahunSelect.addEventListener("change", () => loadPeringkat());
+        tahunSelect.addEventListener("change", () => {
+          currentPage = 1;
+          loadPeringkat();
+        });
       }
     }
   } catch (error) {
@@ -95,7 +102,9 @@ async function loadPeringkat() {
     if (kelasCard) kelasCard.textContent = `Kelas ${siswa.kelas || "-"}`;
     if (nilaiRataRata) nilaiRataRata.textContent = siswa.nilai || "-";
 
-    renderTable();
+    // Reset ke halaman 1 setiap kali data baru dimuat
+    currentPage = 1;
+    renderTableWithPagination();
   } catch (error) {
     console.error("Error:", error);
     alert("Terjadi kesalahan saat mengambil data dari server");
@@ -110,10 +119,11 @@ function getStatusBadge(status) {
   return '<span class="status-badge status-na">-</span>';
 }
 
-function renderTable() {
+// Fungsi baru untuk render tabel dengan pagination
+function renderTableWithPagination() {
   if (!tableBody) return;
-
-  tableBody.innerHTML = "";
+  
+  const paginationContainer = document.getElementById("paginationContainer");
 
   if (data.length === 0) {
     tableBody.innerHTML = `
@@ -121,10 +131,31 @@ function renderTable() {
         <td colspan="5" style="text-align:center;">Data peringkat tidak ditemukan</td>
       </tr>
     `;
+    if (paginationContainer) paginationContainer.style.display = "none";
     return;
   }
 
-  data.forEach((item) => {
+  // Hitung total halaman
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  
+  // Tampilkan pagination hanya jika lebih dari 1 halaman
+  if (paginationContainer) {
+    if (totalPages > 1) {
+      paginationContainer.style.display = "flex";
+    } else {
+      paginationContainer.style.display = "none";
+    }
+  }
+
+  // Tentukan data yang akan ditampilkan di halaman ini
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageData = data.slice(startIndex, endIndex);
+
+  // Render tabel untuk halaman saat ini
+  tableBody.innerHTML = "";
+
+  currentPageData.forEach((item) => {
     const row = document.createElement("tr");
 
     const isLoginUser =
@@ -146,7 +177,109 @@ function renderTable() {
 
     tableBody.appendChild(row);
   });
+
+  // Update info pagination
+  updatePaginationInfo(startIndex, endIndex, data.length);
+  
+  // Render tombol pagination
+  renderPaginationButtons(totalPages);
 }
+
+function updatePaginationInfo(startIndex, endIndex, totalData) {
+  const paginationInfo = document.getElementById("paginationInfo");
+  if (!paginationInfo) return;
+  
+  const start = startIndex + 1;
+  const end = Math.min(endIndex, totalData);
+  
+  paginationInfo.textContent = `Menampilkan ${start}-${end} dari ${totalData} data`;
+}
+
+function renderPaginationButtons(totalPages) {
+  const pageNumbersDiv = document.getElementById("pageNumbers");
+  const prevBtn = document.getElementById("prevPageBtn");
+  const nextBtn = document.getElementById("nextPageBtn");
+  
+  if (!pageNumbersDiv) return;
+  
+  // Update state tombol prev/next
+  if (prevBtn) prevBtn.disabled = (currentPage === 1);
+  if (nextBtn) nextBtn.disabled = (currentPage === totalPages);
+  
+  // Generate tombol halaman
+  let pageButtonsHtml = "";
+  
+  // Tentukan range halaman yang ditampilkan
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, currentPage + 2);
+  
+  // Tambahkan halaman pertama jika perlu
+  if (startPage > 1) {
+    pageButtonsHtml += `<button class="page-number" data-page="1">1</button>`;
+    if (startPage > 2) {
+      pageButtonsHtml += `<span class="pagination-ellipsis">...</span>`;
+    }
+  }
+  
+  // Halaman dalam range
+  for (let i = startPage; i <= endPage; i++) {
+    const activeClass = (i === currentPage) ? "active" : "";
+    pageButtonsHtml += `<button class="page-number ${activeClass}" data-page="${i}">${i}</button>`;
+  }
+  
+  // Tambahkan halaman terakhir jika perlu
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      pageButtonsHtml += `<span class="pagination-ellipsis">...</span>`;
+    }
+    pageButtonsHtml += `<button class="page-number" data-page="${totalPages}">${totalPages}</button>`;
+  }
+  
+  pageNumbersDiv.innerHTML = pageButtonsHtml;
+  
+  // Tambahkan event listener ke tombol halaman
+  document.querySelectorAll(".page-number").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const page = parseInt(btn.getAttribute("data-page"));
+      if (!isNaN(page) && page !== currentPage) {
+        changePage(page);
+      }
+    });
+  });
+}
+
+function changePage(newPage) {
+  currentPage = newPage;
+  renderTableWithPagination();
+  
+  // Scroll ke bagian tabel
+  const tableSection = document.querySelector(".table-responsive");
+  if (tableSection) {
+    tableSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+// Event listener untuk tombol prev/next
+document.addEventListener("DOMContentLoaded", () => {
+  // Event delegation untuk tombol yang mungkin belum ada saat load
+  document.addEventListener("click", (e) => {
+    const prevBtn = document.getElementById("prevPageBtn");
+    const nextBtn = document.getElementById("nextPageBtn");
+    
+    if (e.target === prevBtn || prevBtn?.contains(e.target)) {
+      if (currentPage > 1) {
+        changePage(currentPage - 1);
+      }
+    }
+    
+    if (e.target === nextBtn || nextBtn?.contains(e.target)) {
+      const totalPages = Math.ceil(data.length / itemsPerPage);
+      if (currentPage < totalPages) {
+        changePage(currentPage + 1);
+      }
+    }
+  });
+});
 
 function aktifkanFilter() {
   const semester = document.getElementById("semester");
@@ -154,12 +287,14 @@ function aktifkanFilter() {
 
   if (semester) {
     semester.addEventListener("change", async () => {
+      currentPage = 1;
       await loadPeringkat();
     });
   }
   
   if (tahunAjaran) {
     tahunAjaran.addEventListener("change", async () => {
+      currentPage = 1;
       await loadPeringkat();
     });
   }

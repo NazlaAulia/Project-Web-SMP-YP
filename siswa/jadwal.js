@@ -14,7 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
   loadJadwal();
 });
 
-// hahhhh
+// Variabel untuk pagination
+let jadwalDataFull = [];
+let currentPage = 1;
+const itemsPerPage = 5; // Jumlah baris per halaman
+
 function isiHeaderDariLocalStorage() {
   const nama = localStorage.getItem("nama_siswa") || "Siswa";
   const kelas = localStorage.getItem("kelas_siswa") || "-";
@@ -61,13 +65,16 @@ async function loadJadwal() {
     renderProfil(result.siswa);
     renderRingkasan(result.ringkasan);
     renderUpdate(result.update_terbaru);
-    renderTabel(result.jadwal_minggu, result.siswa.kelas);
+    
+    // Simpan data jadwal dan render dengan pagination
+    jadwalDataFull = result.jadwal_minggu || [];
+    currentPage = 1;
+    renderTabelWithPagination(jadwalDataFull);
   } catch (error) {
     renderError("Terjadi kesalahan saat mengambil data jadwal.");
     console.error("ERROR FETCH / JSON:", error);
   }
 }
-
 
 function renderProfil(siswa) {
   document.getElementById("kelasBadge").textContent = siswa.kelas || "-";
@@ -139,6 +146,161 @@ function renderUpdate(updateList) {
     .join("");
 }
 
+// Fungsi baru untuk render tabel dengan pagination
+function renderTabelWithPagination(jadwalList) {
+  const tbody = document.getElementById("jadwalTableBody");
+  const paginationContainer = document.getElementById("paginationContainer");
+  const kelas = localStorage.getItem("kelas_siswa") || "-";
+
+  if (!jadwalList || jadwalList.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty-state">Belum ada jadwal untuk kelas ${kelas}.</td>
+      </tr>
+    `;
+    paginationContainer.style.display = "none";
+    return;
+  }
+
+  // Hitung total halaman
+  const totalPages = Math.ceil(jadwalList.length / itemsPerPage);
+  
+  // Tampilkan pagination hanya jika lebih dari 1 halaman
+  if (totalPages > 1) {
+    paginationContainer.style.display = "flex";
+  } else {
+    paginationContainer.style.display = "none";
+  }
+
+  // Tentukan data yang akan ditampilkan di halaman ini
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageData = jadwalList.slice(startIndex, endIndex);
+
+  // Render tabel untuk halaman saat ini
+  tbody.innerHTML = currentPageData.map((item) => {
+    let statusClass = "status-waiting";
+
+    if (item.status && item.status.toLowerCase() === "selesai") {
+      statusClass = "status-done";
+    } else if (item.status && item.status.toLowerCase() === "berlangsung") {
+      statusClass = "status-live";
+    }
+
+    return `
+      <tr class="show-row">
+        <td>
+          <strong>${item.hari}</strong><br>
+          ${item.jam}
+         </td>
+         <td>${item.mata_pelajaran}</td>
+         <td>${item.guru}</td>
+         <td>
+          <span class="status-badge ${statusClass}">${item.status || "Mendatang"}</span>
+         </td>
+       </tr>
+    `;
+  }).join("");
+
+  // Update info pagination
+  updatePaginationInfo(startIndex, endIndex, jadwalList.length);
+  
+  // Render tombol pagination
+  renderPaginationButtons(totalPages);
+}
+
+function updatePaginationInfo(startIndex, endIndex, totalData) {
+  const paginationInfo = document.getElementById("paginationInfo");
+  const start = startIndex + 1;
+  const end = Math.min(endIndex, totalData);
+  
+  paginationInfo.textContent = `Menampilkan ${start}-${end} dari ${totalData} data`;
+}
+
+function renderPaginationButtons(totalPages) {
+  const pageNumbersDiv = document.getElementById("pageNumbers");
+  const prevBtn = document.getElementById("prevPageBtn");
+  const nextBtn = document.getElementById("nextPageBtn");
+  
+  // Update state tombol prev/next
+  prevBtn.disabled = (currentPage === 1);
+  nextBtn.disabled = (currentPage === totalPages);
+  
+  // Generate tombol halaman
+  let pageButtonsHtml = "";
+  
+  // Tentukan range halaman yang ditampilkan
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, currentPage + 2);
+  
+  // Tambahkan halaman pertama jika perlu
+  if (startPage > 1) {
+    pageButtonsHtml += `<button class="page-number" data-page="1">1</button>`;
+    if (startPage > 2) {
+      pageButtonsHtml += `<span class="pagination-ellipsis">...</span>`;
+    }
+  }
+  
+  // Halaman dalam range
+  for (let i = startPage; i <= endPage; i++) {
+    const activeClass = (i === currentPage) ? "active" : "";
+    pageButtonsHtml += `<button class="page-number ${activeClass}" data-page="${i}">${i}</button>`;
+  }
+  
+  // Tambahkan halaman terakhir jika perlu
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      pageButtonsHtml += `<span class="pagination-ellipsis">...</span>`;
+    }
+    pageButtonsHtml += `<button class="page-number" data-page="${totalPages}">${totalPages}</button>`;
+  }
+  
+  pageNumbersDiv.innerHTML = pageButtonsHtml;
+  
+  // Tambahkan event listener ke tombol halaman
+  document.querySelectorAll(".page-number").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const page = parseInt(btn.getAttribute("data-page"));
+      if (!isNaN(page) && page !== currentPage) {
+        changePage(page);
+      }
+    });
+  });
+}
+
+function changePage(newPage) {
+  currentPage = newPage;
+  renderTabelWithPagination(jadwalDataFull);
+  
+  // Scroll ke bagian tabel
+  const jadwalSection = document.querySelector(".jadwal-section");
+  if (jadwalSection) {
+    jadwalSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+// Event listener untuk tombol prev/next
+document.addEventListener("DOMContentLoaded", () => {
+  // Event delegation untuk tombol yang mungkin belum ada saat load
+  document.addEventListener("click", (e) => {
+    const prevBtn = document.getElementById("prevPageBtn");
+    const nextBtn = document.getElementById("nextPageBtn");
+    
+    if (e.target === prevBtn || prevBtn?.contains(e.target)) {
+      if (currentPage > 1) {
+        changePage(currentPage - 1);
+      }
+    }
+    
+    if (e.target === nextBtn || nextBtn?.contains(e.target)) {
+      const totalPages = Math.ceil(jadwalDataFull.length / itemsPerPage);
+      if (currentPage < totalPages) {
+        changePage(currentPage + 1);
+      }
+    }
+  });
+});
+
 function renderTabel(jadwalList, kelas) {
   const tbody = document.getElementById("jadwalTableBody");
 
@@ -165,18 +327,23 @@ function renderTabel(jadwalList, kelas) {
         <td>
           <strong>${item.hari}</strong><br>
           ${item.jam}
-        </td>
-        <td>${item.mata_pelajaran}</td>
-        <td>${item.guru}</td>
-        <td>
+         </td>
+         <td>${item.mata_pelajaran}</td>
+         <td>${item.guru}</td>
+         <td>
           <span class="status-badge ${statusClass}">${item.status || "Mendatang"}</span>
-        </td>
-      </tr>
+         </td>
+       </tr>
     `;
   }).join("");
 }
 
 function renderError(message) {
+  const paginationContainer = document.getElementById("paginationContainer");
+  if (paginationContainer) {
+    paginationContainer.style.display = "none";
+  }
+  
   document.getElementById("jadwalTableBody").innerHTML = `
     <tr>
       <td colspan="4" class="empty-state">${message}</td>

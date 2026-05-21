@@ -34,34 +34,35 @@
           <button id="tabWaliBtn" class="tab-btn">📄 Cetak Rapor (Wali Kelas)</button>
         </div>
       </div>
-
+      
       <!-- SECTION UPLOAD CSV (HANYA UNTUK GURU MAPEL) -->
       <section class="card import-card" id="uploadSection">
         <div class="card-heading">
           <div>
-            <h3>Masukan Nilai</h3>
+            <h3>📁 Masukan Nilai</h3>
             <p>Upload file CSV berisi nilai angka dan rekap kehadiran siswa.</p>
           </div>
         </div>
 
         <div class="upload-area">
-          <label class="file-drop" for="fileInput">
-            <i class="bi bi-file-earmark-spreadsheet"></i>
-            <div>
-              <strong>Pilih Dokumen CSV</strong>
-              <span>Gunakan template agar format data sesuai.</span>
-            </div>
+          <!-- Pilih File -->
+          <div class="file-input-row">
+            <label for="fileInput" class="file-input-button">
+              <i class="bi bi-folder2-open"></i>
+              Pilih File CSV
+            </label>
             <input type="file" id="fileInput" accept=".csv" />
-          </label>
-              
+            <span id="selectedFileName" class="file-name-display">Belum ada file dipilih</span>
+          </div>
+
+          <!-- Tombol Aksi -->
           <div class="upload-actions">
             <button id="downloadTemplateBtn" class="btn btn-outline" type="button">
-              <i class="bi bi-file-earmark-arrow-down"></i>
+              <i class="bi bi-download"></i>
               Unduh Templat CSV
             </button>
-
             <button id="uploadBtn" class="btn btn-primary" type="button">
-              <i class="bi bi-save"></i>
+              <i class="bi bi-cloud-upload"></i>
               Simpan Nilai
             </button>
           </div>
@@ -79,24 +80,34 @@
           </div>
         </div>
 
-        <div class="filter-group nilai-filter-group">
-  <label for="modeNilai">Tampilkan Data</label>
-  <div class="select-clean">
-    <select id="modeNilai">
-      <option value="mapel">Guru Mapel</option>
-      <option value="wali">Wali Kelas</option>
-    </select>
-    <i class="bi bi-chevron-down"></i>
-  </div>
-</div>
+        <!-- FILTER ROW: semua filter dalam satu baris -->
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="modeNilai">Tampilkan Data</label>
+            <div class="select-clean">
+              <select id="modeNilai">
+                <option value="mapel">Guru Mapel</option>
+                <option value="wali">Wali Kelas</option>
+              </select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+          </div>
 
-        <div class="filter-grid nilai-filter-grid">
-          <div class="filter-group nilai-filter-group" id="filterKelasGroup">
+          <div class="filter-group" id="filterKelasGroup">
             <label for="filterKelas" id="filterKelasLabel">Pilih Kelas</label>
             <div class="select-clean">
               <select id="filterKelas"></select>
               <i class="bi bi-chevron-down"></i>
             </div>
+          </div>
+
+          <!-- Tombol Cetak Semua Rapor - ada di kanan, hanya muncul di mode wali -->
+          <div class="filter-group filter-action-group" id="btnCetakSemuaRaporGroup" style="display: none;">
+            <label>&nbsp;</label>
+            <button id="btnCetakSemuaRapor" class="btn btn-primary" type="button">
+              <i class="bi bi-printer"></i>
+              Cetak Semua Rapor Kelas
+            </button>
           </div>
         </div>
       </section>

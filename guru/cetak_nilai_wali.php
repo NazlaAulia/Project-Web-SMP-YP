@@ -24,6 +24,15 @@ if ($id_guru <= 0 || $id_kelas <= 0) {
     kirim_json("error", "Data guru atau kelas tidak valid.");
 }
 
+// ========== AMBIL TAHUN AJARAN AKTIF ==========
+$queryTahun = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+$tahunAktif = $queryTahun->fetch_assoc();
+$id_tahun_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+
+if ($id_tahun_aktif == 0) {
+    kirim_json("error", "Tidak ada tahun ajaran aktif.");
+}
+
 /* CEK WALI KELAS */
 $cekWali = $conn->prepare("
     SELECT 
@@ -53,7 +62,7 @@ if ($resultWali->num_rows === 0) {
 
 $wali = $resultWali->fetch_assoc();
 
-/* AMBIL NILAI SISWA */
+/* AMBIL NILAI SISWA - HANYA TAHUN AJARAN AKTIF */
 $sql = "
     SELECT
         s.id_siswa,
@@ -71,10 +80,11 @@ $sql = "
     INNER JOIN kelas k ON s.id_kelas = k.id_kelas
     INNER JOIN mapel m ON n.id_mapel = m.id_mapel
     WHERE s.id_kelas = ?
+      AND n.id_tahun_ajaran = ?
 ";
 
-$types = "i";
-$params = [$id_kelas];
+$types = "ii";
+$params = [$id_kelas, $id_tahun_aktif];
 
 if ($id_siswa > 0) {
     $sql .= " AND s.id_siswa = ?";
