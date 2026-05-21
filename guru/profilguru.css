@@ -1944,3 +1944,14 @@ button:focus,
 .shimmer-effect {
     animation: none !important;
 }
+/* Mencegah cache pada gambar */
+img {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Force refresh gambar */
+.profile-photo-section img {
+    animation: none !important;
+    transition: none !important;
+}
