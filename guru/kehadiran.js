@@ -198,11 +198,13 @@ function escapeHtml(text) {
 }
 
 function updatePaginationControls(totalPages, totalItems) {
+  // Update info teks
   if (paginationInfo) {
     const displayTotalPages = totalPages === 0 ? 1 : totalPages;
     paginationInfo.textContent = `Halaman ${currentPage} dari ${displayTotalPages} (${totalItems} data)`;
   }
   
+  // Update tombol prev/next
   if (prevPageBtn) {
     prevPageBtn.disabled = currentPage === 1 || totalItems === 0;
   }
@@ -210,6 +212,64 @@ function updatePaginationControls(totalPages, totalItems) {
   if (nextPageBtn) {
     nextPageBtn.disabled = currentPage === totalPages || totalItems === 0 || totalPages === 0;
   }
+  
+  // Generate nomor halaman dengan kotak
+  generatePageNumbers(totalPages);
+}
+
+function generatePageNumbers(totalPages) {
+  const container = document.getElementById('paginationNumbers');
+  if (!container) return;
+  
+  if (totalPages <= 1) {
+    container.innerHTML = '';
+    return;
+  }
+  
+  let html = '';
+  const maxVisible = 5; // Maksimal 5 nomor halaman yang terlihat
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+  
+  // Adjust startPage jika endPage terlalu dekat dengan akhir
+  if (endPage - startPage + 1 < maxVisible) {
+    startPage = Math.max(1, endPage - maxVisible + 1);
+  }
+  
+  // Tombol ke halaman pertama (jika tidak di awal)
+  if (startPage > 1) {
+    html += `<div class="page-number" data-page="1">1</div>`;
+    if (startPage > 2) {
+      html += `<div class="page-number-dots">...</div>`;
+    }
+  }
+  
+  // Nomor halaman utama
+  for (let i = startPage; i <= endPage; i++) {
+    const activeClass = i === currentPage ? 'active' : '';
+    html += `<div class="page-number ${activeClass}" data-page="${i}">${i}</div>`;
+  }
+  
+  // Tombol ke halaman terakhir (jika tidak di akhir)
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      html += `<div class="page-number-dots">...</div>`;
+    }
+    html += `<div class="page-number" data-page="${totalPages}">${totalPages}</div>`;
+  }
+  
+  container.innerHTML = html;
+  
+  // Tambahkan event listener untuk setiap nomor halaman
+  document.querySelectorAll('.page-number').forEach(el => {
+    el.addEventListener('click', () => {
+      const page = parseInt(el.dataset.page);
+      if (page && page !== currentPage) {
+        currentPage = page;
+        renderSemua();
+      }
+    });
+  });
 }
 
 function goToPrevPage() {
