@@ -45,7 +45,7 @@ if ($conn->connect_error) {
 $conn->set_charset("utf8mb4");
 
 // ==============================================
-// Ambil id_siswa (PRIORITAS: GET -> SESSION id_siswa -> SESSION id_user)
+// Ambil id_siswa
 // ==============================================
 $id_siswa = 0;
 
@@ -78,23 +78,17 @@ if ($id_siswa <= 0) {
     echo json_encode([
         'success' => false,
         'message' => 'Silakan login terlebih dahulu. Session tidak ditemukan.',
-        'debug' => [
-            'session_id' => session_id(),
-            'session_data_keys' => array_keys($_SESSION)
-        ]
+        'debug' => ['session_id' => session_id(), 'session_data_keys' => array_keys($_SESSION)]
     ]);
     $conn->close();
     exit;
 }
 
-// ==============================================
 // 5. Ambil data siswa
-// ==============================================
 $sqlSiswa = "SELECT s.id_siswa, s.nama, s.nisn, s.id_kelas, k.nama_kelas, s.id_tahun_ajaran
              FROM siswa s
              LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-             WHERE s.id_siswa = ?
-             LIMIT 1";
+             WHERE s.id_siswa = ? LIMIT 1";
 $stmt = $conn->prepare($sqlSiswa);
 $stmt->bind_param("i", $id_siswa);
 $stmt->execute();
@@ -113,7 +107,6 @@ $kelas_siswa = $siswa['nama_kelas'] ?? 'SMP';
 $id_tahun_ajaran = $siswa['id_tahun_ajaran'];
 $stmt->close();
 
-// 5.5 Ambil tahun ajaran
 $sqlTahun = "SELECT tahun_ajaran FROM tahun_ajaran WHERE id_tahun_ajaran = ?";
 $stmtTahun = $conn->prepare($sqlTahun);
 $stmtTahun->bind_param("i", $id_tahun_ajaran);
@@ -144,11 +137,7 @@ while ($row = $resultNilai->fetch_assoc()) {
     $semester = $row['semester'];
     $rata = round($row['rata_rata'], 2);
     if (!isset($nilai_per_mapel[$id_mapel])) {
-        $nilai_per_mapel[$id_mapel] = [
-            'nama_mapel' => $row['nama_mapel'],
-            'semester_1' => null,
-            'semester_2' => null
-        ];
+        $nilai_per_mapel[$id_mapel] = ['nama_mapel' => $row['nama_mapel'], 'semester_1' => null, 'semester_2' => null];
     }
     if ($semester == 1) {
         $nilai_per_mapel[$id_mapel]['semester_1'] = $rata;
@@ -169,16 +158,9 @@ $cp_per_mapel = [];
 while ($row = $resultCP->fetch_assoc()) {
     $id = $row['id_mapel'];
     if (!isset($cp_per_mapel[$id])) {
-        $cp_per_mapel[$id] = [
-            'nama_mapel' => $row['nama_mapel'],
-            'cp_list' => []
-        ];
+        $cp_per_mapel[$id] = ['nama_mapel' => $row['nama_mapel'], 'cp_list' => []];
     }
-    $cp_per_mapel[$id]['cp_list'][] = [
-        'elemen' => $row['elemen'],
-        'deskripsi' => $row['deskripsi_cp'],
-        'level' => $row['level_kognitif']
-    ];
+    $cp_per_mapel[$id]['cp_list'][] = ['elemen' => $row['elemen'], 'deskripsi' => $row['deskripsi_cp'], 'level' => $row['level_kognitif']];
 }
 
 // 8. Gabungkan data untuk AI
@@ -213,7 +195,6 @@ foreach ($nilai_per_mapel as $id_mapel => $nilai) {
     ];
 }
 
-// Rata-rata keseluruhan
 $rata_keseluruhan = 0;
 $total_nilai = 0;
 $jumlah_mapel = 0;
@@ -226,7 +207,7 @@ foreach ($data_analisis as $mapel) {
 if ($jumlah_mapel > 0) $rata_keseluruhan = round($total_nilai / $jumlah_mapel, 1);
 
 // ==============================================
-// 9. Siapkan prompt untuk Gemini (DIPERBAIKI - Kesimpulan Singkat)
+// 9. Prompt untuk Gemini (sudah diperbaiki)
 // ==============================================
 $prompt = "Kamu adalah seorang GURU SMP YP 17 Surabaya. Gunakan sapaan 'Saya' atau 'Guru'.
 
@@ -234,8 +215,6 @@ LARANGAN KERAS:
 - JANGAN sebut AI, bot, asisten, teknologi apapun
 - JANGAN pakai emoji atau simbol aneh
 - JANGAN sebut 'Ibu' atau 'Bapak'
-- JANGAN tulis 'Kesimpulan:' atau 'Kesimpulan & Motivasi' sebagai judul
-- **JANGAN ulang analisis per mapel di bagian kesimpulan**
 
 Data siswa:
 Nama: $nama_siswa
@@ -264,31 +243,14 @@ $prompt .= "Rata-rata keseluruhan: $rata_keseluruhan\n";
 $prompt .= "Mapel terendah: $mapel_terendah ($nilai_terendah)\n\n";
 
 $prompt .= "TUGAS:
-1. Untuk setiap mapel, tulis analisis 1-2 kalimat dengan format [NAMA MAPEL]: isi analisis.
-   - Apresiasi jika nilai naik/tinggi
-   - Semangat jika nilai turun
-   - Sebutkan CP yang dikuasai atau perlu ditingkatkan
+1. Tulis analisis untuk setiap mapel dengan format [NAMA MAPEL]: ... (maksimal 2 kalimat per mapel).
+2. Setelah semua mapel, tulis baris '---' lalu tulis KESIMPULAN yang HANYA 2-3 KALIMAT. Kesimpulan tidak boleh menyebut nama mapel lagi. Cukup apresiasi umum, saran perbaikan (hanya untuk mapel terendah jika ada), dan motivasi.
 
-2. **SETELAH SEMUA MAPEL**, tulis KESIMPULAN yang SANGAT SINGKAT (maksimal 3 kalimat). 
-   Kesimpulan hanya berisi:
-   - Apresiasi umum (contoh: \"Nak Sandi, secara umum kamu sudah berprestasi sangat baik.\")
-   - Saran perbaikan (hanya untuk mapel terendah, jika ada)
-   - Motivasi singkat (contoh: \"Pertahankan semangat belajarmu!\")
+CONTOH KESIMPULAN YANG BENAR:
+--- 
+Nak $nama_siswa, nilai rata-ratamu $rata_keseluruhan sangat membanggakan. Coba lebih giat lagi untuk $mapel_terendah. Teruslah belajar dengan tekun!
 
-CONTOH KESIMPULAN YANG BENAR (pendek, tidak mengulang mapel):
-\"Nak Sandi, nilai rata-ratamu 96.3 sangat membanggakan. Coba lebih giat lagi untuk PKN agar semakin seimbang. Teruslah belajar dengan tekun!\"
-
-CONTOH KESIMPULAN YANG SALAH (JANGAN DITULIS, karena terlalu panjang):
-( Tidak perlu menulis ulang analisis PKN, Matematika, IPA, dll. )
-
-JANGAN tulis kata 'Kesimpulan:' sebagai judul. Langsung tulis isi kesimpulan setelah selesai semua mapel.
-
-Aturan tambahan:
-- Gunakan sapaan 'Nak $nama_siswa' di awal kesimpulan
-- JANGAN pakai 'Ibu Guru' atau 'Bapak Guru' - cukup 'Saya' atau 'Guru'
-- Jangan pakai kata 'AI', 'bot', 'asisten', 'teknologi'
-- Jangan pakai emoji atau simbol aneh
-- Langsung tulis pesannya tanpa kata pengantar";
+JANGAN tulis kesimpulan lebih dari 3 kalimat. JANGAN ulang daftar mapel di kesimpulan. Langsung tulis tanpa kata pengantar.";
 
 // 10. Fungsi callGeminiAPI
 function callGeminiAPI($api_key, $prompt, $model) {
@@ -327,7 +289,7 @@ function callGeminiAPI($api_key, $prompt, $model) {
     return ['success' => true, 'response' => $gemini_data['candidates'][0]['content']['parts'][0]['text']];
 }
 
-// 11. Coba beberapa model
+// 11. Panggil API dengan beberapa model
 $models = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash', 'gemini-flash-latest'];
 $ai_response = null;
 foreach ($models as $model) {
@@ -385,7 +347,37 @@ if ($ai_response === null) {
     exit;
 }
 
-// 13. Kirim respons sukses dari AI
+// ========== PERBAIKAN: POTONG RESPON AI AGAR KESIMPULAN SINGKAT ==========
+function shortenConclusion($response) {
+    // Coba pisahkan berdasarkan separator '---' atau 'Kesimpulan'
+    if (preg_match('/---\s*\n?(.*)$/s', $response, $matches)) {
+        $conclusion = trim($matches[1]);
+    } elseif (preg_match('/Kesimpulan\s*[:]?\s*(.*)$/is', $response, $matches)) {
+        $conclusion = trim($matches[1]);
+    } else {
+        // Jika tidak ada separator, ambil 3 kalimat terakhir dari seluruh respons
+        $sentences = preg_split('/(?<=[.!?])\s+/', $response, -1, PREG_SPLIT_NO_EMPTY);
+        if (count($sentences) > 3) {
+            $lastThree = array_slice($sentences, -3);
+            $conclusion = implode(' ', $lastThree);
+        } else {
+            return $response; // terlalu pendek, biarkan saja
+        }
+    }
+    
+    // Potong kesimpulan menjadi maksimal 3 kalimat
+    $sentences = preg_split('/(?<=[.!?])\s+/', $conclusion, -1, PREG_SPLIT_NO_EMPTY);
+    if (count($sentences) > 3) {
+        $conclusion = implode(' ', array_slice($sentences, 0, 3)) . ' ...';
+    }
+    // Hapus jika masih ada [MAPEL]: di kesimpulan
+    $conclusion = preg_replace('/\[[A-Z\s\/\.]+\]:\s*/', '', $conclusion);
+    return $conclusion;
+}
+
+$ai_response = shortenConclusion($ai_response);
+
+// 13. Kirim respons
 echo json_encode([
     'success' => true,
     'data' => [
