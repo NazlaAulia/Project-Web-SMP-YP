@@ -375,6 +375,54 @@ td {
 }
 
 /* =========================
+   PAGINATION
+========================= */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gray-light);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.pagination-btn {
+    background: var(--white);
+    border: 1px solid var(--gray-light);
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-weight: 600;
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-gray);
+    background: var(--bg-soft);
+    padding: 6px 12px;
+    border-radius: 40px;
+}
+
+/* =========================
    EMPTY STATE OPSIONAL
 ========================= */
 
@@ -712,9 +760,9 @@ td {
         font-size: 0.74rem;
     }
 }
+
 /* =========================
    FIX FINAL KEHADIRAN CLEAN
-   hanya UI, tidak ubah logika
 ========================= */
 
 .click-animate,
@@ -739,15 +787,6 @@ input {
 .kelas-card:hover,
 button:hover {
     transform: none !important;
-}
-
-/* search clean dengan icon */
-.table-heading {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    gap: 18px !important;
-    margin-bottom: 20px !important;
 }
 
 .search-box {
@@ -792,7 +831,6 @@ button:hover {
     box-shadow: 0 0 0 4px rgba(7, 72, 74, 0.08) !important;
 }
 
-/* select lebih clean */
 .filter-group select {
     height: 54px !important;
     border-radius: 16px !important;
@@ -800,33 +838,17 @@ button:hover {
     box-shadow: none !important;
 }
 
-/* table lebih formal */
 .table-card {
     border-radius: 24px !important;
     box-shadow: 0 8px 28px rgba(7, 72, 74, 0.08) !important;
 }
 
-.detail-table th {
-    font-size: 0.86rem !important;
-    padding: 14px 12px !important;
-}
-
-.detail-table td {
-    font-size: 0.9rem !important;
-    padding: 14px 12px !important;
-}
-
-/* responsive */
 @media (max-width: 800px) {
-    .table-heading {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-    }
-
     .search-box {
         max-width: 100% !important;
     }
 }
+
 @media (max-width: 480px) {
     .search-box {
         height: 46px !important;
@@ -842,6 +864,7 @@ button:hover {
         font-size: 0.95rem !important;
     }
 }
+
 .readonly-mapel {
     pointer-events: none;
     appearance: none;
