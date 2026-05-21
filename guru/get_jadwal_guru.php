@@ -23,12 +23,7 @@ if ($id_guru <= 0) {
     kirim_json("error", "ID guru tidak valid. Silakan login ulang.");
 }
 
-$stmtGuru = $conn->prepare("
-    SELECT id_guru, nama
-    FROM guru
-    WHERE id_guru = ?
-    LIMIT 1
-");
+$stmtGuru = $conn->prepare("SELECT id_guru, nama FROM guru WHERE id_guru = ? LIMIT 1");
 if (!$stmtGuru) {
     kirim_json("error", "Query guru gagal: " . $conn->error);
 }
@@ -44,14 +39,17 @@ if (!$guru) {
 
 // Ambil tahun ajaran aktif
 $tahunAktifQuery = $conn->query("SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1");
+if (!$tahunAktifQuery) {
+    kirim_json("error", "Gagal mengambil tahun ajaran aktif.");
+}
 $tahunAktif = $tahunAktifQuery->fetch_assoc();
-$id_tahun_ajaran_aktif = $tahunAktif ? $tahunAktif['id_tahun_ajaran'] : 0;
+$id_tahun_ajaran_aktif = $tahunAktif ? (int)$tahunAktif['id_tahun_ajaran'] : 0;
+$tahunAktifQuery->close();
 
-if ($id_tahun_ajaran_aktif == 0) {
+if ($id_tahun_ajaran_aktif <= 0) {
     kirim_json("error", "Tahun ajaran aktif tidak ditemukan.");
 }
 
-// Query ambil semua jadwal (draft & fix) untuk tahun ajaran aktif
 $stmt = $conn->prepare("
     SELECT 
         j.id_jadwal,
@@ -113,4 +111,3 @@ kirim_json("success", "Jadwal guru berhasil diambil.", [
     "guru" => $guru,
     "data" => $jadwal
 ]);
-?>
