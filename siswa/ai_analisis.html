@@ -318,7 +318,7 @@
 
     <script>
         function loadAnalisis(forceRefresh = false) {
-            // Ambil id_siswa dari localStorage (disimpan saat login di siswa.js)
+            // Ambil id_siswa dari localStorage
             const idSiswa = localStorage.getItem("id_siswa");
             if (!idSiswa) {
                 document.getElementById('loadingState').style.display = 'none';
@@ -326,14 +326,12 @@
                 return;
             }
 
-            // Tampilkan loading
             document.getElementById('loadingState').style.display = 'block';
             document.getElementById('analisisContainer').innerHTML = '';
             document.getElementById('ringkasanContainer').style.display = 'none';
             document.getElementById('kesimpulanContainer').style.display = 'none';
             document.getElementById('infoSiswa').style.display = 'none';
             
-            // Buat URL dengan parameter id_siswa dari localStorage
             const baseUrl = 'get_analisis_ai.php';
             const params = new URLSearchParams();
             params.append('id_siswa', idSiswa);
@@ -344,9 +342,7 @@
             fetch(url, {
                 method: 'GET',
                 credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(res => {
                 if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -357,7 +353,7 @@
                 document.getElementById('loadingState').style.display = 'none';
                 
                 if (data.success) {
-                    // Tampilkan info siswa
+                    // Info siswa
                     if (data.data.siswa || data.data.kelas || data.data.tahun_ajaran) {
                         let infoHtml = '';
                         if (data.data.siswa) infoHtml += `<span>👤 ${data.data.siswa}</span>`;
@@ -368,23 +364,20 @@
                         document.getElementById('infoSiswa').style.display = 'flex';
                     }
                     
-                    // Tampilkan ringkasan nilai per mapel
+                    // Ringkasan nilai
                     if (data.data.data_analisis && data.data.data_analisis.length > 0) {
                         let badgesHtml = '';
                         let mapelTerendah = '';
                         let nilaiTerendah = 100;
-                        
                         data.data.data_analisis.forEach(mapel => {
                             let nilaiAkhir = mapel.nilai_akhir || mapel.nilai_semester_2 || mapel.nilai_semester_1 || 0;
                             let cls = nilaiAkhir < 75 ? 'lowest' : '';
                             badgesHtml += `<span class="mapel-badge ${cls}">${mapel.nama_mapel}: ${nilaiAkhir}</span>`;
-                            
                             if (nilaiAkhir < nilaiTerendah && nilaiAkhir > 0) {
                                 nilaiTerendah = nilaiAkhir;
                                 mapelTerendah = mapel.nama_mapel;
                             }
                         });
-                        
                         document.getElementById('ringkasanBadges').innerHTML = badgesHtml;
                         if (mapelTerendah) {
                             document.getElementById('catatanRingkasan').innerHTML = `<span style="background:#fee2e2; padding:4px 12px; border-radius:20px;">⚠️ Perlu perhatian khusus: ${mapelTerendah} (${nilaiTerendah})</span>`;
@@ -392,72 +385,111 @@
                         document.getElementById('ringkasanContainer').style.display = 'block';
                     }
                     
-                    // Tampilkan analisis per mapel (dari AI)
+                    // Tampilkan analisis AI dengan parsing yang lebih baik
                     if (data.data.ai_response) {
                         let responseText = data.data.ai_response;
                         let lines = responseText.split('\n');
-                        let currentMapel = '';
-                        let mapelHtml = '';
-                        let kesimpulanHtml = '';
+                        let mapelData = new Map(); // key: nama mapel, value: array baris analisis
+                        let currentMapel = null;
+                        let kesimpulanLines = [];
                         let isKesimpulan = false;
                         
-                        const mapelRegex = /^\[?([A-Z\s\/]+)\]?\s*:/i;
+                        // Fungsi untuk mengekstrak nama mapel dari baris (format [MAPEL]: atau MAPEL: atau ## MAPEL)
+                        function extractMapelName(line) {
+                            // Coba format [MAPEL]: atau [MAPEL]
+                            let match = line.match(/^\[([A-Z\s\/\.]+)\]\s*:?\s*/i);
+                            if (match) return match[1].trim();
+                            // Coba format MAPEL: (tanpa kurung)
+                            match = line.match(/^([A-Z\s\/\.]+)\s*:\s*/i);
+                            if (match && !line.startsWith('##')) return match[1].trim();
+                            // Coba format ## MAPEL
+                            match = line.match(/^##\s+([A-Z\s\/\.]+)/i);
+                            if (match) return match[1].trim();
+                            return null;
+                        }
                         
                         for (let i = 0; i < lines.length; i++) {
                             let line = lines[i];
-                            let match = line.match(mapelRegex);
+                            let trimmed = line.trim();
+                            if (trimmed === "") continue;
                             
-                            if (match && !isKesimpulan) {
-                                if (currentMapel) {
-                                    mapelHtml += `</div></div>`;
-                                }
-                                currentMapel = match[1].trim();
-                                mapelHtml += `
-                                    <div class="mapel-card">
-                                        <div class="mapel-header">
-                                            <span class="mapel-name">📖 ${currentMapel}</span>
-                                        </div>
-                                        <div class="analisis-section">
-                                            <div class="analisis-text">
-                                `;
-                            } else if (line.toLowerCase().includes('kesimpulan') || line.toLowerCase().includes('rangkuman')) {
+                            // Deteksi awal kesimpulan
+                            if (trimmed.toLowerCase().includes('kesimpulan') || trimmed.toLowerCase().includes('rangkuman')) {
                                 isKesimpulan = true;
-                                if (currentMapel) {
-                                    mapelHtml += `</div></div>`;
-                                    currentMapel = '';
+                                currentMapel = null;
+                                continue;
+                            }
+                            
+                            if (isKesimpulan) {
+                                kesimpulanLines.push(trimmed);
+                                continue;
+                            }
+                            
+                            // Coba ekstrak nama mapel
+                            let mapelName = extractMapelName(trimmed);
+                            if (mapelName) {
+                                currentMapel = mapelName;
+                                if (!mapelData.has(currentMapel)) {
+                                    mapelData.set(currentMapel, []);
                                 }
-                            } else if (isKesimpulan) {
-                                kesimpulanHtml += line + '<br>';
+                                // Hapus teks yang mengandung nama mapel dari baris (agar tidak dobel)
+                                let contentLine = trimmed.replace(/^\[?[A-Z\s\/\.]+\]?\s*:?\s*/, '');
+                                if (contentLine && contentLine !== trimmed) {
+                                    mapelData.get(currentMapel).push(contentLine);
+                                }
                             } else if (currentMapel) {
-                                if (line.trim()) {
-                                    mapelHtml += line + '<br>';
+                                // Baris deskripsi lanjutan
+                                mapelData.get(currentMapel).push(trimmed);
+                            } else {
+                                // Teks di luar mapel (mungkin pembuka)
+                                if (trimmed.length > 0 && !mapelData.has('_info')) {
+                                    mapelData.set('_info', [trimmed]);
+                                } else if (mapelData.has('_info')) {
+                                    mapelData.get('_info').push(trimmed);
                                 }
                             }
                         }
                         
-                        if (currentMapel) {
-                            mapelHtml += `</div></div>`;
-                        }
-                        
-                        if (mapelHtml) {
-                            document.getElementById('analisisContainer').innerHTML = mapelHtml;
-                        }
-                        
-                        if (kesimpulanHtml) {
-                            document.getElementById('kesimpulanContainer').innerHTML = `
-                                <div class="kesimpulan-section">
-                                    <div class="kesimpulan-title">🎯 Kesimpulan & Motivasi</div>
-                                    <div class="kesimpulan-text">${kesimpulanHtml}</div>
+                        // Bangun HTML untuk setiap mapel
+                        let mapelHtml = '';
+                        for (let [mapel, linesArray] of mapelData.entries()) {
+                            if (mapel === '_info') continue; // skip info pembuka
+                            let konten = linesArray.join(' ').trim();
+                            if (!konten) konten = 'Tidak ada analisis khusus untuk mata pelajaran ini.';
+                            mapelHtml += `
+                                <div class="mapel-card">
+                                    <div class="mapel-header">
+                                        <span class="mapel-name">📖 ${mapel}</span>
+                                    </div>
+                                    <div class="analisis-section">
+                                        <div class="analisis-text">${konten.replace(/\n/g, '<br>')}</div>
+                                    </div>
                                 </div>
                             `;
-                            document.getElementById('kesimpulanContainer').style.display = 'block';
-                        } else if (!mapelHtml) {
+                        }
+                        
+                        // Jika tidak ada mapel yang terdeteksi, tampilkan seluruh response sebagai teks biasa
+                        if (mapelHtml === '') {
                             let guruHtml = responseText.replace(/\n/g, '<br>');
                             document.getElementById('analisisContainer').innerHTML = `
                                 <div class="guru-response" style="background:#fefce8; border-left:5px solid #eab308; padding:20px; border-radius:16px;">
                                     ${guruHtml}
                                 </div>
                             `;
+                        } else {
+                            document.getElementById('analisisContainer').innerHTML = mapelHtml;
+                        }
+                        
+                        // Tampilkan kesimpulan
+                        if (kesimpulanLines.length > 0) {
+                            let kesimpulanText = kesimpulanLines.join(' ').replace(/\n/g, '<br>');
+                            document.getElementById('kesimpulanContainer').innerHTML = `
+                                <div class="kesimpulan-section">
+                                    <div class="kesimpulan-title">🎯 Kesimpulan & Motivasi</div>
+                                    <div class="kesimpulan-text">${kesimpulanText}</div>
+                                </div>
+                            `;
+                            document.getElementById('kesimpulanContainer').style.display = 'block';
                         }
                     } else {
                         document.getElementById('analisisContainer').innerHTML = '<div class="error-box">❌ Belum ada catatan dari guru</div>';
