@@ -1466,3 +1466,93 @@ body {
     text-align: center;
   }
 }
+/* =====================================================
+   FILE UPLOAD RAPI
+===================================================== */
+.file-input-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: #f8fbfb;
+  padding: 20px 24px;
+  border-radius: 20px;
+  border: 1px solid #e2ecea;
+  margin-bottom: 20px;
+}
+
+.file-input-button {
+  background: #07484a;
+  color: white;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.file-input-button:hover {
+  background: #05393a;
+  transform: translateY(-1px);
+}
+
+#fileInput {
+  display: none;
+}
+
+.file-name-display {
+  color: #5a6e6e;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1px solid #d4e2df;
+  flex: 1;
+  min-width: 200px;
+}
+
+.upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.upload-actions .btn {
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .file-input-row {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  .file-input-button {
+    justify-content: center;
+  }
+  
+  .file-name-display {
+    text-align: center;
+  }
+  
+  .upload-actions {
+    flex-direction: column;
+  }
+  
+  .upload-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
