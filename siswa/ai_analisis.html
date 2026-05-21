@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <title>Catatan Guru - SMP YP 17 Surabaya</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Font Awesome untuk icon navbar -->
-      <link rel="stylesheet" href="navbar.css">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="navbar.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
         * {
@@ -19,161 +21,24 @@
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             background: #f0f7f5;
-            margin: 0;
-            padding: 20px;
         }
 
-        /* ========== STYLE UNTUK SIDEBAR/NAVBAR ========== */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 260px;
-            height: 100vh;
-            background: #064e4b;
-            color: white;
-            z-index: 1000;
-            transition: transform 0.3s ease;
+        /* WRAPPER UTAMA */
+        .container-layout {
             display: flex;
-            flex-direction: column;
+            min-height: 100vh;
         }
 
-        .sidebar-header {
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .logo {
-            height: 40px;
-        }
-
-        .hamburger {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            display: none;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 20px 0;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-        }
-
-        .sidebar-menu li a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            color: white;
-            text-decoration: none;
-            transition: background 0.3s;
-        }
-
-        .sidebar-menu li a:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .sidebar-menu li a i {
-            width: 20px;
-        }
-
-        .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        /* Modal logout */
-        .logout-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .logout-modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .logout-modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .btn-batal, .btn-keluar {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-        }
-
-        .btn-batal {
-            background: #e0e0e0;
-        }
-
-        .btn-keluar {
-            background: #dc2626;
-            color: white;
-        }
-
-        /* ========== STYLE MAIN CONTENT ========== */
+        /* MAIN CONTENT */
         .main-content {
+            flex: 1;
             margin-left: 260px;
+            padding: 20px;
             transition: margin-left 0.3s;
         }
 
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-            }
-            .hamburger {
-                display: block;
-            }
-        }
-
-        .container {
+        /* CONTAINER ISI */
+        .content-container {
             max-width: 900px;
             margin: 0 auto;
             background: white;
@@ -341,293 +206,266 @@
             color: #991b1b;
         }
 
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+        }
+
         @media (max-width: 600px) {
-            .container {
+            .content-container {
                 padding: 20px;
             }
+
             .mapel-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .info-siswa {
                 flex-direction: column;
             }
         }
     </style>
 </head>
-<body>
-    <!-- Tempat navbar akan di-load -->
-    <div id="navbarContainer"></div>
 
-    <!-- Konten utama catatan guru -->
-    <div class="main-content">
-        <div class="container">
+<body>
+
+<div class="container-layout">
+
+    <!-- NAVBAR -->
+    <div id="navbar-container"></div>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <div class="content-container">
+
             <h2>
                 <span>📝</span> Catatan Guru
             </h2>
-            <p class="subtitle">Guru memberikan masukan dan saran untuk membantumu meningkatkan prestasi.</p>
-            
+
+            <p class="subtitle">
+                Guru memberikan masukan dan saran untuk membantumu meningkatkan prestasi.
+            </p>
+
             <div id="infoSiswa" class="info-siswa" style="display: none;"></div>
-            
+
             <div id="ringkasanContainer" class="ringkasan-section" style="display: none;">
                 <div class="ringkasan-title">📊 Ringkasan Nilai</div>
+
                 <div id="ringkasanBadges"></div>
-                <div id="catatanRingkasan" style="margin-top: 12px; font-size: 13px; color: #666;"></div>
+
+                <div id="catatanRingkasan"
+                     style="margin-top: 12px; font-size: 13px; color: #666;">
+                </div>
             </div>
-            
+
             <div id="analisisContainer"></div>
-            
-            <div id="loadingState" class="loading">⏳ Sedang menyiapkan catatan dari guru...</div>
-            
+
+            <div id="loadingState" class="loading">
+                ⏳ Sedang menyiapkan catatan dari guru...
+            </div>
+
             <div id="kesimpulanContainer" style="display: none;"></div>
-            
-            <button class="refresh-btn" id="refreshBtn">🔄 Muat Ulang Catatan</button>
+
+            <button class="refresh-btn" id="refreshBtn">
+                🔄 Muat Ulang Catatan
+            </button>
+
         </div>
-    </div>
 
-    <script>
-        // ========== LOAD NAVBAR ==========
-        fetch('navbar.html')
-            .then(response => {
-                if (!response.ok) throw new Error('Navbar tidak ditemukan');
-                return response.text();
-            })
-            .then(html => {
-                document.getElementById('navbarContainer').innerHTML = html;
-                initNavbar();
-            })
-            .catch(error => {
-                console.warn('Gagal load navbar:', error);
-            });
-        
-        function initNavbar() {
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
-            const sidebar = document.querySelector('.sidebar');
-            
-            if (hamburgerBtn && sidebar) {
-                hamburgerBtn.addEventListener('click', function() {
-                    sidebar.classList.toggle('active');
-                });
-            }
-            
-            const logoutBtn = document.getElementById('logoutBtn');
-            const logoutModal = document.getElementById('logoutModal');
-            const cancelLogout = document.getElementById('cancelLogout');
-            const confirmLogout = document.getElementById('confirmLogout');
-            
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (logoutModal) logoutModal.style.display = 'flex';
-                });
-            }
-            
-            if (cancelLogout) {
-                cancelLogout.addEventListener('click', () => {
-                    if (logoutModal) logoutModal.style.display = 'none';
-                });
-            }
-            
-            if (confirmLogout) {
-                confirmLogout.addEventListener('click', () => {
-                    localStorage.removeItem('id_siswa');
-                    window.location.href = 'login.html';
-                });
-            }
-            
-            if (logoutModal) {
-                window.addEventListener('click', (e) => {
-                    if (e.target === logoutModal) {
-                        logoutModal.style.display = 'none';
-                    }
-                });
-            }
+    </main>
+
+</div>
+
+<!-- NAVBAR JS -->
+<script src="navbar.js"></script>
+
+<script>
+
+    // ========== FUNGSI LOAD ANALISIS ==========
+    function loadAnalisis(forceRefresh = false) {
+
+        const idSiswa = localStorage.getItem("id_siswa");
+
+        if (!idSiswa) {
+            document.getElementById('loadingState').style.display = 'none';
+
+            document.getElementById('analisisContainer').innerHTML =
+                '<div class="error-box">❌ Anda belum login. Silakan login terlebih dahulu.</div>';
+
+            return;
         }
-        
-        // ========== FUNGSI LOAD ANALISIS YANG LENGKAP ==========
-        function loadAnalisis(forceRefresh = false) {
-            const idSiswa = localStorage.getItem("id_siswa");
-            if (!idSiswa) {
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('analisisContainer').innerHTML = '<div class="error-box">❌ Anda belum login. Silakan login terlebih dahulu.</div>';
-                return;
-            }
 
-            document.getElementById('loadingState').style.display = 'block';
-            document.getElementById('analisisContainer').innerHTML = '';
-            document.getElementById('ringkasanContainer').style.display = 'none';
-            document.getElementById('kesimpulanContainer').style.display = 'none';
-            document.getElementById('infoSiswa').style.display = 'none';
-            
-            const baseUrl = 'get_analisis_ai.php';
-            const params = new URLSearchParams();
-            params.append('id_siswa', idSiswa);
-            params.append('t', Date.now());
-            if (forceRefresh) params.append('refresh', '1');
-            const url = baseUrl + '?' + params.toString();
-            
-            fetch(url, {
-                method: 'GET',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                return res.json();
-            })
-            .then(data => {
-                console.log('Response:', data);
-                document.getElementById('loadingState').style.display = 'none';
-                
-                if (data.success) {
-                    // Info siswa
-                    if (data.data.siswa || data.data.kelas || data.data.tahun_ajaran) {
-                        let infoHtml = '';
-                        if (data.data.siswa) infoHtml += `<span>👤 ${data.data.siswa}</span>`;
-                        if (data.data.kelas) infoHtml += `<span>📚 Kelas: ${data.data.kelas}</span>`;
-                        if (data.data.tahun_ajaran) infoHtml += `<span>📅 Tahun Ajaran: ${data.data.tahun_ajaran}</span>`;
-                        if (data.data.rata_keseluruhan) infoHtml += `<span>⭐ Rata-rata: ${data.data.rata_keseluruhan}</span>`;
-                        document.getElementById('infoSiswa').innerHTML = infoHtml;
-                        document.getElementById('infoSiswa').style.display = 'flex';
-                    }
-                    
-                    // Ringkasan nilai
-                    if (data.data.data_analisis && data.data.data_analisis.length > 0) {
-                        let badgesHtml = '';
-                        let mapelTerendah = '';
-                        let nilaiTerendah = 100;
-                        data.data.data_analisis.forEach(mapel => {
-                            let nilaiAkhir = mapel.nilai_akhir || mapel.nilai_semester_2 || mapel.nilai_semester_1 || 0;
-                            let cls = nilaiAkhir < 75 ? 'lowest' : '';
-                            badgesHtml += `<span class="mapel-badge ${cls}">${mapel.nama_mapel}: ${nilaiAkhir}</span>`;
-                            if (nilaiAkhir < nilaiTerendah && nilaiAkhir > 0) {
-                                nilaiTerendah = nilaiAkhir;
-                                mapelTerendah = mapel.nama_mapel;
-                            }
-                        });
-                        document.getElementById('ringkasanBadges').innerHTML = badgesHtml;
-                        if (mapelTerendah) {
-                            document.getElementById('catatanRingkasan').innerHTML = `<span style="background:#fee2e2; padding:4px 12px; border-radius:20px;">⚠️ Perlu perhatian khusus: ${mapelTerendah} (${nilaiTerendah})</span>`;
-                        }
-                        document.getElementById('ringkasanContainer').style.display = 'block';
-                    }
-                    
-                    // Tampilkan AI response dengan parsing yang lebih baik
-                    if (data.data.ai_response) {
-                        let responseText = data.data.ai_response;
-                        let lines = responseText.split('\n');
-                        
-                        function isMapelTitle(line) {
-                            let trimmed = line.trim();
-                            if (trimmed.startsWith('###')) return true;
-                            if (trimmed === '---') return true;
-                            if (trimmed.match(/^\[[A-Z\s\/\.]+\]\s*:?/i)) return true;
-                            if (trimmed.match(/^[A-Z\s\/\.]+\s*:/i) && !trimmed.startsWith('#')) return true;
-                            return false;
-                        }
-                        
-                        function extractMapelName(line) {
-                            let trimmed = line.trim();
-                            let afterSharp = trimmed.replace(/^###\s*/, '');
-                            let match = afterSharp.match(/^\[?([A-Z\s\/\.]+)\]?\s*:?\s*/i);
-                            if (match) return match[1].trim();
-                            let colonMatch = afterSharp.match(/^([A-Z\s\/\.]+)\s*:/i);
-                            if (colonMatch) return colonMatch[1].trim();
-                            return afterSharp.split(' ')[0].trim();
-                        }
-                        
-                        let mapelItems = [];
-                        let currentMapel = null;
-                        let isInConclusion = false;
-                        let conclusionLines = [];
-                        
-                        for (let line of lines) {
-                            let trimmed = line.trim();
-                            if (trimmed === "") continue;
-                            
-                            let lowerLine = trimmed.toLowerCase();
-                            let isConclusionKeyword = lowerLine.includes('kesimpulan') || lowerLine.includes('rangkuman') || 
-                                                    lowerLine.includes('secara keseluruhan') || lowerLine.includes('guru sangat bangga');
-                            
-                            if (isInConclusion) {
-                                conclusionLines.push(trimmed);
-                                continue;
-                            }
-                            
-                            if (isConclusionKeyword && currentMapel !== null) {
-                                isInConclusion = true;
-                                conclusionLines.push(trimmed);
-                                continue;
-                            }
-                            
-                            if (isMapelTitle(line)) {
-                                if (currentMapel !== null && currentMapel.contentLines.length > 0) {
-                                    mapelItems.push({ name: currentMapel.name, content: currentMapel.contentLines.join(' ') });
-                                }
-                                let newName = extractMapelName(line);
-                                if (newName && !newName.match(/^-+$/)) {
-                                    currentMapel = { name: newName, contentLines: [] };
-                                } else {
-                                    currentMapel = null;
-                                }
-                                continue;
-                            }
-                            
-                            if (currentMapel !== null) {
-                                currentMapel.contentLines.push(trimmed);
-                            }
-                        }
-                        
-                        if (currentMapel !== null && currentMapel.contentLines.length > 0) {
-                            mapelItems.push({ name: currentMapel.name, content: currentMapel.contentLines.join(' ') });
-                        }
-                        
-                        let mapelHtml = '';
-                        if (mapelItems.length > 0) {
-                            for (let item of mapelItems) {
-                                let konten = item.content.trim() || 'Tidak ada analisis khusus untuk mata pelajaran ini.';
-                                mapelHtml += `
-                                    <div class="mapel-card">
-                                        <div class="mapel-header">
-                                            <span class="mapel-name">📖 ${item.name}</span>
-                                        </div>
-                                        <div class="analisis-section">
-                                            <div class="analisis-text">${konten.replace(/\n/g, '<br>')}</div>
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                        } else {
-                            mapelHtml = `<div class="analisis-text" style="background:#fefce8; padding:20px; border-radius:16px;">${responseText.replace(/\n/g, '<br>')}</div>`;
-                        }
-                        document.getElementById('analisisContainer').innerHTML = mapelHtml;
-                        
-                        if (conclusionLines.length > 0) {
-                            let kesimpulanText = conclusionLines.join(' ').replace(/\n/g, '<br>');
-                            document.getElementById('kesimpulanContainer').innerHTML = `
-                                <div class="kesimpulan-section">
-                                    <div class="kesimpulan-title">🎯 Kesimpulan & Motivasi</div>
-                                    <div class="kesimpulan-text">${kesimpulanText}</div>
-                                </div>
-                            `;
-                            document.getElementById('kesimpulanContainer').style.display = 'block';
-                        }
-                    } else {
-                        document.getElementById('analisisContainer').innerHTML = '<div class="error-box">❌ Belum ada catatan dari guru</div>';
-                    }
-                } else {
-                    document.getElementById('analisisContainer').innerHTML = `<div class="error-box">❌ ${data.message || 'Terjadi kesalahan'}</div>`;
+        document.getElementById('loadingState').style.display = 'block';
+
+        document.getElementById('analisisContainer').innerHTML = '';
+
+        document.getElementById('ringkasanContainer').style.display = 'none';
+
+        document.getElementById('kesimpulanContainer').style.display = 'none';
+
+        document.getElementById('infoSiswa').style.display = 'none';
+
+        const baseUrl = 'get_analisis_ai.php';
+
+        const params = new URLSearchParams();
+
+        params.append('id_siswa', idSiswa);
+
+        params.append('t', Date.now());
+
+        if (forceRefresh) params.append('refresh', '1');
+
+        const url = baseUrl + '?' + params.toString();
+
+        fetch(url, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+
+        .then(res => {
+
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+
+            return res.json();
+        })
+
+        .then(data => {
+
+            console.log('Response:', data);
+
+            document.getElementById('loadingState').style.display = 'none';
+
+            if (data.success) {
+
+                // INFO SISWA
+                if (data.data.siswa || data.data.kelas || data.data.tahun_ajaran) {
+
+                    let infoHtml = '';
+
+                    if (data.data.siswa)
+                        infoHtml += `<span>👤 ${data.data.siswa}</span>`;
+
+                    if (data.data.kelas)
+                        infoHtml += `<span>📚 Kelas: ${data.data.kelas}</span>`;
+
+                    if (data.data.tahun_ajaran)
+                        infoHtml += `<span>📅 Tahun Ajaran: ${data.data.tahun_ajaran}</span>`;
+
+                    if (data.data.rata_keseluruhan)
+                        infoHtml += `<span>⭐ Rata-rata: ${data.data.rata_keseluruhan}</span>`;
+
+                    document.getElementById('infoSiswa').innerHTML = infoHtml;
+
+                    document.getElementById('infoSiswa').style.display = 'flex';
                 }
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('analisisContainer').innerHTML = `<div class="error-box">❌ Gagal terhubung ke server. ${err.message}</div>`;
-            });
-        }
-        
-        document.getElementById('refreshBtn').addEventListener('click', () => loadAnalisis(true));
-        loadAnalisis();
-    </script>
+
+                // RINGKASAN
+                if (data.data.data_analisis &&
+                    data.data.data_analisis.length > 0) {
+
+                    let badgesHtml = '';
+
+                    let mapelTerendah = '';
+
+                    let nilaiTerendah = 100;
+
+                    data.data.data_analisis.forEach(mapel => {
+
+                        let nilaiAkhir =
+                            mapel.nilai_akhir ||
+                            mapel.nilai_semester_2 ||
+                            mapel.nilai_semester_1 ||
+                            0;
+
+                        let cls = nilaiAkhir < 75 ? 'lowest' : '';
+
+                        badgesHtml += `
+                            <span class="mapel-badge ${cls}">
+                                ${mapel.nama_mapel}: ${nilaiAkhir}
+                            </span>
+                        `;
+
+                        if (nilaiAkhir < nilaiTerendah && nilaiAkhir > 0) {
+                            nilaiTerendah = nilaiAkhir;
+                            mapelTerendah = mapel.nama_mapel;
+                        }
+                    });
+
+                    document.getElementById('ringkasanBadges').innerHTML = badgesHtml;
+
+                    if (mapelTerendah) {
+
+                        document.getElementById('catatanRingkasan').innerHTML = `
+                            <span style="background:#fee2e2;
+                                         padding:4px 12px;
+                                         border-radius:20px;">
+                                ⚠️ Perlu perhatian khusus:
+                                ${mapelTerendah} (${nilaiTerendah})
+                            </span>
+                        `;
+                    }
+
+                    document.getElementById('ringkasanContainer').style.display = 'block';
+                }
+
+                // AI RESPONSE
+                if (data.data.ai_response) {
+
+                    let responseText = data.data.ai_response;
+
+                    document.getElementById('analisisContainer').innerHTML = `
+                        <div class="analisis-text"
+                             style="background:#fefce8;
+                                    padding:20px;
+                                    border-radius:16px;">
+                            ${responseText.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+
+                } else {
+
+                    document.getElementById('analisisContainer').innerHTML =
+                        '<div class="error-box">❌ Belum ada catatan dari guru</div>';
+                }
+
+            } else {
+
+                document.getElementById('analisisContainer').innerHTML = `
+                    <div class="error-box">
+                        ❌ ${data.message || 'Terjadi kesalahan'}
+                    </div>
+                `;
+            }
+        })
+
+        .catch(err => {
+
+            console.error('Error:', err);
+
+            document.getElementById('loadingState').style.display = 'none';
+
+            document.getElementById('analisisContainer').innerHTML = `
+                <div class="error-box">
+                    ❌ Gagal terhubung ke server.
+                    ${err.message}
+                </div>
+            `;
+        });
+    }
+
+    document.getElementById('refreshBtn')
+        .addEventListener('click', () => loadAnalisis(true));
+
+    loadAnalisis();
+
+</script>
+
 </body>
 </html>
