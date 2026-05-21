@@ -92,7 +92,6 @@
                   <th>Status</th>
                 </tr>
               </thead>
-
               <tbody id="jadwalTableBody">
                 <tr>
                   <td colspan="4" class="empty-state">Memuat jadwal...</td>
@@ -100,8 +99,25 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Pagination Container -->
+          <div class="pagination-container" id="paginationContainer" style="display: none;">
+            <div class="pagination-info" id="paginationInfo">
+              Menampilkan 1-5 dari 10 data
+            </div>
+            <div class="pagination-controls">
+              <button class="pagination-btn" id="prevPageBtn" disabled>
+                <i class="fas fa-chevron-left"></i>
+                <span>Sebelumnya</span>
+              </button>
+              <div class="page-numbers" id="pageNumbers"></div>
+              <button class="pagination-btn" id="nextPageBtn">
+                <span>Selanjutnya</span>
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
         </section>
-      </section>
     </main>
 
   </div>
