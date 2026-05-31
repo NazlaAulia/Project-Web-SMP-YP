@@ -39,10 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const roleId = localStorage.getItem("role_id");
     const username = localStorage.getItem("username");
 
-    if (roleId !== "1") {
-        window.location.replace("login.html");
-        return;
-    }
+  if (roleId !== "1") {
+    window.location.replace("/login.html");
+    return;
+}
 
     tampilkanAdmin(username || "Admin");
     loadDashboardStats();
