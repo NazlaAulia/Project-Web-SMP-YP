@@ -1,3 +1,6 @@
+// ========== TAMBAHAN: Variabel global untuk data nilai per mapel ==========
+let nilaiPerMapelGlobal = [];
+
 window.addEventListener("load", async () => {
   isiHeaderDariLocalStorage();
   aktifkanFilterAnimasi();
@@ -25,6 +28,7 @@ async function loadDataNilai() {
     const semester = document.getElementById("semester").value;
     const idSiswa = localStorage.getItem("id_siswa") || "";
 
+    // --- AMBIL DATA RINGKASAN (TIDAK BERUBAH) ---
     const response = await fetch(
       `get_nilai.php?id_siswa=${encodeURIComponent(idSiswa)}&kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}`,
       {
@@ -51,9 +55,26 @@ async function loadDataNilai() {
     if (result.siswa && result.siswa.nama) {
       localStorage.setItem("nama_siswa", result.siswa.nama);
     }
-
     if (result.siswa && result.siswa.kelas) {
       localStorage.setItem("kelas_siswa", result.siswa.kelas);
+    }
+
+    // ========== TAMBAHAN: Ambil data nilai per mapel dari database ==========
+    const responseMapel = await fetch(
+      `get_nilai_per_mapel.php?id_siswa=${encodeURIComponent(idSiswa)}&semester=${encodeURIComponent(semester)}`,
+      { method: "GET", credentials: "same-origin" }
+    );
+    const dataMapel = await responseMapel.json();
+
+    if (dataMapel.success && dataMapel.data) {
+      nilaiPerMapelGlobal = dataMapel.data;
+      console.log("Nilai per mapel dari DB:", nilaiPerMapelGlobal);
+      localStorage.setItem("nilai_per_mapel", JSON.stringify(nilaiPerMapelGlobal));
+    } else {
+      console.warn("Gagal ambil nilai per mapel:", dataMapel.message);
+      const cached = localStorage.getItem("nilai_per_mapel");
+      if (cached) nilaiPerMapelGlobal = JSON.parse(cached);
+      else nilaiPerMapelGlobal = [];
     }
 
     jalankanCounter();
@@ -207,6 +228,7 @@ function aktifkanFilterAnimasi() {
   });
 }
 
+// ========== FUNGSI EXPORT ANIMASI YANG ASLI (TIDAK DIUBAH) ==========
 function aktifkanExportAnimasi() {
   const exportBtn = document.getElementById("exportBtn");
 
@@ -219,26 +241,11 @@ function aktifkanExportAnimasi() {
       exportBtn.classList.remove("pulse-click");
     }, 350);
 
-    await exportNilaiPdf();
+    await exportNilaiPdfFinal(); // <-- PASTIKAN MEMANGGIL exportNilaiPdfFinal
   });
 }
 
-function aktifkanExportAnimasi() {
-  const exportBtn = document.getElementById("exportBtn");
-
-  if (!exportBtn) return;
-
-  exportBtn.addEventListener("click", async () => {
-    exportBtn.classList.add("pulse-click");
-
-    setTimeout(() => {
-      exportBtn.classList.remove("pulse-click");
-    }, 350);
-
-    await exportNilaiPdfFinal();
-  });
-}
-
+// ========== FUNGSI EXPORT YANG SUDAH DIMODIFIKASI PAKAI DATA DARI DATABASE ==========
 async function exportNilaiPdfFinal() {
   try {
     if (!window.jspdf || !window.jspdf.jsPDF) {
@@ -249,6 +256,18 @@ async function exportNilaiPdfFinal() {
     if (!window.jspdf.jsPDF.API.autoTable) {
       alert("jspdf-autotable belum kebaca. Pastikan script autotable ada sebelum nilai.js.");
       return;
+    }
+
+    // Pastikan data nilai per mapel tersedia
+    if (!nilaiPerMapelGlobal || nilaiPerMapelGlobal.length === 0) {
+      const cached = localStorage.getItem("nilai_per_mapel");
+      if (cached) {
+        nilaiPerMapelGlobal = JSON.parse(cached);
+      }
+      if (!nilaiPerMapelGlobal.length) {
+        alert("Data nilai per mapel belum tersedia. Silakan refresh halaman.");
+        return;
+      }
     }
 
     const { jsPDF } = window.jspdf;
@@ -264,7 +283,12 @@ async function exportNilaiPdfFinal() {
     const kepalaSekolah = getNamaKepalaSekolahFinal();
     const waliKelas = getNamaWaliKelasFinal(kelas);
 
-    const dataMapel = ambilNilaiPerMapelDariHalamanFinal();
+    // === Data mapel dari database (bukan dari rata-rata) ===
+    const dataMapel = nilaiPerMapelGlobal.map((item, idx) => {
+      const nilai = item.nilai;
+      const keterangan = nilai >= 75 ? "Tuntas" : "Belum Tuntas";
+      return [idx + 1, item.mapel, nilai, keterangan];
+    });
 
     let logoData = null;
 
@@ -427,31 +451,29 @@ async function exportNilaiPdfFinal() {
     doc.rect(16, afterTableY + 3, 178, 16);
     doc.text("Pertahankan semangat belajar dan terus tingkatkan prestasi.", 18, afterTableY + 10);
 
-// =========================
-// TANDA TANGAN BAWAH
-// =========================
-let ttdY = afterTableY + 24;
+    // =========================
+    // TANDA TANGAN BAWAH
+    // =========================
+    let ttdY = afterTableY + 24;
 
-// Biar tanda tangan tidak nabrak border bawah
-if (ttdY + 50 > pageHeight - 16) {
-  ttdY = pageHeight - 72;
-}
+    if (ttdY + 50 > pageHeight - 16) {
+      ttdY = pageHeight - 72;
+    }
 
-doc.setFont("times", "normal");
-doc.setFontSize(11);
+    doc.setFont("times", "normal");
+    doc.setFontSize(11);
 
-doc.text("Mengetahui,", 16, ttdY);
-doc.text("Kepala Sekolah", 16, ttdY + 9);
+    doc.text("Mengetahui,", 16, ttdY);
+    doc.text("Kepala Sekolah", 16, ttdY + 9);
 
-doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
-doc.text("Wali Kelas", 124, ttdY + 9);
+    doc.text(`Surabaya, ${formatTanggalIndonesiaFinal(new Date())}`, 124, ttdY);
+    doc.text("Wali Kelas", 124, ttdY + 9);
 
-doc.setFont("times", "bold");
-doc.setFontSize(11);
+    doc.setFont("times", "bold");
+    doc.setFontSize(11);
 
-// Nama dibuat lebih naik, jadi rapi dan tidak kepotong
-doc.text(`( ${kepalaSekolah} )`, 16, ttdY + 43);
-doc.text(`( ${waliKelas} )`, 124, ttdY + 43);
+    doc.text(`( ${kepalaSekolah} )`, 16, ttdY + 43);
+    doc.text(`( ${waliKelas} )`, 124, ttdY + 43);
 
     const namaFile = `Nilai_Akhir_Semester_${nama.replace(/\s+/g, "_")}.pdf`;
 
@@ -463,6 +485,7 @@ doc.text(`( ${waliKelas} )`, 124, ttdY + 43);
   }
 }
 
+// ========== FUNGSI LAMA (TETAP DI PERTAHANKAN, TAPI TIDAK DIPAKAI) ==========
 function ambilNilaiPerMapelDariHalamanFinal() {
   const rataRata = parseFloat(
     document.getElementById("rataRataCounter")?.dataset.target ||
@@ -528,8 +551,6 @@ function getNamaKepalaSekolahFinal() {
 function getNamaWaliKelasFinal(kelas) {
   const kelasBersih = String(kelas || "").trim().toUpperCase();
 
-  // Data wali kelas dari database:
-  // kelas.id_wali_kelas -> guru.id_guru
   const daftarWali = {
     "7A": "Osa Noraise, S.Pd",
     "7B": "Nindy Putri Oktaviara, S.Pd",
